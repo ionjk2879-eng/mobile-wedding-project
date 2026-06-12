@@ -47,14 +47,16 @@ const App: React.FC = () => {
       </div>
 
       <div className="preview-panel">
-        <div className="phone-frame">
-          <div className="phone-content">
-            <Hero data={data} />
-            <Greeting data={data} />
-            <Gallery data={data} />
-            <Location data={data} />
-            <Money data={data} />
-            <Share data={data} />
+        <div className="phone-container">
+          <div className="phone-frame">
+            <div className="phone-content">
+              <Hero data={data} />
+              <Greeting data={data} />
+              <Gallery data={data} />
+              <Location data={data} />
+              <Money data={data} />
+              <Share data={data} />
+            </div>
           </div>
         </div>
       </div>
@@ -62,77 +64,126 @@ const App: React.FC = () => {
       <style>{`
         .builder-layout {
           display: grid;
-          grid-template-columns: 400px 1fr;
+          grid-template-columns: 450px 1fr;
           height: 100vh;
           width: 100vw;
           overflow: hidden;
           background: #f0f2f5;
+          font-family: 'Pretendard', sans-serif;
         }
         .editor-panel {
           display: flex;
           flex-direction: column;
-          height: 100%;
+          height: 100vh;
           background: white;
           z-index: 10;
-          box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+          box-shadow: 2px 0 15px rgba(0,0,0,0.08);
+          overflow: hidden;
         }
         .builder-header {
-          padding: 20px;
+          padding: 24px;
           border-bottom: 1px solid #eee;
+          background: #fff;
         }
         .builder-header h1 {
-          font-size: 1.4rem;
+          font-size: 1.5rem;
           margin: 0;
           color: #333;
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
         .builder-header p {
-          font-size: 0.8rem;
+          font-size: 0.85rem;
           color: #888;
-          margin: 5px 0 0 0;
+          margin: 8px 0 0 0;
+          line-height: 1.4;
+        }
+        .editor-scroll-area {
+          flex: 1;
+          overflow-y: auto;
+          padding: 10px 0;
+          background: #f8f9fa;
         }
         .preview-panel {
           flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 40px;
-          overflow-y: auto;
+          padding: 20px;
+          overflow: hidden;
+          background: #e2e8f0;
+          position: relative;
+        }
+        .phone-container {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: scale(0.9); /* Default scale for safety */
+        }
+        @media (min-height: 900px) {
+          .phone-container {
+            transform: scale(1);
+          }
+        }
+        @media (max-height: 750px) {
+          .phone-container {
+            transform: scale(0.75);
+          }
         }
         .phone-frame {
           width: 375px;
           height: 812px;
           background: white;
-          border: 12px solid #333;
-          border-radius: 40px;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+          border: 12px solid #1a1a1a;
+          border-radius: 45px;
+          box-shadow: 0 30px 60px rgba(0,0,0,0.3);
           overflow: hidden;
           position: relative;
+          display: flex;
+          flex-direction: column;
+        }
+        /* Top Notch */
+        .phone-frame::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 150px;
+          height: 25px;
+          background: #1a1a1a;
+          border-bottom-left-radius: 15px;
+          border-bottom-right-radius: 15px;
+          z-index: 100;
         }
         .phone-content {
+          flex: 1;
           width: 100%;
-          height: 100%;
           overflow-y: auto;
+          background: #fff;
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
         .phone-content::-webkit-scrollbar {
           display: none;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
           .builder-layout {
             grid-template-columns: 1fr;
             overflow-y: auto;
           }
           .editor-panel {
             height: auto;
+            max-height: none;
           }
           .preview-panel {
-            padding: 20px;
+            height: 900px;
+            padding: 40px 0;
           }
-          .phone-frame {
-            width: 100%;
-            max-width: 375px;
-            height: 667px;
+          .phone-container {
+            transform: scale(1) !important;
           }
         }
       `}</style>
