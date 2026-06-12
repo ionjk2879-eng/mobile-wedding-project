@@ -8,7 +8,7 @@ interface PreviewProps {
 
 const Greeting: React.FC<PreviewProps> = ({ data }) => {
   return (
-    <section className="greeting section">
+    <section className="greeting section" style={{ fontFamily: data.fontFamily }}>
       <div className="greeting-text">
         <h2>{data.greetingTitle}</h2>
         <p style={{ whiteSpace: 'pre-wrap' }}>

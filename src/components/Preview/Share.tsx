@@ -17,7 +17,17 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
   };
 
   return (
-    <section className="share section">
+    <section className="share section" style={{ fontFamily: data.fontFamily }}>
+      {data.bgMusicUrl && (
+        <div className="music-player">
+          <p className="music-label">🎵 배경음악 재생 중</p>
+          <audio controls loop autoPlay className="styled-audio">
+            <source src={data.bgMusicUrl} type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      )}
+
       <div className="share-buttons">
         <button className="share-btn kakao" onClick={handleKakaoShare}>
           <Share2 size={20} />
@@ -67,6 +77,21 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
           margin-top: 40px;
           font-size: 0.75rem;
           color: #bbb;
+        }
+        .music-player {
+          margin-bottom: 30px;
+          padding: 15px;
+          background: #f9f9f9;
+          border-radius: 12px;
+        }
+        .music-label {
+          font-size: 0.8rem;
+          color: #666;
+          margin-bottom: 10px;
+        }
+        .styled-audio {
+          width: 100%;
+          height: 35px;
         }
       `}</style>
     </section>

@@ -24,9 +24,47 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
     onChange({ ...data, accounts: newAccounts });
   };
 
+  const fonts = [
+    { name: '기본 (Pretendard)', value: "'Pretendard', sans-serif" },
+    { name: '고운 바탕 (세리프)', value: "'Gowun Batang', serif" },
+    { name: '고운 돋움 (산세리프)', value: "'Gowun Dodum', sans-serif" },
+    { name: '나눔 명조 (클래식)', value: "'Nanum Myeongjo', serif" },
+    { name: 'Dancing Script (영문 필기체)', value: "'Dancing Script', cursive" },
+  ];
+
   return (
     <div className="editor-scroll-area">
       <div className="editor-content-wrapper">
+        <div className="editor-section">
+          <h3>디자인 설정</h3>
+          <div className="input-group">
+            <label>폰트 선택</label>
+            <select 
+              name="fontFamily" 
+              value={data.fontFamily} 
+              onChange={(e) => onChange({ ...data, fontFamily: e.target.value })}
+              className="styled-select"
+            >
+              {fonts.map(font => (
+                <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                  {font.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="input-group">
+            <label>배경음악 URL (MP3)</label>
+            <input 
+              type="text" 
+              name="bgMusicUrl" 
+              value={data.bgMusicUrl} 
+              onChange={handleChange} 
+              placeholder="https://example.com/music.mp3"
+            />
+            <p className="input-hint">MP3 링크를 입력하면 청첩장에서 재생됩니다.</p>
+          </div>
+        </div>
+
         <div className="editor-section">
           <h3>기본 정보</h3>
           <div className="input-group">
@@ -183,6 +221,21 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         .input-group input:focus, .input-group textarea:focus {
           outline: none;
           border-color: #ff9a9e;
+        }
+        .styled-select {
+          width: 100%;
+          padding: 12px;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 10px;
+          font-size: 0.95rem;
+          background: white;
+          cursor: pointer;
+        }
+        .input-hint {
+          font-size: 0.75rem;
+          color: #888;
+          margin-top: 5px;
+          margin-bottom: 0;
         }
         .nested-grid {
           display: flex;

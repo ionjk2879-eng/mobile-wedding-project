@@ -8,7 +8,7 @@ interface PreviewProps {
 
 const Hero: React.FC<PreviewProps> = ({ data }) => {
   return (
-    <section className="hero">
+    <section className="hero" style={{ fontFamily: data.fontFamily }}>
       <motion.div 
         key={`${data.groomName}-${data.brideName}`}
         initial={{ opacity: 0, y: 20 }}

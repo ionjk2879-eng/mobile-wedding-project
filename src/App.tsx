@@ -34,10 +34,13 @@ const App: React.FC = () => {
       '/src/assets/hero.png',
       '/src/assets/hero.png',
     ],
+    fontFamily: "'Pretendard', sans-serif",
+    bgMusicUrl: '',
   });
 
   return (
     <div className="builder-layout">
+      <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
       <div className="editor-panel">
         <header className="builder-header">
           <h1>💍 Invitation Builder</h1>
