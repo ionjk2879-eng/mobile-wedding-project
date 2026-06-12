@@ -36,6 +36,8 @@ const App: React.FC = () => {
     ],
     fontFamily: "'Pretendard', sans-serif",
     bgMusicUrl: '',
+    groomMessage: '항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다.',
+    brideMessage: '서로 아끼고 배려하며 예쁘게 잘 살겠습니다.',
   });
 
   return (
@@ -86,7 +88,7 @@ const App: React.FC = () => {
           display: flex;
           flex-direction: column;
           height: 100vh;
-          background: white;
+          background: #fcfaf5; /* Ivory / Light Champagne background for Editor */
           z-index: 10;
           box-shadow: 10px 0 30px rgba(74, 69, 67, 0.05);
           overflow: hidden;
@@ -94,7 +96,7 @@ const App: React.FC = () => {
         .builder-header {
           padding: 30px 24px;
           border-bottom: 1px solid #f0eae5;
-          background: #fff;
+          background: #fcfaf5;
           flex-shrink: 0;
         }
         .builder-header h1 {

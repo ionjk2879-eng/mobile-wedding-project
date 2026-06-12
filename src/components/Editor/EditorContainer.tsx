@@ -211,13 +211,25 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
             ))}
           </div>
         </div>
+
+        <div className="editor-section">
+          <h3>신랑 & 신부의 한마디</h3>
+          <div className="input-group">
+            <label>신랑의 한마디</label>
+            <textarea name="groomMessage" value={data.groomMessage} onChange={handleChange} rows={3} placeholder="신랑의 개인적인 메시지를 입력하세요" />
+          </div>
+          <div className="input-group">
+            <label>신부의 한마디</label>
+            <textarea name="brideMessage" value={data.brideMessage} onChange={handleChange} rows={3} placeholder="신부의 개인적인 메시지를 입력하세요" />
+          </div>
+        </div>
       </div>
 
       <style>{`
         .editor-scroll-area {
           flex: 1;
           overflow-y: auto;
-          background: #fdfbf9;
+          background: #fcfaf5;
         }
         .editor-content-wrapper {
           padding: 30px 24px;

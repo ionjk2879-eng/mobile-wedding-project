@@ -16,7 +16,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
   };
 
   return (
-    <section className="money section">
+    <section className="money section" style={{ fontFamily: data.fontFamily }}>
       <h2>마음 전하실 곳</h2>
       <p className="money-desc">
         축하의 마음을 담아 축의금을 전달하실 수 있습니다.
@@ -44,6 +44,17 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
         ))}
       </div>
 
+      <div className="personal-messages">
+        <div className="message-box groom">
+          <span className="message-role">Groom's Message</span>
+          <p>{data.groomMessage}</p>
+        </div>
+        <div className="message-box bride">
+          <span className="message-role">Bride's Message</span>
+          <p>{data.brideMessage}</p>
+        </div>
+      </div>
+
       <style>{`
         .money-desc {
           font-size: 0.9rem;
@@ -54,29 +65,32 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           display: flex;
           flex-direction: column;
           gap: 15px;
+          margin-bottom: 50px;
         }
         .account-item {
-          background: #f9f9f9;
+          background: #fdfbf9;
           padding: 20px;
           border-radius: 12px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           text-align: left;
+          border: 1px solid #f0eae5;
         }
         .side-label {
           font-size: 0.75rem;
-          color: #999;
+          color: #b89c8e;
           display: block;
           margin-bottom: 5px;
         }
         .bank-details strong {
           font-size: 1rem;
           margin-right: 10px;
+          color: #4a4543;
         }
         .bank-details span {
           font-size: 0.9rem;
-          color: #555;
+          color: #8c8581;
         }
         .owner {
           margin-left: 10px;
@@ -87,16 +101,45 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           gap: 5px;
           padding: 8px 12px;
           background: #fff;
-          border: 1px solid #eee;
+          border: 1px solid #f0eae5;
           border-radius: 20px;
           font-size: 0.8rem;
-          color: #666;
+          color: #b89c8e;
           transition: all 0.2s;
         }
         .copy-btn.copied {
-          background: #f0fff0;
-          border-color: #90ee90;
-          color: #2e8b57;
+          background: #fdfbf9;
+          border-color: #b89c8e;
+          color: #b89c8e;
+        }
+        .personal-messages {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          padding-top: 30px;
+          border-top: 1px solid #f0eae5;
+        }
+        .message-box {
+          text-align: center;
+          padding: 25px;
+          background: #fff;
+          border-radius: 20px;
+          border: 1px solid #f0eae5;
+          position: relative;
+        }
+        .message-role {
+          font-size: 0.7rem;
+          letter-spacing: 2px;
+          color: #b89c8e;
+          text-transform: uppercase;
+          margin-bottom: 12px;
+          display: block;
+        }
+        .message-box p {
+          font-size: 0.95rem;
+          line-height: 1.6;
+          color: #4a4543;
+          font-style: italic;
         }
       `}</style>
     </section>

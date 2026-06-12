@@ -25,4 +25,6 @@ export interface InvitationData {
   photos: string[];
   fontFamily: string;
   bgMusicUrl: string;
+  groomMessage: string;
+  brideMessage: string;
 }
