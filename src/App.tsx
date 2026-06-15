@@ -13,6 +13,7 @@ import { InvitationData } from './types';
 
 const App: React.FC = () => {
   const [showDashboard, setShowDashboard] = useState(false);
+  const [isFullPreview, setIsFullPreview] = useState(false);
   const [data, setData] = useState<InvitationData>({
     groomName: '김지현',
     brideName: '이민지',
@@ -46,6 +47,85 @@ const App: React.FC = () => {
     theme: 'warm',
   });
 
+  if (isFullPreview) {
+    return (
+      <div className="full-preview-container" style={{ fontFamily: data.fontFamily }}>
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
+        
+        {/* Floating Return to Editor Button */}
+        <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>
+          🛠️ 편집기로 돌아가기
+        </button>
+
+        <div className={`invitation-page theme-${data.theme || 'warm'}`}>
+          <Hero data={data} />
+          <Greeting data={data} />
+          <PersonalMessage data={data} />
+          <Gallery data={data} />
+          <Location data={data} />
+          <RSVPForm data={data} />
+          <Money data={data} />
+          <Share data={data} />
+        </div>
+
+        <style>{`
+          .full-preview-container {
+            width: 100vw;
+            min-height: 100vh;
+            background: #FAF5F7;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            padding: 0;
+            margin: 0;
+          }
+          .invitation-page {
+            width: 100%;
+            max-width: 480px;
+            background: var(--wedding-bg);
+            box-shadow: 0 0 40px rgba(212, 165, 198, 0.15);
+            min-height: 100vh;
+            border-left: 1px solid var(--wedding-border);
+            border-right: 1px solid var(--wedding-border);
+          }
+          .back-to-editor-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #B3A2C8;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(179, 162, 200, 0.4);
+            z-index: 9999;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+          }
+          .back-to-editor-btn:hover {
+            background: #D4A5C6;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(212, 165, 198, 0.5);
+          }
+          @media (max-width: 480px) {
+            .invitation-page {
+              border-left: none;
+              border-right: none;
+            }
+            .back-to-editor-btn {
+              top: auto;
+              bottom: 20px;
+              right: 20px;
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <div className="builder-layout">
       {showDashboard && <Dashboard onClose={() => setShowDashboard(false)} />}
@@ -54,7 +134,10 @@ const App: React.FC = () => {
         <header className="builder-header">
           <div className="header-main">
             <h1>💍 Invitation Builder</h1>
-            <button className="admin-btn" onClick={() => setShowDashboard(true)}>📊 응답 분석</button>
+            <div className="header-buttons">
+              <button className="preview-toggle-btn" onClick={() => setIsFullPreview(true)}>👁️ 전체화면 보기</button>
+              <button className="admin-btn" onClick={() => setShowDashboard(true)}>📊 응답 분석</button>
+            </div>
           </div>
           <p>내용을 입력하면 오른쪽에서 실시간으로 확인할 수 있습니다.</p>
         </header>
@@ -116,6 +199,27 @@ const App: React.FC = () => {
           justify-content: space-between;
           align-items: center;
         }
+        .header-buttons {
+          display: flex;
+          gap: 8px;
+        }
+        .preview-toggle-btn {
+          background: transparent;
+          border: 1px solid #B3A2C8;
+          color: #B3A2C8;
+          padding: 8px 14px;
+          border-radius: 10px;
+          font-size: 0.85rem;
+          font-weight: 700;
+          transition: all 0.2s;
+          cursor: pointer;
+        }
+        .preview-toggle-btn:hover {
+          background: #FAF5F7;
+          border-color: #D4A5C6;
+          color: #D4A5C6;
+          transform: translateY(-1px);
+        }
         .admin-btn {
           background: #B3A2C8;
           color: white;
@@ -124,6 +228,8 @@ const App: React.FC = () => {
           font-size: 0.85rem;
           font-weight: 700;
           transition: all 0.2s;
+          cursor: pointer;
+          border: none;
         }
         .admin-btn:hover {
           background: #D4A5C6;
