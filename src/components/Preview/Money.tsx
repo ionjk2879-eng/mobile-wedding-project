@@ -58,7 +58,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
       <style>{`
         .money-desc {
           font-size: 0.9rem;
-          color: #888;
+          color: var(--wedding-text-sub);
           margin-bottom: 30px;
         }
         .account-list {
@@ -68,29 +68,29 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           margin-bottom: 50px;
         }
         .account-item {
-          background: #fdfbf9;
+          background: var(--wedding-card-bg);
           padding: 20px;
           border-radius: 12px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           text-align: left;
-          border: 1px solid #f0eae5;
+          border: 1px solid var(--wedding-border);
         }
         .side-label {
           font-size: 0.75rem;
-          color: #b89c8e;
+          color: var(--wedding-main);
           display: block;
           margin-bottom: 5px;
         }
         .bank-details strong {
           font-size: 1rem;
           margin-right: 10px;
-          color: #4a4543;
+          color: var(--wedding-text-main);
         }
         .bank-details span {
           font-size: 0.9rem;
-          color: #8c8581;
+          color: var(--wedding-text-body);
         }
         .owner {
           margin-left: 10px;
@@ -100,37 +100,37 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           align-items: center;
           gap: 5px;
           padding: 8px 12px;
-          background: #fff;
-          border: 1px solid #f0eae5;
+          background: var(--wedding-bg);
+          border: 1px solid var(--wedding-border);
           border-radius: 20px;
           font-size: 0.8rem;
-          color: #b89c8e;
+          color: var(--wedding-main);
           transition: all 0.2s;
         }
         .copy-btn.copied {
-          background: #fdfbf9;
-          border-color: #b89c8e;
-          color: #b89c8e;
+          background: var(--wedding-card-bg);
+          border-color: var(--wedding-main);
+          color: var(--wedding-main);
         }
         .personal-messages {
           display: flex;
           flex-direction: column;
           gap: 20px;
           padding-top: 30px;
-          border-top: 1px solid #f0eae5;
+          border-top: 1px solid var(--wedding-border);
         }
         .message-box {
           text-align: center;
           padding: 25px;
-          background: #fff;
+          background: var(--wedding-card-bg);
           border-radius: 20px;
-          border: 1px solid #f0eae5;
+          border: 1px solid var(--wedding-border);
           position: relative;
         }
         .message-role {
           font-size: 0.7rem;
           letter-spacing: 2px;
-          color: #b89c8e;
+          color: var(--wedding-main);
           text-transform: uppercase;
           margin-bottom: 12px;
           display: block;
@@ -138,7 +138,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
         .message-box p {
           font-size: 0.95rem;
           line-height: 1.6;
-          color: #4a4543;
+          color: var(--wedding-text-body);
           font-style: italic;
         }
       `}</style>

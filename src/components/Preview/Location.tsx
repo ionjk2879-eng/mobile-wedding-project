@@ -38,25 +38,38 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
       <style>{`
         .location-info {
           margin-bottom: 20px;
+          background: var(--wedding-card-bg);
+          border-left: 3px solid var(--wedding-main);
+          border-radius: 0 16px 16px 0;
+          padding: 18px 20px;
+          text-align: left;
+          border-top: 1px solid var(--wedding-border);
+          border-right: 1px solid var(--wedding-border);
+          border-bottom: 1px solid var(--wedding-border);
         }
         .venue-name {
-          font-size: 1.1rem;
-          margin-bottom: 5px;
+          font-size: 1.15rem;
+          color: var(--wedding-text-main);
+          font-weight: 600;
+          margin-bottom: 6px;
         }
         .address {
-          color: #888;
+          color: var(--wedding-text-body);
           font-size: 0.9rem;
+          margin: 0;
         }
         .map-placeholder {
           width: 100%;
           height: 200px;
-          background: #f5f5f5;
+          background: var(--wedding-card-bg);
+          border: 1px dashed var(--wedding-border);
+          border-radius: 16px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           margin-bottom: 20px;
-          color: #aaa;
+          color: var(--wedding-text-sub);
           font-size: 0.8rem;
           gap: 10px;
         }
@@ -67,14 +80,20 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
           margin-bottom: 30px;
         }
         .nav-item {
-          padding: 10px;
-          border: 1px solid #eee;
-          border-radius: 8px;
+          padding: 12px 10px;
+          border: 1px solid var(--wedding-border);
+          background: var(--wedding-card-bg);
+          color: var(--wedding-text-body);
+          border-radius: 12px;
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 5px;
           font-size: 0.8rem;
+          transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+          background: var(--wedding-border);
         }
       `}</style>
     </section>

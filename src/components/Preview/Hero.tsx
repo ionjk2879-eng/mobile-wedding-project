@@ -30,26 +30,31 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         .hero {
           padding: 60px 20px;
           text-align: center;
-          background-color: #fff;
+          background-color: var(--wedding-bg);
+          transition: background-color 0.4s ease;
         }
         .wedding-label {
           font-size: 0.8rem;
           letter-spacing: 3px;
-          color: #888;
+          color: var(--wedding-main);
           margin-bottom: 20px;
         }
         .names {
-          font-size: 2.5rem;
+          font-size: 3.8rem;
           font-weight: 300;
           margin-bottom: 30px;
-          color: #333;
+          color: var(--wedding-text-main);
+          letter-spacing: 0.1em;
+          line-height: 1.2;
+          word-break: keep-all;
         }
         .main-image-container {
           width: 100%;
           margin-bottom: 30px;
           border-radius: 200px 200px 0 0;
           overflow: hidden;
-          background: #f5f5f5;
+          background: var(--wedding-card-bg);
+          border: 1px solid var(--wedding-border);
         }
         .main-image {
           width: 100%;
@@ -57,7 +62,7 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         }
         .wedding-info {
           font-size: 1.1rem;
-          color: #555;
+          color: var(--wedding-text-body);
         }
         .date {
           font-weight: 500;
@@ -65,7 +70,7 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         }
         .venue {
           font-size: 0.9rem;
-          color: #888;
+          color: var(--wedding-text-sub);
         }
       `}</style>
     </section>

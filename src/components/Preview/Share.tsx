@@ -45,8 +45,9 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
 
       <style>{`
         .share {
-          background: #fff;
+          background-color: var(--wedding-bg);
           padding-bottom: 40px;
+          transition: background-color 0.4s ease;
         }
         .share-buttons {
           display: flex;
@@ -57,36 +58,43 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
         .share-btn {
           width: 100%;
           padding: 15px;
-          border-radius: 8px;
+          border-radius: 30px;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 10px;
           font-weight: 500;
           font-size: 0.95rem;
+          transition: all 0.2s ease;
+        }
+        .share-btn:hover {
+          filter: brightness(0.9);
+          transform: translateY(-1px);
         }
         .kakao {
           background: #fee500;
           color: #3c1e1e;
         }
         .link {
-          background: #f0f0f0;
-          color: #333;
+          background: transparent;
+          border: 1px solid var(--wedding-main);
+          color: var(--wedding-main);
         }
         .footer {
           margin-top: 40px;
           font-size: 0.75rem;
-          color: #bbb;
+          color: var(--wedding-text-sub);
         }
         .music-player {
           margin-bottom: 30px;
           padding: 15px;
-          background: #f9f9f9;
+          background: var(--wedding-card-bg);
+          border: 1px solid var(--wedding-border);
           border-radius: 12px;
         }
         .music-label {
           font-size: 0.8rem;
-          color: #666;
+          color: var(--wedding-text-body);
           margin-bottom: 10px;
         }
         .styled-audio {

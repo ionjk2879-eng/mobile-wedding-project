@@ -25,7 +25,8 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
         .photo-item {
           aspect-ratio: 1 / 1;
           overflow: hidden;
-          background: #eee;
+          background: var(--wedding-border);
+          border-radius: 8px;
         }
         .photo-item img {
           width: 100%;

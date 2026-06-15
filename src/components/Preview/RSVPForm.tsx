@@ -39,17 +39,17 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         <style>{`
           .success-message {
             padding: 40px 20px;
-            background: #fff;
+            background: var(--wedding-card-bg);
             border-radius: 24px;
-            border: 1px solid #f0eae5;
+            border: 1px solid var(--wedding-border);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
           }
-          .success-message h3 { color: #b89c8e; margin: 0; }
-          .success-message p { color: #8c8581; margin: 0; }
-          .reset-btn { margin-top: 10px; font-size: 0.8rem; color: #aaa; text-decoration: underline; }
+          .success-message h3 { color: var(--wedding-main); margin: 0; }
+          .success-message p { color: var(--wedding-text-sub); margin: 0; }
+          .reset-btn { margin-top: 10px; font-size: 0.8rem; color: var(--wedding-text-sub); text-decoration: underline; }
         `}</style>
       </div>
     );
@@ -134,21 +134,22 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
       <style>{`
         .rsvp-section {
-          background-color: #f7f3f0;
+          background-color: var(--wedding-bg);
+          transition: background-color 0.4s ease;
         }
         .rsvp-header h2 { margin-bottom: 15px; }
         .rsvp-header p { 
           font-size: 0.9rem; 
-          color: #8c8581; 
+          color: var(--wedding-text-sub); 
           line-height: 1.6;
           margin-bottom: 40px;
         }
         .rsvp-form {
-          background: #fff;
+          background: var(--wedding-card-bg);
           padding: 30px 20px;
           border-radius: 28px;
-          border: 1px solid #f0eae5;
-          box-shadow: 0 10px 40px rgba(184, 156, 142, 0.1);
+          border: 1px solid var(--wedding-border);
+          box-shadow: 0 10px 40px rgba(74, 69, 67, 0.05);
           text-align: left;
         }
         .form-group { margin-bottom: 20px; }
@@ -160,12 +161,12 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           gap: 6px;
           font-size: 0.75rem;
           font-weight: 600;
-          color: #b89c8e;
+          color: var(--wedding-main);
           margin-bottom: 8px;
         }
         .tab-group {
           display: flex;
-          background: #f7f3f0;
+          background: var(--wedding-bg);
           padding: 4px;
           border-radius: 12px;
         }
@@ -174,41 +175,45 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           padding: 10px;
           border-radius: 8px;
           font-size: 0.85rem;
-          color: #8c8581;
+          color: var(--wedding-text-sub);
           transition: all 0.2s;
         }
         .tab-btn.active {
-          background: #fff;
-          color: #b89c8e;
+          background: var(--wedding-card-bg);
+          color: var(--wedding-main);
           font-weight: 700;
           box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .rsvp-input, .rsvp-select, .rsvp-textarea {
           width: 100%;
           padding: 14px;
-          border: 1px solid #f0eae5;
+          border: 1px solid var(--wedding-border);
           border-radius: 12px;
-          background: #fdfbf9;
+          background: var(--wedding-bg);
+          color: var(--wedding-text-body);
           font-size: 0.9rem;
           box-sizing: border-box;
           font-family: inherit;
         }
         .rsvp-input:focus, .rsvp-select:focus, .rsvp-textarea:focus {
           outline: none;
-          border-color: #b89c8e;
+          border-color: var(--wedding-main);
         }
         .submit-btn {
           width: 100%;
           padding: 16px;
-          background: #b89c8e;
+          background: var(--wedding-main);
           color: white;
-          border-radius: 14px;
+          border-radius: 30px;
           font-weight: 700;
           font-size: 1rem;
           margin-top: 10px;
-          transition: background 0.2s;
+          transition: all 0.2s ease;
         }
-        .submit-btn:hover { background: #a68b7d; }
+        .submit-btn:hover { 
+          filter: brightness(0.9);
+          transform: translateY(-1px);
+        }
       `}</style>
     </div>
   );

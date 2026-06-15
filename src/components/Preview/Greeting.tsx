@@ -36,7 +36,7 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
       <style>{`
         .greeting-text p {
           line-height: 2;
-          color: #666;
+          color: var(--wedding-text-body);
           font-size: 0.95rem;
           margin-bottom: 50px;
         }
@@ -44,7 +44,7 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
           display: flex;
           flex-direction: column;
           gap: 20px;
-          border-top: 1px solid #eee;
+          border-top: 1px solid var(--wedding-border);
           padding-top: 40px;
         }
         .contact-item {
@@ -55,10 +55,11 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
         }
         .role {
           font-size: 0.8rem;
-          color: #888;
+          color: var(--wedding-text-sub);
         }
         .name {
           font-weight: 500;
+          color: var(--wedding-text-main);
           min-width: 60px;
         }
         .contact-buttons {
@@ -69,15 +70,16 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          background: #f0f0f0;
+          background: var(--wedding-card-bg);
+          border: 1px solid var(--wedding-border);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #555;
+          color: var(--wedding-text-body);
           transition: background 0.2s;
         }
         .contact-btn:hover {
-          background: #e0e0e0;
+          background: var(--wedding-border);
         }
       `}</style>
     </section>

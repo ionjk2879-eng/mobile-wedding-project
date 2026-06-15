@@ -1,4 +1,4 @@
-# 💍 데이터 분석 기반 프리미엄 모바일 청첩장 빌더 (Mobile Wedding Invitation Builder & Analytics)
+a# 💍 데이터 분석 기반 프리미엄 모바일 청첩장 빌더 (Mobile Wedding Invitation Builder & Analytics)
 
 > **"단순한 청첩장을 넘어, 하객 관리까지 완벽하게"**  
 > 기간 제한 없는 영구 보관 서비스는 물론, 하객들의 참석 응답(RSVP)을 수집하고 실시간으로 통계를 분석해주는 데이터 중심의 웨딩 솔루션입니다.

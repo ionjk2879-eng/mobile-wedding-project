@@ -23,8 +23,9 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
 
       <style>{`
         .personal-message {
-          background-color: #fdfbf9;
+          background-color: var(--wedding-bg);
           padding: 80px 24px;
+          transition: background-color 0.4s ease;
         }
         .message-container {
           display: flex;
@@ -34,15 +35,15 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
         .message-box {
           position: relative;
           padding: 30px;
-          background: #fff;
+          background: var(--wedding-card-bg);
           border-radius: 24px;
-          border: 1px solid #f0eae5;
-          box-shadow: 0 10px 30px rgba(184, 156, 142, 0.05);
+          border: 1px solid var(--wedding-border);
+          box-shadow: 0 10px 30px rgba(74, 69, 67, 0.05);
         }
         .quote-icon {
           font-family: 'Gowun Batang', serif;
           font-size: 3rem;
-          color: #e5d1c8;
+          color: var(--wedding-accent);
           position: absolute;
           top: -10px;
           left: 20px;
@@ -51,7 +52,7 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
         .message-box p {
           font-size: 1rem;
           line-height: 1.8;
-          color: #4a4543;
+          color: var(--wedding-text-body);
           margin-bottom: 20px;
           position: relative;
           z-index: 1;
@@ -60,16 +61,16 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
         .message-name {
           font-size: 0.85rem;
           font-weight: 600;
-          color: #b89c8e;
+          color: var(--wedding-main);
           display: block;
           text-align: right;
           letter-spacing: 1px;
         }
         .groom {
-          border-left: 4px solid #e5d1c8;
+          border-left: 4px solid var(--wedding-accent);
         }
         .bride {
-          border-left: 4px solid #b89c8e;
+          border-left: 4px solid var(--wedding-main);
         }
       `}</style>
     </section>

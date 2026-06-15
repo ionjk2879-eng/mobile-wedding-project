@@ -58,6 +58,8 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
 
   const fonts = [
     { name: '기본 (Pretendard)', value: "'Pretendard', sans-serif" },
+    { name: 'Cormorant Garamond (럭셔리 세리프)', value: "'Cormorant Garamond', serif" },
+    { name: 'Playfair Display (에디토리얼 세리프)', value: "'Playfair Display', serif" },
     { name: '고운 바탕 (세리프)', value: "'Gowun Batang', serif" },
     { name: '고운 돋움 (산세리프)', value: "'Gowun Dodum', sans-serif" },
     { name: '나눔 명조 (클래식)', value: "'Nanum Myeongjo', serif" },
@@ -83,6 +85,47 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="input-group">
+            <label>청첩장 테마 (2026 트렌드)</label>
+            <div className="theme-select-grid">
+              <button
+                type="button"
+                className={`theme-select-btn warm ${data.theme === 'warm' ? 'active' : ''}`}
+                onClick={() => onChange({ ...data, theme: 'warm' })}
+              >
+                <div className="theme-color-dots">
+                  <span style={{ background: '#F7F2EB' }}></span>
+                  <span style={{ background: '#A07850' }}></span>
+                  <span style={{ background: '#2C1E10' }}></span>
+                </div>
+                <span>Warm Editorial</span>
+              </button>
+              <button
+                type="button"
+                className={`theme-select-btn dark ${data.theme === 'dark' ? 'active' : ''}`}
+                onClick={() => onChange({ ...data, theme: 'dark' })}
+              >
+                <div className="theme-color-dots">
+                  <span style={{ background: '#2C2419' }}></span>
+                  <span style={{ background: '#D4A96A' }}></span>
+                  <span style={{ background: '#F5ECD7' }}></span>
+                </div>
+                <span>Dark Luxe</span>
+              </button>
+              <button
+                type="button"
+                className={`theme-select-btn midnight ${data.theme === 'midnight' ? 'active' : ''}`}
+                onClick={() => onChange({ ...data, theme: 'midnight' })}
+              >
+                <div className="theme-color-dots">
+                  <span style={{ background: '#1A2630' }}></span>
+                  <span style={{ background: '#8EBCB0' }}></span>
+                  <span style={{ background: '#D4E8E4' }}></span>
+                </div>
+                <span>Midnight Sage</span>
+              </button>
+            </div>
           </div>
           <div className="input-group">
             <label>배경음악 URL (MP3)</label>
@@ -240,7 +283,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         .editor-scroll-area {
           flex: 1;
           overflow-y: auto;
-          background: #fcfaf5;
+          background: #F7F2EB;
         }
         .editor-content-wrapper {
           padding: 30px 24px;
@@ -250,15 +293,15 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           padding: 28px;
           border-radius: 20px;
           margin-bottom: 30px;
-          box-shadow: 0 4px 20px rgba(184, 156, 142, 0.08);
-          border: 1px solid #f0eae5;
+          box-shadow: 0 4px 20px rgba(74, 69, 67, 0.05);
+          border: 1px solid #D9C5A8;
         }
         .editor-section h3 {
           margin-top: 0;
           margin-bottom: 24px;
           font-size: 1.1rem;
-          color: #b89c8e;
-          border-left: 4px solid #e5d1c8;
+          color: #A07850;
+          border-left: 4px solid #C8A87A;
           padding-left: 14px;
           font-weight: 700;
           letter-spacing: 1px;
@@ -275,7 +318,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           display: block;
           font-size: 0.8rem;
           font-weight: 600;
-          color: #8c8581;
+          color: #8C6E5A;
           margin-bottom: 10px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -283,35 +326,77 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         .input-group input, .input-group textarea, .styled-select {
           width: 100%;
           padding: 14px;
-          border: 1px solid #f0eae5;
+          border: 1px solid #D9C5A8;
           border-radius: 12px;
           font-size: 0.95rem;
-          color: #4a4543;
+          color: #2C1E10;
           box-sizing: border-box;
-          background: #fdfbf9;
+          background: #F7F2EB;
           transition: all 0.2s ease;
         }
         .input-group input:focus, .input-group textarea:focus, .styled-select:focus {
           outline: none;
-          border-color: #b89c8e;
+          border-color: #A07850;
           background: white;
-          box-shadow: 0 0 0 4px rgba(184, 156, 142, 0.1);
+          box-shadow: 0 0 0 4px rgba(160, 120, 80, 0.1);
         }
         .styled-select {
           width: 100%;
           padding: 14px;
-          border: 1px solid #f0eae5;
+          border: 1px solid #D9C5A8;
           border-radius: 12px;
           font-size: 0.95rem;
           background: white;
           cursor: pointer;
+        }
+        .theme-select-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          margin-top: 8px;
+        }
+        .theme-select-btn {
+          padding: 12px 8px;
+          border-radius: 12px;
+          border: 1px solid #D9C5A8;
+          background: #F7F2EB;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .theme-select-btn span {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #8C6E5A;
+        }
+        .theme-select-btn.active {
+          border-color: #A07850;
+          background: white;
+          box-shadow: 0 4px 12px rgba(160, 120, 80, 0.1);
+        }
+        .theme-select-btn.active span {
+          color: #2C1E10;
+        }
+        .theme-color-dots {
+          display: flex;
+          gap: 4px;
+        }
+        .theme-color-dots span {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          border: 1px solid rgba(0,0,0,0.05);
         }
         .checkbox-label {
           display: flex;
           align-items: center;
           gap: 10px;
           font-size: 0.9rem;
-          color: #4a4543;
+          color: #2C1E10;
           font-weight: 600;
           cursor: pointer;
           text-transform: none !important;
@@ -331,7 +416,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           align-items: center;
           gap: 8px;
           padding: 0 20px;
-          background: #b89c8e;
+          background: #A07850;
           color: white;
           border-radius: 12px;
           font-size: 0.85rem;
@@ -340,12 +425,12 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           transition: all 0.2s ease;
         }
         .search-btn:hover {
-          background: #a68b7d;
+          background: #b89c8e;
           transform: translateY(-1px);
         }
         .input-hint {
           font-size: 0.75rem;
-          color: #b89c8e;
+          color: #8C6E5A;
           margin-top: 8px;
           margin-bottom: 0;
         }
@@ -356,9 +441,9 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         }
         .nested-card {
           padding: 20px;
-          background: #fdfbf9;
+          background: #F7F2EB;
           border-radius: 14px;
-          border: 1px solid #f0eae5;
+          border: 1px solid #D9C5A8;
         }
         .nested-inputs {
           display: flex;
@@ -368,7 +453,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         .nested-inputs input {
           width: 100%;
           padding: 12px;
-          border: 1px solid #f0eae5;
+          border: 1px solid #D9C5A8;
           border-radius: 10px;
           font-size: 0.9rem;
           box-sizing: border-box;
@@ -379,7 +464,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           font-size: 0.8rem;
           margin-top: 0;
           margin-bottom: 12px;
-          color: #b89c8e;
+          color: #8C6E5A;
         }
       `}</style>
     </div>

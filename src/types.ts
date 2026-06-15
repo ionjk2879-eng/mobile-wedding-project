@@ -28,6 +28,7 @@ export interface InvitationData {
   groomMessage: string;
   brideMessage: string;
   isRSVPEnabled: boolean;
+  theme?: 'warm' | 'dark' | 'midnight';
 }
 
 export interface RSVPResponse {

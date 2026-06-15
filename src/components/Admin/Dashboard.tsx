@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { X, Users, Utensils, MessageSquare } from 'lucide-react';
+import { X, Users, Utensils } from 'lucide-react';
 import { RSVPResponse } from '../../types';
 
 interface DashboardProps {
@@ -75,7 +75,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {relationData.map((entry, index) => (
+                    {relationData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

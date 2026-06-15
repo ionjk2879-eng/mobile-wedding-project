@@ -43,12 +43,13 @@ const App: React.FC = () => {
     groomMessage: '항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다.',
     brideMessage: '서로 아끼고 배려하며 예쁘게 잘 살겠습니다.',
     isRSVPEnabled: true,
+    theme: 'warm',
   });
 
   return (
     <div className="builder-layout">
       {showDashboard && <Dashboard onClose={() => setShowDashboard(false)} />}
-      <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
       <div className="editor-panel">
         <header className="builder-header">
           <div className="header-main">
@@ -63,7 +64,7 @@ const App: React.FC = () => {
       <div className="preview-panel">
         <div className="phone-container">
           <div className="phone-frame">
-            <div className="phone-content">
+            <div className={`phone-content theme-${data.theme || 'warm'}`}>
               <Hero data={data} />
               <Greeting data={data} />
               <PersonalMessage data={data} />
@@ -106,8 +107,8 @@ const App: React.FC = () => {
         }
         .builder-header {
           padding: 30px 24px;
-          border-bottom: 1px solid #f0eae5;
-          background: #fcfaf5;
+          border-bottom: 1px solid #3d3225;
+          background: #2C1E10;
           flex-shrink: 0;
         }
         .header-main {
@@ -116,7 +117,7 @@ const App: React.FC = () => {
           align-items: center;
         }
         .admin-btn {
-          background: #b89c8e;
+          background: #A07850;
           color: white;
           padding: 8px 14px;
           border-radius: 10px;
@@ -125,14 +126,14 @@ const App: React.FC = () => {
           transition: all 0.2s;
         }
         .admin-btn:hover {
-          background: #a68b7d;
+          background: #b89c8e;
           transform: translateY(-1px);
         }
         .builder-header h1 {
           font-size: 1.6rem;
           font-weight: 700;
           margin: 0;
-          color: #b89c8e;
+          color: #C8A87A;
           display: flex;
           align-items: center;
           gap: 12px;
@@ -140,7 +141,7 @@ const App: React.FC = () => {
         }
         .builder-header p {
           font-size: 0.85rem;
-          color: #8c8581;
+          color: #EDE4D6;
           margin: 10px 0 0 0;
           line-height: 1.5;
         }
