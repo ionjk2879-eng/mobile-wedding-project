@@ -135,8 +135,8 @@ const App: React.FC = () => {
           <div className="header-main">
             <h1>💍 Invitation Builder</h1>
             <div className="header-buttons">
-              <button className="preview-toggle-btn" onClick={() => setIsFullPreview(true)}>👁️ 전체화면 보기</button>
-              <button className="admin-btn" onClick={() => setShowDashboard(true)}>📊 응답 분석</button>
+              <button className="preview-toggle-btn" onClick={() => setIsFullPreview(true)}>전체화면 보기</button>
+              <button className="admin-btn" onClick={() => setShowDashboard(true)}>응답 분석</button>
             </div>
           </div>
           <p>내용을 입력하면 오른쪽에서 실시간으로 확인할 수 있습니다.</p>
