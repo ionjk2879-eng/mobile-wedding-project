@@ -92,7 +92,7 @@ const App: React.FC = () => {
           grid-template-columns: 450px 1fr;
           height: 100vh;
           width: 100vw;
-          background: #f7f3f0;
+          background: #FAF5F7;
           font-family: 'Pretendard', sans-serif;
           overflow: hidden;
         }
@@ -100,15 +100,15 @@ const App: React.FC = () => {
           display: flex;
           flex-direction: column;
           height: 100vh;
-          background: #fcfaf5;
+          background: #FFFFFF;
           z-index: 10;
-          box-shadow: 10px 0 30px rgba(74, 69, 67, 0.05);
+          box-shadow: 10px 0 30px rgba(212, 165, 198, 0.05);
           overflow: hidden;
         }
         .builder-header {
           padding: 30px 24px;
-          border-bottom: 1px solid #3d3225;
-          background: #2C1E10;
+          border-bottom: 1px solid #EEDDE4;
+          background: #FFFFFF;
           flex-shrink: 0;
         }
         .header-main {
@@ -117,7 +117,7 @@ const App: React.FC = () => {
           align-items: center;
         }
         .admin-btn {
-          background: #A07850;
+          background: #B3A2C8;
           color: white;
           padding: 8px 14px;
           border-radius: 10px;
@@ -126,14 +126,14 @@ const App: React.FC = () => {
           transition: all 0.2s;
         }
         .admin-btn:hover {
-          background: #b89c8e;
+          background: #D4A5C6;
           transform: translateY(-1px);
         }
         .builder-header h1 {
           font-size: 1.6rem;
           font-weight: 700;
           margin: 0;
-          color: #C8A87A;
+          color: #D4A5C6;
           display: flex;
           align-items: center;
           gap: 12px;
@@ -141,7 +141,7 @@ const App: React.FC = () => {
         }
         .builder-header p {
           font-size: 0.85rem;
-          color: #EDE4D6;
+          color: #8F7D8B;
           margin: 10px 0 0 0;
           line-height: 1.5;
         }
@@ -151,7 +151,7 @@ const App: React.FC = () => {
           align-items: center;
           justify-content: center;
           padding: 20px;
-          background: #f7f3f0;
+          background: #FAF5F7;
           position: relative;
           overflow: hidden;
         }
