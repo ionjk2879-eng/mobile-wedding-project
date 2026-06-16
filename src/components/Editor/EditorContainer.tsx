@@ -305,30 +305,33 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
 
         <div className="editor-section">
           <h3>부모님 연락처</h3>
-          <div className="parent-editor-grid">
-            <div className="parent-side-editor">
+          <div className="nested-grid">
+            <div className="nested-card">
               <p className="sub-label">신랑측 부모님</p>
-              {data.parents.groomParents.map((p, i) => (
-                <div key={i} className="mini-contact-row">
-                  <input type="text" placeholder="관계" value={p.role} onChange={(e) => handleParentChange('groomParents', i, 'role', e.target.value)} />
-                  <input type="text" placeholder="이름" value={p.name} onChange={(e) => handleParentChange('groomParents', i, 'name', e.target.value)} />
-                  <input type="text" placeholder="번호" value={p.phone} onChange={(e) => handleParentChange('groomParents', i, 'phone', e.target.value)} />
-                </div>
-              ))}
+              <div className="nested-inputs">
+                {data.parents.groomParents.map((p, i) => (
+                  <div key={i} className="input-row">
+                    <input type="text" placeholder="관계 (예: 아버지)" value={p.role} onChange={(e) => handleParentChange('groomParents', i, 'role', e.target.value)} />
+                    <input type="text" placeholder="이름" value={p.name} onChange={(e) => handleParentChange('groomParents', i, 'name', e.target.value)} />
+                    <input type="text" placeholder="전화번호" value={p.phone} onChange={(e) => handleParentChange('groomParents', i, 'phone', e.target.value)} className="full-width-input" />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="parent-side-editor">
+            <div className="nested-card">
               <p className="sub-label">신부측 부모님</p>
-              {data.parents.brideParents.map((p, i) => (
-                <div key={i} className="mini-contact-row">
-                  <input type="text" placeholder="관계" value={p.role} onChange={(e) => handleParentChange('brideParents', i, 'role', e.target.value)} />
-                  <input type="text" placeholder="이름" value={p.name} onChange={(e) => handleParentChange('brideParents', i, 'name', e.target.value)} />
-                  <input type="text" placeholder="번호" value={p.phone} onChange={(e) => handleParentChange('brideParents', i, 'phone', e.target.value)} />
-                </div>
-              ))}
+              <div className="nested-inputs">
+                {data.parents.brideParents.map((p, i) => (
+                  <div key={i} className="input-row">
+                    <input type="text" placeholder="관계 (예: 어머니)" value={p.role} onChange={(e) => handleParentChange('brideParents', i, 'role', e.target.value)} />
+                    <input type="text" placeholder="이름" value={p.name} onChange={(e) => handleParentChange('brideParents', i, 'name', e.target.value)} />
+                    <input type="text" placeholder="전화번호" value={p.phone} onChange={(e) => handleParentChange('brideParents', i, 'phone', e.target.value)} className="full-width-input" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-
 
         <div className="editor-section">
           <h3>연락처 설정</h3>
@@ -640,27 +643,15 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           box-sizing: border-box;
           background: white;
         }
+        .full-width-input {
+          grid-column: span 2;
+        }
         .sub-label {
           font-weight: 700;
           font-size: 0.8rem;
           margin-top: 0;
           margin-bottom: 12px;
           color: #8F7D8B;
-        }
-        .mini-contact-row {
-          display: grid;
-          grid-template-columns: 60px 1fr 1.5fr;
-          gap: 8px;
-          margin-bottom: 10px;
-        }
-        .mini-contact-row input {
-          padding: 8px !important;
-          font-size: 0.8rem !important;
-        }
-        .parent-editor-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
         }
         .tab-group.mini {
           margin-bottom: 10px;
