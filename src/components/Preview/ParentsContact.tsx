@@ -7,6 +7,8 @@ interface PreviewProps {
 }
 
 const ParentsContact: React.FC<PreviewProps> = ({ data }) => {
+  const isEn = data.language === 'en';
+  
   const renderParents = (title: string, parents: any[]) => (
     <div className="parent-side">
       <h3>{title}</h3>
@@ -28,60 +30,69 @@ const ParentsContact: React.FC<PreviewProps> = ({ data }) => {
   return (
     <section className="parents-contact section">
       <div className="parents-grid">
-        {renderParents("신랑측 혼주", data.parents.groomParents)}
-        <div className="divider"></div>
-        {renderParents("신부측 혼주", data.parents.brideParents)}
+        {renderParents(isEn ? "Groom's Parents" : "신랑측 부모님", data.parents.groomParents)}
+        {renderParents(isEn ? "Bride's Parents" : "신부측 부모님", data.parents.brideParents)}
       </div>
       <style>{`
         .parents-contact {
           background-color: var(--wedding-bg);
-          padding-top: 40px;
-          padding-bottom: 40px;
+          padding: 40px 20px;
         }
         .parents-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 30px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+          width: 100%;
+        }
+        .parent-side {
+          min-width: 0; /* Prevents flex/grid blowout */
         }
         .parent-side h3 {
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           color: var(--wedding-main);
-          margin-bottom: 15px;
+          margin-bottom: 12px;
           font-weight: 700;
+          text-align: center;
         }
         .parent-list {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
           background: var(--wedding-card-bg);
-          padding: 20px;
+          padding: 15px 12px;
           border-radius: 16px;
           border: 1px solid var(--wedding-border);
         }
         .parent-item {
           display: flex;
           align-items: center;
-          gap: 15px;
+          justify-content: space-between;
+          gap: 5px;
         }
         .role {
-          font-size: 0.8rem;
+          font-size: 0.7rem;
           color: var(--wedding-text-sub);
-          width: 50px;
+          flex-shrink: 0;
         }
         .name {
-          font-size: 1rem;
+          font-size: 0.9rem;
           font-weight: 600;
           color: var(--wedding-text-main);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
           flex: 1;
           text-align: left;
+          padding-left: 4px;
         }
         .contact-actions {
           display: flex;
-          gap: 8px;
+          gap: 4px;
+          flex-shrink: 0;
         }
         .action-btn {
-          width: 34px;
-          height: 34px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -91,10 +102,10 @@ const ParentsContact: React.FC<PreviewProps> = ({ data }) => {
           border: 1px solid var(--wedding-border);
           transition: all 0.2s;
         }
-        .divider {
-          height: 1px;
-          background: var(--wedding-border);
-          margin: 0 20px;
+        @media (max-width: 350px) {
+          .parents-grid {
+            grid-template-columns: 1fr;
+          }
         }
       `}</style>
     </section>

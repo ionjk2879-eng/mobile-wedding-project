@@ -92,7 +92,6 @@ const App: React.FC = () => {
       <VideoEmbed data={data} />
       <Gallery data={data} />
       <Location data={data} />
-      <Guestbook data={data} onUpdate={(msgs) => setData({...data, guestMessages: msgs})} />
       <RSVPForm data={data} />
       <Money data={data} />
       <Share data={data} />

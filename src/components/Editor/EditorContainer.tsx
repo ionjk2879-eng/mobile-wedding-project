@@ -304,7 +304,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         </div>
 
         <div className="editor-section">
-          <h3>혼주 연락처</h3>
+          <h3>부모님 연락처</h3>
           <div className="parent-editor-grid">
             <div className="parent-side-editor">
               <p className="sub-label">신랑측 부모님</p>

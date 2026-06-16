@@ -11,6 +11,8 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
   const groomName = isEn && data.en.groomName ? data.en.groomName : data.groomName;
   const brideName = isEn && data.en.brideName ? data.en.brideName : data.brideName;
   const venueName = isEn && data.en.venueName ? data.en.venueName : data.venueName;
+  const dateStr = isEn && data.en.date ? data.en.date : data.date;
+  const timeStr = isEn && data.en.time ? data.en.time : data.time;
 
   const calculateDDay = () => {
     const today = new Date();
@@ -29,20 +31,20 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
   return (
     <section className="hero" style={{ fontFamily: data.fontFamily }}>
       <motion.div 
-        key={`${data.groomName}-${data.brideName}`}
+        key={`${groomName}-${brideName}-${data.language}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="hero-content"
       >
         <div className="d-day-badge">{calculateDDay()}</div>
-        <p className="wedding-label">WEDDING INVITATION</p>
+        <p className="wedding-label">{isEn ? 'WEDDING INVITATION' : '결혼식에 초대합니다'}</p>
         <h1 className="names">{groomName} & {brideName}</h1>
         <div className="main-image-container">
           <img src={data.photos[0] || "/src/assets/hero.png"} alt="Wedding Hero" className="main-image" />
         </div>
         <div className="wedding-info">
-          <p className="date">{data.date} {data.time}</p>
+          <p className="date">{dateStr} {timeStr}</p>
           <p className="venue">{venueName}</p>
         </div>
       </motion.div>
@@ -67,16 +69,16 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         }
         .wedding-label {
           font-size: 0.8rem;
-          letter-spacing: 3px;
+          letter-spacing: 2px;
           color: var(--wedding-text-sub);
           margin-bottom: 15px;
         }
         .names {
-          font-size: 3.8rem;
+          font-size: 3.5rem;
           font-weight: 300;
           margin-bottom: 30px;
           color: var(--wedding-text-main);
-          letter-spacing: 0.1em;
+          letter-spacing: 0.05em;
           line-height: 1.2;
           word-break: keep-all;
         }

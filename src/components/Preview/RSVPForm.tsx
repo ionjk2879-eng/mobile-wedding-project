@@ -7,6 +7,8 @@ interface PreviewProps {
 }
 
 const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
+  const isEn = data.language === 'en';
+  
   const [formData, setFormData] = useState({
     guestName: '',
     isAttending: true,
@@ -42,9 +44,11 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
       <div className="rsvp-section section">
         <div className="success-message">
           <CheckCircle2 size={48} color="#b89c8e" />
-          <h3>참석 응답이 전달되었습니다</h3>
-          <p>소중한 응답 감사합니다.</p>
-          <button className="reset-btn" onClick={() => setSubmitted(false)}>다시 입력하기</button>
+          <h3>{isEn ? 'Response Submitted' : '참석 응답이 전달되었습니다'}</h3>
+          <p>{isEn ? 'Thank you for your response.' : '소중한 응답 감사합니다.'}</p>
+          <button className="reset-btn" onClick={() => setSubmitted(false)}>
+            {isEn ? 'Edit Response' : '다시 입력하기'}
+          </button>
         </div>
         <style>{`
           .success-message {
@@ -59,7 +63,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           }
           .success-message h3 { color: var(--wedding-main); margin: 0; }
           .success-message p { color: var(--wedding-text-sub); margin: 0; }
-          .reset-btn { margin-top: 10px; font-size: 0.8rem; color: var(--wedding-text-sub); text-decoration: underline; }
+          .reset-btn { margin-top: 10px; font-size: 0.8rem; color: var(--wedding-text-sub); text-decoration: underline; background: none; border: none; cursor: pointer; }
         `}</style>
       </div>
     );
@@ -68,47 +72,51 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
   return (
     <div className="rsvp-section section" style={{ fontFamily: data.fontFamily }}>
       <div className="rsvp-header">
-        <h2>참석 여부 전달하기</h2>
-        <p>축하의 마음으로 참석해주시는<br />모든 분들의 성함을 남겨주세요.</p>
+        <h2>{isEn ? 'RSVP' : '참석 여부 전달하기'}</h2>
+        <p>
+          {isEn 
+            ? 'Please let us know if you can join us\nby providing your name below.' 
+            : '축하의 마음으로 참석해주시는\n모든 분들의 성함을 남겨주세요.'}
+        </p>
       </div>
 
       <form className="rsvp-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label className="section-label">구분</label>
+          <label className="section-label">{isEn ? 'Side' : '구분'}</label>
           <div className="tab-group">
             <button 
               type="button" 
               className={`tab-btn ${formData.relation === 'groom' ? 'active' : ''}`}
               onClick={() => setFormData({...formData, relation: 'groom'})}
             >
-              신랑측
+              {isEn ? "Groom's" : '신랑측'}
             </button>
             <button 
               type="button" 
               className={`tab-btn ${formData.relation === 'bride' ? 'active' : ''}`}
               onClick={() => setFormData({...formData, relation: 'bride'})}
             >
-              신부측
+              {isEn ? "Bride's" : '신부측'}
             </button>
           </div>
         </div>
 
         <div className="form-group">
-          <label className="section-label">참석 여부</label>
+          <label className="section-label">{isEn ? 'Attendance' : '참석 여부'}</label>
           <div className="attendance-toggle">
             <button 
               type="button" 
               className={`toggle-btn ${formData.isAttending ? 'active' : ''}`}
               onClick={() => setFormData({...formData, isAttending: true})}
             >
-              참석합니다
+              {isEn ? 'Attending' : '참석합니다'}
             </button>
             <button 
               type="button" 
               className={`toggle-btn ${!formData.isAttending ? 'active-refuse' : ''}`}
               onClick={() => setFormData({...formData, isAttending: false})}
             >
-              참석이 어렵습니다
+              {isEn ? 'Unable to Attend' : '참석이 어렵습니다'}
             </button>
           </div>
         </div>
@@ -116,7 +124,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         <div className="form-group">
           <input 
             type="text" 
-            placeholder="성함을 입력해 주세요" 
+            placeholder={isEn ? "Guest Name" : "성함을 입력해 주세요"} 
             className="rsvp-input"
             required
             value={formData.guestName}
@@ -127,24 +135,24 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         {formData.isAttending && (
           <div className="form-row">
             <div className="form-group flex-1">
-              <label><Users size={14} /> 동반 인원</label>
+              <label><Users size={14} /> {isEn ? 'Number of Guests' : '동반 인원'}</label>
               <select 
                 className="rsvp-select"
                 value={formData.totalGuests}
                 onChange={(e) => setFormData({...formData, totalGuests: parseInt(e.target.value)})}
               >
-                {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}명 (본인포함)</option>)}
+                {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}{isEn ? '' : '명'} ({isEn ? 'incl. self' : '본인포함'})</option>)}
               </select>
             </div>
             <div className="form-group flex-1">
-              <label><Utensils size={14} /> 식사 여부</label>
+              <label><Utensils size={14} /> {isEn ? 'Meal' : '식사 여부'}</label>
               <select 
                 className="rsvp-select"
                 value={formData.wantsMeal ? 'yes' : 'no'}
                 onChange={(e) => setFormData({...formData, wantsMeal: e.target.value === 'yes'})}
               >
-                <option value="yes">식사 함</option>
-                <option value="no">식사 안함</option>
+                <option value="yes">{isEn ? 'Will eat' : '식사 함'}</option>
+                <option value="no">{isEn ? "Won't eat" : '식사 안함'}</option>
               </select>
             </div>
           </div>
@@ -152,7 +160,11 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
         <div className="form-group">
           <textarea 
-            placeholder={formData.isAttending ? "축하 메시지 (선택사항)" : "축하 메시지 및 아쉬운 마음을 전해주세요"} 
+            placeholder={
+              formData.isAttending 
+                ? (isEn ? "Congratulatory Message (Optional)" : "축하 메시지 (선택사항)") 
+                : (isEn ? "Share your warm wishes" : "축하 메시지 및 아쉬운 마음을 전해주세요")
+            } 
             className="rsvp-textarea"
             rows={3}
             value={formData.message}
@@ -161,7 +173,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         </div>
 
         <button type="submit" className="submit-btn">
-          {formData.isAttending ? "참석 의사 전달하기" : "답변 전달하기"}
+          {formData.isAttending ? (isEn ? 'Submit' : '참석 의사 전달하기') : (isEn ? 'Submit' : '답변 전달하기')}
         </button>
       </form>
 
@@ -190,6 +202,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           font-size: 0.85rem;
           color: var(--wedding-text-sub);
           transition: all 0.2s;
+          cursor: pointer;
         }
         .toggle-btn.active {
           background: var(--wedding-main);
@@ -209,6 +222,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           color: var(--wedding-text-sub); 
           line-height: 1.6;
           margin-bottom: 40px;
+          white-space: pre-line;
         }
         .rsvp-form {
           background: var(--wedding-card-bg);
@@ -243,6 +257,9 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           font-size: 0.85rem;
           color: var(--wedding-text-sub);
           transition: all 0.2s;
+          border: none;
+          background: none;
+          cursor: pointer;
         }
         .tab-btn.active {
           background: var(--wedding-card-bg);
@@ -275,6 +292,8 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           font-size: 1rem;
           margin-top: 10px;
           transition: all 0.2s ease;
+          border: none;
+          cursor: pointer;
         }
         .submit-btn:hover { 
           filter: brightness(0.9);

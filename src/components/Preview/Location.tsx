@@ -13,6 +13,10 @@ interface PreviewProps {
 }
 
 const Location: React.FC<PreviewProps> = ({ data }) => {
+  const isEn = data.language === 'en';
+  const venueName = isEn && data.en.venueName ? data.en.venueName : data.venueName;
+  const venueAddress = isEn && data.en.venueAddress ? data.en.venueAddress : data.venueAddress;
+  
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,17 +48,17 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
   }, [data.venueAddress]);
 
   const navLinks = [
-    { name: '카카오내비', url: `https://map.kakao.com/link/to/${data.venueName},${data.venueAddress}` },
-    { name: '네이버 지도', url: `https://map.naver.com/index.nhn?slng=&slat=&stext=&elng=&elat=&etext=${encodeURIComponent(data.venueName)}&menu=route` },
-    { name: 'T맵', url: `https://apis.openapi.sk.com/tmap/app/routes?appKey=YOUR_TMAP_APP_KEY&name=${encodeURIComponent(data.venueName)}` },
+    { name: isEn ? 'Kakao Navi' : '카카오내비', url: `https://map.kakao.com/link/to/${venueName},${data.venueAddress}` },
+    { name: isEn ? 'Naver Map' : '네이버 지도', url: `https://map.naver.com/index.nhn?slng=&slat=&stext=&elng=&elat=&etext=${encodeURIComponent(venueName)}&menu=route` },
+    { name: 'T-Map', url: `https://apis.openapi.sk.com/tmap/app/routes?appKey=YOUR_TMAP_APP_KEY&name=${encodeURIComponent(venueName)}` },
   ];
 
   return (
     <section className="location section">
-      <h2>오시는 길</h2>
+      <h2>{isEn ? 'LOCATION' : '오시는 길'}</h2>
       <div className="location-info">
-        <h3 className="venue-name">{data.venueName}</h3>
-        <p className="address">{data.venueAddress}</p>
+        <h3 className="venue-name">{venueName}</h3>
+        <p className="address">{venueAddress}</p>
       </div>
 
       <div ref={mapRef} className="map-container"></div>
@@ -70,15 +74,15 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
 
       <div className="transport-info">
         <div className="transport-item">
-          <div className="transport-label"><Train size={18} /> 지하철</div>
+          <div className="transport-label"><Train size={18} /> {isEn ? 'Subway' : '지하철'}</div>
           <div className="transport-detail">{data.transport.subway}</div>
         </div>
         <div className="transport-item">
-          <div className="transport-label"><Bus size={18} /> 버스</div>
+          <div className="transport-label"><Bus size={18} /> {isEn ? 'Bus' : '버스'}</div>
           <div className="transport-detail">{data.transport.bus}</div>
         </div>
         <div className="transport-item">
-          <div className="transport-label"><Car size={18} /> 자가용/주차</div>
+          <div className="transport-label"><Car size={18} /> {isEn ? 'Parking' : '자가용/주차'}</div>
           <div className="transport-detail">{data.transport.parking}</div>
         </div>
       </div>
