@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { InvitationData } from '../../types';
 
@@ -11,8 +11,22 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
+  const isDragging = useRef(false);
 
   const minSwipeDistance = 50;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedIndex === null) return;
+      
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') nextImage();
+      if (e.key === 'ArrowLeft') prevImage();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIndex]);
 
   const openLightbox = (index: number) => {
     setSelectedIndex(index);
@@ -34,6 +48,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
     setSelectedIndex((selectedIndex - 1 + data.photos.length) % data.photos.length);
   };
 
+  // Touch handlers
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.targetTouches[0].clientX;
     touchEndX.current = null;
@@ -44,6 +59,27 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
   };
 
   const onTouchEnd = () => {
+    handleSwipe();
+  };
+
+  // Mouse handlers (for PC drag)
+  const onMouseDown = (e: React.MouseEvent) => {
+    touchStartX.current = e.clientX;
+    isDragging.current = true;
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current) return;
+    touchEndX.current = e.clientX;
+  };
+
+  const onMouseUp = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    handleSwipe();
+  };
+
+  const handleSwipe = () => {
     if (!touchStartX.current || !touchEndX.current) return;
     
     const distance = touchStartX.current - touchEndX.current;
@@ -55,6 +91,9 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
     } else if (isRightSwipe) {
       prevImage();
     }
+    
+    touchStartX.current = null;
+    touchEndX.current = null;
   };
 
   return (
@@ -74,6 +113,10 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseUp}
         >
           <div className="lightbox-backdrop" />
           
@@ -85,7 +128,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
             <ChevronLeft size={48} />
           </button>
           
-          <div className="lightbox-container" onClick={(e) => e.stopPropagation()}>
+          <div className="lightbox-container">
             <img 
               src={data.photos[selectedIndex]} 
               alt={`Full view ${selectedIndex + 1}`} 
