@@ -41,7 +41,7 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         <p className="wedding-label">{isEn ? 'WEDDING INVITATION' : '결혼식에 초대합니다'}</p>
         <h1 className="names">{groomName} & {brideName}</h1>
         <div className="main-image-container">
-          <img src={data.photos[0] || "/src/assets/hero.png"} alt="Wedding Hero" className="main-image" />
+          <img src={data.heroPhoto} alt="Wedding Hero" className="main-image" />
         </div>
         <div className="wedding-info">
           <p className="date">{dateStr} {timeStr}</p>

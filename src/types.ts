@@ -29,6 +29,7 @@ export interface InvitationData {
   greetingContent: string;
   contacts: Contact[];
   accounts: Account[];
+  heroPhoto: string;
   photos: string[];
   fontFamily: string;
   bgMusicUrl: string;

@@ -33,6 +33,7 @@ const App: React.FC = () => {
       { side: '신랑측', bank: '국민은행', number: '123456-78-901234', owner: '김지현' },
       { side: '신부측', bank: '신한은행', number: '110-123-456789', owner: '이민지' },
     ],
+    heroPhoto: '/src/assets/hero.png',
     photos: [
       '/src/assets/hero.png',
       '/src/assets/hero.png',

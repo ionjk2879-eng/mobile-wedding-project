@@ -32,7 +32,7 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
       content: {
         title: `${data.groomName} ♡ ${data.brideName} 결혼합니다`,
         description: `${data.date} ${data.time} | ${data.venueName}`,
-        imageUrl: window.location.origin + (data.photos[0] || '/hero.png'),
+        imageUrl: data.heroPhoto.startsWith('data:') ? window.location.origin + '/src/assets/hero.png' : data.heroPhoto,
         link: {
           mobileWebUrl: window.location.href,
           webUrl: window.location.href,

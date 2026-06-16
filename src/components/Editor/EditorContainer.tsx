@@ -79,6 +79,17 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
     onChange({ ...data, accounts: newAccounts });
   };
 
+  const handleHeroPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      onChange({ ...data, heroPhoto: event.target?.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -390,25 +401,79 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         </div>
 
         <div className="editor-section">
-          <h3>갤러리 사진</h3>
-          <div className="photo-upload-area">
-            <label className="upload-btn">
-              <span>📸 사진 추가하기</span>
-              <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} hidden />
-            </label>
-            <div className="photo-preview-grid">
-              {data.photos.map((photo, index) => (
-                <div key={index} className="photo-preview-item">
-                  <img src={photo} alt={`Preview ${index}`} />
-                  <button className="remove-photo-btn" onClick={() => removePhoto(index)}><Search size={14} style={{ transform: 'rotate(45deg)' }} /></button>
+          <h3>사진 관리</h3>
+          <div className="photo-editor-wrapper">
+            <div className="main-photo-upload">
+              <p className="sub-label">대표 메인 사진</p>
+              <div className="main-photo-preview">
+                <img src={data.heroPhoto} alt="Main Preview" />
+                <label className="upload-overlay">
+                  <span>변경하기</span>
+                  <input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden />
+                </label>
+              </div>
+            </div>
+            
+            <div className="gallery-photos-upload">
+              <p className="sub-label">갤러리 사진 목록</p>
+              <div className="photo-upload-area">
+                <label className="upload-btn">
+                  <span>📸 사진 추가하기</span>
+                  <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} hidden />
+                </label>
+                <div className="photo-preview-grid">
+                  {data.photos.map((photo, index) => (
+                    <div key={index} className="photo-preview-item">
+                      <img src={photo} alt={`Preview ${index}`} />
+                      <button className="remove-photo-btn" onClick={() => removePhoto(index)}><Search size={14} style={{ transform: 'rotate(45deg)' }} /></button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <style>{`
+        .photo-editor-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+        }
+        .main-photo-preview {
+          width: 100%;
+          aspect-ratio: 16/9;
+          background: #FAF5F7;
+          border-radius: 16px;
+          overflow: hidden;
+          position: relative;
+          border: 1px solid #EEDDE4;
+        }
+        .main-photo-preview img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .upload-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 700;
+          opacity: 0;
+          transition: opacity 0.2s;
+          cursor: pointer;
+        }
+        .main-photo-preview:hover .upload-overlay {
+          opacity: 1;
+        }
         .photo-upload-area {
           display: flex;
           flex-direction: column;
