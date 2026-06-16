@@ -113,21 +113,22 @@ const App: React.FC = () => {
         <style>{`
           .full-preview-container {
             width: 100vw;
-            min-height: 100vh;
+            height: 100vh;
             background: #FAF5F7;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            overflow-y: auto;
+            overflow-y: scroll;
             padding: 0;
             margin: 0;
+            -webkit-overflow-scrolling: touch;
           }
           .invitation-page {
             width: 100%;
             max-width: 480px;
             background: var(--wedding-bg);
             box-shadow: 0 0 40px rgba(212, 165, 198, 0.15);
-            min-height: 100vh;
+            min-height: 100%;
             border-left: 1px solid var(--wedding-border);
             border-right: 1px solid var(--wedding-border);
           }
