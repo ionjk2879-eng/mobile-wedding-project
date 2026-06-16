@@ -7,6 +7,7 @@ interface PreviewProps {
 }
 
 const Money: React.FC<PreviewProps> = ({ data }) => {
+  const isEn = data.language === 'en';
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
 
   const handleCopy = (account: string) => {
@@ -17,9 +18,11 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <section className="money section" style={{ fontFamily: data.fontFamily }}>
-      <h2>마음 전하실 곳</h2>
+      <h2>{isEn ? 'REGISTRY' : '마음 전하실 곳'}</h2>
       <p className="money-desc">
-        축하의 마음을 담아 축의금을 전달하실 수 있습니다.
+        {isEn 
+          ? 'Your presence is enough, but if you wish to give,\nwe appreciate your kindness.' 
+          : '축하의 마음을 담아 축의금을 전달하실 수 있습니다.'}
       </p>
 
       <div className="account-list">
@@ -38,7 +41,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
               onClick={() => handleCopy(acc.number)}
             >
               {copiedAccount === acc.number ? <Check size={16} /> : <Copy size={16} />}
-              <span>{copiedAccount === acc.number ? '복사됨' : '복사'}</span>
+              <span>{copiedAccount === acc.number ? (isEn ? 'Copied' : '복사됨') : (isEn ? 'Copy' : '복사')}</span>
             </button>
           </div>
         ))}
@@ -46,11 +49,11 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
 
       <div className="personal-messages">
         <div className="message-box groom">
-          <span className="message-role">Groom's Message</span>
+          <span className="message-role">{isEn ? "Groom's Message" : "신랑의 한마디"}</span>
           <p>{data.groomMessage}</p>
         </div>
         <div className="message-box bride">
-          <span className="message-role">Bride's Message</span>
+          <span className="message-role">{isEn ? "Bride's Message" : "신부의 한마디"}</span>
           <p>{data.brideMessage}</p>
         </div>
       </div>
@@ -60,6 +63,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           font-size: 0.9rem;
           color: var(--wedding-text-sub);
           margin-bottom: 30px;
+          white-space: pre-line;
         }
         .account-list {
           display: flex;
@@ -106,6 +110,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           font-size: 0.8rem;
           color: var(--wedding-main);
           transition: all 0.2s;
+          cursor: pointer;
         }
         .copy-btn.copied {
           background: var(--wedding-card-bg);

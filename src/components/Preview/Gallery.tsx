@@ -7,6 +7,7 @@ interface PreviewProps {
 }
 
 const Gallery: React.FC<PreviewProps> = ({ data }) => {
+  const isEn = data.language === 'en';
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const openLightbox = (index: number) => {
@@ -33,7 +34,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <section className="gallery section">
-      <h2>갤러리</h2>
+      <h2>{isEn ? 'GALLERY' : '갤러리'}</h2>
       <div className="photo-grid">
         {data.photos.map((src, index) => (
           <div key={index} className="photo-item" onClick={() => openLightbox(index)}>

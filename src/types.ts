@@ -51,7 +51,6 @@ export interface InvitationData {
   videoUrl: string;
   language: 'ko' | 'en';
   en: Partial<InvitationData>;
-  guestMessages: GuestMessage[];
 }
 
 export interface RSVPResponse {

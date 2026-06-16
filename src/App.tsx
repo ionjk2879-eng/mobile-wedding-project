@@ -11,7 +11,6 @@ import Share from './components/Preview/Share';
 import Dashboard from './components/Admin/Dashboard';
 import ParentsContact from './components/Preview/ParentsContact';
 import VideoEmbed from './components/Preview/VideoEmbed';
-import Guestbook from './components/Preview/Guestbook';
 import { InvitationData } from './types';
 
 const App: React.FC = () => {
@@ -72,7 +71,6 @@ const App: React.FC = () => {
       venueName: 'Seoul Wedding Garden',
       venueAddress: '123 Teheran-ro, Gangnam-gu, Seoul',
     },
-    guestMessages: [],
   });
 
   // Translation helper
