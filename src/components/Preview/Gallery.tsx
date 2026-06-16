@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { InvitationData } from '../../types';
 
@@ -9,8 +9,8 @@ interface PreviewProps {
 const Gallery: React.FC<PreviewProps> = ({ data }) => {
   const isEn = data.language === 'en';
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
 
   const minSwipeDistance = 50;
 
@@ -24,30 +24,29 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
     document.body.style.overflow = 'auto';
   };
 
-  const nextImage = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
+  const nextImage = () => {
     if (selectedIndex === null) return;
     setSelectedIndex((selectedIndex + 1) % data.photos.length);
   };
 
-  const prevImage = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
+  const prevImage = () => {
     if (selectedIndex === null) return;
     setSelectedIndex((selectedIndex - 1 + data.photos.length) % data.photos.length);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = null;
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
   };
 
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
+  const onTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
     
@@ -72,9 +71,9 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
       {selectedIndex !== null && (
         <div 
           className="lightbox-overlay" 
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           <div className="lightbox-backdrop" />
           
@@ -82,7 +81,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
             <X size={32} />
           </button>
           
-          <button className="nav-btn prev" onClick={prevImage} aria-label="Previous">
+          <button className="nav-btn prev" onClick={(e) => { e.stopPropagation(); prevImage(); }} aria-label="Previous">
             <ChevronLeft size={48} />
           </button>
           
@@ -98,7 +97,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
             </div>
           </div>
           
-          <button className="nav-btn next" onClick={nextImage} aria-label="Next">
+          <button className="nav-btn next" onClick={(e) => { e.stopPropagation(); nextImage(); }} aria-label="Next">
             <ChevronRight size={48} />
           </button>
         </div>
@@ -127,7 +126,6 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           object-fit: cover;
         }
 
-        /* Lightbox Fix */
         .lightbox-overlay {
           position: fixed;
           top: 0;
@@ -138,7 +136,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           align-items: center;
           justify-content: center;
           z-index: 99999;
-          touch-action: none; /* Prevent scrolling while swiping */
+          touch-action: none;
         }
         .lightbox-backdrop {
           position: absolute;
@@ -158,13 +156,15 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           flex-direction: column;
           align-items: center;
           justify-content: center;
+          pointer-events: none; /* Let touches pass to overlay */
         }
         .lightbox-image {
           max-width: 100%;
-          max-height: 100vh;
+          max-height: 80vh;
           object-fit: contain;
           box-shadow: 0 0 50px rgba(0,0,0,0.5);
           user-select: none;
+          pointer-events: auto; /* Re-enable for the image specifically if needed, but overlay handles swipe */
         }
         .close-btn {
           position: absolute;
@@ -180,7 +180,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          z-index: 10;
+          z-index: 100;
           transition: background 0.2s;
         }
         .close-btn:hover { background: rgba(255, 255, 255, 0.2); }
@@ -194,7 +194,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           border: none;
           cursor: pointer;
           padding: 20px;
-          z-index: 10;
+          z-index: 100;
           opacity: 0.6;
           transition: all 0.2s;
         }
@@ -210,6 +210,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           padding: 6px 16px;
           border-radius: 20px;
           font-weight: 500;
+          pointer-events: none;
         }
 
         @media (max-width: 768px) {
