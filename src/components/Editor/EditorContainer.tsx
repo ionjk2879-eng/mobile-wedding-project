@@ -16,6 +16,39 @@ interface EditorProps {
 const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    if (name === 'weddingDateISO') {
+      const selectedDate = new Date(value);
+      if (!isNaN(selectedDate.getTime())) {
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth() + 1;
+        const day = selectedDate.getDate();
+        const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const dayName = dayNames[selectedDate.getDay()];
+        
+        onChange({ 
+          ...data, 
+          [name]: value,
+          date: `${year}. ${month}. ${day}. ${dayName}`
+        });
+        return;
+      }
+    }
+
+    if (name === 'weddingTimeInput') {
+      const [hours, minutes] = value.split(':');
+      const h = parseInt(hours);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const displayHours = h % 12 || 12;
+      const timeString = `${ampm} ${displayHours}:${minutes}`;
+      
+      onChange({
+        ...data,
+        time: timeString
+      });
+      return;
+    }
+    
     onChange({ ...data, [name]: value });
   };
 
@@ -241,17 +274,23 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           </div>
           <div className="input-row">
             <div className="input-group">
-              <label>표시 날짜</label>
-              <input type="text" name="date" value={data.date} onChange={handleChange} placeholder="2026. 10. 24. SAT" />
-            </div>
-            <div className="input-group">
-              <label>D-Day 계산 날짜</label>
+              <label>예식일 선택</label>
               <input type="date" name="weddingDateISO" value={data.weddingDateISO} onChange={handleChange} />
             </div>
+            <div className="input-group">
+              <label>표시 날짜 (자동 생성)</label>
+              <input type="text" name="date" value={data.date} readOnly className="readonly-input" />
+            </div>
           </div>
-          <div className="input-group">
-            <label>예식 시간</label>
-            <input type="text" name="time" value={data.time} onChange={handleChange} placeholder="PM 12:30" />
+          <div className="input-row">
+            <div className="input-group">
+              <label>예식 시간 선택</label>
+              <input type="time" name="weddingTimeInput" onChange={handleChange} />
+            </div>
+            <div className="input-group">
+              <label>표시 시간 (자동 생성)</label>
+              <input type="text" name="time" value={data.time} readOnly className="readonly-input" />
+            </div>
           </div>
         </div>
 
@@ -268,16 +307,14 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         </div>
 
         <div className="editor-section">
-          <h3>영상 하이라이트</h3>
+          <h3>신랑/신부 한마디</h3>
           <div className="input-group">
-            <label>YouTube / Vimeo URL</label>
-            <input 
-              type="text" 
-              name="videoUrl" 
-              value={data.videoUrl} 
-              onChange={handleChange} 
-              placeholder="https://www.youtube.com/watch?v=..."
-            />
+            <label>신랑의 한마디</label>
+            <textarea name="groomMessage" value={data.groomMessage} onChange={handleChange} rows={3} placeholder="항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다." />
+          </div>
+          <div className="input-group">
+            <label>신부의 한마디</label>
+            <textarea name="brideMessage" value={data.brideMessage} onChange={handleChange} rows={3} placeholder="서로 아끼고 배려하며 예쁘게 잘 살겠습니다." />
           </div>
         </div>
 
@@ -729,6 +766,12 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           margin-top: 8px;
           background: #fdf6f9 !important;
           border-color: #f3d6e5 !important;
+        }
+        .readonly-input {
+          background: #f0f0f0 !important;
+          color: #888 !important;
+          cursor: not-allowed;
+          border-style: dashed !important;
         }
       `}</style>
     </div>

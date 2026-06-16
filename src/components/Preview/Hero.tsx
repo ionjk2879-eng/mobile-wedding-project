@@ -37,74 +37,125 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         transition={{ duration: 0.8 }}
         className="hero-content"
       >
-        <div className="d-day-badge">{calculateDDay()}</div>
-        <p className="wedding-label">{isEn ? 'WEDDING INVITATION' : '결혼식에 초대합니다'}</p>
-        <h1 className="names">{groomName} & {brideName}</h1>
         <div className="main-image-container">
           <img src={data.heroPhoto} alt="Wedding Hero" className="main-image" />
         </div>
-        <div className="wedding-info">
-          <p className="date">{dateStr} {timeStr}</p>
-          <p className="venue">{venueName}</p>
+
+        <div className="hero-footer">
+          <div className="d-day-badge">{calculateDDay()}</div>
+          <p className="wedding-label">{isEn ? 'WEDDING INVITATION' : '결혼식에 초대합니다'}</p>
+          <h1 className="names">
+            <span className="name">{groomName}</span>
+            <span className="ampersand">&</span>
+            <span className="name">{brideName}</span>
+          </h1>
+          <div className="wedding-info">
+            <p className="date">{dateStr}</p>
+            <p className="time">{timeStr}</p>
+            <p className="venue">{venueName}</p>
+          </div>
         </div>
       </motion.div>
       <style>{`
         .hero {
-          padding: 60px 20px;
+          padding: 40px 0 60px;
           text-align: center;
           background-color: var(--wedding-bg);
           transition: background-color 0.4s ease;
           position: relative;
         }
+        .hero-content {
+          padding: 0 20px;
+        }
         .d-day-badge {
           display: inline-block;
-          padding: 6px 16px;
-          background: var(--wedding-main);
-          color: white;
-          border-radius: 20px;
-          font-size: 0.85rem;
-          font-weight: 700;
-          margin-bottom: 20px;
+          padding: 4px 12px;
+          background: rgba(212, 165, 198, 0.1);
+          color: var(--wedding-accent);
+          border: 1px solid var(--wedding-accent);
+          border-radius: 4px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          margin-bottom: 15px;
           letter-spacing: 1px;
         }
         .wedding-label {
-          font-size: 0.8rem;
-          letter-spacing: 2px;
+          font-size: 0.7rem;
+          letter-spacing: 3px;
           color: var(--wedding-text-sub);
-          margin-bottom: 15px;
-        }
-        .names {
-          font-size: 3.5rem;
-          font-weight: 300;
-          margin-bottom: 30px;
-          color: var(--wedding-text-main);
-          letter-spacing: 0.05em;
-          line-height: 1.2;
-          word-break: keep-all;
+          margin-bottom: 25px;
+          opacity: 0.8;
         }
         .main-image-container {
           width: 100%;
-          margin-bottom: 30px;
-          border-radius: 200px 200px 0 0;
+          margin-bottom: 35px;
           overflow: hidden;
-          background: var(--wedding-card-bg);
-          border: 1px solid var(--wedding-border);
+          background: #fff;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+          line-height: 0;
         }
         .main-image {
           width: 100%;
+          height: auto;
           display: block;
         }
+        .hero-footer {
+          padding: 0 10px;
+        }
+        .names {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 15px;
+          font-size: 1.8rem;
+          font-weight: 400;
+          margin: 0 0 20px;
+          color: var(--wedding-text-main);
+          letter-spacing: 0.05em;
+        }
+        .ampersand {
+          font-size: 1.2rem;
+          color: var(--wedding-accent);
+          opacity: 0.6;
+          font-family: serif;
+          font-style: italic;
+        }
+        .name {
+          word-break: keep-all;
+        }
         .wedding-info {
-          font-size: 1.1rem;
-          color: var(--wedding-text-body);
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
         }
         .date {
+          font-size: 1rem;
           font-weight: 500;
-          margin-bottom: 5px;
+          color: var(--wedding-text-main);
+          margin: 0;
+          letter-spacing: 1px;
+        }
+        .time {
+          font-size: 0.9rem;
+          color: var(--wedding-text-sub);
+          margin: 0;
         }
         .venue {
           font-size: 0.9rem;
           color: var(--wedding-text-sub);
+          margin-top: 5px;
+          position: relative;
+          padding-top: 10px;
+        }
+        .venue::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 20px;
+          height: 1px;
+          background: var(--wedding-border);
         }
       `}</style>
     </section>

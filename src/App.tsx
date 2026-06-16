@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import EditorContainer from './components/Editor/EditorContainer';
 import Hero from './components/Preview/Hero';
 import Greeting from './components/Preview/Greeting';
+import Calendar from './components/Preview/Calendar';
 import PersonalMessage from './components/Preview/PersonalMessage';
 import Gallery from './components/Preview/Gallery';
 import Location from './components/Preview/Location';
@@ -10,7 +11,6 @@ import Money from './components/Preview/Money';
 import Share from './components/Preview/Share';
 import Dashboard from './components/Admin/Dashboard';
 import ParentsContact from './components/Preview/ParentsContact';
-import VideoEmbed from './components/Preview/VideoEmbed';
 import { InvitationData } from './types';
 
 const App: React.FC = () => {
@@ -86,9 +86,9 @@ const App: React.FC = () => {
     <>
       <Hero data={data} />
       <Greeting data={data} />
+      <Calendar data={data} />
       <ParentsContact data={data} />
       <PersonalMessage data={data} />
-      <VideoEmbed data={data} />
       <Gallery data={data} />
       <Location data={data} />
       <RSVPForm data={data} />
