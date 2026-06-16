@@ -56,6 +56,32 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
     onChange({ ...data, accounts: newAccounts });
   };
 
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const fileArray = Array.from(files);
+    const readers = fileArray.map(file => {
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          resolve(event.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readers).then(newPhotos => {
+      onChange({ ...data, photos: [...data.photos, ...newPhotos] });
+    });
+  };
+
+  const removePhoto = (index: number) => {
+    const newPhotos = [...data.photos];
+    newPhotos.splice(index, 1);
+    onChange({ ...data, photos: newPhotos });
+  };
+
   const fonts = [
     { name: '기본 (Pretendard)', value: "'Pretendard', sans-serif" },
     { name: 'Cormorant Garamond (럭셔리 세리프)', value: "'Cormorant Garamond', serif" },
@@ -277,9 +303,82 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
             ))}
           </div>
         </div>
+
+        <div className="editor-section">
+          <h3>갤러리 사진</h3>
+          <div className="photo-upload-area">
+            <label className="upload-btn">
+              <span>📸 사진 추가하기</span>
+              <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} hidden />
+            </label>
+            <div className="photo-preview-grid">
+              {data.photos.map((photo, index) => (
+                <div key={index} className="photo-preview-item">
+                  <img src={photo} alt={`Preview ${index}`} />
+                  <button className="remove-photo-btn" onClick={() => removePhoto(index)}><Search size={14} style={{ transform: 'rotate(45deg)' }} /></button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       <style>{`
+        .photo-upload-area {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .upload-btn {
+          width: 100%;
+          padding: 20px;
+          border: 2px dashed #D4A5C6;
+          border-radius: 16px;
+          color: #D4A5C6;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .upload-btn:hover {
+          background: rgba(212, 165, 198, 0.05);
+          border-color: #B3A2C8;
+          color: #B3A2C8;
+        }
+        .photo-preview-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 10px;
+        }
+        .photo-preview-item {
+          aspect-ratio: 1;
+          border-radius: 8px;
+          overflow: hidden;
+          position: relative;
+          border: 1px solid #EEDDE4;
+        }
+        .photo-preview-item img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .remove-photo-btn {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: rgba(0,0,0,0.5);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: none;
+          cursor: pointer;
+        }
         .editor-scroll-area {
           flex: 1;
           overflow-y: auto;

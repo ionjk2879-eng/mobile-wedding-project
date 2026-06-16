@@ -134,12 +134,12 @@ const App: React.FC = () => {
         <header className="builder-header">
           <div className="header-main">
             <h1>💍 Invitation Builder</h1>
-            <div className="header-buttons">
-              <button className="preview-toggle-btn" onClick={() => setIsFullPreview(true)}>전체화면 보기</button>
-              <button className="admin-btn" onClick={() => setShowDashboard(true)}>응답 분석</button>
-            </div>
+            <p>내용을 입력하면 오른쪽에서 실시간으로 확인할 수 있습니다.</p>
           </div>
-          <p>내용을 입력하면 오른쪽에서 실시간으로 확인할 수 있습니다.</p>
+          <div className="header-buttons">
+            <button className="preview-toggle-btn" onClick={() => setIsFullPreview(true)}>전체화면 보기</button>
+            <button className="admin-btn" onClick={() => setShowDashboard(true)}>응답 분석</button>
+          </div>
         </header>
         <EditorContainer data={data} onChange={setData} />
       </div>
@@ -189,30 +189,38 @@ const App: React.FC = () => {
           overflow: hidden;
         }
         .builder-header {
-          padding: 30px 24px;
+          padding: 24px;
           border-bottom: 1px solid #EEDDE4;
           background: #FFFFFF;
           flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
         }
         .header-main {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 6px;
         }
         .header-buttons {
           display: flex;
-          gap: 8px;
+          gap: 10px;
+          width: 100%;
         }
         .preview-toggle-btn {
+          flex: 1;
           background: transparent;
           border: 1px solid #B3A2C8;
           color: #B3A2C8;
-          padding: 8px 14px;
-          border-radius: 10px;
+          padding: 10px 14px;
+          border-radius: 12px;
           font-size: 0.85rem;
           font-weight: 700;
           transition: all 0.2s;
           cursor: pointer;
+          white-space: nowrap;
+          text-align: center;
         }
         .preview-toggle-btn:hover {
           background: #FAF5F7;
@@ -221,22 +229,25 @@ const App: React.FC = () => {
           transform: translateY(-1px);
         }
         .admin-btn {
+          flex: 1;
           background: #B3A2C8;
           color: white;
-          padding: 8px 14px;
-          border-radius: 10px;
+          padding: 10px 14px;
+          border-radius: 12px;
           font-size: 0.85rem;
           font-weight: 700;
           transition: all 0.2s;
           cursor: pointer;
           border: none;
+          white-space: nowrap;
+          text-align: center;
         }
         .admin-btn:hover {
           background: #D4A5C6;
           transform: translateY(-1px);
         }
         .builder-header h1 {
-          font-size: 1.6rem;
+          font-size: 1.5rem;
           font-weight: 700;
           margin: 0;
           color: #D4A5C6;
@@ -246,10 +257,10 @@ const App: React.FC = () => {
           letter-spacing: -0.5px;
         }
         .builder-header p {
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           color: #8F7D8B;
-          margin: 10px 0 0 0;
-          line-height: 1.5;
+          margin: 0;
+          line-height: 1.4;
         }
         .preview-panel {
           height: 100vh;

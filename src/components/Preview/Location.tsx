@@ -1,16 +1,52 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
 import { InvitationData } from '../../types';
+
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
 
 interface PreviewProps {
   data: InvitationData;
 }
 
 const Location: React.FC<PreviewProps> = ({ data }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!window.kakao || !window.kakao.maps) return;
+
+    const container = mapRef.current;
+    if (!container) return;
+
+    const options = {
+      center: new window.kakao.maps.LatLng(33.450701, 126.570667),
+      level: 3
+    };
+
+    const map = new window.kakao.maps.Map(container, options);
+    const geocoder = new window.kakao.maps.services.Geocoder();
+
+    geocoder.addressSearch(data.venueAddress, (result: any, status: any) => {
+      if (status === window.kakao.maps.services.Status.OK) {
+        const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+
+        const marker = new window.kakao.maps.Marker({
+          map: map,
+          position: coords
+        });
+
+        map.setCenter(coords);
+      }
+    });
+  }, [data.venueAddress]);
+
   const navLinks = [
-    { name: '카카오내비', url: 'https://map.kakao.com/' },
-    { name: '네이버 지도', url: 'https://map.naver.com/' },
-    { name: 'T맵', url: 'https://www.tmap.co.kr/' },
+    { name: '카카오내비', url: `https://map.kakao.com/link/to/${data.venueName},${data.venueAddress}` },
+    { name: '네이버 지도', url: `https://map.naver.com/index.nhn?slng=&slat=&stext=&elng=&elat=&etext=${encodeURIComponent(data.venueName)}&menu=route` },
+    { name: 'T맵', url: `https://apis.openapi.sk.com/tmap/app/routes?appKey=YOUR_TMAP_APP_KEY&name=${encodeURIComponent(data.venueName)}` },
   ];
 
   return (
@@ -21,10 +57,7 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
         <p className="address">{data.venueAddress}</p>
       </div>
 
-      <div className="map-placeholder">
-        <MapPin size={40} color="#ddd" />
-        <p>지도 영역 (API 연결 필요)</p>
-      </div>
+      <div ref={mapRef} className="map-container"></div>
 
       <div className="nav-grid">
         {navLinks.map((nav, index) => (
@@ -58,20 +91,13 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
           font-size: 0.9rem;
           margin: 0;
         }
-        .map-placeholder {
+        .map-container {
           width: 100%;
-          height: 200px;
-          background: var(--wedding-card-bg);
-          border: 1px dashed var(--wedding-border);
+          height: 300px;
+          background: #eee;
+          border: 1px solid var(--wedding-border);
           border-radius: 16px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
           margin-bottom: 20px;
-          color: var(--wedding-text-sub);
-          font-size: 0.8rem;
-          gap: 10px;
         }
         .nav-grid {
           display: grid;

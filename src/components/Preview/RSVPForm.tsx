@@ -22,8 +22,18 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Logic for Supabase integration will go here later
-    console.log('RSVP Submitted:', formData);
+    
+    const newResponse = {
+      ...formData,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString()
+    };
+
+    // Mock Backend: Save to localStorage
+    const existingResponses = JSON.parse(localStorage.getItem('wedding_rsvp_responses') || '[]');
+    localStorage.setItem('wedding_rsvp_responses', JSON.stringify([...existingResponses, newResponse]));
+
+    console.log('RSVP Submitted:', newResponse);
     setSubmitted(true);
   };
 

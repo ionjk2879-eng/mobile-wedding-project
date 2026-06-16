@@ -1,19 +1,53 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Share2, Link } from 'lucide-react';
 import { InvitationData } from '../../types';
+
+declare global {
+  interface Window {
+    Kakao: any;
+  }
+}
 
 interface PreviewProps {
   data: InvitationData;
 }
 
 const Share: React.FC<PreviewProps> = ({ data }) => {
+  useEffect(() => {
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init('YOUR_KAKAO_APP_KEY');
+    }
+  }, []);
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     alert('링크가 복사되었습니다.');
   };
 
   const handleKakaoShare = () => {
-    alert('카카오톡 공유 기능은 SDK 설정이 필요합니다.');
+    if (!window.Kakao) return;
+
+    window.Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: `${data.groomName} ♡ ${data.brideName} 결혼합니다`,
+        description: `${data.date} ${data.time} | ${data.venueName}`,
+        imageUrl: window.location.origin + (data.photos[0] || '/hero.png'),
+        link: {
+          mobileWebUrl: window.location.href,
+          webUrl: window.location.href,
+        },
+      },
+      buttons: [
+        {
+          title: '모바일 청첩장 보기',
+          link: {
+            mobileWebUrl: window.location.href,
+            webUrl: window.location.href,
+          },
+        },
+      ],
+    });
   };
 
   return (
