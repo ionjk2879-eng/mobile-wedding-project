@@ -9,6 +9,10 @@ interface PreviewProps {
 const Gallery: React.FC<PreviewProps> = ({ data }) => {
   const isEn = data.language === 'en';
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
 
   const openLightbox = (index: number) => {
     setSelectedIndex(index);
@@ -20,16 +24,38 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
     document.body.style.overflow = 'auto';
   };
 
-  const nextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const nextImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (selectedIndex === null) return;
     setSelectedIndex((selectedIndex + 1) % data.photos.length);
   };
 
-  const prevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const prevImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (selectedIndex === null) return;
     setSelectedIndex((selectedIndex - 1 + data.photos.length) % data.photos.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      nextImage();
+    } else if (isRightSwipe) {
+      prevImage();
+    }
   };
 
   return (
@@ -44,7 +70,13 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
       </div>
 
       {selectedIndex !== null && (
-        <div className="lightbox-overlay" onClick={closeLightbox}>
+        <div 
+          className="lightbox-overlay" 
+          onClick={closeLightbox}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div className="lightbox-backdrop" />
           
           <button className="close-btn" onClick={closeLightbox} aria-label="Close">
@@ -60,6 +92,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
               src={data.photos[selectedIndex]} 
               alt={`Full view ${selectedIndex + 1}`} 
               className="lightbox-image"
+              draggable="false"
             />
             <div className="index-indicator">
               {selectedIndex + 1} / {data.photos.length}
@@ -105,7 +138,8 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 99999; /* Ensure it's above everything */
+          z-index: 99999;
+          touch-action: none; /* Prevent scrolling while swiping */
         }
         .lightbox-backdrop {
           position: absolute;
@@ -147,7 +181,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          z-index: 2;
+          z-index: 10;
           transition: background 0.2s;
         }
         .close-btn:hover { background: rgba(255, 255, 255, 0.2); }
@@ -161,7 +195,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           border: none;
           cursor: pointer;
           padding: 20px;
-          z-index: 2;
+          z-index: 10;
           opacity: 0.6;
           transition: all 0.2s;
         }
@@ -179,8 +213,8 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           font-weight: 500;
         }
 
-        @media (max-width: 600px) {
-          .nav-btn { display: none; } /* Use swipe/tap on mobile or just simplify */
+        @media (max-width: 768px) {
+          .nav-btn { display: none; }
           .lightbox-image { max-height: 70vh; }
         }
       `}</style>
