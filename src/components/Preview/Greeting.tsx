@@ -7,12 +7,16 @@ interface PreviewProps {
 }
 
 const Greeting: React.FC<PreviewProps> = ({ data }) => {
+  const isEn = data.language === 'en';
+  const title = isEn ? 'INVITATION' : (data.greetingTitle || '초대합니다');
+  const content = isEn && data.en.greetingContent ? data.en.greetingContent : data.greetingContent;
+
   return (
     <section className="greeting section" style={{ fontFamily: data.fontFamily }}>
       <div className="greeting-text">
-        <h2>{data.greetingTitle}</h2>
+        <h2>{title}</h2>
         <p style={{ whiteSpace: 'pre-wrap' }}>
-          {data.greetingContent}
+          {content}
         </p>
       </div>
 

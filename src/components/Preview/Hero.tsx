@@ -7,6 +7,25 @@ interface PreviewProps {
 }
 
 const Hero: React.FC<PreviewProps> = ({ data }) => {
+  const isEn = data.language === 'en';
+  const groomName = isEn && data.en.groomName ? data.en.groomName : data.groomName;
+  const brideName = isEn && data.en.brideName ? data.en.brideName : data.brideName;
+  const venueName = isEn && data.en.venueName ? data.en.venueName : data.venueName;
+
+  const calculateDDay = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weddingDate = new Date(data.weddingDateISO);
+    weddingDate.setHours(0, 0, 0, 0);
+    
+    const diffTime = weddingDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'D-Day';
+    if (diffDays < 0) return `D+${Math.abs(diffDays)}`;
+    return `D-${diffDays}`;
+  };
+
   return (
     <section className="hero" style={{ fontFamily: data.fontFamily }}>
       <motion.div 
@@ -16,14 +35,15 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         transition={{ duration: 0.8 }}
         className="hero-content"
       >
+        <div className="d-day-badge">{calculateDDay()}</div>
         <p className="wedding-label">WEDDING INVITATION</p>
-        <h1 className="names">{data.groomName} & {data.brideName}</h1>
+        <h1 className="names">{groomName} & {brideName}</h1>
         <div className="main-image-container">
           <img src={data.photos[0] || "/src/assets/hero.png"} alt="Wedding Hero" className="main-image" />
         </div>
         <div className="wedding-info">
           <p className="date">{data.date} {data.time}</p>
-          <p className="venue">{data.venueName}</p>
+          <p className="venue">{venueName}</p>
         </div>
       </motion.div>
       <style>{`
@@ -32,12 +52,24 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
           text-align: center;
           background-color: var(--wedding-bg);
           transition: background-color 0.4s ease;
+          position: relative;
+        }
+        .d-day-badge {
+          display: inline-block;
+          padding: 6px 16px;
+          background: var(--wedding-main);
+          color: white;
+          border-radius: 20px;
+          font-size: 0.85rem;
+          font-weight: 700;
+          margin-bottom: 20px;
+          letter-spacing: 1px;
         }
         .wedding-label {
           font-size: 0.8rem;
           letter-spacing: 3px;
-          color: var(--wedding-main);
-          margin-bottom: 20px;
+          color: var(--wedding-text-sub);
+          margin-bottom: 15px;
         }
         .names {
           font-size: 3.8rem;

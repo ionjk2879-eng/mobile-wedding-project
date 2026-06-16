@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { MapPin, Navigation } from 'lucide-react';
+import { MapPin, Navigation, Train, Bus, Car } from 'lucide-react';
 import { InvitationData } from '../../types';
 
 declare global {
@@ -68,6 +68,21 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
         ))}
       </div>
 
+      <div className="transport-info">
+        <div className="transport-item">
+          <div className="transport-label"><Train size={18} /> 지하철</div>
+          <div className="transport-detail">{data.transport.subway}</div>
+        </div>
+        <div className="transport-item">
+          <div className="transport-label"><Bus size={18} /> 버스</div>
+          <div className="transport-detail">{data.transport.bus}</div>
+        </div>
+        <div className="transport-item">
+          <div className="transport-label"><Car size={18} /> 자가용/주차</div>
+          <div className="transport-detail">{data.transport.parking}</div>
+        </div>
+      </div>
+
       <style>{`
         .location-info {
           margin-bottom: 20px;
@@ -120,6 +135,35 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
         }
         .nav-item:hover {
           background: var(--wedding-border);
+        }
+        .transport-info {
+          text-align: left;
+          background: var(--wedding-card-bg);
+          padding: 24px;
+          border-radius: 20px;
+          border: 1px solid var(--wedding-border);
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .transport-item {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .transport-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--wedding-main);
+        }
+        .transport-detail {
+          font-size: 0.9rem;
+          color: var(--wedding-text-body);
+          line-height: 1.5;
+          padding-left: 26px;
         }
       `}</style>
     </section>

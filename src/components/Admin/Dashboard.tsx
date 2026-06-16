@@ -26,10 +26,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
     }
   };
 
-  const totalGuests = responses.reduce((acc, curr) => acc + curr.totalGuests, 0);
-  const groomGuests = responses.filter(r => r.relation === 'groom').reduce((acc, curr) => acc + curr.totalGuests, 0);
-  const brideGuests = responses.filter(r => r.relation === 'bride').reduce((acc, curr) => acc + curr.totalGuests, 0);
-  const mealCount = responses.filter(r => r.wantsMeal).reduce((acc, curr) => acc + curr.totalGuests, 0);
+  const attendingResponses = responses.filter(r => r.isAttending);
+  const totalGuests = attendingResponses.reduce((acc, curr) => acc + curr.totalGuests, 0);
+  const groomGuests = attendingResponses.filter(r => r.relation === 'groom').reduce((acc, curr) => acc + curr.totalGuests, 0);
+  const brideGuests = attendingResponses.filter(r => r.relation === 'bride').reduce((acc, curr) => acc + curr.totalGuests, 0);
+  const mealCount = attendingResponses.filter(r => r.wantsMeal).reduce((acc, curr) => acc + curr.totalGuests, 0);
+  const nonAttendingCount = responses.filter(r => !r.isAttending).length;
 
   const relationData = [
     { name: '신랑측', value: groomGuests },
@@ -40,6 +42,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
     { name: '식사함', value: mealCount },
     { name: '안함', value: totalGuests - mealCount },
   ];
+
+  const handleCopyTemplate = (type: string) => {
+    const text = type === 'sms' 
+      ? `[초대장] 저희 두 사람, 결혼합니다.\n일시: 2026년 10월 24일 오후 12:30\n장소: 서울 웨딩 가든\n모시는 글: ${window.location.href}`
+      : `💍 저희 결혼합니다!\n소중한 분들을 초대합니다.\n\n✨ 일시: 2026. 10. 24. 토요일 PM 12:30\n📍 장소: 서울 웨딩 가든\n\n아래 링크에서 상세 내용을 확인해주세요.\n${window.location.href}`;
+    
+    navigator.clipboard.writeText(text);
+    alert('초대 문구가 복사되었습니다.');
+  };
 
   return (
     <div className="dashboard-overlay">
@@ -68,6 +79,27 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
             <div className="stat-info">
               <span>총 식사 인원</span>
               <strong>{mealCount}명</strong>
+            </div>
+          </div>
+          <div className="stat-card">
+            <X size={20} color="#e74c3c" />
+            <div className="stat-info">
+              <span>참석 불가 응답</span>
+              <strong>{nonAttendingCount}건</strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="list-card template-card">
+          <h3>📩 초대장 발송 템플릿</h3>
+          <div className="template-grid">
+            <div className="template-item">
+              <p>기본 SMS 양식</p>
+              <button onClick={() => handleCopyTemplate('sms')}>복사하기</button>
+            </div>
+            <div className="template-item">
+              <p>카카오톡/SNS 양식</p>
+              <button onClick={() => handleCopyTemplate('kakao')}>복사하기</button>
             </div>
           </div>
         </div>
@@ -119,6 +151,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
                 <table>
                   <thead>
                     <tr>
+                      <th>상태</th>
                       <th>구분</th>
                       <th>이름</th>
                       <th>인원</th>
@@ -129,10 +162,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
                   <tbody>
                     {responses.map((res, i) => (
                       <tr key={i}>
+                        <td>{res.isAttending ? <span className="att-ok">참석</span> : <span className="att-no">불참</span>}</td>
                         <td><span className={`tag ${res.relation}`}>{res.relation === 'groom' ? '신랑측' : '신부측'}</span></td>
                         <td>{res.guestName}</td>
-                        <td>{res.totalGuests}명</td>
-                        <td>{res.wantsMeal ? 'O' : 'X'}</td>
+                        <td>{res.isAttending ? `${res.totalGuests}명` : '-'}</td>
+                        <td>{res.isAttending ? (res.wantsMeal ? 'O' : 'X') : '-'}</td>
                         <td className="msg-td">{res.message}</td>
                       </tr>
                     ))}
@@ -188,7 +222,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
 
         .stats-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(3, 1fr);
           gap: 20px;
           margin-bottom: 30px;
         }
@@ -203,6 +237,28 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
         }
         .stat-info span { font-size: 0.85rem; color: #8c8581; display: block; }
         .stat-info strong { font-size: 1.5rem; color: #4a4543; }
+
+        .template-card { margin-bottom: 30px; }
+        .template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .template-item { 
+          background: #fdf6f9; 
+          padding: 15px; 
+          border-radius: 12px; 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center;
+          border: 1px solid #f3d6e5;
+        }
+        .template-item p { margin: 0; font-size: 0.85rem; font-weight: 600; color: #D4A5C6; }
+        .template-item button { 
+          background: #D4A5C6; 
+          color: white; 
+          border: none; 
+          padding: 6px 12px; 
+          border-radius: 8px; 
+          font-size: 0.75rem; 
+          cursor: pointer;
+        }
 
         .charts-grid {
           display: grid;
@@ -234,6 +290,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
         .tag.groom { background: #e5d1c8; color: #fff; }
         .tag.bride { background: #b89c8e; color: #fff; }
         .msg-td { font-style: italic; color: #8c8581; font-size: 0.85rem; }
+        .att-ok { color: #2ecc71; font-weight: 700; }
+        .att-no { color: #e74c3c; font-weight: 700; }
 
         .no-data {
           padding: 60px;
@@ -245,7 +303,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
         }
 
         @media (max-width: 700px) {
-          .stats-grid, .charts-grid { grid-template-columns: 1fr; }
+          .stats-grid, .charts-grid, .template-grid { grid-template-columns: 1fr; }
           .dashboard-modal { padding: 20px; }
         }
       `}</style>

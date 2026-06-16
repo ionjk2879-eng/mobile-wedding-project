@@ -9,6 +9,9 @@ import RSVPForm from './components/Preview/RSVPForm';
 import Money from './components/Preview/Money';
 import Share from './components/Preview/Share';
 import Dashboard from './components/Admin/Dashboard';
+import ParentsContact from './components/Preview/ParentsContact';
+import VideoEmbed from './components/Preview/VideoEmbed';
+import Guestbook from './components/Preview/Guestbook';
 import { InvitationData } from './types';
 
 const App: React.FC = () => {
@@ -45,7 +48,56 @@ const App: React.FC = () => {
     brideMessage: '서로 아끼고 배려하며 예쁘게 잘 살겠습니다.',
     isRSVPEnabled: true,
     theme: 'warm',
+    weddingDateISO: '2026-10-24',
+    transport: {
+      subway: '2호선 강남역 12번 출구 도보 5분',
+      bus: '강남역 정류장 하차 (140, 441, 470번 등)',
+      parking: '건물 내 지하 주차장 이용 가능 (2시간 무료)'
+    },
+    parents: {
+      groomParents: [
+        { role: '아버지', name: '김철수', phone: '010-0000-0000' },
+        { role: '어머니', name: '박영희', phone: '010-0000-0000' },
+      ],
+      brideParents: [
+        { role: '아버지', name: '이영호', phone: '010-0000-0000' },
+        { role: '어머니', name: '최미숙', phone: '010-0000-0000' },
+      ]
+    },
+    videoUrl: '',
+    language: 'ko',
+    en: {
+      groomName: 'Jihyun Kim',
+      brideName: 'Minji Lee',
+      venueName: 'Seoul Wedding Garden',
+      venueAddress: '123 Teheran-ro, Gangnam-gu, Seoul',
+    },
+    guestMessages: [],
   });
+
+  // Translation helper
+  const t = (key: keyof InvitationData) => {
+    if (data.language === 'en' && data.en && data.en[key]) {
+      return data.en[key] as any;
+    }
+    return data[key] as any;
+  };
+
+  const previewContent = (
+    <>
+      <Hero data={data} />
+      <Greeting data={data} />
+      <ParentsContact data={data} />
+      <PersonalMessage data={data} />
+      <VideoEmbed data={data} />
+      <Gallery data={data} />
+      <Location data={data} />
+      <Guestbook data={data} onUpdate={(msgs) => setData({...data, guestMessages: msgs})} />
+      <RSVPForm data={data} />
+      <Money data={data} />
+      <Share data={data} />
+    </>
+  );
 
   if (isFullPreview) {
     return (
@@ -58,14 +110,7 @@ const App: React.FC = () => {
         </button>
 
         <div className={`invitation-page theme-${data.theme || 'warm'}`}>
-          <Hero data={data} />
-          <Greeting data={data} />
-          <PersonalMessage data={data} />
-          <Gallery data={data} />
-          <Location data={data} />
-          <RSVPForm data={data} />
-          <Money data={data} />
-          <Share data={data} />
+          {previewContent}
         </div>
 
         <style>{`
@@ -148,14 +193,7 @@ const App: React.FC = () => {
         <div className="phone-container">
           <div className="phone-frame">
             <div className={`phone-content theme-${data.theme || 'warm'}`}>
-              <Hero data={data} />
-              <Greeting data={data} />
-              <PersonalMessage data={data} />
-              <Gallery data={data} />
-              <Location data={data} />
-              <RSVPForm data={data} />
-              <Money data={data} />
-              <Share data={data} />
+              {previewContent}
             </div>
           </div>
         </div>

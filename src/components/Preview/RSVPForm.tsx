@@ -74,6 +74,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
       <form className="rsvp-form" onSubmit={handleSubmit}>
         <div className="form-group">
+          <label className="section-label">구분</label>
           <div className="tab-group">
             <button 
               type="button" 
@@ -93,6 +94,26 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         </div>
 
         <div className="form-group">
+          <label className="section-label">참석 여부</label>
+          <div className="attendance-toggle">
+            <button 
+              type="button" 
+              className={`toggle-btn ${formData.isAttending ? 'active' : ''}`}
+              onClick={() => setFormData({...formData, isAttending: true})}
+            >
+              참석합니다
+            </button>
+            <button 
+              type="button" 
+              className={`toggle-btn ${!formData.isAttending ? 'active-refuse' : ''}`}
+              onClick={() => setFormData({...formData, isAttending: false})}
+            >
+              참석이 어렵습니다
+            </button>
+          </div>
+        </div>
+
+        <div className="form-group">
           <input 
             type="text" 
             placeholder="성함을 입력해 주세요" 
@@ -103,33 +124,35 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           />
         </div>
 
-        <div className="form-row">
-          <div className="form-group flex-1">
-            <label><Users size={14} /> 동반 인원</label>
-            <select 
-              className="rsvp-select"
-              value={formData.totalGuests}
-              onChange={(e) => setFormData({...formData, totalGuests: parseInt(e.target.value)})}
-            >
-              {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}명 (본인포함)</option>)}
-            </select>
+        {formData.isAttending && (
+          <div className="form-row">
+            <div className="form-group flex-1">
+              <label><Users size={14} /> 동반 인원</label>
+              <select 
+                className="rsvp-select"
+                value={formData.totalGuests}
+                onChange={(e) => setFormData({...formData, totalGuests: parseInt(e.target.value)})}
+              >
+                {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}명 (본인포함)</option>)}
+              </select>
+            </div>
+            <div className="form-group flex-1">
+              <label><Utensils size={14} /> 식사 여부</label>
+              <select 
+                className="rsvp-select"
+                value={formData.wantsMeal ? 'yes' : 'no'}
+                onChange={(e) => setFormData({...formData, wantsMeal: e.target.value === 'yes'})}
+              >
+                <option value="yes">식사 함</option>
+                <option value="no">식사 안함</option>
+              </select>
+            </div>
           </div>
-          <div className="form-group flex-1">
-            <label><Utensils size={14} /> 식사 여부</label>
-            <select 
-              className="rsvp-select"
-              value={formData.wantsMeal ? 'yes' : 'no'}
-              onChange={(e) => setFormData({...formData, wantsMeal: e.target.value === 'yes'})}
-            >
-              <option value="yes">식사 함</option>
-              <option value="no">식사 안함</option>
-            </select>
-          </div>
-        </div>
+        )}
 
         <div className="form-group">
           <textarea 
-            placeholder="축하 메시지 (선택사항)" 
+            placeholder={formData.isAttending ? "축하 메시지 (선택사항)" : "축하 메시지 및 아쉬운 마음을 전해주세요"} 
             className="rsvp-textarea"
             rows={3}
             value={formData.message}
@@ -138,7 +161,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         </div>
 
         <button type="submit" className="submit-btn">
-          참석 의사 전달하기
+          {formData.isAttending ? "참석 의사 전달하기" : "답변 전달하기"}
         </button>
       </form>
 
@@ -146,6 +169,39 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         .rsvp-section {
           background-color: var(--wedding-bg);
           transition: background-color 0.4s ease;
+        }
+        .section-label {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: var(--wedding-main);
+          margin-bottom: 10px;
+        }
+        .attendance-toggle {
+          display: flex;
+          gap: 10px;
+        }
+        .toggle-btn {
+          flex: 1;
+          padding: 12px;
+          border-radius: 12px;
+          border: 1px solid var(--wedding-border);
+          background: var(--wedding-bg);
+          font-size: 0.85rem;
+          color: var(--wedding-text-sub);
+          transition: all 0.2s;
+        }
+        .toggle-btn.active {
+          background: var(--wedding-main);
+          color: white;
+          border-color: var(--wedding-main);
+          font-weight: 700;
+        }
+        .toggle-btn.active-refuse {
+          background: #8c8581;
+          color: white;
+          border-color: #8c8581;
+          font-weight: 700;
         }
         .rsvp-header h2 { margin-bottom: 15px; }
         .rsvp-header p { 

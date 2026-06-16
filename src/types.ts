@@ -11,6 +11,13 @@ export interface Contact {
   phone: string;
 }
 
+export interface GuestMessage {
+  id: string;
+  name: string;
+  content: string;
+  createdAt: string;
+}
+
 export interface InvitationData {
   groomName: string;
   brideName: string;
@@ -29,6 +36,22 @@ export interface InvitationData {
   brideMessage: string;
   isRSVPEnabled: boolean;
   theme?: 'warm' | 'dark' | 'midnight';
+  
+  // New features
+  weddingDateISO: string;
+  transport: {
+    subway: string;
+    bus: string;
+    parking: string;
+  };
+  parents: {
+    groomParents: Contact[];
+    brideParents: Contact[];
+  };
+  videoUrl: string;
+  language: 'ko' | 'en';
+  en: Partial<InvitationData>;
+  guestMessages: GuestMessage[];
 }
 
 export interface RSVPResponse {

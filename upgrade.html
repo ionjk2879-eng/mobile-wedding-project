@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>모바일 청첩장 — 디자인 방향 시각화</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Pretendard', 'Noto Sans KR', sans-serif;
+    background: #f5f0eb;
+    color: #2C1E10;
+    padding: 40px 24px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.5rem; font-weight: 500; margin-bottom: 6px; }
+  .subtitle { font-size: 0.85rem; color: #8C6E5A; margin-bottom: 48px; }
+
+  .section { margin-bottom: 52px; }
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: #8C6E5A;
+    margin-bottom: 16px; border-left: 3px solid #A07850;
+    padding-left: 10px;
+  }
+
+  /* ── 현재 vs 개선 ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .compare-card {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid #D9C5A8;
+  }
+  .compare-head {
+    padding: 12px 16px; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+  }
+  .compare-head.old { background: #EDE4D6; color: #8C6E5A; }
+  .compare-head.new { background: #2C1E10; color: #C8A87A; }
+  .compare-body { background: #fff; }
+  .compare-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 16px; border-bottom: 1px solid #F0EAE5;
+    font-size: 12px; color: #5C4A3A;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .tag {
+    font-size: 10px; font-weight: 600; padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .tag-warn { background: #FFF3D6; color: #7A5C3A; }
+  .tag-bad  { background: #FCEBEB; color: #A32D2D; }
+  .tag-good { background: #EAF3DE; color: #3B6D11; }
+
+  /* ── 테마 카드 ── */
+  .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .theme-card { border-radius: 16px; overflow: hidden; border: 1px solid #D9C5A8; }
+  .theme-swatch {
+    height: 100px; display: flex; align-items: flex-end;
+    padding: 12px 14px;
+  }
+  .dot-row { display: flex; gap: 6px; }
+  .dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.3);
+  }
+  .theme-body { background: #fff; padding: 12px 14px 14px; }
+  .theme-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #2C1E10; }
+  .theme-desc { font-size: 11px; color: #8C6E5A; line-height: 1.5; margin-bottom: 8px; }
+  .theme-tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 3px 9px; border-radius: 20px;
+  }
+
+  /* ── 팔레트 ── */
+  .palette { margin-bottom: 28px; }
+  .palette-title { font-size: 12px; font-weight: 600; color: #5C4A3A; margin-bottom: 12px; }
+  .swatch-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .swatch-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .swatch-box {
+    width: 52px; height: 52px; border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .swatch-role { font-size: 9px; color: #8C6E5A; text-align: center; line-height: 1.4; }
+  .swatch-hex  { font-size: 9px; color: #A07850; font-family: monospace; text-align: center; }
+
+  /* ── UI 프리뷰 ── */
+  .ui-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ui-block { border-radius: 12px; padding: 14px 16px; }
+  .ui-role { font-size: 9px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .ui-name { font-size: 13px; font-weight: 500; }
+  .ui-desc { font-size: 11px; margin-top: 3px; line-height: 1.4; }
+
+  /* ── 타이포 ── */
+  .typo-demo { background: #fff; border-radius: 14px; padding: 28px 24px; border: 1px solid #D9C5A8; margin-bottom: 14px; }
+  .typo-label { font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #A07850; margin-bottom: 10px; }
+  .typo-current { font-size: 2.5rem; font-weight: 300; color: #b89c8e; margin-bottom: 6px; }
+  .typo-new     { font-size: 3.8rem; font-weight: 300; color: #2C1E10; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .typo-note    { font-size: 11px; color: #8C6E5A; }
+
+  .h2-current { font-size: 1.4rem; font-weight: 500; color: #b89c8e; letter-spacing: 2px; margin-bottom: 4px; }
+  .h2-new     { font-size: 1.4rem; font-weight: 500; color: #2C1E10; letter-spacing: 5px; margin-bottom: 4px; }
+
+  /* ── 우선순위 테이블 ── */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    text-align: left; padding: 10px 12px;
+    background: #2C1E10; color: #C8A87A;
+    font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child  { border-radius: 0 8px 0 0; }
+  td { padding: 9px 12px; border-bottom: 1px solid #EDE4D6; color: #5C4A3A; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #FAF6F1; }
+  .badge {
+    font-size: 10px; font-weight: 600; padding: 3px 8px;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .b-now  { background: #FCEBEB; color: #A32D2D; }
+  .b-short{ background: #FFF3D6; color: #7A5C3A; }
+  .b-mid  { background: #EAF3DE; color: #3B6D11; }
+  .b-long { background: #E6F1FB; color: #185FA5; }
+
+  hr { border: none; border-top: 1px solid #D9C5A8; margin: 0; }
+</style>
+</head>
+<body>
+
+<h1>💍 모바일 청첩장 — 디자인 방향</h1>
+<p class="subtitle">색감·테마·타이포그래피 개선 가이드 / 2026 웨딩 트렌드 기반</p>
+
+<!-- 1. 현재 vs 개선 -->
+<div class="section">
+  <p class="section-label">현재 팔레트 문제점</p>
+  <div class="compare">
+    <div class="compare-card">
+      <div class="compare-head old">현재</div>
+      <div class="compare-body">
+        <div class="compare-row"><span>배경 --wedding-bg</span><span class="tag tag-warn">#fdfbf9</span></div>
+        <div class="compare-row"><span>메인 --wedding-main</span><span class="tag tag-warn">#b89c8e</span></div>
+        <div class="compare-row"><span>포인트 --wedding-accent</span><span class="tag tag-warn">#e5d1c8</span></div>
+        <div class="compare-row"><span>서브 텍스트</span><span class="tag tag-warn">#8c8581</span></div>
+        <div class="compare-row"><span>문제</span><span class="tag tag-bad">명도·채도 모두 유사 구간 집중</span></div>
+        <div class="compare-row"><span>접근성</span><span class="tag tag-bad">텍스트 대비비 ~3:1 (AA 미달)</span></div>
+      </div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-head new">2026 트렌드 방향</div>
+      <div class="compare-body">
+        <div class="compare-row"><span>색 대비</span><span class="tag tag-good">명도 차 확보 필수</span></div>
+        <div class="compare-row"><span>포인트 색</span><span class="tag tag-good">한 곳에 강한 채도</span></div>
+        <div class="compare-row"><span>무드</span><span class="tag tag-good">Earthy · Bold · 고급</span></div>
+        <div class="compare-row"><span>타이포</span><span class="tag tag-good">디스플레이 세리프 + 여백</span></div>
+        <div class="compare-row"><span>피할 것</span><span class="tag tag-bad">blush-on-blush 단색 팔레트</span></div>
+        <div class="compare-row"><span>키워드</span><span class="tag tag-good">terracotta · sage · deep brown</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. 테마 방향 -->
+<div class="section">
+  <p class="section-label">추천 테마 방향 3가지</p>
+  <div class="theme-grid">
+
+    <div class="theme-card">
+      <div class="theme-swatch" style="background:#F7F2EB;">
+        <div class="dot-row">
+          <div class="dot" style="background:#2C1E10;"></div>
+          <div class="dot" style="background:#A07850;"></div>
+          <div class="dot" style="background:#C8A87A;"></div>
+          <div class="dot" style="background:#EDE4D6;"></div>
+        </div>
+      </div>
+      <div class="theme-body">
+        <p class="theme-name">A. Warm Editorial</p>
+        <p class="theme-desc">현재 베이지 무드를 유지하되 명도 스펙트럼을 넓힘. 가장 자연스러운 업그레이드 경로.</p>
+        <span class="theme-tag" style="background:#EDE4D6;color:#5C4A3A;">권장 시작점</span>
+      </div>
+    </div>
+
+    <div class="theme-card">
+      <div class="theme-swatch" style="background:#2C2419;">
+        <div class="dot-row">
+          <div class="dot" style="background:#D4A96A;"></div>
+          <div class="dot" style="background:#F5ECD7;"></div>
+          <div class="dot" style="background:#7A5C3A;"></div>
+          <div class="dot" style="background:#2C2419;"></div>
+        </div>
+      </div>
+      <div class="theme-body">
+        <p class="theme-name">B. Dark Luxe</p>
+        <p class="theme-desc">딥 다크 브라운 배경 + 골드 포인트. 드라마틱하고 고급스러운 무드. Hero/헤더에 부분 적용 가능.</p>
+        <span class="theme-tag" style="background:#FFF3D6;color:#7A5C3A;">2026 메인 트렌드</span>
+      </div>
+    </div>
+
+    <div class="theme-card">
+      <div class="theme-swatch" style="background:#1A2630;">
+        <div class="dot-row">
+          <div class="dot" style="background:#8EBCB0;"></div>
+          <div class="dot" style="background:#D4E8E4;"></div>
+          <div class="dot" style="background:#C8A87A;"></div>
+          <div class="dot" style="background:#1A2630;"></div>
+        </div>
+      </div>
+      <div class="theme-body">
+        <p class="theme-name">C. Midnight Sage</p>
+        <p class="theme-desc">딥 네이비/슬레이트 배경 + 세이지 그린 포인트. 기존 웨딩 앱과 가장 차별화.</p>
+        <span class="theme-tag" style="background:#E4EEF0;color:#1A4050;">차별화 포인트</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 3. 팔레트 상세 -->
+<div class="section">
+  <p class="section-label">팔레트 상세 — A. Warm Editorial</p>
+
+  <div class="palette">
+    <p class="palette-title">기본 팔레트</p>
+    <div class="swatch-row">
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#F7F2EB;"></div>
+        <span class="swatch-role">배경</span>
+        <span class="swatch-hex">#F7F2EB</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#EDE4D6;"></div>
+        <span class="swatch-role">카드 서피스</span>
+        <span class="swatch-hex">#EDE4D6</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#D9C5A8;"></div>
+        <span class="swatch-role">보더</span>
+        <span class="swatch-hex">#D9C5A8</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#A07850; border-color:#7A5C3A;"></div>
+        <span class="swatch-role">포인트</span>
+        <span class="swatch-hex">#A07850</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#C8A87A;"></div>
+        <span class="swatch-role">골드 액센트</span>
+        <span class="swatch-hex">#C8A87A</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#2C1E10;"></div>
+        <span class="swatch-role">헤딩 텍스트</span>
+        <span class="swatch-hex">#2C1E10</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#5C4A3A;"></div>
+        <span class="swatch-role">본문 텍스트</span>
+        <span class="swatch-hex">#5C4A3A</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#8C6E5A;"></div>
+        <span class="swatch-role">서브 텍스트</span>
+        <span class="swatch-hex">#8C6E5A</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="palette">
+    <p class="palette-title">B. Dark Luxe — 부분 적용용</p>
+    <div class="swatch-row">
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#2C2419;"></div>
+        <span class="swatch-role">딥 다크 배경</span>
+        <span class="swatch-hex">#2C2419</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#3D3225;"></div>
+        <span class="swatch-role">다크 서피스</span>
+        <span class="swatch-hex">#3D3225</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#D4A96A;"></div>
+        <span class="swatch-role">골드 메인</span>
+        <span class="swatch-hex">#D4A96A</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#F5ECD7;"></div>
+        <span class="swatch-role">라이트 텍스트</span>
+        <span class="swatch-hex">#F5ECD7</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#7A5C3A;"></div>
+        <span class="swatch-role">보더</span>
+        <span class="swatch-hex">#7A5C3A</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="palette">
+    <p class="palette-title">C. Midnight Sage</p>
+    <div class="swatch-row">
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#1A2630;"></div>
+        <span class="swatch-role">딥 네이비 배경</span>
+        <span class="swatch-hex">#1A2630</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#223040;"></div>
+        <span class="swatch-role">서피스</span>
+        <span class="swatch-hex">#223040</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#8EBCB0;"></div>
+        <span class="swatch-role">세이지 포인트</span>
+        <span class="swatch-hex">#8EBCB0</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#D4E8E4;"></div>
+        <span class="swatch-role">세이지 라이트</span>
+        <span class="swatch-hex">#D4E8E4</span>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-box" style="background:#C8A87A;"></div>
+        <span class="swatch-role">골드 크로스</span>
+        <span class="swatch-hex">#C8A87A</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. UI 프리뷰 -->
+<div class="section">
+  <p class="section-label">에디터 UI 개선 프리뷰</p>
+  <div class="ui-grid">
+    <div class="ui-block" style="background:#2C1E10;">
+      <p class="ui-role" style="color:#C8A87A;">에디터 헤더 (개선)</p>
+      <p class="ui-name" style="color:#C8A87A; font-size:1.1rem;">💍 Invitation Builder</p>
+      <p class="ui-desc" style="color:#EDE4D6;">딥 브라운 배경으로 무게감 확보 — 현재 cream 단색 헤더에서 개선</p>
+    </div>
+    <div class="ui-block" style="background:#F7F2EB; border:1px solid #D9C5A8;">
+      <p class="ui-role" style="color:#8C6E5A;">에디터 바디 (유지)</p>
+      <p class="ui-name" style="color:#2C1E10;">섹션 카드</p>
+      <p class="ui-desc" style="color:#5C4A3A;">따뜻한 아이보리 유지. 카드 배경을 #EDE4D6으로 분리하면 계층 생김</p>
+    </div>
+    <div class="ui-block" style="background:#A07850;">
+      <p class="ui-role" style="color:#EDE4D6;">Primary 버튼 (개선)</p>
+      <p class="ui-name" style="color:#fff;">저장 / 주소 검색</p>
+      <p class="ui-desc" style="color:#EDE4D6;">채도 높여 클릭 유도 향상 — 현재 #b89c8e보다 명확한 CTA</p>
+    </div>
+    <div class="ui-block" style="background:#EDE4D6; border:1px solid #D9C5A8;">
+      <p class="ui-role" style="color:#8C6E5A;">Secondary 버튼 (신규)</p>
+      <p class="ui-name" style="color:#5C4A3A;">취소 / 초기화</p>
+      <p class="ui-desc" style="color:#8C6E5A;">Primary와 대비 확보. 현재 secondary 버튼 개념 자체가 없음</p>
+    </div>
+  </div>
+</div>
+
+<!-- 5. 청첩장 프리뷰 -->
+<div class="section">
+  <p class="section-label">청첩장(프리뷰) 개선 프리뷰</p>
+  <div class="ui-grid">
+    <div class="ui-block" style="background:#2C1E10; text-align:center; padding:24px 16px;">
+      <p style="font-size:9px;letter-spacing:3px;color:#8EBCB0;margin-bottom:10px;text-transform:uppercase;">WEDDING INVITATION</p>
+      <p style="font-size:2.2rem;font-weight:300;color:#C8A87A;letter-spacing:0.1em;margin-bottom:8px;">지현 & 민지</p>
+      <p style="font-size:11px;color:#EDE4D6;">2026. 10. 24. SAT · PM 12:30</p>
+      <p style="font-size:10px;color:#8C6E5A;margin-top:4px;">서울 웨딩 가든</p>
+      <p style="font-size:9px;color:#A07850;margin-top:12px;">← Hero Dark Luxe 버전</p>
+    </div>
+    <div class="ui-block" style="background:#F7F2EB; text-align:center; padding:24px 16px; border:1px solid #D9C5A8;">
+      <p style="font-size:9px;letter-spacing:3px;color:#A07850;margin-bottom:10px;text-transform:uppercase;">WEDDING INVITATION</p>
+      <p style="font-size:2.2rem;font-weight:300;color:#2C1E10;letter-spacing:0.1em;margin-bottom:8px;">지현 & 민지</p>
+      <p style="font-size:11px;color:#5C4A3A;">2026. 10. 24. SAT · PM 12:30</p>
+      <p style="font-size:10px;color:#8C6E5A;margin-top:4px;">서울 웨딩 가든</p>
+      <p style="font-size:9px;color:#A07850;margin-top:12px;">← Hero Warm Editorial 버전</p>
+    </div>
+    <div class="ui-block" style="background:#F7F2EB; border-left:3px solid #A07850; border-radius:0 12px 12px 0; padding:14px 16px;">
+      <p style="font-size:9px;letter-spacing:5px;color:#A07850;margin-bottom:8px;text-transform:uppercase;">오시는 길</p>
+      <p style="font-size:13px;font-weight:500;color:#2C1E10;margin-bottom:4px;">서울 웨딩 가든</p>
+      <p style="font-size:11px;color:#5C4A3A;">서울 강남구 테헤란로 123</p>
+      <p style="font-size:9px;color:#8C6E5A;margin-top:8px;">섹션 좌측 3px solid 포인트 보더</p>
+    </div>
+    <div style="background:#2C1E10; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;">
+      <div style="background:#C8A87A; color:#2C1E10; font-size:13px; font-weight:600; padding:12px 24px; border-radius:30px; width:100%; text-align:center;">참석 의사 전달하기</div>
+      <div style="background:transparent; color:#C8A87A; font-size:12px; padding:10px 20px; border:1px solid #7A5C3A; border-radius:30px; width:100%; text-align:center;">링크 복사하기</div>
+      <p style="font-size:9px;color:#8C6E5A;">CTA 버튼 — pill 형태 Dark Luxe</p>
+    </div>
+  </div>
+</div>
+
+<!-- 6. 타이포 비교 -->
+<div class="section">
+  <p class="section-label">타이포그래피 비교</p>
+
+  <div class="typo-demo">
+    <p class="typo-label">이름 표기 — Hero 섹션</p>
+    <p class="typo-current">지현 & 민지</p>
+    <p class="typo-note" style="margin-bottom:16px;">현재: 2.5rem · font-weight 300 · color #b89c8e · letter-spacing 없음</p>
+    <p class="typo-new">지현 & 민지</p>
+    <p class="typo-note">개선: 3.8rem · font-weight 300 · color #2C1E10 · letter-spacing 0.1em</p>
+  </div>
+
+  <div class="typo-demo">
+    <p class="typo-label">섹션 제목 (h2)</p>
+    <p class="h2-current">오시는 길</p>
+    <p class="typo-note" style="margin-bottom:14px;">현재: letter-spacing 2px · color #b89c8e</p>
+    <p class="h2-new">오시는 길</p>
+    <p class="typo-note">개선: letter-spacing 5px · color #2C1E10 — 동일 크기지만 여백 차이로 고급감 확연히 다름</p>
+  </div>
+
+  <div style="background:#EDE4D6; border-radius:14px; padding:16px 20px; border:1px solid #D9C5A8;">
+    <p class="typo-label" style="color:#A07850;">추가 권장 폰트</p>
+    <p style="font-size:12px;color:#5C4A3A;line-height:1.8;">
+      Google Fonts에서 추가 가능:<br/>
+      <strong style="font-weight:600;">Cormorant Garamond</strong> — 럭셔리 디스플레이 세리프, wght 300/400<br/>
+      <strong style="font-weight:600;">Playfair Display</strong> — 에디토리얼 세리프, 임팩트 강함<br/>
+      <span style="color:#8C6E5A;font-size:11px;">두 폰트 모두 2026 웨딩 Editorial 트렌드의 핵심 선택지</span>
+    </p>
+  </div>
+</div>
+
+<!-- 7. 개선 우선순위 -->
+<div class="section">
+  <p class="section-label">디자인 개선 우선순위</p>
+  <div style="border-radius:14px; overflow:hidden; border:1px solid #D9C5A8;">
+    <table>
+      <thead>
+        <tr>
+          <th>우선순위</th>
+          <th>항목</th>
+          <th>효과</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge b-now">즉시</span></td>
+          <td>--wedding-text-sub 명도 높이기 → #8C6E5A</td>
+          <td>접근성 + 가독성 동시 해결</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-now">즉시</span></td>
+          <td>--wedding-main 채도 높이기 → #A07850</td>
+          <td>버튼·강조 요소 클릭 유도 향상</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-short">단기</span></td>
+          <td>에디터 헤더 배경을 딥 다크로 변경</td>
+          <td>UI 계층 및 전문성 확보</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-short">단기</span></td>
+          <td>Hero 이름 font-size 3.8rem + letter-spacing 0.1em</td>
+          <td>첫인상 임팩트</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-short">단기</span></td>
+          <td>Cormorant Garamond / Playfair Display 폰트 추가</td>
+          <td>2026 트렌드 대응</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-short">단기</span></td>
+          <td>섹션 h2 letter-spacing 5px로 확대</td>
+          <td>고급스러움 확보, 변경 1줄</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-mid">중기</span></td>
+          <td>CSS 변수 기반 테마 전환 시스템 구현</td>
+          <td>사용자 테마 선택 기능</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-long">장기</span></td>
+          <td>Dark Luxe / Midnight Sage 테마 추가</td>
+          <td>제품 차별화</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

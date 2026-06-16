@@ -19,6 +19,29 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
     onChange({ ...data, [name]: value });
   };
 
+  const handleEnChange = (field: keyof InvitationData, value: string) => {
+    onChange({
+      ...data,
+      en: { ...data.en, [field]: value }
+    });
+  };
+
+  const handleTransportChange = (field: string, value: string) => {
+    onChange({
+      ...data,
+      transport: { ...data.transport, [field]: value }
+    });
+  };
+
+  const handleParentChange = (side: 'groomParents' | 'brideParents', index: number, field: string, value: string) => {
+    const newParents = [...data.parents[side]];
+    newParents[index] = { ...newParents[index], [field]: value };
+    onChange({
+      ...data,
+      parents: { ...data.parents, [side]: newParents }
+    });
+  };
+
   const handleAddressSearch = () => {
     new window.daum.Postcode({
       oncomplete: (searchData: any) => {
@@ -98,6 +121,20 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         <div className="editor-section">
           <h3>디자인 설정</h3>
           <div className="input-group">
+            <label>기본 언어 선택</label>
+            <div className="tab-group mini">
+              <button 
+                className={`tab-btn ${data.language === 'ko' ? 'active' : ''}`}
+                onClick={() => onChange({...data, language: 'ko'})}
+              >KOREAN</button>
+              <button 
+                className={`tab-btn ${data.language === 'en' ? 'active' : ''}`}
+                onClick={() => onChange({...data, language: 'en'})}
+              >ENGLISH</button>
+            </div>
+            <p className="input-hint">언어를 전환하면 미리보기의 UI 레이블이 해당 언어로 변경됩니다.</p>
+          </div>
+          <div className="input-group">
             <label>폰트 선택</label>
             <select 
               name="fontFamily" 
@@ -162,7 +199,6 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
               onChange={handleChange} 
               placeholder="https://example.com/music.mp3"
             />
-            <p className="input-hint">MP3 링크를 입력하면 청첩장에서 재생됩니다.</p>
           </div>
           <div className="input-group">
             <label className="checkbox-label">
@@ -173,7 +209,6 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
               />
               참석 응답(RSVP) 기능 활성화
             </label>
-            <p className="input-hint">하객들이 참석 여부를 전달할 수 있는 폼을 생성합니다.</p>
           </div>
         </div>
 
@@ -182,20 +217,30 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           <div className="input-group">
             <label>신랑 이름</label>
             <input type="text" name="groomName" value={data.groomName} onChange={handleChange} />
+            {data.language === 'en' && (
+              <input type="text" placeholder="Groom Name (EN)" value={data.en.groomName} onChange={(e) => handleEnChange('groomName', e.target.value)} className="en-input" />
+            )}
           </div>
           <div className="input-group">
             <label>신부 이름</label>
             <input type="text" name="brideName" value={data.brideName} onChange={handleChange} />
+            {data.language === 'en' && (
+              <input type="text" placeholder="Bride Name (EN)" value={data.en.brideName} onChange={(e) => handleEnChange('brideName', e.target.value)} className="en-input" />
+            )}
           </div>
           <div className="input-row">
             <div className="input-group">
-              <label>예식 날짜</label>
+              <label>표시 날짜</label>
               <input type="text" name="date" value={data.date} onChange={handleChange} placeholder="2026. 10. 24. SAT" />
             </div>
             <div className="input-group">
-              <label>예식 시간</label>
-              <input type="text" name="time" value={data.time} onChange={handleChange} placeholder="PM 12:30" />
+              <label>D-Day 계산 날짜</label>
+              <input type="date" name="weddingDateISO" value={data.weddingDateISO} onChange={handleChange} />
             </div>
+          </div>
+          <div className="input-group">
+            <label>예식 시간</label>
+            <input type="text" name="time" value={data.time} onChange={handleChange} placeholder="PM 12:30" />
           </div>
         </div>
 
@@ -212,19 +257,21 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
         </div>
 
         <div className="editor-section">
-          <h3>신랑 & 신부의 한마디</h3>
+          <h3>영상 하이라이트</h3>
           <div className="input-group">
-            <label>신랑의 한마디</label>
-            <textarea name="groomMessage" value={data.groomMessage} onChange={handleChange} rows={3} placeholder="신랑의 개인적인 메시지를 입력하세요" />
-          </div>
-          <div className="input-group">
-            <label>신부의 한마디</label>
-            <textarea name="brideMessage" value={data.brideMessage} onChange={handleChange} rows={3} placeholder="신부의 개인적인 메시지를 입력하세요" />
+            <label>YouTube / Vimeo URL</label>
+            <input 
+              type="text" 
+              name="videoUrl" 
+              value={data.videoUrl} 
+              onChange={handleChange} 
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
           </div>
         </div>
 
         <div className="editor-section">
-          <h3>장소 정보</h3>
+          <h3>장소 및 교통 정보</h3>
           <div className="input-group">
             <label>예식장 주소</label>
             <div className="search-input-wrapper">
@@ -233,20 +280,55 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
                 name="venueAddress" 
                 value={data.venueAddress} 
                 onChange={handleChange} 
-                placeholder="주소 검색 버튼을 눌러주세요"
                 readOnly
               />
-              <button className="search-btn" onClick={handleAddressSearch}>
-                <Search size={18} />
-                <span>주소 검색</span>
-              </button>
+              <button className="search-btn" onClick={handleAddressSearch}><Search size={18} /><span>검색</span></button>
             </div>
           </div>
           <div className="input-group">
-            <label>예식장 이름 (자동 입력 후 수정 가능)</label>
+            <label>예식장 이름</label>
             <input type="text" name="venueName" value={data.venueName} onChange={handleChange} />
           </div>
+          <div className="input-group">
+            <label>지하철 안내</label>
+            <textarea value={data.transport.subway} onChange={(e) => handleTransportChange('subway', e.target.value)} rows={2} />
+          </div>
+          <div className="input-group">
+            <label>버스 안내</label>
+            <textarea value={data.transport.bus} onChange={(e) => handleTransportChange('bus', e.target.value)} rows={2} />
+          </div>
+          <div className="input-group">
+            <label>주차 안내</label>
+            <textarea value={data.transport.parking} onChange={(e) => handleTransportChange('parking', e.target.value)} rows={2} />
+          </div>
         </div>
+
+        <div className="editor-section">
+          <h3>혼주 연락처</h3>
+          <div className="parent-editor-grid">
+            <div className="parent-side-editor">
+              <p className="sub-label">신랑측 부모님</p>
+              {data.parents.groomParents.map((p, i) => (
+                <div key={i} className="mini-contact-row">
+                  <input type="text" placeholder="관계" value={p.role} onChange={(e) => handleParentChange('groomParents', i, 'role', e.target.value)} />
+                  <input type="text" placeholder="이름" value={p.name} onChange={(e) => handleParentChange('groomParents', i, 'name', e.target.value)} />
+                  <input type="text" placeholder="번호" value={p.phone} onChange={(e) => handleParentChange('groomParents', i, 'phone', e.target.value)} />
+                </div>
+              ))}
+            </div>
+            <div className="parent-side-editor">
+              <p className="sub-label">신부측 부모님</p>
+              {data.parents.brideParents.map((p, i) => (
+                <div key={i} className="mini-contact-row">
+                  <input type="text" placeholder="관계" value={p.role} onChange={(e) => handleParentChange('brideParents', i, 'role', e.target.value)} />
+                  <input type="text" placeholder="이름" value={p.name} onChange={(e) => handleParentChange('brideParents', i, 'name', e.target.value)} />
+                  <input type="text" placeholder="번호" value={p.phone} onChange={(e) => handleParentChange('brideParents', i, 'phone', e.target.value)} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
 
         <div className="editor-section">
           <h3>연락처 설정</h3>
@@ -564,6 +646,33 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange }) => {
           margin-top: 0;
           margin-bottom: 12px;
           color: #8F7D8B;
+        }
+        .mini-contact-row {
+          display: grid;
+          grid-template-columns: 60px 1fr 1.5fr;
+          gap: 8px;
+          margin-bottom: 10px;
+        }
+        .mini-contact-row input {
+          padding: 8px !important;
+          font-size: 0.8rem !important;
+        }
+        .parent-editor-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .tab-group.mini {
+          margin-bottom: 10px;
+        }
+        .tab-group.mini .tab-btn {
+          padding: 8px;
+          font-size: 0.75rem;
+        }
+        .en-input {
+          margin-top: 8px;
+          background: #fdf6f9 !important;
+          border-color: #f3d6e5 !important;
         }
       `}</style>
     </div>
