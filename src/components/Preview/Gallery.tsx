@@ -72,7 +72,6 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
       {selectedIndex !== null && (
         <div 
           className="lightbox-overlay" 
-          onClick={closeLightbox}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
