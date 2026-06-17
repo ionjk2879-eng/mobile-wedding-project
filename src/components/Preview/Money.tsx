@@ -60,7 +60,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
 
       <style>{`
         .money-desc {
-          font-size: 0.9rem;
+          font-size: 0.9em;
           color: var(--wedding-text-sub);
           margin-bottom: 30px;
           white-space: pre-line;
@@ -82,18 +82,18 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           border: 1px solid var(--wedding-border);
         }
         .side-label {
-          font-size: 0.75rem;
+          font-size: 0.75em;
           color: var(--wedding-main);
           display: block;
           margin-bottom: 5px;
         }
         .bank-details strong {
-          font-size: 1rem;
+          font-size: 1em;
           margin-right: 10px;
           color: var(--wedding-text-main);
         }
         .bank-details span {
-          font-size: 0.9rem;
+          font-size: 0.9em;
           color: var(--wedding-text-body);
         }
         .owner {
@@ -107,7 +107,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           background: var(--wedding-bg);
           border: 1px solid var(--wedding-border);
           border-radius: 20px;
-          font-size: 0.8rem;
+          font-size: 0.8em;
           color: var(--wedding-main);
           transition: all 0.2s;
           cursor: pointer;
@@ -133,7 +133,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           position: relative;
         }
         .message-role {
-          font-size: 0.7rem;
+          font-size: 0.7em;
           letter-spacing: 2px;
           color: var(--wedding-main);
           text-transform: uppercase;
@@ -141,7 +141,7 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           display: block;
         }
         .message-box p {
-          font-size: 0.95rem;
+          font-size: 0.95em;
           line-height: 1.6;
           color: var(--wedding-text-body);
           font-style: italic;

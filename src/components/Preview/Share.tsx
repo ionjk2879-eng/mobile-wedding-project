@@ -98,7 +98,7 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
           justify-content: center;
           gap: 10px;
           font-weight: 500;
-          font-size: 0.95rem;
+          font-size: 0.95em;
           transition: all 0.2s ease;
         }
         .share-btn:hover {
@@ -116,7 +116,7 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
         }
         .footer {
           margin-top: 40px;
-          font-size: 0.75rem;
+          font-size: 0.75em;
           color: var(--wedding-text-sub);
         }
         .music-player {
@@ -127,7 +127,7 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
           border-radius: 12px;
         }
         .music-label {
-          font-size: 0.8rem;
+          font-size: 0.8em;
           color: var(--wedding-text-body);
           margin-bottom: 10px;
         }

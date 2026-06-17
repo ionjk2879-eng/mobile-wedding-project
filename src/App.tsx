@@ -43,11 +43,14 @@ const App: React.FC = () => {
       '/src/assets/hero.png',
     ],
     fontFamily: "'Pretendard', sans-serif",
+    fontSize: 'medium',
     bgMusicUrl: '',
     groomMessage: '항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다.',
     brideMessage: '서로 아끼고 배려하며 예쁘게 잘 살겠습니다.',
     isRSVPEnabled: true,
     theme: 'warm',
+    bgTexture: 'none',
+    bgEffect: 'none',
     weddingDateISO: '2026-10-24',
     transport: {
       subway: '2호선 강남역 12번 출구 도보 5분',
@@ -82,8 +85,49 @@ const App: React.FC = () => {
     return data[key] as any;
   };
 
+  const getBaseFontSize = () => {
+    switch (data.fontSize) {
+      case 'small': return '14px';
+      case 'large': return '19px';
+      default: return '16.5px';
+    }
+  };
+
   const previewContent = (
-    <>
+    <div className={`preview-wrapper texture-${data.bgTexture || 'none'}`}>
+      {data.bgEffect === 'cherry-blossom' && (
+        <div className="effect-layer cherry-blossoms">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className="particle blossom" style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${10 + Math.random() * 10}s`
+            }} />
+          ))}
+        </div>
+      )}
+      {data.bgEffect === 'snow' && (
+        <div className="effect-layer snow">
+          {[...Array(40)].map((_, i) => (
+            <div key={i} className="particle snowflake" style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${5 + Math.random() * 5}s`
+            }} />
+          ))}
+        </div>
+      )}
+      {data.bgEffect === 'stars' && (
+        <div className="effect-layer stars">
+          {[...Array(30)].map((_, i) => (
+            <div key={i} className="particle star" style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`
+            }} />
+          ))}
+        </div>
+      )}
       <Hero data={data} />
       <Greeting data={data} />
       <Calendar data={data} />
@@ -94,7 +138,7 @@ const App: React.FC = () => {
       <RSVPForm data={data} />
       <Money data={data} />
       <Share data={data} />
-    </>
+    </div>
   );
 
   if (isFullPreview) {
@@ -107,7 +151,7 @@ const App: React.FC = () => {
           🛠️ 편집기로 돌아가기
         </button>
 
-        <div className={`invitation-page theme-${data.theme || 'warm'}`}>
+        <div className={`invitation-page theme-${data.theme || 'warm'}`} style={{ fontSize: getBaseFontSize() }}>
           {previewContent}
         </div>
 
@@ -165,7 +209,111 @@ const App: React.FC = () => {
               right: 20px;
             }
           }
-        `}</style>
+
+          /* Background Textures */
+          .preview-wrapper {
+            position: relative;
+            min-height: 100%;
+            width: 100%;
+          }
+          .preview-wrapper.texture-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/handmade-paper.png");
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 5;
+          }
+          .preview-wrapper.texture-linen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/linen-design.png");
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 5;
+          }
+          .preview-wrapper.texture-pattern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/subtle-dots.png");
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 5;
+          }
+
+          /* Visual Effects Layer */
+          .effect-layer {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            overflow: hidden;
+          }
+          .particle {
+            position: absolute;
+            top: -20px;
+          }
+
+          /* Cherry Blossom Effect */
+          .particle.blossom {
+            width: 15px;
+            height: 15px;
+            background: #FFD1DC;
+            border-radius: 50% 0 50% 50%;
+            opacity: 0.7;
+            animation: fall linear infinite, sway ease-in-out infinite;
+          }
+          @keyframes fall {
+            0% { top: -20px; }
+            100% { top: 100%; }
+          }
+          @keyframes sway {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            50% { transform: translateX(50px) rotate(180deg); }
+          }
+
+          /* Snow Effect */
+          .particle.snowflake {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            filter: blur(1px);
+            animation: fall linear infinite;
+          }
+
+          /* Stars Effect */
+          .particle.star {
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+            top: auto;
+          }
+          @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px white; }
+          }
+          `}</style>
       </div>
     );
   }
@@ -191,7 +339,7 @@ const App: React.FC = () => {
       <div className="preview-panel">
         <div className="phone-container">
           <div className="phone-frame">
-            <div className={`phone-content theme-${data.theme || 'warm'}`}>
+            <div className={`phone-content theme-${data.theme || 'warm'}`} style={{ fontSize: getBaseFontSize() }}>
               {previewContent}
             </div>
           </div>
@@ -371,6 +519,108 @@ const App: React.FC = () => {
           .phone-container {
             transform: scale(1) !important;
           }
+        }
+
+        /* Background Textures */
+        .preview-wrapper {
+          position: relative;
+          min-height: 100%;
+          width: 100%;
+        }
+        .preview-wrapper.texture-paper::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url("https://www.transparenttextures.com/patterns/handmade-paper.png");
+          opacity: 0.4;
+          pointer-events: none;
+          z-index: 5;
+        }
+        .preview-wrapper.texture-linen::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url("https://www.transparenttextures.com/patterns/linen-design.png");
+          opacity: 0.3;
+          pointer-events: none;
+          z-index: 5;
+        }
+        .preview-wrapper.texture-pattern::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url("https://www.transparenttextures.com/patterns/subtle-dots.png");
+          opacity: 0.2;
+          pointer-events: none;
+          z-index: 5;
+        }
+
+        /* Visual Effects Layer */
+        .effect-layer {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 50;
+          overflow: hidden;
+        }
+        .particle {
+          position: absolute;
+          top: -20px;
+        }
+
+        /* Cherry Blossom Effect */
+        .particle.blossom {
+          width: 15px;
+          height: 15px;
+          background: #FFD1DC;
+          border-radius: 50% 0 50% 50%;
+          opacity: 0.7;
+          animation: fall linear infinite, sway ease-in-out infinite;
+        }
+        @keyframes fall {
+          0% { top: -20px; }
+          100% { top: 100%; }
+        }
+        @keyframes sway {
+          0%, 100% { transform: translateX(0) rotate(0deg); }
+          50% { transform: translateX(50px) rotate(180deg); }
+        }
+
+        /* Snow Effect */
+        .particle.snowflake {
+          width: 6px;
+          height: 6px;
+          background: white;
+          border-radius: 50%;
+          opacity: 0.8;
+          filter: blur(1px);
+          animation: fall linear infinite;
+        }
+
+        /* Stars Effect */
+        .particle.star {
+          width: 4px;
+          height: 4px;
+          background: white;
+          border-radius: 50%;
+          animation: twinkle 2s infinite ease-in-out;
+          top: auto;
+        }
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.3; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px white; }
         }
       `}</style>
     </div>

@@ -38,6 +38,22 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
     'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
   ];
 
+  const formatKoreanDate = () => {
+    return `${year}년 ${month + 1}월 ${date}일`;
+  };
+
+  const formatKoreanTime = () => {
+    if (!data.time) return '';
+    const parts = data.time.match(/(AM|PM)\s(\d+):(\d+)/);
+    if (parts) {
+      const ampm = parts[1] === 'AM' ? '오전' : '오후';
+      const h = parts[2];
+      const m = parts[3];
+      return `${ampm} ${h}시 ${m === '00' ? '' : m + '분'}`.trim();
+    }
+    return data.time;
+  };
+
   return (
     <section className="calendar-section">
       <div className="calendar-container">
@@ -59,11 +75,11 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
             </div>
           ))}
         </div>
+      </div>
 
-        <div className="wedding-info">
-          <p className="wedding-date-text">{data.date}</p>
-          <p className="wedding-time-text">{data.time}</p>
-        </div>
+      <div className="wedding-detail-info">
+        <p className="wedding-date-text">{formatKoreanDate()}</p>
+        <p className="wedding-time-text">{formatKoreanTime()}</p>
       </div>
 
       <style>{`
@@ -85,14 +101,14 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           margin-bottom: 25px;
         }
         .month-name {
-          font-size: 1.2rem;
+          font-size: 1.2em;
           font-weight: 700;
           color: var(--wedding-accent);
           margin: 0;
           letter-spacing: 2px;
         }
         .year-name {
-          font-size: 0.9rem;
+          font-size: 0.9em;
           color: #8F7D8B;
           margin: 5px 0 0;
         }
@@ -103,7 +119,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           margin-bottom: 30px;
         }
         .weekday-label {
-          font-size: 0.7rem;
+          font-size: 0.7em;
           font-weight: 700;
           color: #B3A2C8;
           padding: 10px 0;
@@ -113,7 +129,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.9rem;
+          font-size: 0.9em;
           color: #3C2B38;
           position: relative;
           border-radius: 50%;
@@ -129,7 +145,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
         .heart-marker {
           position: absolute;
           bottom: -2px;
-          font-size: 0.6rem;
+          font-size: 0.6em;
           color: var(--wedding-accent);
           display: none;
         }
@@ -138,20 +154,24 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           color: white;
           bottom: 2px;
         }
-        .wedding-info {
-          padding-top: 20px;
-          border-top: 1px solid #F0E6EB;
+        .wedding-detail-info {
+          margin-top: 40px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
         }
         .wedding-date-text {
-          font-size: 1rem;
-          font-weight: 600;
+          font-size: 1.2em;
+          font-weight: 700;
           color: #3C2B38;
           margin: 0;
+          letter-spacing: -0.5px;
         }
         .wedding-time-text {
-          font-size: 0.9rem;
+          font-size: 1.1em;
           color: #8F7D8B;
-          margin: 5px 0 0;
+          margin: 0;
+          font-weight: 500;
         }
       `}</style>
     </section>

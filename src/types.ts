@@ -32,11 +32,14 @@ export interface InvitationData {
   heroPhoto: string;
   photos: string[];
   fontFamily: string;
+  fontSize: 'small' | 'medium' | 'large';
   bgMusicUrl: string;
   groomMessage: string;
   brideMessage: string;
   isRSVPEnabled: boolean;
   theme?: 'warm' | 'dark' | 'midnight';
+  bgTexture?: 'none' | 'paper' | 'linen' | 'pattern';
+  bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars';
   
   // New features
   weddingDateISO: string;

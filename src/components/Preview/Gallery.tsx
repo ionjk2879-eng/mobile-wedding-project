@@ -248,7 +248,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
         .index-indicator {
           margin-top: 15px;
           color: white;
-          font-size: 0.9rem;
+          font-size: 0.9em;
           background: rgba(255,255,255,0.1);
           padding: 6px 16px;
           border-radius: 20px;

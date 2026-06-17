@@ -42,7 +42,7 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
         }
         .quote-icon {
           font-family: 'Gowun Batang', serif;
-          font-size: 3rem;
+          font-size: 3em;
           color: var(--wedding-accent);
           position: absolute;
           top: -10px;
@@ -50,7 +50,7 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
           line-height: 1;
         }
         .message-box p {
-          font-size: 1rem;
+          font-size: 1em;
           line-height: 1.8;
           color: var(--wedding-text-body);
           margin-bottom: 20px;
@@ -59,7 +59,7 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
           word-break: keep-all;
         }
         .message-name {
-          font-size: 0.85rem;
+          font-size: 0.85em;
           font-weight: 600;
           color: var(--wedding-main);
           display: block;

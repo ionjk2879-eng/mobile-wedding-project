@@ -63,7 +63,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           }
           .success-message h3 { color: var(--wedding-main); margin: 0; }
           .success-message p { color: var(--wedding-text-sub); margin: 0; }
-          .reset-btn { margin-top: 10px; font-size: 0.8rem; color: var(--wedding-text-sub); text-decoration: underline; background: none; border: none; cursor: pointer; }
+          .reset-btn { margin-top: 10px; font-size: 0.8em; color: var(--wedding-text-sub); text-decoration: underline; background: none; border: none; cursor: pointer; }
         `}</style>
       </div>
     );
@@ -184,7 +184,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         }
         .section-label {
           display: block;
-          font-size: 0.75rem;
+          font-size: 0.75em;
           font-weight: 700;
           color: var(--wedding-main);
           margin-bottom: 10px;
@@ -199,7 +199,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           border-radius: 12px;
           border: 1px solid var(--wedding-border);
           background: var(--wedding-bg);
-          font-size: 0.85rem;
+          font-size: 0.85em;
           color: var(--wedding-text-sub);
           transition: all 0.2s;
           cursor: pointer;
@@ -218,7 +218,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
         }
         .rsvp-header h2 { margin-bottom: 15px; }
         .rsvp-header p { 
-          font-size: 0.9rem; 
+          font-size: 0.9em; 
           color: var(--wedding-text-sub); 
           line-height: 1.6;
           margin-bottom: 40px;
@@ -239,7 +239,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           display: flex;
           align-items: center;
           gap: 6px;
-          font-size: 0.75rem;
+          font-size: 0.75em;
           font-weight: 600;
           color: var(--wedding-main);
           margin-bottom: 8px;
@@ -254,7 +254,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           flex: 1;
           padding: 10px;
           border-radius: 8px;
-          font-size: 0.85rem;
+          font-size: 0.85em;
           color: var(--wedding-text-sub);
           transition: all 0.2s;
           border: none;
@@ -274,7 +274,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           border-radius: 12px;
           background: var(--wedding-bg);
           color: var(--wedding-text-body);
-          font-size: 0.9rem;
+          font-size: 0.9em;
           box-sizing: border-box;
           font-family: inherit;
         }
@@ -289,7 +289,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           color: white;
           border-radius: 30px;
           font-weight: 700;
-          font-size: 1rem;
+          font-size: 1em;
           margin-top: 10px;
           transition: all 0.2s ease;
           border: none;

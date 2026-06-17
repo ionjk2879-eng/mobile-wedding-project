@@ -41,7 +41,7 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
         .greeting-text p {
           line-height: 2;
           color: var(--wedding-text-body);
-          font-size: 0.95rem;
+          font-size: 0.95em;
           margin-bottom: 50px;
         }
         .contact-grid {
@@ -58,7 +58,7 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
           gap: 15px;
         }
         .role {
-          font-size: 0.8rem;
+          font-size: 0.8em;
           color: var(--wedding-text-sub);
         }
         .name {

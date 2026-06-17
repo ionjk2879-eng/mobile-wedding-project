@@ -74,13 +74,13 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
           color: var(--wedding-accent);
           border: 1px solid var(--wedding-accent);
           border-radius: 4px;
-          font-size: 0.75rem;
+          font-size: 0.75em;
           font-weight: 600;
           margin-bottom: 15px;
           letter-spacing: 1px;
         }
         .wedding-label {
-          font-size: 0.7rem;
+          font-size: 0.7em;
           letter-spacing: 3px;
           color: var(--wedding-text-sub);
           margin-bottom: 25px;
@@ -107,14 +107,14 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
           align-items: center;
           justify-content: center;
           gap: 15px;
-          font-size: 1.8rem;
+          font-size: 1.8em;
           font-weight: 400;
           margin: 0 0 20px;
           color: var(--wedding-text-main);
           letter-spacing: 0.05em;
         }
         .ampersand {
-          font-size: 1.2rem;
+          font-size: 1.2em;
           color: var(--wedding-accent);
           opacity: 0.6;
           font-family: serif;
@@ -129,19 +129,19 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
           gap: 6px;
         }
         .date {
-          font-size: 1rem;
+          font-size: 1em;
           font-weight: 500;
           color: var(--wedding-text-main);
           margin: 0;
           letter-spacing: 1px;
         }
         .time {
-          font-size: 0.9rem;
+          font-size: 0.9em;
           color: var(--wedding-text-sub);
           margin: 0;
         }
         .venue {
-          font-size: 0.9rem;
+          font-size: 0.9em;
           color: var(--wedding-text-sub);
           margin-top: 5px;
           position: relative;

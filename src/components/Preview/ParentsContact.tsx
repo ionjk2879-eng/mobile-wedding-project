@@ -63,7 +63,7 @@ const ParentsContact: React.FC<PreviewProps> = ({ data }) => {
           text-align: left;
         }
         .parent-side-title {
-          font-size: 0.85rem;
+          font-size: 0.85em;
           font-weight: 700;
           color: var(--wedding-main);
           margin-bottom: 20px;
@@ -88,12 +88,12 @@ const ParentsContact: React.FC<PreviewProps> = ({ data }) => {
           gap: 12px;
         }
         .parent-role {
-          font-size: 0.8rem;
+          font-size: 0.8em;
           color: var(--wedding-text-sub);
           min-width: 45px;
         }
         .parent-name {
-          font-size: 1.05rem;
+          font-size: 1.05em;
           font-weight: 600;
           color: var(--wedding-text-main);
         }

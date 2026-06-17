@@ -100,14 +100,14 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
           border-bottom: 1px solid var(--wedding-border);
         }
         .venue-name {
-          font-size: 1.15rem;
+          font-size: 1.15em;
           color: var(--wedding-text-main);
           font-weight: 600;
           margin-bottom: 6px;
         }
         .address {
           color: var(--wedding-text-body);
-          font-size: 0.9rem;
+          font-size: 0.9em;
           margin: 0;
         }
         .map-container {
@@ -134,7 +134,7 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
           flex-direction: column;
           align-items: center;
           gap: 5px;
-          font-size: 0.8rem;
+          font-size: 0.8em;
           transition: all 0.2s ease;
         }
         .nav-item:hover {
@@ -159,12 +159,12 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
           display: flex;
           align-items: center;
           gap: 8px;
-          font-size: 0.85rem;
+          font-size: 0.85em;
           font-weight: 700;
           color: var(--wedding-main);
         }
         .transport-detail {
-          font-size: 0.9rem;
+          font-size: 0.9em;
           color: var(--wedding-text-body);
           line-height: 1.5;
           padding-left: 26px;
