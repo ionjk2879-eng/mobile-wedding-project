@@ -9,6 +9,7 @@ export interface Contact {
   role: string;
   name: string;
   phone: string;
+  isDeceased?: boolean;
 }
 
 export interface GuestMessage {
