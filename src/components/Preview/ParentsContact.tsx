@@ -46,8 +46,7 @@ const ParentsContact: React.FC<PreviewProps> = ({ data }) => {
 
       <style>{`
         .parents-contact {
-          background-color: var(--wedding-bg);
-          transition: background-color 0.4s ease;
+          background-color: transparent;
         }
         .parents-container {
           display: flex;

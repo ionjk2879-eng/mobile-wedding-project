@@ -38,9 +38,9 @@ export interface InvitationData {
   groomMessage: string;
   brideMessage: string;
   isRSVPEnabled: boolean;
-  theme?: 'warm' | 'dark' | 'midnight';
+  theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern';
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern';
-  bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars';
+  bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti';
   
   // New features
   weddingDateISO: string;

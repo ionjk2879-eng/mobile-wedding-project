@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, ChevronUp, ChevronDown, Clock, Palette, Info, MessageSquare, Heart, MapPin, Phone, CreditCard, Image as ImageIcon, ChevronRight } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown, Clock, Palette, Info, MessageSquare, Heart, MapPin, Phone, CreditCard, Image as ImageIcon, ChevronRight, Sparkles } from 'lucide-react';
 import { InvitationData } from '../../types';
 
 declare global {
@@ -16,6 +16,7 @@ interface EditorProps {
 
 const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick }) => {
   const sectionRefs = {
+    theme: React.useRef<HTMLDivElement>(null),
     design: React.useRef<HTMLDivElement>(null),
     basic: React.useRef<HTMLDivElement>(null),
     greeting: React.useRef<HTMLDivElement>(null),
@@ -29,6 +30,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
   const workspaceRef = React.useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = React.useState('design');
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
+    theme: true,
     design: true,
     basic: true,
     greeting: false,
@@ -274,6 +276,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
   ];
 
   const navItems = [
+    { id: 'theme', name: '테마', icon: <Sparkles size={18} />, ref: sectionRefs.theme },
     { id: 'design', name: '디자인', icon: <Palette size={18} />, ref: sectionRefs.design },
     { id: 'basic', name: '기본정보', icon: <Info size={18} />, ref: sectionRefs.basic },
     { id: 'greeting', name: '인사말', icon: <MessageSquare size={18} />, ref: sectionRefs.greeting },
@@ -312,6 +315,41 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
       
       <div className="editor-content-scrollable" ref={workspaceRef}>
         <div className="editor-sections-list">
+          {/* Theme Section */}
+          <div className={`editor-section-card ${expandedSections.theme ? 'expanded' : ''}`} ref={sectionRefs.theme}>
+            <div className="section-header" onClick={() => toggleSection('theme')}>
+              <div className="header-left">
+                <Sparkles size={20} />
+                <h3>청첩장 테마</h3>
+              </div>
+              <ChevronRight size={18} className="collapse-icon" />
+            </div>
+            {expandedSections.theme && (
+              <div className="section-content">
+                <div className="input-group">
+                  <label>테마 선택</label>
+                  <div className="theme-select-grid modern">
+                    {[
+                      { key: 'blush', color: '#D4918E', name: '블러시 핑크' },
+                      { key: 'champagne', color: '#C8A97E', name: '샴페인' },
+                      { key: 'sage', color: '#8BA888', name: '세이지 그린' },
+                      { key: 'navy', color: '#4A5E7A', name: '클래식 네이비' },
+                      { key: 'burgundy', color: '#8B3A4A', name: '버건디 와인' },
+                      { key: 'lavender', color: '#9B8BB8', name: '라벤더' },
+                      { key: 'dusty', color: '#B67A82', name: '더스티 로즈' },
+                      { key: 'modern', color: '#888888', name: '모던 화이트' },
+                    ].map(t => (
+                      <button key={t.key} type="button" className={`theme-chip ${data.theme === t.key ? 'active' : ''}`} style={data.theme === t.key ? { borderColor: t.color, color: t.color } : {}} onClick={() => onChange({ ...data, theme: t.key as any })}>
+                        <span className="dot" style={{ background: t.color }}></span>
+                        {t.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Design Section */}
           <div className={`editor-section-card ${expandedSections.design ? 'expanded' : ''}`} ref={sectionRefs.design}>
             <div className="section-header" onClick={() => toggleSection('design')}>
@@ -341,34 +379,39 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                   </div>
                 </div>
                 <div className="input-group">
-                  <label>청첩장 테마</label>
+                  <label>배경 재질</label>
                   <div className="theme-select-grid modern">
-                    {['warm', 'dark', 'midnight'].map(t => (
-                      <button key={t} type="button" className={`theme-chip ${data.theme === t ? 'active' : ''}`} onClick={() => onChange({ ...data, theme: t as any })}>
-                        <span className="dot" style={{ background: t === 'warm' ? '#D4A5C6' : t === 'dark' ? '#A899C9' : '#DF8EB0' }}></span>
-                        {t === 'warm' ? 'Soft Blossom' : t === 'dark' ? 'Lavender Mist' : 'Blossom Bouquet'}
+                    {[
+                      { key: 'none', name: '없음', desc: '기본 배경' },
+                      { key: 'paper', name: '한지', desc: '종이 질감' },
+                      { key: 'linen', name: '린넨', desc: '패브릭 질감' },
+                      { key: 'pattern', name: '도트', desc: '은은한 패턴' },
+                    ].map(t => (
+                      <button key={t.key} type="button" className={`theme-chip ${(data.bgTexture || 'none') === t.key ? 'active' : ''}`} onClick={() => onChange({ ...data, bgTexture: t.key as any })}>
+                        <span className={`texture-preview tex-${t.key}`}></span>
+                        {t.name}
                       </button>
                     ))}
                   </div>
                 </div>
-                <div className="input-grid-2">
-                  <div className="input-group">
-                    <label>배경 재질</label>
-                    <select value={data.bgTexture || 'none'} onChange={(e) => onChange({ ...data, bgTexture: e.target.value as any })} className="modern-input">
-                      <option value="none">없음 (기본)</option>
-                      <option value="paper">한지/종이 질감</option>
-                      <option value="linen">린넨 패브릭</option>
-                      <option value="pattern">은은한 도트 패턴</option>
-                    </select>
-                  </div>
-                  <div className="input-group">
-                    <label>흩날리는 효과</label>
-                    <select value={data.bgEffect || 'none'} onChange={(e) => onChange({ ...data, bgEffect: e.target.value as any })} className="modern-input">
-                      <option value="none">없음</option>
-                      <option value="cherry-blossom">🌸 벚꽃 휘날리며</option>
-                      <option value="snow">❄️ 함박눈 내리는</option>
-                      <option value="stars">✨ 반짝이는 별빛</option>
-                    </select>
+                <div className="input-group">
+                  <label>흩날리는 효과</label>
+                  <div className="theme-select-grid modern">
+                    {[
+                      { key: 'none', name: '없음', icon: '—' },
+                      { key: 'cherry-blossom', name: '벚꽃', icon: '🌸' },
+                      { key: 'snow', name: '함박눈', icon: '❄️' },
+                      { key: 'stars', name: '별빛', icon: '✨' },
+                      { key: 'leaves', name: '나뭇잎', icon: '🍃' },
+                      { key: 'hearts', name: '하트', icon: '💕' },
+                      { key: 'firefly', name: '반딧불', icon: '🔅' },
+                      { key: 'confetti', name: '꽃가루', icon: '🎊' },
+                    ].map(t => (
+                      <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => onChange({ ...data, bgEffect: t.key as any })}>
+                        <span className="effect-icon">{t.icon}</span>
+                        {t.name}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 <div className="input-group">
@@ -692,9 +735,17 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .tab-group.modern { display: flex; background: #F3F4F6; padding: 4px; border-radius: 12px; }
         .tab-btn { flex: 1; padding: 10px; border: none; background: none; font-size: 0.75rem; font-weight: 800; color: #6B7280; cursor: pointer; border-radius: 8px; }
         .tab-btn.active { background: white; color: #D4A5C6; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .theme-chip { padding: 10px 20px; border-radius: 30px; border: 1px solid #E5E7EB; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: #4B5563; transition: all 0.2s; }
-        .theme-chip.active { background: white; border-color: #D4A5C6; color: #D4A5C6; box-shadow: 0 4px 12px rgba(212, 165, 198, 0.1); }
-        .theme-chip .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .theme-select-grid.modern { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .theme-chip { padding: 10px 16px; border-radius: 14px; border: 1px solid #E5E7EB; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.8rem; font-weight: 700; color: #4B5563; transition: all 0.2s; }
+        .theme-chip:hover { border-color: #D1D5DB; background: #FAFAFA; }
+        .theme-chip.active { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
+        .theme-chip .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .texture-preview { width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; border: 1px solid #E5E7EB; }
+        .tex-none { background: #FFFFFF; }
+        .tex-paper { background: #F5EDE3; background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E"); }
+        .tex-linen { background: #F0EBE3; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px); }
+        .tex-pattern { background: #F8F8F8; background-image: radial-gradient(circle, #D1D5DB 0.5px, transparent 0.5px); background-size: 6px 6px; }
+        .effect-icon { font-size: 1rem; line-height: 1; }
         .modern-checkbox { display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .modern-checkbox input { width: 20px; height: 20px; accent-color: #D4A5C6; }
         .modern-checkbox span { font-size: 0.9rem; font-weight: 700; color: #374151; }

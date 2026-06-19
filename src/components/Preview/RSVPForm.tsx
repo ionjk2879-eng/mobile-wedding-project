@@ -43,7 +43,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
     return (
       <div className="rsvp-section section">
         <div className="success-message">
-          <CheckCircle2 size={48} color="#b89c8e" />
+          <CheckCircle2 size={48} style={{ color: 'var(--wedding-main)' }} />
           <h3>{isEn ? 'Response Submitted' : '참석 응답이 전달되었습니다'}</h3>
           <p>{isEn ? 'Thank you for your response.' : '소중한 응답 감사합니다.'}</p>
           <button className="reset-btn" onClick={() => setSubmitted(false)}>
@@ -179,8 +179,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
       <style>{`
         .rsvp-section {
-          background-color: var(--wedding-bg);
-          transition: background-color 0.4s ease;
+          background-color: transparent;
         }
         .section-label {
           display: block;

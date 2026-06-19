@@ -23,9 +23,8 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
 
       <style>{`
         .personal-message {
-          background-color: var(--wedding-bg);
+          background-color: transparent;
           padding: 80px 24px;
-          transition: background-color 0.4s ease;
         }
         .message-container {
           display: flex;

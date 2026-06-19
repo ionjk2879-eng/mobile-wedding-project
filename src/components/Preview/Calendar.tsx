@@ -85,7 +85,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
       <style>{`
         .calendar-section {
           padding: 80px 20px;
-          background: var(--wedding-bg);
+          background: transparent;
           text-align: center;
         }
         .calendar-container {
@@ -94,7 +94,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           background: white;
           padding: 30px 20px;
           border-radius: 20px;
-          box-shadow: 0 10px 30px rgba(212, 165, 198, 0.1);
+          box-shadow: 0 10px 30px color-mix(in srgb, var(--wedding-main) 10%, transparent);
           border: 1px solid var(--wedding-border);
         }
         .calendar-header {
@@ -109,7 +109,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
         }
         .year-name {
           font-size: 0.9em;
-          color: #8F7D8B;
+          color: var(--wedding-text-sub);
           margin: 5px 0 0;
         }
         .calendar-grid {
@@ -121,7 +121,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
         .weekday-label {
           font-size: 0.7em;
           font-weight: 700;
-          color: #B3A2C8;
+          color: var(--wedding-accent);
           padding: 10px 0;
         }
         .calendar-day {
@@ -130,12 +130,12 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           align-items: center;
           justify-content: center;
           font-size: 0.9em;
-          color: #3C2B38;
+          color: var(--wedding-text-main);
           position: relative;
           border-radius: 50%;
         }
         .calendar-day.sunday {
-          color: #E78DA1;
+          color: var(--wedding-main);
         }
         .calendar-day.selected {
           background: var(--wedding-accent);
@@ -163,13 +163,13 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
         .wedding-date-text {
           font-size: 1.2em;
           font-weight: 700;
-          color: #3C2B38;
+          color: var(--wedding-text-main);
           margin: 0;
           letter-spacing: -0.5px;
         }
         .wedding-time-text {
           font-size: 1.1em;
-          color: #8F7D8B;
+          color: var(--wedding-text-sub);
           margin: 0;
           font-weight: 500;
         }

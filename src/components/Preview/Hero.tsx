@@ -60,8 +60,7 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         .hero {
           padding: 40px 0 60px;
           text-align: center;
-          background-color: var(--wedding-bg);
-          transition: background-color 0.4s ease;
+          background-color: transparent;
           position: relative;
         }
         .hero-content {
@@ -70,7 +69,7 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         .d-day-badge {
           display: inline-block;
           padding: 4px 12px;
-          background: rgba(212, 165, 198, 0.1);
+          background: color-mix(in srgb, var(--wedding-accent) 10%, transparent);
           color: var(--wedding-accent);
           border: 1px solid var(--wedding-accent);
           border-radius: 4px;

@@ -79,9 +79,8 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
 
       <style>{`
         .share {
-          background-color: var(--wedding-bg);
+          background-color: transparent;
           padding-bottom: 40px;
-          transition: background-color 0.4s ease;
         }
         .share-buttons {
           display: flex;

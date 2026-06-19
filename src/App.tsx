@@ -14,6 +14,7 @@ import { InvitationData } from './types';
 const App: React.FC = () => {
   const [isFullPreview, setIsFullPreview] = useState(false);
   const previewRefs = {
+    theme: React.useRef<HTMLDivElement>(null),
     design: React.useRef<HTMLDivElement>(null),
     basic: React.useRef<HTMLDivElement>(null),
     greeting: React.useRef<HTMLDivElement>(null),
@@ -57,7 +58,7 @@ const App: React.FC = () => {
     groomMessage: '항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다.',
     brideMessage: '서로 아끼고 배려하며 예쁘게 잘 살겠습니다.',
     isRSVPEnabled: true,
-    theme: 'warm',
+    theme: 'blush',
     bgTexture: 'none',
     bgEffect: 'none',
     weddingDateISO: '2026-10-24',
@@ -136,7 +137,53 @@ const App: React.FC = () => {
           ))}
         </div>
       )}
-      <div ref={previewRefs.design}><Hero data={data} /></div>
+      {data.bgEffect === 'leaves' && (
+        <div className="effect-layer leaves">
+          {[...Array(15)].map((_, i) => (
+            <div key={i} className="particle leaf" style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 12}s`,
+              animationDuration: `${8 + Math.random() * 8}s`
+            }} />
+          ))}
+        </div>
+      )}
+      {data.bgEffect === 'hearts' && (
+        <div className="effect-layer hearts">
+          {[...Array(15)].map((_, i) => (
+            <div key={i} className="particle heart" style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${8 + Math.random() * 8}s`,
+              fontSize: `${8 + Math.random() * 10}px`
+            }}>♥</div>
+          ))}
+        </div>
+      )}
+      {data.bgEffect === 'firefly' && (
+        <div className="effect-layer fireflies">
+          {[...Array(25)].map((_, i) => (
+            <div key={i} className="particle firefly" style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 6}s`,
+              animationDuration: `${3 + Math.random() * 4}s`
+            }} />
+          ))}
+        </div>
+      )}
+      {data.bgEffect === 'confetti' && (
+        <div className="effect-layer confetti-layer">
+          {[...Array(30)].map((_, i) => (
+            <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${6 + Math.random() * 6}s`
+            }} />
+          ))}
+        </div>
+      )}
+      <div ref={previewRefs.theme} /><div ref={previewRefs.design}><Hero data={data} /></div>
       <div ref={previewRefs.basic}><Greeting data={data} /></div>
       <div ref={previewRefs.greeting}><Calendar data={data} /></div>
       <div ref={previewRefs.message}><PersonalMessage data={data} /></div>
@@ -153,14 +200,14 @@ const App: React.FC = () => {
       <div className="full-preview-container" style={{ fontFamily: data.fontFamily }}>
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
         <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>🛠️ 편집기로 돌아가기</button>
-        <div className={`invitation-page theme-${data.theme || 'warm'}`} style={{ fontSize: getBaseFontSize() }}>
+        <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize() }}>
           {previewContent}
         </div>
         <style>{`
           .full-preview-container {
             width: 100vw;
             height: 100vh;
-            background: #FAF5F7;
+            background: #F0F2F5;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -216,7 +263,7 @@ const App: React.FC = () => {
                 전체화면 보기
               </button>
             </div>
-            <div className={`preview-content-scroll theme-${data.theme || 'warm'}`} ref={previewScrollRef}>
+            <div className={`preview-content-scroll theme-${data.theme || 'blush'}`} ref={previewScrollRef}>
               {previewContent}
             </div>
           </div>
@@ -307,14 +354,46 @@ const App: React.FC = () => {
         }
         .preview-content-scroll::-webkit-scrollbar { display: none; }
 
+        /* Textures */
+        .preview-wrapper { position: relative; min-height: 100%; width: 100%; background-color: var(--wedding-bg); transition: background-color 0.4s ease; }
+        .preview-wrapper.texture-none { }
+        .preview-wrapper.texture-paper {
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+        }
+        .preview-wrapper.texture-linen {
+          background-image:
+            repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.02) 3px, rgba(0,0,0,0.02) 4px),
+            repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,0,0,0.02) 3px, rgba(0,0,0,0.02) 4px);
+        }
+        .preview-wrapper.texture-pattern {
+          background-image: radial-gradient(circle, rgba(0,0,0,0.06) 0.8px, transparent 0.8px);
+          background-size: 12px 12px;
+        }
+
         /* Effects */
-        .preview-wrapper { position: relative; min-height: 100%; width: 100%; }
         .particle { position: absolute; top: -20px; }
         @keyframes fall { 0% { top: -20px; } 100% { top: 100%; } }
         .particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: 0.7; animation: fall linear infinite; }
         .particle.snowflake { width: 6px; height: 6px; background: white; border-radius: 50%; opacity: 0.8; animation: fall linear infinite; }
         .particle.star { width: 4px; height: 4px; background: white; border-radius: 50%; animation: twinkle 2s infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        .particle.leaf { width: 12px; height: 16px; background: #A8C686; border-radius: 2px 50% 50% 50%; opacity: 0.6; animation: fall-sway linear infinite; transform-origin: center; }
+        @keyframes fall-sway { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(90deg) translateX(20px); } 50% { transform: rotate(180deg) translateX(-20px); } 75% { transform: rotate(270deg) translateX(15px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
+
+        .particle.heart { color: #F4A0B0; opacity: 0.5; animation: float-up linear infinite; line-height: 1; }
+        @keyframes float-up { 0% { top: 100%; opacity: 0; transform: scale(0.5) translateX(0); } 10% { opacity: 0.5; } 50% { transform: scale(1) translateX(15px); } 90% { opacity: 0.5; } 100% { top: -20px; opacity: 0; transform: scale(0.8) translateX(-10px); } }
+
+        .particle.firefly { width: 5px; height: 5px; background: #F5E6A3; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(245, 230, 163, 0.6); animation: firefly-glow ease-in-out infinite; }
+        @keyframes firefly-glow { 0%, 100% { opacity: 0.1; transform: translate(0, 0); } 25% { opacity: 0.8; transform: translate(10px, -15px); } 50% { opacity: 0.3; transform: translate(-8px, 10px); } 75% { opacity: 0.9; transform: translate(12px, 5px); } }
+
+        .particle.confetti { width: 6px; height: 10px; opacity: 0.7; animation: confetti-fall linear infinite; }
+        .confetti.c1 { background: #FFB3BA; border-radius: 1px; }
+        .confetti.c2 { background: #BAFFC9; border-radius: 50%; width: 7px; height: 7px; }
+        .confetti.c3 { background: #BAE1FF; border-radius: 1px; transform: rotate(45deg); }
+        .confetti.c4 { background: #FFFFBA; border-radius: 50%; width: 5px; height: 5px; }
+        .confetti.c5 { background: #E8BAFF; border-radius: 1px; }
+        @keyframes confetti-fall { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(-10px); } 75% { transform: rotate(300deg) translateX(12px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
       `}</style>
     </div>
   );
