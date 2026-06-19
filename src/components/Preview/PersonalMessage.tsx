@@ -8,16 +8,33 @@ interface PreviewProps {
 const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
   return (
     <section className="personal-message section" style={{ fontFamily: data.fontFamily }}>
+      <h2>한마디</h2>
       <div className="message-container">
         <div className="message-box groom">
-          <div className="quote-icon">"</div>
-          <p>{data.groomMessage}</p>
-          <span className="message-name">신랑 {data.groomName}</span>
+          <div className="msg-profile-row">
+            {data.groomPhoto ? (
+              <img src={data.groomPhoto} alt="신랑" className="msg-profile-img" />
+            ) : (
+              <div className="msg-profile-empty" />
+            )}
+            <div className="msg-content">
+              <span className="message-name">신랑 {data.groomName}</span>
+              <p>{data.groomMessage}</p>
+            </div>
+          </div>
         </div>
         <div className="message-box bride">
-          <div className="quote-icon">"</div>
-          <p>{data.brideMessage}</p>
-          <span className="message-name">신부 {data.brideName}</span>
+          <div className="msg-profile-row reverse">
+            <div className="msg-content">
+              <span className="message-name">신부 {data.brideName}</span>
+              <p>{data.brideMessage}</p>
+            </div>
+            {data.bridePhoto ? (
+              <img src={data.bridePhoto} alt="신부" className="msg-profile-img" />
+            ) : (
+              <div className="msg-profile-empty" />
+            )}
+          </div>
         </div>
       </div>
 
@@ -29,47 +46,58 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
         .message-container {
           display: flex;
           flex-direction: column;
-          gap: 40px;
+          gap: 24px;
         }
         .message-box {
-          position: relative;
-          padding: 30px;
+          padding: 16px;
           background: var(--wedding-card-bg);
-          border-radius: 24px;
+          border-radius: 20px;
           border: 1px solid var(--wedding-border);
           box-shadow: 0 10px 30px rgba(74, 69, 67, 0.05);
         }
-        .quote-icon {
-          font-family: 'Gowun Batang', serif;
-          font-size: 3em;
-          color: var(--wedding-accent);
-          position: absolute;
-          top: -10px;
-          left: 20px;
-          line-height: 1;
+        .groom { border-left: 4px solid var(--wedding-accent); border-right: none; }
+        .bride { border-right: 4px solid var(--wedding-main); border-left: none; }
+        .msg-profile-row.reverse { flex-direction: row; }
+        .msg-profile-row.reverse .msg-content { text-align: center; }
+        .msg-profile-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 14px;
         }
-        .message-box p {
-          font-size: 1em;
-          line-height: 1.8;
-          color: var(--wedding-text-body);
-          margin-bottom: 20px;
-          position: relative;
-          z-index: 1;
-          word-break: keep-all;
+        .msg-profile-img {
+          width: 130px;
+          height: 130px;
+          border-radius: 14px;
+          object-fit: cover;
+          flex-shrink: 0;
+          border: 2px solid var(--wedding-border);
+        }
+        .msg-profile-empty {
+          width: 130px;
+          height: 130px;
+          border-radius: 14px;
+          flex-shrink: 0;
+          background: var(--wedding-border);
+          opacity: 0.5;
+        }
+        .msg-content {
+          flex: 1;
+          min-width: 0;
         }
         .message-name {
-          font-size: 0.85em;
-          font-weight: 600;
+          font-size: 0.8em;
+          font-weight: 700;
           color: var(--wedding-main);
-          display: block;
-          text-align: right;
           letter-spacing: 1px;
+          display: block;
+          margin-bottom: 8px;
         }
-        .groom {
-          border-left: 4px solid var(--wedding-accent);
-        }
-        .bride {
-          border-left: 4px solid var(--wedding-main);
+        .msg-content p {
+          font-size: 0.95em;
+          line-height: 1.8;
+          color: var(--wedding-text-body);
+          margin: 0;
+          word-break: keep-all;
         }
       `}</style>
     </section>

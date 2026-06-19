@@ -37,10 +37,13 @@ export interface InvitationData {
   bgMusicUrl: string;
   groomMessage: string;
   brideMessage: string;
+  groomPhoto: string;
+  bridePhoto: string;
   isRSVPEnabled: boolean;
   theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern';
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern';
   bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti';
+  scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   
   // New features
   weddingDateISO: string;

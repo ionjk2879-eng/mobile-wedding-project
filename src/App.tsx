@@ -9,6 +9,7 @@ import Location from './components/Preview/Location';
 import RSVPForm from './components/Preview/RSVPForm';
 import Money from './components/Preview/Money';
 import Contacts from './components/Preview/Contacts';
+import ScrollReveal, { ScrollRootContext } from './components/Preview/ScrollReveal';
 import Share from './components/Preview/Share';
 import { InvitationData } from './types';
 
@@ -27,6 +28,7 @@ const App: React.FC = () => {
     music: React.useRef<HTMLDivElement>(null),
   };
   const previewScrollRef = React.useRef<HTMLDivElement>(null);
+  const fullPreviewScrollRef = React.useRef<HTMLDivElement>(null);
 
   const [data, setData] = useState<InvitationData>({
     groomName: '김지현',
@@ -52,10 +54,13 @@ const App: React.FC = () => {
     bgMusicUrl: '',
     groomMessage: '항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다.',
     brideMessage: '서로 아끼고 배려하며 예쁘게 잘 살겠습니다.',
+    groomPhoto: '',
+    bridePhoto: '',
     isRSVPEnabled: true,
     theme: 'blush',
     bgTexture: 'none',
     bgEffect: 'none',
+    scrollEffect: 'none',
     weddingDateISO: '2026-10-24',
     transport: {
       subway: '2호선 강남역 12번 출구 도보 5분',
@@ -181,25 +186,27 @@ const App: React.FC = () => {
       <div ref={previewRefs.theme} />
       <div ref={previewRefs.design} />
       <div ref={previewRefs.basic}><Hero data={data} /></div>
-      <div ref={previewRefs.greeting}><Greeting data={data} /></div>
-      <Calendar data={data} />
-      <div ref={previewRefs.message}><PersonalMessage data={data} /></div>
-      <div ref={previewRefs.photos}><Gallery data={data} /></div>
-      <div ref={previewRefs.location}><Location data={data} /></div>
-      <RSVPForm data={data} />
-      <div ref={previewRefs.accounts}><Money data={data} /></div>
-      <div ref={previewRefs.contacts}><Contacts data={data} /></div>
-      <div ref={previewRefs.music}><Share data={data} /></div>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.greeting}><Greeting data={data} /></div></ScrollReveal>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><Calendar data={data} /></ScrollReveal>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.message}><PersonalMessage data={data} /></div></ScrollReveal>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><div ref={previewRefs.photos}><Gallery data={data} /></div></ScrollReveal>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.location}><Location data={data} /></div></ScrollReveal>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><RSVPForm data={data} /></ScrollReveal>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.accounts}><Money data={data} /></div></ScrollReveal>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><div ref={previewRefs.contacts}><Contacts data={data} /></div></ScrollReveal>
+      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.music}><Share data={data} /></div></ScrollReveal>
     </div>
   );
 
   if (isFullPreview) {
     return (
-      <div className="full-preview-container" style={{ fontFamily: data.fontFamily }}>
+      <div className="full-preview-container" style={{ fontFamily: data.fontFamily }} ref={fullPreviewScrollRef}>
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
         <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>🛠️ 편집기로 돌아가기</button>
         <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize() }}>
-          {previewContent}
+          <ScrollRootContext.Provider value={fullPreviewScrollRef}>
+            {previewContent}
+          </ScrollRootContext.Provider>
         </div>
         <style>{`
           .full-preview-container {
@@ -392,6 +399,7 @@ const App: React.FC = () => {
         .confetti.c4 { background: #FFFFBA; border-radius: 50%; width: 5px; height: 5px; }
         .confetti.c5 { background: #E8BAFF; border-radius: 1px; }
         @keyframes confetti-fall { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(-10px); } 75% { transform: rotate(300deg) translateX(12px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
+
       `}</style>
     </div>
   );

@@ -291,6 +291,16 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     onChange({ ...data, accounts: newAccounts });
   };
 
+  const handleProfilePhotoUpload = (field: 'groomPhoto' | 'bridePhoto', e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      onChange({ ...data, [field]: event.target?.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleHeroPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -344,7 +354,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     { id: 'design', name: '디자인', icon: <Palette size={18} />, ref: sectionRefs.design },
     { id: 'basic', name: '기본정보', icon: <Info size={18} />, ref: sectionRefs.basic },
     { id: 'greeting', name: '인사말', icon: <MessageSquare size={18} />, ref: sectionRefs.greeting },
-    { id: 'message', name: '인사말', icon: <Heart size={18} />, ref: sectionRefs.message },
+    { id: 'message', name: '한마디', icon: <Heart size={18} />, ref: sectionRefs.message },
     { id: 'photos', name: '사진', icon: <ImageIcon size={18} />, ref: sectionRefs.photos },
     { id: 'location', name: '장소', icon: <MapPin size={18} />, ref: sectionRefs.location },
     { id: 'accounts', name: '계좌', icon: <CreditCard size={18} />, ref: sectionRefs.accounts },
@@ -480,6 +490,22 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                       { key: 'confetti', name: '꽃가루', icon: '🎊' },
                     ].map(t => (
                       <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => onChange({ ...data, bgEffect: t.key as any })}>
+                        <span className="effect-icon">{t.icon}</span>
+                        {t.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="input-group">
+                  <label>스크롤 등장 효과</label>
+                  <div className="theme-select-grid modern">
+                    {[
+                      { key: 'none', name: '없음', icon: '—' },
+                      { key: 'fade-up', name: '페이드 업', icon: '↑' },
+                      { key: 'fade-in', name: '페이드 인', icon: '◎' },
+                      { key: 'slide-in', name: '슬라이드', icon: '→' },
+                    ].map(t => (
+                      <button key={t.key} type="button" className={`theme-chip ${(data.scrollEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => onChange({ ...data, scrollEffect: t.key as any })}>
                         <span className="effect-icon">{t.icon}</span>
                         {t.name}
                       </button>
@@ -629,13 +655,49 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             </div>
             {expandedSections.message && (
               <div className="section-content">
-                <div className="input-group">
-                  <label>신랑의 한마디</label>
-                  <textarea name="groomMessage" value={data.groomMessage} onChange={handleChange} rows={2} className="modern-input" placeholder="항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다." />
+                <div className="profile-msg-card">
+                  <div className="profile-msg-header"><span className="person-type">신랑</span></div>
+                  <div className="profile-msg-body">
+                    <div className="profile-upload-area">
+                      {data.groomPhoto ? (
+                        <div className="profile-thumb">
+                          <img src={data.groomPhoto} alt="신랑" />
+                          <label className="profile-change-btn"><ImageIcon size={12} /><input type="file" accept="image/*" onChange={(e) => handleProfilePhotoUpload('groomPhoto', e)} hidden /></label>
+                        </div>
+                      ) : (
+                        <label className="profile-empty">
+                          <ImageIcon size={20} />
+                          <span>프로필</span>
+                          <input type="file" accept="image/*" onChange={(e) => handleProfilePhotoUpload('groomPhoto', e)} hidden />
+                        </label>
+                      )}
+                    </div>
+                    <div className="profile-msg-input">
+                      <textarea name="groomMessage" value={data.groomMessage} onChange={handleChange} rows={2} className="modern-input" placeholder="항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다." />
+                    </div>
+                  </div>
                 </div>
-                <div className="input-group">
-                  <label>신부의 한마디</label>
-                  <textarea name="brideMessage" value={data.brideMessage} onChange={handleChange} rows={2} className="modern-input" placeholder="서로 아끼고 배려하며 예쁘게 잘 살겠습니다." />
+                <div className="profile-msg-card">
+                  <div className="profile-msg-header"><span className="person-type bride">신부</span></div>
+                  <div className="profile-msg-body">
+                    <div className="profile-upload-area">
+                      {data.bridePhoto ? (
+                        <div className="profile-thumb">
+                          <img src={data.bridePhoto} alt="신부" />
+                          <label className="profile-change-btn"><ImageIcon size={12} /><input type="file" accept="image/*" onChange={(e) => handleProfilePhotoUpload('bridePhoto', e)} hidden /></label>
+                        </div>
+                      ) : (
+                        <label className="profile-empty">
+                          <ImageIcon size={20} />
+                          <span>프로필</span>
+                          <input type="file" accept="image/*" onChange={(e) => handleProfilePhotoUpload('bridePhoto', e)} hidden />
+                        </label>
+                      )}
+                    </div>
+                    <div className="profile-msg-input">
+                      <textarea name="brideMessage" value={data.brideMessage} onChange={handleChange} rows={2} className="modern-input" placeholder="서로 아끼고 배려하며 예쁘게 잘 살겠습니다." />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -827,6 +889,17 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .time-adj { padding: 6px 10px; border-radius: 8px; font-size: 0.95rem; font-weight: 800; color: #1F2937; background: none; cursor: pointer; transition: all 0.15s; }
         .time-adj:hover { background: #F3F4F6; color: #D4A5C6; }
         .time-colon { font-size: 0.95rem; font-weight: 800; color: #1F2937; }
+        .profile-msg-card { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+        .profile-msg-header { padding: 14px 20px; border-bottom: 1px solid #F0F2F5; }
+        .profile-msg-body { display: flex; gap: 16px; padding: 20px; align-items: flex-start; }
+        .profile-upload-area { flex-shrink: 0; }
+        .profile-thumb { position: relative; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; }
+        .profile-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-change-btn { position: absolute; bottom: 0; right: 0; width: 24px; height: 24px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.15); cursor: pointer; color: #6B7280; }
+        .profile-empty { width: 80px; height: 80px; border-radius: 12px; border: 2px dashed #D1D5DB; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #9CA3AF; cursor: pointer; transition: all 0.2s; }
+        .profile-empty:hover { border-color: #D4A5C6; color: #D4A5C6; }
+        .profile-empty span { font-size: 0.6rem; font-weight: 700; }
+        .profile-msg-input { flex: 1; }
         .input-with-checkbox { display: flex; align-items: center; gap: 10px; }
         .deceased-check { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; font-weight: 700; color: #6B7280; cursor: pointer; white-space: nowrap; }
         .deceased-check input { width: 16px; height: 16px; accent-color: #D4A5C6; }
