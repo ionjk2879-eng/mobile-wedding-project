@@ -376,11 +376,12 @@ const App: React.FC = () => {
         }
 
         /* Effects */
+        .effect-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; }
         .particle { position: absolute; top: -20px; }
         @keyframes fall { 0% { top: -20px; } 100% { top: 100%; } }
         .particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: 0.7; animation: fall linear infinite; }
-        .particle.snowflake { width: 6px; height: 6px; background: white; border-radius: 50%; opacity: 0.8; animation: fall linear infinite; }
-        .particle.star { width: 4px; height: 4px; background: white; border-radius: 50%; animation: twinkle 2s infinite; }
+        .particle.snowflake { width: 6px; height: 6px; background: #C8D8E8; border-radius: 50%; opacity: 0.7; box-shadow: 0 0 4px rgba(200,216,232,0.5); animation: fall linear infinite; }
+        .particle.star { width: 4px; height: 4px; background: #D4B896; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(212,184,150,0.5); animation: twinkle 2s infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
         .particle.leaf { width: 12px; height: 16px; background: #A8C686; border-radius: 2px 50% 50% 50%; opacity: 0.6; animation: fall-sway linear infinite; transform-origin: center; }
