@@ -99,13 +99,19 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
   return (
     <section className="gallery section">
       <h2>{isEn ? 'GALLERY' : '갤러리'}</h2>
-      <div className="photo-grid">
-        {data.photos.map((src, index) => (
-          <div key={index} className="photo-item" onClick={() => openLightbox(index)}>
-            <img src={src} alt={`Gallery ${index}`} />
-          </div>
-        ))}
-      </div>
+      {data.photos.length > 0 ? (
+        <div className="photo-grid">
+          {data.photos.map((src, index) => (
+            <div key={index} className="photo-item" onClick={() => openLightbox(index)}>
+              <img src={src} alt={`Gallery ${index}`} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="gallery-empty">
+          <span>갤러리 사진을 등록해주세요</span>
+        </div>
+      )}
 
       {selectedIndex !== null && (
         <div 
@@ -151,6 +157,20 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 10px;
+        }
+        .gallery-empty {
+          width: 100%;
+          padding: 60px 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--wedding-card-bg);
+          border: 2px dashed var(--wedding-border);
+          border-radius: 12px;
+        }
+        .gallery-empty span {
+          font-size: 0.9em;
+          color: var(--wedding-text-sub);
         }
         .photo-item {
           aspect-ratio: 1 / 1;

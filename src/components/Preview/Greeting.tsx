@@ -1,5 +1,4 @@
 import React from 'react';
-import { Phone, MessageSquare } from 'lucide-react';
 import { InvitationData } from '../../types';
 
 interface PreviewProps {
@@ -11,6 +10,16 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
   const title = isEn ? 'INVITATION' : (data.greetingTitle || '초대합니다');
   const content = isEn && data.en.greetingContent ? data.en.greetingContent : data.greetingContent;
 
+  const groomFather = data.parents.groomParents.find(p => p.role === '아버지');
+  const groomMother = data.parents.groomParents.find(p => p.role === '어머니');
+  const brideFather = data.parents.brideParents.find(p => p.role === '아버지');
+  const brideMother = data.parents.brideParents.find(p => p.role === '어머니');
+
+  const formatParent = (parent: any) => {
+    if (!parent || !parent.name) return '';
+    return parent.isDeceased ? `故 ${parent.name}` : parent.name;
+  };
+
   return (
     <section className="greeting section" style={{ fontFamily: data.fontFamily }}>
       <div className="greeting-text">
@@ -20,21 +29,21 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
         </p>
       </div>
 
-      <div className="contact-grid">
-        {data.contacts.map((contact, index) => (
-          <div key={index} className="contact-item">
-            <span className="role">{contact.role}</span>
-            <span className="name">{contact.name}</span>
-            <div className="contact-buttons">
-              <a href={`tel:${contact.phone}`} className="contact-btn">
-                <Phone size={18} />
-              </a>
-              <a href={`sms:${contact.phone}`} className="contact-btn">
-                <MessageSquare size={18} />
-              </a>
-            </div>
-          </div>
-        ))}
+      <div className="family-info">
+        <div className="family-block">
+          <span className="parent-names">
+            {formatParent(groomFather)}{groomFather?.name && groomMother?.name ? ' · ' : ''}{formatParent(groomMother)}
+            <span className="child-label">{isEn ? 'Son' : '의 아들'}</span>
+          </span>
+          <span className="child-name">{data.groomName}</span>
+        </div>
+        <div className="family-block">
+          <span className="parent-names">
+            {formatParent(brideFather)}{brideFather?.name && brideMother?.name ? ' · ' : ''}{formatParent(brideMother)}
+            <span className="child-label">{isEn ? 'Daughter' : '의 딸'}</span>
+          </span>
+          <span className="child-name">{data.brideName}</span>
+        </div>
       </div>
 
       <style>{`
@@ -42,48 +51,35 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
           line-height: 2;
           color: var(--wedding-text-body);
           font-size: 0.95em;
-          margin-bottom: 50px;
+          margin-bottom: 0;
         }
-        .contact-grid {
+        .family-info {
+          margin-top: 50px;
           display: flex;
           flex-direction: column;
-          gap: 20px;
-          border-top: 1px solid var(--wedding-border);
-          padding-top: 40px;
+          gap: 30px;
         }
-        .contact-item {
+        .family-block {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          justify-content: center;
-          gap: 15px;
-        }
-        .role {
-          font-size: 0.8em;
-          color: var(--wedding-text-sub);
-        }
-        .name {
-          font-weight: 500;
-          color: var(--wedding-text-main);
-          min-width: 60px;
-        }
-        .contact-buttons {
-          display: flex;
           gap: 10px;
         }
-        .contact-btn {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: var(--wedding-card-bg);
-          border: 1px solid var(--wedding-border);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--wedding-text-body);
-          transition: background 0.2s;
+        .parent-names {
+          font-size: 0.95em;
+          color: var(--wedding-text-sub);
+          letter-spacing: 1px;
         }
-        .contact-btn:hover {
-          background: var(--wedding-border);
+        .child-label {
+          font-size: 0.85em;
+          color: var(--wedding-text-sub);
+          margin-left: 4px;
+        }
+        .child-name {
+          font-size: 1.4em;
+          font-weight: 600;
+          color: var(--wedding-text-main);
+          letter-spacing: 3px;
         }
       `}</style>
     </section>

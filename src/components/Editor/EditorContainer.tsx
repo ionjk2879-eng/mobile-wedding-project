@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, ChevronUp, ChevronDown, Clock, Palette, Info, MessageSquare, Heart, MapPin, Phone, CreditCard, Image as ImageIcon, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown, Clock, Palette, Info, MessageSquare, Heart, MapPin, Phone, CreditCard, Image as ImageIcon, ChevronRight, Sparkles, Music } from 'lucide-react';
 import { InvitationData } from '../../types';
 
 declare global {
@@ -25,6 +25,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     contacts: React.useRef<HTMLDivElement>(null),
     accounts: React.useRef<HTMLDivElement>(null),
     photos: React.useRef<HTMLDivElement>(null),
+    music: React.useRef<HTMLDivElement>(null),
   };
 
   const workspaceRef = React.useRef<HTMLDivElement>(null);
@@ -39,6 +40,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     contacts: false,
     accounts: false,
     photos: false,
+    music: false,
   });
   
   const isScrollingRef = React.useRef(false);
@@ -207,11 +209,72 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
           fullAddress += (extraAddress !== '' ? ` (${extraAddress})` : '');
         }
 
-        onChange({
+        const venueNameFinal = searchData.buildingName || data.venueName;
+        const bname = searchData.bname || '';
+        const sigungu = searchData.sigungu || '';
+
+        const updatedData: any = {
           ...data,
           venueAddress: fullAddress,
-          venueName: searchData.buildingName || data.venueName
-        });
+          venueName: venueNameFinal,
+          transport: {
+            subway: `${sigungu} ${bname} 인근 지하철역 이용`,
+            bus: `${bname || sigungu} 정류장 하차`,
+            parking: `${venueNameFinal || '건물'} 내 지하 주차장 이용 가능`
+          }
+        };
+
+        onChange(updatedData);
+
+        if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+          const geocoder = new window.kakao.maps.services.Geocoder();
+          const places = new window.kakao.maps.services.Places();
+
+          geocoder.addressSearch(fullAddress, (result: any, status: any) => {
+            if (status !== window.kakao.maps.services.Status.OK || !result[0]) return;
+
+            const lat = parseFloat(result[0].y);
+            const lng = parseFloat(result[0].x);
+            const location = new window.kakao.maps.LatLng(lat, lng);
+
+            let subwayText = '';
+            let busText = '';
+            let completed = 0;
+
+            const tryUpdate = () => {
+              completed++;
+              if (completed < 2) return;
+              onChange({
+                ...updatedData,
+                transport: {
+                  subway: subwayText || updatedData.transport.subway,
+                  bus: busText || updatedData.transport.bus,
+                  parking: updatedData.transport.parking
+                }
+              });
+            };
+
+            places.keywordSearch('지하철역', (results: any, s: any) => {
+              if (s === window.kakao.maps.services.Status.OK && results.length > 0) {
+                subwayText = results.slice(0, 2).map((r: any) => {
+                  const dist = Math.round(Math.sqrt(Math.pow((parseFloat(r.y) - lat) * 111000, 2) + Math.pow((parseFloat(r.x) - lng) * 88000, 2)));
+                  return `${r.place_name.replace(' ', '')} 도보 약 ${Math.ceil(dist / 80)}분 (${dist}m)`;
+                }).join('\n');
+              }
+              tryUpdate();
+            }, { location, radius: 2000, sort: window.kakao.maps.services.SortBy.DISTANCE });
+
+            places.keywordSearch('버스정류장', (results: any, s: any) => {
+              if (s === window.kakao.maps.services.Status.OK && results.length > 0) {
+                busText = results.slice(0, 2).map((r: any) => {
+                  const dist = Math.round(Math.sqrt(Math.pow((parseFloat(r.y) - lat) * 111000, 2) + Math.pow((parseFloat(r.x) - lng) * 88000, 2)));
+                  return `${r.place_name} 하차 (${dist}m)`;
+                }).join('\n');
+              }
+              tryUpdate();
+            }, { location, radius: 1000, sort: window.kakao.maps.services.SortBy.DISTANCE });
+          });
+        }
       }
     }).open();
   };
@@ -275,16 +338,18 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     { name: 'Dancing Script (영문 필기체)', value: "'Dancing Script', cursive" },
   ];
 
+  // 순서: 프리뷰 기준 (Hero → Greeting → Calendar → PersonalMessage → Gallery → Location → RSVP → Money → Share)
   const navItems = [
     { id: 'theme', name: '테마', icon: <Sparkles size={18} />, ref: sectionRefs.theme },
     { id: 'design', name: '디자인', icon: <Palette size={18} />, ref: sectionRefs.design },
     { id: 'basic', name: '기본정보', icon: <Info size={18} />, ref: sectionRefs.basic },
     { id: 'greeting', name: '인사말', icon: <MessageSquare size={18} />, ref: sectionRefs.greeting },
-    { id: 'message', name: '메시지', icon: <Heart size={18} />, ref: sectionRefs.message },
-    { id: 'location', name: '장소', icon: <MapPin size={18} />, ref: sectionRefs.location },
-    { id: 'contacts', name: '연락처', icon: <Phone size={18} />, ref: sectionRefs.contacts },
-    { id: 'accounts', name: '계좌', icon: <CreditCard size={18} />, ref: sectionRefs.accounts },
+    { id: 'message', name: '인사말', icon: <Heart size={18} />, ref: sectionRefs.message },
     { id: 'photos', name: '사진', icon: <ImageIcon size={18} />, ref: sectionRefs.photos },
+    { id: 'location', name: '장소', icon: <MapPin size={18} />, ref: sectionRefs.location },
+    { id: 'accounts', name: '계좌', icon: <CreditCard size={18} />, ref: sectionRefs.accounts },
+    { id: 'contacts', name: '연락처', icon: <Phone size={18} />, ref: sectionRefs.contacts },
+    { id: 'music', name: '배경음악', icon: <Music size={18} />, ref: sectionRefs.music },
   ];
 
   const getParentValue = (side: 'groomParents' | 'brideParents', role: string) => {
@@ -330,18 +395,25 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                   <label>테마 선택</label>
                   <div className="theme-select-grid modern">
                     {[
-                      { key: 'blush', color: '#D4918E', name: '블러시 핑크' },
-                      { key: 'champagne', color: '#C8A97E', name: '샴페인' },
-                      { key: 'sage', color: '#8BA888', name: '세이지 그린' },
-                      { key: 'navy', color: '#4A5E7A', name: '클래식 네이비' },
-                      { key: 'burgundy', color: '#8B3A4A', name: '버건디 와인' },
-                      { key: 'lavender', color: '#9B8BB8', name: '라벤더' },
-                      { key: 'dusty', color: '#B67A82', name: '더스티 로즈' },
-                      { key: 'modern', color: '#888888', name: '모던 화이트' },
+                      { key: 'blush', name: '블러시 핑크', colors: ['#FFF5F6', '#F3CDCC', '#D4918E', '#E8A0A0', '#3C2B2B'] },
+                      { key: 'champagne', name: '샴페인', colors: ['#FBF8F3', '#E8DFD2', '#C8A97E', '#D4B896', '#3B3228'] },
+                      { key: 'sage', name: '세이지 그린', colors: ['#F5F7F4', '#D6DED0', '#8BA888', '#A3B59E', '#2B3328'] },
+                      { key: 'navy', name: '클래식 네이비', colors: ['#F3F5F9', '#D0D8E8', '#4A5E7A', '#6A80A0', '#1E2638'] },
+                      { key: 'burgundy', name: '버건디 와인', colors: ['#FBF5F5', '#E8D4D4', '#8B3A4A', '#A8626E', '#2E1A1E'] },
+                      { key: 'lavender', name: '라벤더', colors: ['#F7F5FA', '#E3DFEE', '#9B8BB8', '#B5A4CC', '#2C2038'] },
+                      { key: 'dusty', name: '더스티 로즈', colors: ['#FAF5F3', '#E8D8D4', '#B67A82', '#C99498', '#38282A'] },
+                      { key: 'modern', name: '모던 화이트', colors: ['#FAFAFA', '#E8E8E8', '#888888', '#AAAAAA', '#1A1A1A'] },
                     ].map(t => (
-                      <button key={t.key} type="button" className={`theme-chip ${data.theme === t.key ? 'active' : ''}`} style={data.theme === t.key ? { borderColor: t.color, color: t.color } : {}} onClick={() => onChange({ ...data, theme: t.key as any })}>
-                        <span className="dot" style={{ background: t.color }}></span>
-                        {t.name}
+                      <button key={t.key} type="button" className={`theme-chip-v2 ${data.theme === t.key ? 'active' : ''}`} style={data.theme === t.key ? { borderColor: t.colors[2] } : {}} onClick={() => onChange({ ...data, theme: t.key as any })}>
+                        <div className="theme-chip-info">
+                          <span className="dot" style={{ background: t.colors[2] }}></span>
+                          <span className="theme-chip-name" style={data.theme === t.key ? { color: t.colors[2] } : {}}>{t.name}</span>
+                        </div>
+                        <div className="theme-palette">
+                          {t.colors.map((c, i) => (
+                            <span key={i} className="palette-swatch" style={{ background: c }} />
+                          ))}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -415,10 +487,6 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                   </div>
                 </div>
                 <div className="input-group">
-                  <label>배경음악 URL</label>
-                  <input type="text" name="bgMusicUrl" value={data.bgMusicUrl} onChange={handleChange} className="modern-input" placeholder="https://example.com/music.mp3" />
-                </div>
-                <div className="input-group">
                   <label className="modern-checkbox">
                     <input type="checkbox" checked={data.isRSVPEnabled} onChange={(e) => onChange({ ...data, isRSVPEnabled: e.target.checked })} />
                     <span>참석 응답(RSVP) 기능 활성화</span>
@@ -439,81 +507,87 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             </div>
             {expandedSections.basic && (
               <div className="section-content">
-                <div className="person-info-group">
-                  <div className="info-label-row">
-                    <span className="person-type">신랑</span>
-                    <input type="text" name="groomName" value={data.groomName} onChange={handleChange} className="modern-input name-input" placeholder="이름" />
-                  </div>
-                  <div className="parents-grid">
-                    <div className="parent-input-item">
-                      <label>아버지 성함</label>
-                      <div className="input-with-checkbox">
-                        <input type="text" value={getParentValue('groomParents', '아버지')} onChange={(e) => handleParentNameChange('groomParents', '아버지', e.target.value)} className="modern-input" />
-                        <label className="deceased-check"><input type="checkbox" checked={getParentDeceased('groomParents', '아버지')} onChange={(e) => handleParentDeceasedChange('groomParents', '아버지', e.target.checked)} /> 故</label>
-                      </div>
+                <div className="basic-cards">
+                  <div className="basic-card">
+                    <div className="basic-card-header">
+                      <span className="person-type">신랑</span>
                     </div>
-                    <div className="parent-input-item">
-                      <label>어머니 성함</label>
-                      <div className="input-with-checkbox">
-                        <input type="text" value={getParentValue('groomParents', '어머니')} onChange={(e) => handleParentNameChange('groomParents', '어머니', e.target.value)} className="modern-input" />
-                        <label className="deceased-check"><input type="checkbox" checked={getParentDeceased('groomParents', '어머니')} onChange={(e) => handleParentDeceasedChange('groomParents', '어머니', e.target.checked)} /> 故</label>
+                    <div className="basic-card-body">
+                      <div className="basic-field">
+                        <label>이름</label>
+                        <input type="text" name="groomName" value={data.groomName} onChange={handleChange} className="modern-input" placeholder="이름" />
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="section-divider-mini"></div>
-                <div className="person-info-group">
-                  <div className="info-label-row">
-                    <span className="person-type bride">신부</span>
-                    <input type="text" name="brideName" value={data.brideName} onChange={handleChange} className="modern-input name-input" placeholder="이름" />
-                  </div>
-                  <div className="parents-grid">
-                    <div className="parent-input-item">
-                      <label>아버지 성함</label>
-                      <div className="input-with-checkbox">
-                        <input type="text" value={getParentValue('brideParents', '아버지')} onChange={(e) => handleParentNameChange('brideParents', '아버지', e.target.value)} className="modern-input" />
-                        <label className="deceased-check"><input type="checkbox" checked={getParentDeceased('brideParents', '아버지')} onChange={(e) => handleParentDeceasedChange('brideParents', '아버지', e.target.checked)} /> 故</label>
-                      </div>
-                    </div>
-                    <div className="parent-input-item">
-                      <label>어머니 성함</label>
-                      <div className="input-with-checkbox">
-                        <input type="text" value={getParentValue('brideParents', '어머니')} onChange={(e) => handleParentNameChange('brideParents', '어머니', e.target.value)} className="modern-input" />
-                        <label className="deceased-check"><input type="checkbox" checked={getParentDeceased('brideParents', '어머니')} onChange={(e) => handleParentDeceasedChange('brideParents', '어머니', e.target.checked)} /> 故</label>
+                      <div className="basic-field-row">
+                        <div className="basic-field">
+                          <label>아버지 성함</label>
+                          <div className="input-with-checkbox">
+                            <input type="text" value={getParentValue('groomParents', '아버지')} onChange={(e) => handleParentNameChange('groomParents', '아버지', e.target.value)} className="modern-input" />
+                            <label className="deceased-check"><input type="checkbox" checked={getParentDeceased('groomParents', '아버지')} onChange={(e) => handleParentDeceasedChange('groomParents', '아버지', e.target.checked)} /> 故</label>
+                          </div>
+                        </div>
+                        <div className="basic-field">
+                          <label>어머니 성함</label>
+                          <div className="input-with-checkbox">
+                            <input type="text" value={getParentValue('groomParents', '어머니')} onChange={(e) => handleParentNameChange('groomParents', '어머니', e.target.value)} className="modern-input" />
+                            <label className="deceased-check"><input type="checkbox" checked={getParentDeceased('groomParents', '어머니')} onChange={(e) => handleParentDeceasedChange('groomParents', '어머니', e.target.checked)} /> 故</label>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="section-divider-mini"></div>
-                <div className="input-grid-2">
-                  <div className="input-group">
-                    <label>예식일</label>
-                    <input type="date" name="weddingDateISO" value={data.weddingDateISO} onChange={handleChange} className="modern-input" />
-                  </div>
-                  <div className="input-group">
-                    <label>표시 날짜</label>
-                    <input type="text" name="date" value={data.date} readOnly className="modern-input readonly" />
-                  </div>
-                </div>
-                <div className="input-group">
-                  <label>예식 시간</label>
-                  <div className="modern-time-picker">
-                    <div className="time-controls">
-                      <div className="time-unit">
-                        <button type="button" onClick={() => adjustTime('hours', 1)}><ChevronUp size={16} /></button>
-                        <span>{timeParts.hours.toString().padStart(2, '0')}</span>
-                        <button type="button" onClick={() => adjustTime('hours', -1)}><ChevronDown size={16} /></button>
+
+                  <div className="basic-card">
+                    <div className="basic-card-header">
+                      <span className="person-type bride">신부</span>
+                    </div>
+                    <div className="basic-card-body">
+                      <div className="basic-field">
+                        <label>이름</label>
+                        <input type="text" name="brideName" value={data.brideName} onChange={handleChange} className="modern-input" placeholder="이름" />
                       </div>
-                      <span className="sep">:</span>
-                      <div className="time-unit">
-                        <button type="button" onClick={() => adjustTime('minutes', 5)}><ChevronUp size={16} /></button>
-                        <span>{timeParts.minutes.toString().padStart(2, '0')}</span>
-                        <button type="button" onClick={() => adjustTime('minutes', -5)}><ChevronDown size={16} /></button>
+                      <div className="basic-field-row">
+                        <div className="basic-field">
+                          <label>아버지 성함</label>
+                          <div className="input-with-checkbox">
+                            <input type="text" value={getParentValue('brideParents', '아버지')} onChange={(e) => handleParentNameChange('brideParents', '아버지', e.target.value)} className="modern-input" />
+                            <label className="deceased-check"><input type="checkbox" checked={getParentDeceased('brideParents', '아버지')} onChange={(e) => handleParentDeceasedChange('brideParents', '아버지', e.target.checked)} /> 故</label>
+                          </div>
+                        </div>
+                        <div className="basic-field">
+                          <label>어머니 성함</label>
+                          <div className="input-with-checkbox">
+                            <input type="text" value={getParentValue('brideParents', '어머니')} onChange={(e) => handleParentNameChange('brideParents', '어머니', e.target.value)} className="modern-input" />
+                            <label className="deceased-check"><input type="checkbox" checked={getParentDeceased('brideParents', '어머니')} onChange={(e) => handleParentDeceasedChange('brideParents', '어머니', e.target.checked)} /> 故</label>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="ampm-toggle">
-                      <button type="button" className={timeParts.ampm === 'AM' ? 'active' : ''} onClick={() => adjustTime('ampm', 0)}>AM</button>
-                      <button type="button" className={timeParts.ampm === 'PM' ? 'active' : ''} onClick={() => adjustTime('ampm', 0)}>PM</button>
+                  </div>
+
+                  <div className="basic-card">
+                    <div className="basic-card-header">
+                      <span className="person-type date">예식 일시</span>
+                    </div>
+                    <div className="basic-card-body">
+                      <div className="date-time-row">
+                        <div className="basic-field date-field">
+                          <label>예식일</label>
+                          <input type="date" name="weddingDateISO" value={data.weddingDateISO} onChange={handleChange} className="modern-input" />
+                        </div>
+                        <div className="basic-field date-field">
+                          <label>표시 날짜</label>
+                          <input type="text" name="date" value={data.date} readOnly className="modern-input readonly" />
+                        </div>
+                        <div className="basic-field time-field">
+                          <label>예식 시간</label>
+                          <div className="time-picker-flat">
+                            <button type="button" className="time-adj" onClick={() => adjustTime('ampm', 0)}>{timeParts.ampm}</button>
+                            <button type="button" className="time-adj" onClick={() => adjustTime('hours', 1)}>{timeParts.hours.toString().padStart(2, '0')}</button>
+                            <span className="time-colon">:</span>
+                            <button type="button" className="time-adj" onClick={() => adjustTime('minutes', 5)}>{timeParts.minutes.toString().padStart(2, '0')}</button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -538,7 +612,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                 </div>
                 <div className="input-group">
                   <label>내용</label>
-                  <textarea name="greetingContent" value={data.greetingContent} onChange={handleChange} rows={5} className="modern-input" />
+                  <textarea name="greetingContent" value={data.greetingContent} onChange={handleChange} rows={10} className="modern-input" />
                 </div>
               </div>
             )}
@@ -567,6 +641,45 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             )}
           </div>
 
+          {/* Photos Section */}
+          <div className={`editor-section-card ${expandedSections.photos ? 'expanded' : ''}`} ref={sectionRefs.photos}>
+            <div className="section-header" onClick={() => toggleSection('photos')}>
+              <div className="header-left">
+                <ImageIcon size={20} />
+                <h3>사진 관리</h3>
+              </div>
+              <ChevronRight size={18} className="collapse-icon" />
+            </div>
+            {expandedSections.photos && (
+              <div className="section-content">
+                <div className="modern-photo-editor">
+                  <div className="photo-label">메인 사진</div>
+                  <div className="modern-hero-upload">
+                    {data.heroPhoto ? (
+                      <>
+                        <img src={data.heroPhoto} alt="Hero" />
+                        <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden /></label>
+                      </>
+                    ) : (
+                      <label className="hero-empty-upload">
+                        <ImageIcon size={24} />
+                        <span>메인 사진 등록</span>
+                        <input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden />
+                      </label>
+                    )}
+                  </div>
+                  <div className="photo-label" style={{ marginTop: '30px' }}>갤러리 (다중 선택 가능)</div>
+                  <div className="modern-gallery-grid">
+                    <label className="add-photo-card"><div className="plus">+</div><span>사진 추가</span><input type="file" multiple accept="image/*" onChange={handlePhotoUpload} hidden /></label>
+                    {data.photos.map((photo, index) => (
+                      <div key={index} className="gallery-item"><img src={photo} alt="Preview" /><button className="del-btn" onClick={() => removePhoto(index)}>×</button></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Location Section */}
           <div className={`editor-section-card ${expandedSections.location ? 'expanded' : ''}`} ref={sectionRefs.location}>
             <div className="section-header" onClick={() => toggleSection('location')}>
@@ -589,43 +702,17 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                   <label>예식장 이름</label>
                   <input type="text" name="venueName" value={data.venueName} onChange={handleChange} className="modern-input" />
                 </div>
-                <div className="input-grid-3">
-                  <div className="input-group">
-                    <label>지하철</label>
-                    <textarea value={data.transport.subway} onChange={(e) => handleTransportChange('subway', e.target.value)} rows={3} className="modern-input" />
-                  </div>
-                  <div className="input-group">
-                    <label>버스</label>
-                    <textarea value={data.transport.bus} onChange={(e) => handleTransportChange('bus', e.target.value)} rows={3} className="modern-input" />
-                  </div>
-                  <div className="input-group">
-                    <label>주차</label>
-                    <textarea value={data.transport.parking} onChange={(e) => handleTransportChange('parking', e.target.value)} rows={3} className="modern-input" />
-                  </div>
+                <div className="input-group">
+                  <label>지하철</label>
+                  <textarea value={data.transport.subway} onChange={(e) => handleTransportChange('subway', e.target.value)} rows={2} className="modern-input" />
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* Contacts Section */}
-          <div className={`editor-section-card ${expandedSections.contacts ? 'expanded' : ''}`} ref={sectionRefs.contacts}>
-            <div className="section-header" onClick={() => toggleSection('contacts')}>
-              <div className="header-left">
-                <Phone size={20} />
-                <h3>연락처 설정</h3>
-              </div>
-              <ChevronRight size={18} className="collapse-icon" />
-            </div>
-            {expandedSections.contacts && (
-              <div className="section-content">
-                <div className="modern-list">
-                  {data.contacts.map((contact, index) => (
-                    <div key={index} className="modern-list-item">
-                      <span className="role-tag">{contact.role}</span>
-                      <input type="text" placeholder="이름" value={contact.name} onChange={(e) => handleContactChange(index, 'name', e.target.value)} className="modern-input transparent" />
-                      <input type="text" placeholder="전화번호" value={contact.phone} onChange={(e) => handleContactChange(index, 'phone', e.target.value)} className="modern-input transparent" />
-                    </div>
-                  ))}
+                <div className="input-group">
+                  <label>버스</label>
+                  <textarea value={data.transport.bus} onChange={(e) => handleTransportChange('bus', e.target.value)} rows={2} className="modern-input" />
+                </div>
+                <div className="input-group">
+                  <label>주차</label>
+                  <textarea value={data.transport.parking} onChange={(e) => handleTransportChange('parking', e.target.value)} rows={2} className="modern-input" />
                 </div>
               </div>
             )}
@@ -658,30 +745,44 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             )}
           </div>
 
-          {/* Photos Section */}
-          <div className={`editor-section-card ${expandedSections.photos ? 'expanded' : ''}`} ref={sectionRefs.photos}>
-            <div className="section-header" onClick={() => toggleSection('photos')}>
+          {/* Contacts Section */}
+          <div className={`editor-section-card ${expandedSections.contacts ? 'expanded' : ''}`} ref={sectionRefs.contacts}>
+            <div className="section-header" onClick={() => toggleSection('contacts')}>
               <div className="header-left">
-                <ImageIcon size={20} />
-                <h3>사진 관리</h3>
+                <Phone size={20} />
+                <h3>연락처 설정</h3>
               </div>
               <ChevronRight size={18} className="collapse-icon" />
             </div>
-            {expandedSections.photos && (
+            {expandedSections.contacts && (
               <div className="section-content">
-                <div className="modern-photo-editor">
-                  <div className="photo-label">메인 사진</div>
-                  <div className="modern-hero-upload">
-                    <img src={data.heroPhoto} alt="Hero" />
-                    <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden /></label>
-                  </div>
-                  <div className="photo-label" style={{ marginTop: '30px' }}>갤러리 (다중 선택 가능)</div>
-                  <div className="modern-gallery-grid">
-                    <label className="add-photo-card"><div className="plus">+</div><span>사진 추가</span><input type="file" multiple accept="image/*" onChange={handlePhotoUpload} hidden /></label>
-                    {data.photos.map((photo, index) => (
-                      <div key={index} className="gallery-item"><img src={photo} alt="Preview" /><button className="del-btn" onClick={() => removePhoto(index)}>×</button></div>
-                    ))}
-                  </div>
+                <div className="modern-list">
+                  {data.contacts.map((contact, index) => (
+                    <div key={index} className="modern-list-item">
+                      <span className="role-tag">{contact.role}</span>
+                      <input type="text" placeholder="이름" value={contact.name} onChange={(e) => handleContactChange(index, 'name', e.target.value)} className="modern-input transparent" />
+                      <input type="text" placeholder="전화번호" value={contact.phone} onChange={(e) => handleContactChange(index, 'phone', e.target.value)} className="modern-input transparent" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Music Section */}
+          <div className={`editor-section-card ${expandedSections.music ? 'expanded' : ''}`} ref={sectionRefs.music}>
+            <div className="section-header" onClick={() => toggleSection('music')}>
+              <div className="header-left">
+                <Music size={20} />
+                <h3>배경음악</h3>
+              </div>
+              <ChevronRight size={18} className="collapse-icon" />
+            </div>
+            {expandedSections.music && (
+              <div className="section-content">
+                <div className="input-group">
+                  <label>배경음악 URL</label>
+                  <input type="text" name="bgMusicUrl" value={data.bgMusicUrl} onChange={handleChange} className="modern-input" placeholder="https://example.com/music.mp3" />
                 </div>
               </div>
             )}
@@ -712,17 +813,23 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .collapse-icon { color: #B2A4B0; transition: transform 0.3s; }
         .expanded .collapse-icon { transform: rotate(90deg); }
         .section-content { padding: 0 25px 25px 25px; border-top: 1px solid #F9FAFB; padding-top: 25px; }
-        .person-info-group { padding: 15px 0; }
-        .info-label-row { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .person-type { background: #EFF6FF; color: #3B82F6; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
+        .basic-cards { display: flex; flex-direction: column; gap: 16px; }
+        .basic-card { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 16px; overflow: hidden; }
+        .basic-card-header { padding: 14px 20px; border-bottom: 1px solid #F0F2F5; }
+        .basic-card-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+        .basic-field label { display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 8px; }
+        .basic-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .person-type { display: inline-block; background: #EFF6FF; color: #3B82F6; padding: 5px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
         .person-type.bride { background: #FFF1F2; color: #F43F5E; }
-        .name-input { flex: 1; max-width: 200px; }
-        .parents-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .parent-input-item label { display: block; font-size: 0.8rem !important; color: #8F7D8B !important; margin-bottom: 8px !important; }
+        .person-type.date { background: #F0FDF4; color: #16A34A; }
+        .date-time-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start; }
+        .time-picker-flat { display: flex; align-items: center; gap: 4px; width: 100%; padding: 0; height: 48px; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; justify-content: center; }
+        .time-adj { padding: 6px 10px; border-radius: 8px; font-size: 0.95rem; font-weight: 800; color: #1F2937; background: none; cursor: pointer; transition: all 0.15s; }
+        .time-adj:hover { background: #F3F4F6; color: #D4A5C6; }
+        .time-colon { font-size: 0.95rem; font-weight: 800; color: #1F2937; }
         .input-with-checkbox { display: flex; align-items: center; gap: 10px; }
         .deceased-check { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; font-weight: 700; color: #6B7280; cursor: pointer; white-space: nowrap; }
         .deceased-check input { width: 16px; height: 16px; accent-color: #D4A5C6; }
-        .section-divider-mini { height: 1px; background: #F3F4F6; margin: 10px 0; }
         .input-group { margin-bottom: 25px; }
         .input-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #4B5563; margin-bottom: 10px; }
         .input-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -740,6 +847,13 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .theme-chip:hover { border-color: #D1D5DB; background: #FAFAFA; }
         .theme-chip.active { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
         .theme-chip .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .theme-chip-v2 { padding: 12px 14px; border-radius: 14px; border: 1.5px solid #E5E7EB; background: white; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: all 0.2s; text-align: left; }
+        .theme-chip-v2:hover { border-color: #D1D5DB; background: #FAFAFA; }
+        .theme-chip-v2.active { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
+        .theme-chip-info { display: flex; align-items: center; gap: 8px; }
+        .theme-chip-name { font-size: 0.8rem; font-weight: 700; color: #4B5563; }
+        .theme-palette { display: flex; gap: 3px; }
+        .palette-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.06); }
         .texture-preview { width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; border: 1px solid #E5E7EB; }
         .tex-none { background: #FFFFFF; }
         .tex-paper { background: #F5EDE3; background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E"); }
@@ -755,7 +869,9 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .ampm-toggle { display: flex; background: #EEE; padding: 3px; border-radius: 10px; }
         .ampm-toggle button { padding: 8px 15px; border-radius: 7px; font-size: 0.75rem; font-weight: 800; color: #9CA3AF; }
         .ampm-toggle button.active { background: white; color: #D4A5C6; }
-        .search-btn { display: flex; align-items: center; gap: 8px; background: #111827; color: white; padding: 0 20px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; }
+        .modern-search-box { display: flex; gap: 10px; align-items: stretch; }
+        .modern-search-box .modern-input { flex: 1; }
+        .search-btn { display: flex; align-items: center; gap: 8px; background: #111827; color: white; padding: 0 20px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; flex-shrink: 0; }
         .modern-list { display: flex; flex-direction: column; gap: 12px; }
         .modern-list-item { display: flex; align-items: center; gap: 15px; background: #F9FAFB; padding: 8px 15px; border-radius: 14px; border: 1px solid #F3F4F6; }
         .modern-list-item.col { flex-direction: column; align-items: stretch; padding: 15px; }
@@ -763,6 +879,9 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .photo-label { font-size: 0.8rem; font-weight: 800; color: #9CA3AF; text-transform: uppercase; margin-bottom: 12px; }
         .modern-hero-upload { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 20px; overflow: hidden; background: #F3F4F6; }
         .modern-hero-upload img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-empty-upload { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #9CA3AF; cursor: pointer; border: 2px dashed #D1D5DB; border-radius: 20px; transition: all 0.2s; }
+        .hero-empty-upload:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
+        .hero-empty-upload span { font-size: 0.85rem; font-weight: 700; }
         .change-btn { position: absolute; bottom: 20px; right: 20px; background: white; color: #111827; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .modern-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
         .add-photo-card { aspect-ratio: 1; border: 2px dashed #D1D5DB; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9CA3AF; cursor: pointer; transition: all 0.2s; }

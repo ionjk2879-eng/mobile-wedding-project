@@ -38,7 +38,13 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
         className="hero-content"
       >
         <div className="main-image-container">
-          <img src={data.heroPhoto} alt="Wedding Hero" className="main-image" />
+          {data.heroPhoto ? (
+            <img src={data.heroPhoto} alt="Wedding Hero" className="main-image" />
+          ) : (
+            <div className="main-image-empty">
+              <span>사진을 등록해주세요</span>
+            </div>
+          )}
         </div>
 
         <div className="hero-footer">
@@ -92,6 +98,20 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
           background: #fff;
           box-shadow: 0 10px 30px rgba(0,0,0,0.05);
           line-height: 0;
+        }
+        .main-image-empty {
+          width: 100%;
+          aspect-ratio: 3 / 4;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--wedding-card-bg);
+          border: 2px dashed var(--wedding-border);
+        }
+        .main-image-empty span {
+          font-size: 0.9em;
+          color: var(--wedding-text-sub);
+          line-height: 1;
         }
         .main-image {
           width: 100%;

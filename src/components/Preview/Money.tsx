@@ -47,16 +47,6 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
         ))}
       </div>
 
-      <div className="personal-messages">
-        <div className="message-box groom">
-          <span className="message-role">{isEn ? "Groom's Message" : "신랑의 한마디"}</span>
-          <p>{data.groomMessage}</p>
-        </div>
-        <div className="message-box bride">
-          <span className="message-role">{isEn ? "Bride's Message" : "신부의 한마디"}</span>
-          <p>{data.brideMessage}</p>
-        </div>
-      </div>
 
       <style>{`
         .money-desc {
@@ -116,35 +106,6 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
           background: var(--wedding-card-bg);
           border-color: var(--wedding-main);
           color: var(--wedding-main);
-        }
-        .personal-messages {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          padding-top: 30px;
-          border-top: 1px solid var(--wedding-border);
-        }
-        .message-box {
-          text-align: center;
-          padding: 25px;
-          background: var(--wedding-card-bg);
-          border-radius: 20px;
-          border: 1px solid var(--wedding-border);
-          position: relative;
-        }
-        .message-role {
-          font-size: 0.7em;
-          letter-spacing: 2px;
-          color: var(--wedding-main);
-          text-transform: uppercase;
-          margin-bottom: 12px;
-          display: block;
-        }
-        .message-box p {
-          font-size: 0.95em;
-          line-height: 1.6;
-          color: var(--wedding-text-body);
-          font-style: italic;
         }
       `}</style>
     </section>

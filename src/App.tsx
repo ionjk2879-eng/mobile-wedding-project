@@ -8,6 +8,7 @@ import Gallery from './components/Preview/Gallery';
 import Location from './components/Preview/Location';
 import RSVPForm from './components/Preview/RSVPForm';
 import Money from './components/Preview/Money';
+import Contacts from './components/Preview/Contacts';
 import Share from './components/Preview/Share';
 import { InvitationData } from './types';
 
@@ -19,10 +20,11 @@ const App: React.FC = () => {
     basic: React.useRef<HTMLDivElement>(null),
     greeting: React.useRef<HTMLDivElement>(null),
     message: React.useRef<HTMLDivElement>(null),
+    photos: React.useRef<HTMLDivElement>(null),
     location: React.useRef<HTMLDivElement>(null),
     contacts: React.useRef<HTMLDivElement>(null),
     accounts: React.useRef<HTMLDivElement>(null),
-    photos: React.useRef<HTMLDivElement>(null),
+    music: React.useRef<HTMLDivElement>(null),
   };
   const previewScrollRef = React.useRef<HTMLDivElement>(null);
 
@@ -43,15 +45,8 @@ const App: React.FC = () => {
       { side: '신랑측', bank: '국민은행', number: '123456-78-901234', owner: '김지현' },
       { side: '신부측', bank: '신한은행', number: '110-123-456789', owner: '이민지' },
     ],
-    heroPhoto: '/src/assets/hero.png',
-    photos: [
-      '/src/assets/hero.png',
-      '/src/assets/hero.png',
-      '/src/assets/hero.png',
-      '/src/assets/hero.png',
-      '/src/assets/hero.png',
-      '/src/assets/hero.png',
-    ],
+    heroPhoto: '',
+    photos: [],
     fontFamily: "'Pretendard', sans-serif",
     fontSize: 'medium',
     bgMusicUrl: '',
@@ -183,15 +178,18 @@ const App: React.FC = () => {
           ))}
         </div>
       )}
-      <div ref={previewRefs.theme} /><div ref={previewRefs.design}><Hero data={data} /></div>
-      <div ref={previewRefs.basic}><Greeting data={data} /></div>
-      <div ref={previewRefs.greeting}><Calendar data={data} /></div>
+      <div ref={previewRefs.theme} />
+      <div ref={previewRefs.design} />
+      <div ref={previewRefs.basic}><Hero data={data} /></div>
+      <div ref={previewRefs.greeting}><Greeting data={data} /></div>
+      <Calendar data={data} />
       <div ref={previewRefs.message}><PersonalMessage data={data} /></div>
-      <div ref={previewRefs.location}><Gallery data={data} /></div>
-      <div ref={previewRefs.contacts}><Location data={data} /></div>
-      <div ref={previewRefs.accounts}><RSVPForm data={data} /></div>
-      <div ref={previewRefs.photos}><Money data={data} /></div>
-      <Share data={data} />
+      <div ref={previewRefs.photos}><Gallery data={data} /></div>
+      <div ref={previewRefs.location}><Location data={data} /></div>
+      <RSVPForm data={data} />
+      <div ref={previewRefs.accounts}><Money data={data} /></div>
+      <div ref={previewRefs.contacts}><Contacts data={data} /></div>
+      <div ref={previewRefs.music}><Share data={data} /></div>
     </div>
   );
 
