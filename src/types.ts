@@ -46,7 +46,7 @@ export interface InvitationData {
   contacts: Contact[];
   accounts: Account[];
   accountStyle: 'style1' | 'style2' | 'style3';
-  galleryStyle: 'grid' | 'style2' | 'style3';
+  galleryStyle: 'slide' | 'style3';
   heroPhoto: string;
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split';
   photos: string[];

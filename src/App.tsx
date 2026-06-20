@@ -62,7 +62,7 @@ const App: React.FC = () => {
       { side: '신부 어머니', bank: '', number: '', owner: '' },
     ],
     accountStyle: 'style1',
-    galleryStyle: 'grid',
+    galleryStyle: 'slide',
     heroPhoto: '',
     heroStyle: 'classic',
     photos: [],

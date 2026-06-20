@@ -981,9 +981,8 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                   <div className="photo-label">갤러리 연출 방식</div>
                   <div className="account-style-grid" style={{ marginBottom: '20px' }}>
                     {[
-                      { key: 'grid', name: '그리드', desc: '사진을 격자로 나열' },
-                      { key: 'style2', name: '슬라이드', desc: '한 장씩 좌우로 넘기기' },
-                      { key: 'style3', name: '메이슨리', desc: '가로세로 느낌을 살린 배치' },
+                      { key: 'slide', name: '슬라이드', desc: '한 장씩 좌우로 넘기기' },
+                      { key: 'style3', name: '메이슨리', desc: '사진 미리보기 + 자유 배치' },
                     ].map(s => (
                       <button key={s.key} type="button" className={`account-style-btn ${data.galleryStyle === s.key ? 'active' : ''}`} onClick={() => onChange({ ...data, galleryStyle: s.key as any })}>
                         <strong>{s.name}</strong>

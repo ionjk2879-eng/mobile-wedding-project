@@ -21,6 +21,12 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
   const pvTrackRef = useRef<HTMLDivElement>(null);
   const pvVpRef = useRef<HTMLDivElement>(null);
 
+  const lbDragStartX = useRef(0);
+  const lbDragDelta = useRef(0);
+  const lbDragging = useRef(false);
+  const lbTrackRef = useRef<HTMLDivElement>(null);
+  const lbVpRef = useRef<HTMLDivElement>(null);
+
   const [slideIdx, setSlideIdx] = useState(0);
   const slideDragStartX = useRef(0);
   const slideDragDelta = useRef(0);
@@ -70,6 +76,11 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
   slideIdxRef.current = slideIdx;
   const slDrag = makeDrag(slideIdxRef, setSlideIdx, slideDragDelta, slideDragStartX, slideDragging, slideTrackRef, slideVpRef, data.photos.length);
 
+  const selectedIdxRef = useRef(selectedIndex || 0);
+  selectedIdxRef.current = selectedIndex || 0;
+  const setSelectedSafe = (v: number) => setSelectedIndex(v);
+  const lbDrag = makeDrag(selectedIdxRef, setSelectedSafe, lbDragDelta, lbDragStartX, lbDragging, lbTrackRef, lbVpRef, data.photos.length);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedIndex === null) return;
@@ -104,32 +115,67 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
     setPreviewIdx(index);
   };
 
-  const renderPreviewSlider = () => (
-    <div className="pv-preview">
-      <div
-        className="pv-preview-vp"
-        ref={pvVpRef}
-        onTouchStart={e => pvDrag.onStart(e.touches[0].clientX)}
-        onTouchMove={e => pvDrag.onMove(e.touches[0].clientX)}
-        onTouchEnd={pvDrag.onEnd}
-        onMouseDown={e => { e.preventDefault(); pvDrag.onStart(e.clientX); }}
-        onMouseMove={e => pvDrag.onMove(e.clientX)}
-        onMouseUp={pvDrag.onEnd}
-        onMouseLeave={pvDrag.onEnd}
-      >
-        <div className="pv-preview-track" ref={pvTrackRef} style={{ transform: `translateX(-${previewIdx * 100}%)` }}>
-          {data.photos.map((src, i) => (
-            <div key={i} className="pv-preview-item">
-              <img src={src} alt={`Preview ${i}`} draggable="false" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="pv-preview-counter">{previewIdx + 1} / {data.photos.length}</div>
-    </div>
-  );
+  const [photoRatios, setPhotoRatios] = useState<number[]>([]);
+  const pvDragStartX2 = useRef(0);
+  const pvDragDelta2 = useRef(0);
+  const pvDragging2 = useRef(false);
+  const pvTrackRef2 = useRef<HTMLDivElement>(null);
+  const pvVpRef2 = useRef<HTMLDivElement>(null);
 
-  const style = data.galleryStyle || 'grid';
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all(
+      data.photos.map(src => new Promise<number>(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(img.height / img.width);
+        img.onerror = () => resolve(1);
+        img.src = src;
+      }))
+    ).then(ratios => { if (!cancelled) setPhotoRatios(ratios); });
+    return () => { cancelled = true; };
+  }, [data.photos]);
+
+  const previewIdxRef2 = useRef(previewIdx);
+  previewIdxRef2.current = previewIdx;
+  const pvDrag2 = makeDrag(previewIdxRef2, setPreviewIdx, pvDragDelta2, pvDragStartX2, pvDragging2, pvTrackRef2, pvVpRef2, data.photos.length);
+
+  const renderPreviewSlider = () => {
+    const currentRatio = photoRatios[previewIdx] || 0.75;
+    return (
+      <div className="pv-preview">
+        <div
+          className="pv-preview-vp"
+          ref={pvVpRef2}
+          style={{ paddingBottom: `${currentRatio * 100}%` }}
+          onTouchStart={e => pvDrag2.onStart(e.touches[0].clientX)}
+          onTouchMove={e => pvDrag2.onMove(e.touches[0].clientX)}
+          onTouchEnd={pvDrag2.onEnd}
+          onMouseDown={e => { e.preventDefault(); pvDrag2.onStart(e.clientX); }}
+          onMouseMove={e => pvDrag2.onMove(e.clientX)}
+          onMouseUp={pvDrag2.onEnd}
+          onMouseLeave={pvDrag2.onEnd}
+        >
+          <div className="pv-preview-track" ref={pvTrackRef2} style={{ transform: `translateX(-${previewIdx * 100}%)` }}>
+            {data.photos.map((src, i) => (
+              <div key={i} className="pv-preview-item">
+                <img src={src} alt={`Preview ${i}`} draggable="false" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="pv-preview-counter">{previewIdx + 1} / {data.photos.length}</div>
+        {data.photos.length > 1 && (
+          <div className="gallery-slide-dots">
+            {data.photos.map((_, i) => (
+              <button key={i} className={`gallery-slide-dot ${i === previewIdx ? 'active' : ''}`} onClick={() => setPreviewIdx(i)} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const style = data.galleryStyle === 'style3' ? 'style3' : 'slide';
 
   return (
     <section className="gallery section">
@@ -139,17 +185,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
         <>
           {style === 'style3' && renderPreviewSlider()}
 
-          {style === 'grid' && (
-            <div className="photo-grid">
-              {data.photos.map((src, index) => (
-                <div key={index} className="photo-item" onClick={() => openLightbox(index)}>
-                  <img src={src} alt={`Gallery ${index}`} />
-                </div>
-              ))}
-            </div>
-          )}
-
-          {style === 'style2' && (
+          {style === 'slide' && (
             <div className="gallery-slide">
               <div
                 className="gallery-slide-vp"
@@ -182,13 +218,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           )}
 
           {style === 'style3' && (
-            <div className="photo-masonry">
-              {data.photos.map((src, index) => (
-                <div key={index} className={`masonry-item ${index === previewIdx ? 'selected' : ''}`} onClick={() => handleThumbClick(index)}>
-                  <img src={src} alt={`Gallery ${index}`} />
-                </div>
-              ))}
-            </div>
+            <MasonryGrid photos={data.photos} previewIdx={previewIdx} onThumbClick={handleThumbClick} />
           )}
         </>
       ) : (
@@ -198,19 +228,29 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
       )}
 
       {selectedIndex !== null && (
-        <div
-          className="lightbox-overlay"
-          onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-          onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
-        >
+        <div className="lightbox-overlay">
           <div className="lightbox-backdrop" />
           <button className="close-btn" onClick={closeLightbox}><X size={32} /></button>
-          <button className="nav-btn prev" onClick={e => { e.stopPropagation(); prevImage(); }}><ChevronLeft size={48} /></button>
-          <div className="lightbox-container">
-            <img src={data.photos[selectedIndex]} alt={`Full ${selectedIndex + 1}`} className="lightbox-image" draggable="false" />
-            <div className="index-indicator">{selectedIndex + 1} / {data.photos.length}</div>
+          <div
+            className="lightbox-slide-vp"
+            ref={lbVpRef}
+            onTouchStart={e => lbDrag.onStart(e.touches[0].clientX)}
+            onTouchMove={e => lbDrag.onMove(e.touches[0].clientX)}
+            onTouchEnd={lbDrag.onEnd}
+            onMouseDown={e => { e.preventDefault(); lbDrag.onStart(e.clientX); }}
+            onMouseMove={e => lbDrag.onMove(e.clientX)}
+            onMouseUp={lbDrag.onEnd}
+            onMouseLeave={lbDrag.onEnd}
+          >
+            <div className="lightbox-slide-track" ref={lbTrackRef} style={{ transform: `translateX(-${selectedIndex * 100}%)` }}>
+              {data.photos.map((src, i) => (
+                <div key={i} className="lightbox-slide-item">
+                  <img src={src} alt={`Full ${i + 1}`} draggable="false" />
+                </div>
+              ))}
+            </div>
           </div>
-          <button className="nav-btn next" onClick={e => { e.stopPropagation(); nextImage(); }}><ChevronRight size={48} /></button>
+          <div className="index-indicator">{selectedIndex + 1} / {data.photos.length}</div>
         </div>
       )}
 
@@ -218,22 +258,17 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
         /* Preview (style3) */
         .pv-preview { margin-bottom: 16px; }
         .pv-preview-vp {
+          position: relative;
           overflow: hidden;
           border-radius: 12px;
           cursor: grab;
           user-select: none;
+          transition: padding-bottom 0.3s ease;
         }
         .pv-preview-vp:active { cursor: grabbing; }
-        .pv-preview-track { display: flex; transition: transform 0.35s ease; }
-        .pv-preview-item {
-          width: 100%;
-          flex-shrink: 0;
-        }
-        .pv-preview-item img {
-          width: 100%;
-          height: auto;
-          display: block;
-        }
+        .pv-preview-track { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; transition: transform 0.35s ease; }
+        .pv-preview-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .pv-preview-item img { width: 100%; height: 100%; object-fit: contain; display: block; }
         .pv-preview-counter {
           margin-top: 10px;
           font-size: 0.85em;
@@ -259,16 +294,20 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
         .photo-item:hover {
           transform: scale(1.02);
         }
-        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-item img { width: 100%; height: 100%; object-fit: contain; background: var(--wedding-bg); }
 
         /* Masonry (style3) */
-        .photo-masonry {
-          columns: 2;
-          column-gap: 8px;
+        .masonry-balanced {
+          display: flex;
+          gap: 8px;
+        }
+        .masonry-col {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
         }
         .masonry-item {
-          break-inside: avoid;
-          margin-bottom: 8px;
           border-radius: 8px;
           overflow: hidden;
           cursor: pointer;
@@ -299,20 +338,67 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
         .gallery-empty span { font-size: 0.9em; color: var(--wedding-text-sub); }
 
         /* Lightbox */
-        .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 99999; touch-action: none; }
+        .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; }
         .lightbox-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--wedding-bg); }
-        .lightbox-container { position: relative; z-index: 1; max-width: 90%; max-height: 85%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
-        .lightbox-image { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); user-select: none; pointer-events: auto; }
         .close-btn { position: absolute; top: 20px; right: 20px; color: var(--wedding-text-sub); background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: all 0.2s; }
         .close-btn:hover { background: var(--wedding-border); color: var(--wedding-text-main); }
-        .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); color: var(--wedding-main); background: none; border: none; cursor: pointer; padding: 20px; z-index: 100; opacity: 0.5; transition: all 0.2s; }
-        .nav-btn:hover { opacity: 1; scale: 1.1; }
-        .prev { left: 10px; }
-        .next { right: 10px; }
-        .index-indicator { margin-top: 15px; color: var(--wedding-text-sub); font-size: 0.85em; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); padding: 6px 16px; border-radius: 20px; font-weight: 600; pointer-events: none; }
-        @media (max-width: 768px) { .nav-btn { display: none; } .lightbox-image { max-height: 70vh; } }
+        .lightbox-slide-vp { position: relative; z-index: 1; width: 100%; height: 80vh; overflow: hidden; cursor: grab; user-select: none; }
+        .lightbox-slide-vp:active { cursor: grabbing; }
+        .lightbox-slide-track { display: flex; height: 100%; transition: transform 0.35s ease; }
+        .lightbox-slide-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .lightbox-slide-item img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+        .lightbox-overlay .index-indicator { position: relative; z-index: 1; margin-top: 15px; color: var(--wedding-text-sub); font-size: 0.85em; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); padding: 6px 16px; border-radius: 20px; font-weight: 600; }
       `}</style>
     </section>
+  );
+};
+
+interface MasonryProps {
+  photos: string[];
+  previewIdx: number;
+  onThumbClick: (index: number) => void;
+}
+
+const MasonryGrid: React.FC<MasonryProps> = ({ photos, previewIdx, onThumbClick }) => {
+  const [cols, setCols] = useState<[number[], number[]]>([[], []]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadHeights = async () => {
+      const heights = await Promise.all(
+        photos.map(src => new Promise<number>((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(img.height / img.width);
+          img.onerror = () => resolve(1);
+          img.src = src;
+        }))
+      );
+      if (cancelled) return;
+      const left: number[] = [];
+      const right: number[] = [];
+      let lH = 0, rH = 0;
+      heights.forEach((ratio, i) => {
+        if (lH <= rH) { left.push(i); lH += ratio; }
+        else { right.push(i); rH += ratio; }
+      });
+      setCols([left, right]);
+    };
+    loadHeights();
+    return () => { cancelled = true; };
+  }, [photos]);
+
+  return (
+    <div className="masonry-balanced">
+      {cols.map((col, ci) => (
+        <div key={ci} className="masonry-col">
+          {col.map(i => (
+            <div key={i} className={`masonry-item ${i === previewIdx ? 'selected' : ''}`} onClick={() => onThumbClick(i)}>
+              <img src={photos[i]} alt={`Gallery ${i}`} />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 };
 
