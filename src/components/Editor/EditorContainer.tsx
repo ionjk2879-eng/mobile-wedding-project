@@ -611,6 +611,8 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                       { key: 'paper', name: '한지', desc: '종이 질감' },
                       { key: 'linen', name: '린넨', desc: '패브릭 질감' },
                       { key: 'pattern', name: '도트', desc: '은은한 패턴' },
+                      { key: 'silk', name: '실크', desc: '부드러운 결' },
+                      { key: 'watercolor', name: '수채화', desc: '번짐 효과' },
                     ].map(t => (
                       <button key={t.key} type="button" className={`theme-chip ${(data.bgTexture || 'none') === t.key ? 'active' : ''}`} onClick={() => onChange({ ...data, bgTexture: t.key as any })}>
                         <span className={`texture-preview tex-${t.key}`}></span>
@@ -1298,6 +1300,8 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .tex-paper { background: #F5EDE3; background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E"); }
         .tex-linen { background: #F0EBE3; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px); }
         .tex-pattern { background: #F8F8F8; background-image: radial-gradient(circle, #D1D5DB 0.5px, transparent 0.5px); background-size: 6px 6px; }
+        .tex-silk { background: #F5F0EC; background-image: repeating-linear-gradient(135deg, transparent, transparent 2px, rgba(255,255,255,0.3) 2px, rgba(255,255,255,0.3) 4px); }
+        .tex-watercolor { background: #F3EEF5; background-image: radial-gradient(ellipse at 30% 50%, rgba(200,150,180,0.15) 0%, transparent 70%); }
         .section-desc { font-size: 0.85rem; color: #6B7280; margin: 0 0 20px 0; }
         .timeline-editor-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
         .timeline-editor-item { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 16px; overflow: hidden; }

@@ -178,7 +178,9 @@ const App: React.FC = () => {
       .preview-wrapper { position: relative; min-height: 100%; width: 100%; background-color: var(--wedding-bg); transition: background-color 0.4s ease; }
       .preview-wrapper.texture-none { }
       .preview-wrapper.texture-paper {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+        background-image:
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)' opacity='0.12'/%3E%3C/svg%3E"),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.15' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)' opacity='0.06'/%3E%3C/svg%3E");
       }
       .preview-wrapper.texture-linen {
         background-image:
@@ -188,6 +190,17 @@ const App: React.FC = () => {
       .preview-wrapper.texture-pattern {
         background-image: radial-gradient(circle, rgba(0,0,0,0.06) 0.8px, transparent 0.8px);
         background-size: 12px 12px;
+      }
+      .preview-wrapper.texture-silk {
+        background-image:
+          repeating-linear-gradient(135deg, transparent, transparent 2px, rgba(255,255,255,0.06) 2px, rgba(255,255,255,0.06) 4px),
+          repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px);
+      }
+      .preview-wrapper.texture-watercolor {
+        background-image:
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)' opacity='0.07'/%3E%3C/svg%3E"),
+          radial-gradient(ellipse at 20% 50%, rgba(var(--wedding-main-rgb, 200,150,180), 0.04) 0%, transparent 70%),
+          radial-gradient(ellipse at 80% 30%, rgba(var(--wedding-main-rgb, 200,150,180), 0.03) 0%, transparent 60%);
       }
 
       /* Effects */

@@ -46,7 +46,7 @@ const Interview: React.FC<PreviewProps> = ({ data }) => {
       </button>
 
       {open && (
-        <div className="itv-popup-dim" style={popupStyle} onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
+        <div className="itv-popup-dim" style={popupStyle}>
           <div className="itv-popup">
             <button type="button" className="itv-popup-close" onClick={() => setOpen(false)}>×</button>
             <div className="itv-popup-scroll">
@@ -72,9 +72,6 @@ const Interview: React.FC<PreviewProps> = ({ data }) => {
                   </div>
                 ))}
               </div>
-              <button type="button" className="itv-popup-back" onClick={() => setOpen(false)}>
-                닫기
-              </button>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { InvitationData } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
 
@@ -20,6 +20,31 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
   const [submitted, setSubmitted] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
+
+  useEffect(() => {
+    if (!formOpen || !sectionRef.current) return;
+    const scrollParent = sectionRef.current.closest('.preview-content-scroll');
+    if (scrollParent) {
+      const rect = scrollParent.getBoundingClientRect();
+      setPopupStyle({
+        position: 'fixed',
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height,
+      });
+    } else {
+      setPopupStyle({
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+      });
+    }
+  }, [formOpen]);
 
   if (!data.isRSVPEnabled) return null;
 
@@ -71,7 +96,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
   }
 
   return (
-    <div className="rsvp-section section" style={{ fontFamily: data.fontFamily }}>
+    <div className="rsvp-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef}>
       <h2>RSVP</h2>
       <p className="section-sub">참석 여부를 알려주세요</p>
       <p className="rsvp-desc">
@@ -85,11 +110,13 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
       </button>
 
       {formOpen && (
-      <div className="rsvp-overlay" onClick={(e) => { if (e.target === e.currentTarget) setFormOpen(false); }}>
+      <div className="rsvp-overlay" style={popupStyle}>
       <div className="rsvp-modal">
+        <button type="button" className="rsvp-close-btn" onClick={() => setFormOpen(false)}>×</button>
+        <div className="rsvp-modal-scroll">
         <div className="rsvp-modal-header">
-          <h3>{isEn ? 'RSVP' : '참석 의사 전달하기'}</h3>
-          <button type="button" className="rsvp-close-btn" onClick={() => setFormOpen(false)}>×</button>
+          <h3>RSVP</h3>
+          <p>참석 여부를 알려주세요</p>
         </div>
       <form className="rsvp-form" onSubmit={handleSubmit}>
         <div className="form-group">
@@ -189,6 +216,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
       </form>
       </div>
       </div>
+      </div>
       )}
 
       <style>{`
@@ -219,57 +247,67 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           transform: translateY(-1px);
         }
         .rsvp-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0,0,0,0.5);
-          z-index: 9000;
+          background: rgba(0,0,0,0.45);
+          z-index: 10000;
           display: flex;
-          align-items: flex-end;
+          align-items: center;
           justify-content: center;
-          animation: rsvp-fade-in 0.25s ease;
+          overflow: hidden;
+          border-radius: inherit;
+          animation: rsvp-fade-in 0.2s ease;
         }
         @keyframes rsvp-fade-in {
           from { opacity: 0; }
           to { opacity: 1; }
         }
         .rsvp-modal {
-          width: 100%;
-          max-width: 480px;
-          max-height: 90vh;
+          position: relative;
+          width: 92%;
+          max-width: 400px;
+          max-height: 90%;
           background: var(--wedding-bg, #fff);
-          border-radius: 24px 24px 0 0;
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+          animation: rsvp-pop-in 0.3s ease;
+        }
+        @keyframes rsvp-pop-in {
+          from { opacity: 0; transform: scale(0.95) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .rsvp-modal-scroll {
+          max-height: calc(90vh - 40px);
           overflow-y: auto;
-          padding: 0 24px 30px;
-          animation: rsvp-slide-up 0.35s ease;
+          padding: 0 20px 24px;
+          scrollbar-width: none;
         }
-        @keyframes rsvp-slide-up {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
+        .rsvp-modal-scroll::-webkit-scrollbar { display: none; }
         .rsvp-modal-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 0 16px;
-          position: sticky;
-          top: 0;
-          background: var(--wedding-bg, #fff);
-          z-index: 1;
+          text-align: center;
+          padding: 36px 0 24px;
         }
         .rsvp-modal-header h3 {
+          margin: 0 0 8px;
+          font-size: 0.8em;
+          font-weight: 600;
+          color: var(--wedding-text-sub);
+          letter-spacing: 4px;
+        }
+        .rsvp-modal-header p {
           margin: 0;
           font-size: 1.1em;
           font-weight: 700;
           color: var(--wedding-text-main);
         }
         .rsvp-close-btn {
-          width: 36px;
-          height: 36px;
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
           border: none;
+          z-index: 2;
           background: var(--wedding-border);
           color: var(--wedding-text-sub);
           font-size: 1.3em;
