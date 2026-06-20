@@ -14,36 +14,41 @@ interface PreviewProps {
 
 const Share: React.FC<PreviewProps> = ({ data }) => {
   useEffect(() => {
-    if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init('YOUR_KAKAO_APP_KEY');
+    if (data.kakaoAppKey && window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init(data.kakaoAppKey);
     }
-  }, []);
+  }, [data.kakaoAppKey]);
+
+  const shareLink = data.shareUrl || window.location.href;
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(shareLink);
     alert('링크가 복사되었습니다.');
   };
 
   const handleKakaoShare = () => {
     if (!window.Kakao) return;
 
+    const title = data.shareTitle || `${data.groomName} ♡ ${data.brideName} 결혼합니다`;
+    const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
+
     window.Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
-        title: `${data.groomName} ♡ ${data.brideName} 결혼합니다`,
-        description: `${data.date} ${data.time} | ${data.venueName}`,
+        title,
+        description,
         imageUrl: data.heroPhoto.startsWith('data:') ? window.location.origin + '/src/assets/hero.png' : data.heroPhoto,
         link: {
-          mobileWebUrl: window.location.href,
-          webUrl: window.location.href,
+          mobileWebUrl: shareLink,
+          webUrl: shareLink,
         },
       },
       buttons: [
         {
           title: '모바일 청첩장 보기',
           link: {
-            mobileWebUrl: window.location.href,
-            webUrl: window.location.href,
+            mobileWebUrl: shareLink,
+            webUrl: shareLink,
           },
         },
       ],

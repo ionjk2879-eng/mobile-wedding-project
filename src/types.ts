@@ -12,6 +12,20 @@ export interface Contact {
   isDeceased?: boolean;
 }
 
+export interface TimelineEvent {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+}
+
+export interface InterviewQA {
+  id: string;
+  question: string;
+  groomAnswer: string;
+  brideAnswer: string;
+}
+
 export interface GuestMessage {
   id: string;
   name: string;
@@ -30,6 +44,7 @@ export interface InvitationData {
   greetingContent: string;
   contacts: Contact[];
   accounts: Account[];
+  accountStyle: 'style1' | 'style2' | 'style3';
   heroPhoto: string;
   photos: string[];
   fontFamily: string;
@@ -56,6 +71,12 @@ export interface InvitationData {
     groomParents: Contact[];
     brideParents: Contact[];
   };
+  timeline: TimelineEvent[];
+  interview: InterviewQA[];
+  shareUrl: string;
+  shareTitle: string;
+  shareDescription: string;
+  kakaoAppKey: string;
   videoUrl: string;
   language: 'ko' | 'en';
   en: Partial<InvitationData>;

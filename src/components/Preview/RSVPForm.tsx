@@ -19,6 +19,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
 
   if (!data.isRSVPEnabled) return null;
 
@@ -71,15 +72,24 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <div className="rsvp-section section" style={{ fontFamily: data.fontFamily }}>
-      <div className="rsvp-header">
-        <h2>{isEn ? 'RSVP' : '참석 여부 전달하기'}</h2>
-        <p>
-          {isEn 
-            ? 'Please let us know if you can join us\nby providing your name below.' 
-            : '축하의 마음으로 참석해주시는\n모든 분들의 성함을 남겨주세요.'}
-        </p>
-      </div>
+      <h2>{isEn ? 'RSVP' : '참석 여부'}</h2>
+      <p className="rsvp-desc">
+        {isEn
+          ? 'Please let us know if you can join us\nby providing your name below.'
+          : '축하의 마음으로 참석해주시는\n모든 분들의 성함을 남겨주세요.'}
+      </p>
 
+      <button type="button" className="rsvp-open-btn" onClick={() => setFormOpen(true)}>
+        {isEn ? 'Submit RSVP' : '참석 의사 전달하기'}
+      </button>
+
+      {formOpen && (
+      <div className="rsvp-overlay" onClick={(e) => { if (e.target === e.currentTarget) setFormOpen(false); }}>
+      <div className="rsvp-modal">
+        <div className="rsvp-modal-header">
+          <h3>{isEn ? 'RSVP' : '참석 의사 전달하기'}</h3>
+          <button type="button" className="rsvp-close-btn" onClick={() => setFormOpen(false)}>×</button>
+        </div>
       <form className="rsvp-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="section-label">{isEn ? 'Side' : '구분'}</label>
@@ -176,10 +186,101 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           {formData.isAttending ? (isEn ? 'Submit' : '참석 의사 전달하기') : (isEn ? 'Submit' : '답변 전달하기')}
         </button>
       </form>
+      </div>
+      </div>
+      )}
 
       <style>{`
         .rsvp-section {
           background-color: transparent;
+        }
+        .rsvp-desc {
+          font-size: 0.9em;
+          color: var(--wedding-text-sub);
+          line-height: 1.6;
+          margin-bottom: 24px;
+          white-space: pre-line;
+        }
+        .rsvp-open-btn {
+          width: 100%;
+          padding: 16px;
+          background: var(--wedding-main);
+          color: white;
+          border: none;
+          border-radius: 30px;
+          font-size: 0.95em;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.25s;
+        }
+        .rsvp-open-btn:hover {
+          filter: brightness(0.9);
+          transform: translateY(-1px);
+        }
+        .rsvp-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.5);
+          z-index: 9000;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          animation: rsvp-fade-in 0.25s ease;
+        }
+        @keyframes rsvp-fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .rsvp-modal {
+          width: 100%;
+          max-width: 480px;
+          max-height: 90vh;
+          background: var(--wedding-bg, #fff);
+          border-radius: 24px 24px 0 0;
+          overflow-y: auto;
+          padding: 0 24px 30px;
+          animation: rsvp-slide-up 0.35s ease;
+        }
+        @keyframes rsvp-slide-up {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        .rsvp-modal-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 20px 0 16px;
+          position: sticky;
+          top: 0;
+          background: var(--wedding-bg, #fff);
+          z-index: 1;
+        }
+        .rsvp-modal-header h3 {
+          margin: 0;
+          font-size: 1.1em;
+          font-weight: 700;
+          color: var(--wedding-text-main);
+        }
+        .rsvp-close-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: none;
+          background: var(--wedding-border);
+          color: var(--wedding-text-sub);
+          font-size: 1.3em;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+        .rsvp-close-btn:hover {
+          background: var(--wedding-main);
+          color: white;
         }
         .section-label {
           display: block;
@@ -215,20 +316,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
           border-color: #8c8581;
           font-weight: 700;
         }
-        .rsvp-header h2 { margin-bottom: 15px; }
-        .rsvp-header p { 
-          font-size: 0.9em; 
-          color: var(--wedding-text-sub); 
-          line-height: 1.6;
-          margin-bottom: 40px;
-          white-space: pre-line;
-        }
         .rsvp-form {
-          background: var(--wedding-card-bg);
-          padding: 30px 20px;
-          border-radius: 28px;
-          border: 1px solid var(--wedding-border);
-          box-shadow: 0 10px 40px rgba(74, 69, 67, 0.05);
           text-align: left;
         }
         .form-group { margin-bottom: 20px; }

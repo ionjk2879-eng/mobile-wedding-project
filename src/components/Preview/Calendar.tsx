@@ -6,6 +6,13 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ data }) => {
+  const [now, setNow] = React.useState(Date.now());
+
+  React.useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const weddingDate = new Date(data.weddingDateISO);
   
   // If invalid date, don't render or render placeholder
@@ -54,6 +61,30 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
     return data.time;
   };
 
+  const getWeddingDateTime = () => {
+    const d = new Date(data.weddingDateISO);
+    if (data.time) {
+      const parts = data.time.match(/(AM|PM)\s(\d+):(\d+)/);
+      if (parts) {
+        let h = parseInt(parts[2]);
+        if (parts[1] === 'PM' && h !== 12) h += 12;
+        if (parts[1] === 'AM' && h === 12) h = 0;
+        d.setHours(h, parseInt(parts[3]), 0, 0);
+      }
+    }
+    return d;
+  };
+
+  const weddingDateTime = getWeddingDateTime();
+  const diff = weddingDateTime.getTime() - now;
+  const isPast = diff <= 0;
+
+  const totalSeconds = Math.floor(Math.abs(diff) / 1000);
+  const cDays = Math.floor(totalSeconds / 86400);
+  const cHours = Math.floor((totalSeconds % 86400) / 3600);
+  const cMinutes = Math.floor((totalSeconds % 3600) / 60);
+  const cSeconds = totalSeconds % 60;
+
   return (
     <section className="calendar-section">
       <div className="calendar-container">
@@ -80,6 +111,34 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
       <div className="wedding-detail-info">
         <p className="wedding-date-text">{formatKoreanDate()}</p>
         <p className="wedding-time-text">{formatKoreanTime()}</p>
+      </div>
+
+      <div className="countdown-area">
+        {isPast ? (
+          <p className="countdown-label">{data.language === 'en' ? 'The wedding has begun!' : '결혼식이 시작되었습니다!'}</p>
+        ) : (
+          <>
+            <p className="countdown-label">{data.language === 'en' ? 'Until the Wedding' : '결혼식까지 남은 시간'}</p>
+            <div className="countdown-boxes">
+              <div className="countdown-box">
+                <span className="countdown-unit">DAYS</span>
+                <span className="countdown-num">{cDays}</span>
+              </div>
+              <div className="countdown-box">
+                <span className="countdown-unit">HOURS</span>
+                <span className="countdown-num">{String(cHours).padStart(2, '0')}</span>
+              </div>
+              <div className="countdown-box">
+                <span className="countdown-unit">MIN</span>
+                <span className="countdown-num">{String(cMinutes).padStart(2, '0')}</span>
+              </div>
+              <div className="countdown-box">
+                <span className="countdown-unit">SEC</span>
+                <span className="countdown-num">{String(cSeconds).padStart(2, '0')}</span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <style>{`
@@ -172,6 +231,45 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           color: var(--wedding-text-sub);
           margin: 0;
           font-weight: 500;
+        }
+        .countdown-area {
+          margin-top: 40px;
+        }
+        .countdown-label {
+          font-size: 0.85em;
+          color: var(--wedding-text-sub);
+          margin: 0 0 18px 0;
+          letter-spacing: 1px;
+          font-weight: 600;
+        }
+        .countdown-boxes {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+        }
+        .countdown-box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          min-width: 58px;
+          padding: 14px 10px;
+          background: var(--wedding-card-bg);
+          border: 1px solid var(--wedding-border);
+          border-radius: 14px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .countdown-num {
+          font-size: 1.5em;
+          font-weight: 800;
+          color: var(--wedding-main);
+          line-height: 1;
+        }
+        .countdown-unit {
+          font-size: 0.55em;
+          color: var(--wedding-text-sub);
+          font-weight: 600;
+          letter-spacing: 0.5px;
         }
       `}</style>
     </section>
