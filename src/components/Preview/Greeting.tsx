@@ -23,7 +23,8 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
   return (
     <section className="greeting section" style={{ fontFamily: data.fontFamily }}>
       <div className="greeting-text">
-        <h2>{title}</h2>
+        <h2>INVITATION</h2>
+        <p className="section-sub">소중한 분들을 초대합니다</p>
         <p style={{ whiteSpace: 'pre-wrap' }}>
           {content}
         </p>

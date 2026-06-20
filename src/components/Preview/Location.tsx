@@ -55,7 +55,8 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <section className="location section">
-      <h2>{isEn ? 'LOCATION' : '오시는 길'}</h2>
+      <h2>LOCATION</h2>
+      <p className="section-sub">예식이 진행되는 장소를 안내드립니다</p>
       <div className="location-info">
         <h3 className="venue-name">{venueName}</h3>
         <p className="address">{venueAddress}</p>

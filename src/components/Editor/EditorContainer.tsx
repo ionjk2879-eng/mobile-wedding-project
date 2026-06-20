@@ -367,6 +367,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
       date: '',
       title: '',
       description: '',
+      photo: '',
     };
     onChange({ ...data, timeline: [...(data.timeline || []), newEvent] });
   };
@@ -452,8 +453,8 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     { id: 'location', name: '장소', icon: <MapPin size={18} />, ref: sectionRefs.location },
     { id: 'rsvp', name: '참석의사', icon: <CalendarCheck size={18} />, ref: sectionRefs.rsvp },
     { id: 'accounts', name: '계좌', icon: <CreditCard size={18} />, ref: sectionRefs.accounts },
-    { id: 'order', name: '순서관리', icon: <ListOrdered size={18} />, ref: sectionRefs.order },
     { id: 'music', name: '배경음악', icon: <Music size={18} />, ref: sectionRefs.music },
+    { id: 'order', name: '순서관리', icon: <ListOrdered size={18} />, ref: sectionRefs.order },
   ];
 
   const getParentValue = (side: 'groomParents' | 'brideParents', role: string) => {
@@ -1000,6 +1001,26 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                           <label>설명</label>
                           <textarea value={event.description} onChange={(e) => updateTimelineEvent(event.id, 'description', e.target.value)} rows={2} className="modern-input" placeholder="소개팅으로 처음 만난 날" />
                         </div>
+                        <div className="input-group">
+                          <label>사진 (선택)</label>
+                          {event.photo ? (
+                            <div className="timeline-photo-preview">
+                              <img src={event.photo} alt="" />
+                              <button type="button" className="timeline-remove-btn" onClick={() => updateTimelineEvent(event.id, 'photo', '')}>×</button>
+                            </div>
+                          ) : (
+                            <label className="timeline-photo-upload">
+                              <span>사진 추가</span>
+                              <input type="file" accept="image/*" hidden onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const reader = new FileReader();
+                                reader.onload = (ev) => updateTimelineEvent(event.id, 'photo', ev.target?.result as string);
+                                reader.readAsDataURL(file);
+                              }} />
+                            </label>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1116,6 +1137,55 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             )}
           </div>
 
+          {/* Music Section */}
+          <div className={`editor-section-card ${expandedSections.music ? 'expanded' : ''}`} ref={sectionRefs.music}>
+            <div className="section-header" onClick={() => toggleSection('music')}>
+              <div className="header-left">
+                <Music size={20} />
+                <h3>배경음악</h3>
+              </div>
+              <ChevronRight size={18} className="collapse-icon" />
+            </div>
+            {expandedSections.music && (
+              <div className="section-content">
+                <div className="input-group">
+                  <label>음악 선택</label>
+                  <div className="music-select-list">
+                    {[
+                      { name: '없음', url: '' },
+                      { name: 'Romantic Piano', url: '/music/paulyudin-romantic-romantic-music-493488.mp3' },
+                      { name: 'Romantic', url: '/music/nastelbom-romantic-436840.mp3' },
+                      { name: 'Wedding Romantic', url: '/music/leberch-wedding-romantic-375196.mp3' },
+                      { name: 'Wedding Ceremony', url: '/music/the_mountain-wedding-522480.mp3' },
+                      { name: 'Wedding March', url: '/music/the_mountain-wedding-487025.mp3' },
+                      { name: 'Life Happy', url: '/music/the_mountain-life-happy-131387.mp3' },
+                      { name: 'Life Story', url: '/music/the_mountain-life-story-149913.mp3' },
+                      { name: 'Smile Life', url: '/music/the_mountain-smile-life-133108.mp3' },
+                    ].map(m => (
+                      <button key={m.name} type="button" className={`music-select-btn ${data.bgMusicUrl === m.url ? 'active' : ''}`} onClick={() => onChange({ ...data, bgMusicUrl: m.url })}>
+                        <span className="music-select-name">{m.name}</span>
+                        {m.url && data.bgMusicUrl === m.url && <span className="music-playing-badge">선택됨</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="input-group">
+                  <label>또는 파일 업로드</label>
+                  <label className="music-upload-btn">
+                    <span>{data.bgMusicUrl && data.bgMusicUrl.startsWith('data:') ? '업로드됨' : 'mp3 파일 선택'}</span>
+                    <input type="file" accept="audio/mpeg,audio/mp3" hidden onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => { onChange({ ...data, bgMusicUrl: ev.target?.result as string }); };
+                      reader.readAsDataURL(file);
+                    }} />
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Order Section */}
           <div className={`editor-section-card ${expandedSections.order ? 'expanded' : ''}`} ref={sectionRefs.order}>
             <div className="section-header" onClick={() => toggleSection('order')}>
@@ -1143,25 +1213,6 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                       </div>
                     </div>
                   ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Music Section */}
-          <div className={`editor-section-card ${expandedSections.music ? 'expanded' : ''}`} ref={sectionRefs.music}>
-            <div className="section-header" onClick={() => toggleSection('music')}>
-              <div className="header-left">
-                <Music size={20} />
-                <h3>배경음악</h3>
-              </div>
-              <ChevronRight size={18} className="collapse-icon" />
-            </div>
-            {expandedSections.music && (
-              <div className="section-content">
-                <div className="input-group">
-                  <label>배경음악 URL</label>
-                  <input type="text" name="bgMusicUrl" value={data.bgMusicUrl} onChange={handleChange} className="modern-input" placeholder="https://example.com/music.mp3" />
                 </div>
               </div>
             )}
@@ -1261,6 +1312,11 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .timeline-editor-fields { padding: 16px 20px; }
         .timeline-add-btn { width: 100%; padding: 14px; border: 2px dashed #D1D5DB; border-radius: 14px; background: none; color: #9CA3AF; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .timeline-add-btn:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
+        .timeline-photo-upload { display: flex; align-items: center; justify-content: center; padding: 12px; border: 2px dashed #D1D5DB; border-radius: 12px; color: #9CA3AF; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .timeline-photo-upload:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
+        .timeline-photo-preview { position: relative; display: inline-block; }
+        .timeline-photo-preview img { width: 100%; max-height: 120px; object-fit: cover; border-radius: 12px; }
+        .timeline-photo-preview .timeline-remove-btn { position: absolute; top: 6px; right: 6px; }
         .interview-editor-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
         .interview-editor-item { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 16px; overflow: hidden; }
         .interview-editor-fields { padding: 16px 20px; }
@@ -1292,6 +1348,15 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .order-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #E5E7EB; background: white; color: #6B7280; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; padding: 0; }
         .order-btn:hover:not(:disabled) { background: #F3F4F6; color: #D4A5C6; border-color: #D4A5C6; }
         .order-btn:disabled { opacity: 0.3; cursor: default; }
+        .music-select-list { display: flex; flex-direction: column; gap: 6px; }
+        .music-select-btn { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 12px; border: 1px solid #E5E7EB; background: #F9FAFB; text-align: left; cursor: pointer; transition: all 0.2s; }
+        .music-select-btn:hover { border-color: #D1D5DB; background: #FAFAFA; }
+        .music-select-btn.active { border-color: #D4A5C6; background: #FFF9FB; }
+        .music-select-name { font-size: 0.88rem; font-weight: 700; color: #1F2937; }
+        .music-select-btn.active .music-select-name { color: #D4A5C6; }
+        .music-playing-badge { font-size: 0.72rem; font-weight: 700; color: white; background: #D4A5C6; padding: 3px 10px; border-radius: 20px; }
+        .music-upload-btn { display: flex; align-items: center; justify-content: center; padding: 14px; border: 2px dashed #D1D5DB; border-radius: 14px; color: #9CA3AF; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .music-upload-btn:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
         .rsvp-info-box { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 14px; padding: 18px 20px; }
         .rsvp-info-box p { margin: 0 0 6px 0; font-size: 0.85rem; color: #6B7280; line-height: 1.6; }
         .rsvp-info-box p:last-child { margin-bottom: 0; }

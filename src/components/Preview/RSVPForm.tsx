@@ -72,7 +72,8 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <div className="rsvp-section section" style={{ fontFamily: data.fontFamily }}>
-      <h2>{isEn ? 'RSVP' : '참석 여부'}</h2>
+      <h2>RSVP</h2>
+      <p className="section-sub">참석 여부를 알려주세요</p>
       <p className="rsvp-desc">
         {isEn
           ? 'Please let us know if you can join us\nby providing your name below.'

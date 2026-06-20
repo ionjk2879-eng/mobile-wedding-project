@@ -8,7 +8,8 @@ interface PreviewProps {
 const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
   return (
     <section className="personal-message section" style={{ fontFamily: data.fontFamily }}>
-      <h2>한마디</h2>
+      <h2>MESSAGE</h2>
+      <p className="section-sub">서로에게 전하는 한마디</p>
       <div className="message-container">
         <div className="message-box groom">
           <div className="msg-profile-row">

@@ -133,7 +133,8 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <section className="gallery section">
-      <h2>{isEn ? 'GALLERY' : '갤러리'}</h2>
+      <h2>GALLERY</h2>
+      <p className="section-sub">소중한 순간을 담은 우리의 사진들</p>
       {data.photos.length > 0 ? (
         <>
           {style === 'style3' && renderPreviewSlider()}

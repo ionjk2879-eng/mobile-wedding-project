@@ -13,7 +13,8 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <section className="timeline-section section" style={{ fontFamily: data.fontFamily }}>
-      <h2>{data.language === 'en' ? 'Our Story' : '우리의 이야기'}</h2>
+      <h2>OUR STORY</h2>
+      <p className="section-sub">처음 만남부터 결혼까지, 우리의 여정</p>
 
       <button type="button" className={`timeline-toggle ${open ? 'open' : ''}`} onClick={() => setOpen(!open)}>
         {open ? (data.language === 'en' ? 'Close' : '닫기') : (data.language === 'en' ? 'View Our Story' : '이야기 보기')}
@@ -21,18 +22,31 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
 
       <div className={`timeline-body ${open ? 'open' : ''}`}>
         <div className="timeline-track">
-          {events.map((event, index) => (
-            <div key={event.id} className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
-              <div className="timeline-dot" />
-              <div className="timeline-card">
-                <span className="timeline-date">{event.date || '날짜'}</span>
-                <h3 className="timeline-title">{event.title || '제목을 입력하세요'}</h3>
-                {event.description && (
-                  <p className="timeline-desc">{event.description}</p>
+          {events.map((event, index) => {
+            const isLeft = index % 2 === 0;
+            return (
+              <div key={event.id} className={`timeline-item ${isLeft ? 'left' : 'right'}`}>
+                <div className="timeline-dot" />
+                {isLeft && event.photo && (
+                  <div className="timeline-photo right-photo">
+                    <img src={event.photo} alt="" />
+                  </div>
                 )}
+                {!isLeft && event.photo && (
+                  <div className="timeline-photo left-photo">
+                    <img src={event.photo} alt="" />
+                  </div>
+                )}
+                <div className="timeline-card">
+                  <span className="timeline-date">{event.date || '날짜'}</span>
+                  <h3 className="timeline-title">{event.title || '제목을 입력하세요'}</h3>
+                  {event.description && (
+                    <p className="timeline-desc">{event.description}</p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -158,6 +172,24 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
         }
         .timeline-item.right .timeline-card {
           text-align: left;
+        }
+        .timeline-photo {
+          position: absolute;
+          width: calc(50% - 24px);
+          top: 0;
+        }
+        .timeline-photo.right-photo {
+          left: calc(50% + 16px);
+        }
+        .timeline-photo.left-photo {
+          right: calc(50% + 16px);
+        }
+        .timeline-photo img {
+          width: 100%;
+          border-radius: 12px;
+          object-fit: cover;
+          border: 1px solid var(--wedding-border);
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
       `}</style>
     </section>

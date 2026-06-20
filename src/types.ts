@@ -17,6 +17,7 @@ export interface TimelineEvent {
   date: string;
   title: string;
   description: string;
+  photo: string;
 }
 
 export interface InterviewQA {

@@ -259,7 +259,8 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <section className="money section" style={{ fontFamily: data.fontFamily }}>
-      <h2>{isEn ? 'REGISTRY' : '마음 전하실 곳'}</h2>
+      <h2>GIFT</h2>
+      <p className="section-sub">축하의 마음을 전하실 수 있습니다</p>
       <p className="money-desc">
         {isEn 
           ? 'Your presence is enough, but if you wish to give,\nwe appreciate your kindness.' 

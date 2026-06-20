@@ -39,7 +39,8 @@ const Contacts: React.FC<PreviewProps> = ({ data }) => {
 
   return (
     <section className="contacts-section section" style={{ fontFamily: data.fontFamily }}>
-      <h2>{isEn ? 'CONTACT' : '연락처'}</h2>
+      <h2>CONTACT</h2>
+      <p className="section-sub">축하의 마음을 직접 전해보세요</p>
       {allGroups.map((group, gi) => (
         <div key={gi} className="contact-group">
           <p className="contact-group-label">{group.label}</p>
