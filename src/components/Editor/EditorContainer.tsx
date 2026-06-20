@@ -802,10 +802,6 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             {expandedSections.greeting && (
               <div className="section-content">
                 <div className="input-group">
-                  <label>제목</label>
-                  <input type="text" name="greetingTitle" value={data.greetingTitle} onChange={handleChange} className="modern-input" />
-                </div>
-                <div className="input-group">
                   <label>내용</label>
                   <textarea name="greetingContent" value={data.greetingContent} onChange={handleChange} rows={10} className="modern-input" />
                 </div>

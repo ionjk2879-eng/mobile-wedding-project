@@ -146,11 +146,11 @@ h2 {
 }
 
 .section-sub {
-  font-size: 0.95rem;
-  color: var(--wedding-text-body);
+  font-size: 1.15rem;
+  color: var(--wedding-text-main);
   margin: 0 0 36px 0;
   line-height: 1.6;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 button {
