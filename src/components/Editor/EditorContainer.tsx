@@ -367,6 +367,8 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     const newEvent: TimelineEvent = {
       id: Date.now().toString(),
       date: '',
+      showDate: true,
+      year: '',
       title: '',
       description: '',
       photo: '',
@@ -1022,19 +1024,29 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                         <button type="button" className="timeline-remove-btn" onClick={() => removeTimelineEvent(event.id)}>×</button>
                       </div>
                       <div className="timeline-editor-fields">
+                        <div className="input-group">
+                          <label>연도 구분 (선택)</label>
+                          <input type="text" value={event.year || ''} onChange={(e) => updateTimelineEvent(event.id, 'year', e.target.value)} className="modern-input" placeholder="2024" />
+                          <span className="input-hint">입력하면 사진 위에 크게 표시됩니다.</span>
+                        </div>
                         <div className="input-grid-2">
                           <div className="input-group">
-                            <label>날짜</label>
+                            <div className="label-row">
+                              <label>날짜</label>
+                              <button type="button" className={`deceased-btn ${event.showDate !== false ? 'active' : ''}`} onClick={() => { const updated = (data.timeline || []).map(e => e.id === event.id ? { ...e, showDate: !(e.showDate !== false) } : e); onChange({ ...data, timeline: updated }); }}>표시</button>
+                            </div>
                             <input type="text" value={event.date} onChange={(e) => updateTimelineEvent(event.id, 'date', e.target.value)} className="modern-input" placeholder="2020년 3월" />
                           </div>
                           <div className="input-group">
-                            <label>제목</label>
+                            <div className="label-row">
+                              <label>제목</label>
+                            </div>
                             <input type="text" value={event.title} onChange={(e) => updateTimelineEvent(event.id, 'title', e.target.value)} className="modern-input" placeholder="첫 만남" />
                           </div>
                         </div>
                         <div className="input-group">
                           <label>설명</label>
-                          <textarea value={event.description} onChange={(e) => updateTimelineEvent(event.id, 'description', e.target.value)} rows={2} className="modern-input" placeholder="소개팅으로 처음 만난 날" />
+                          <textarea value={event.description} onChange={(e) => updateTimelineEvent(event.id, 'description', e.target.value)} rows={5} className="modern-input" placeholder="소개팅으로 처음 만난 날" />
                         </div>
                         <div className="input-group">
                           <label>사진 (선택)</label>
@@ -1348,6 +1360,8 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .timeline-remove-btn:hover { background: #FECACA; }
         .timeline-editor-fields { padding: 16px 20px; }
         .timeline-add-btn { width: 100%; padding: 14px; border: 2px dashed #D1D5DB; border-radius: 14px; background: none; color: #9CA3AF; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; min-height: 30px; }
+        .label-row label { margin-bottom: 0; }
         .timeline-add-btn:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
         .timeline-photo-upload { display: flex; align-items: center; justify-content: center; padding: 12px; border: 2px dashed #D1D5DB; border-radius: 12px; color: #9CA3AF; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .timeline-photo-upload:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }

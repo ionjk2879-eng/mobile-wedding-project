@@ -45,8 +45,8 @@ const App: React.FC = () => {
     brideName: '신부',
     date: '2026. 10. 24. SAT',
     time: 'PM 12:30',
-    venueName: '서울 웨딩 가든',
-    venueAddress: '서울 강남구 테헤란로 123',
+    venueName: '',
+    venueAddress: '',
     greetingTitle: '초대합니다',
     greetingContent: '곁에 있을 때 가장 나다운 모습이 되게 하는 사람,\n꿈을 꾸게 하고, 그 꿈을 함께 나누고 싶은 사람을 만났습니다.\n\n서로의 다름을 인정하며,\n서로의 부족함을 채워주는 사랑으로\n행복한 가정을 일구어 나가겠습니다.\n\n저희의 시작을 축복해 주시면 감사하겠습니다.',
     contacts: [
@@ -80,9 +80,9 @@ const App: React.FC = () => {
     scrollEffect: 'none',
     weddingDateISO: '2026-10-24',
     transport: {
-      subway: '2호선 강남역 12번 출구 도보 5분',
-      bus: '강남역 정류장 하차 (140, 441, 470번 등)',
-      parking: '건물 내 지하 주차장 이용 가능 (2시간 무료)'
+      subway: '예) 2호선 강남역 12번 출구 도보 5분',
+      bus: '예) 강남역 정류장 하차 (140, 441번 등)',
+      parking: '예) 건물 내 지하 주차장 이용 가능'
     },
     parents: {
       groomParents: [
@@ -106,8 +106,8 @@ const App: React.FC = () => {
     en: {
       groomName: 'Groom',
       brideName: 'Bride',
-      venueName: 'Seoul Wedding Garden',
-      venueAddress: '123 Teheran-ro, Gangnam-gu, Seoul',
+      venueName: '',
+      venueAddress: '',
     },
   });
 

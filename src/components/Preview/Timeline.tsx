@@ -21,29 +21,43 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
       </button>
 
       <div className={`timeline-body ${open ? 'open' : ''}`}>
-        <div className="timeline-track">
+        <div className="tl-zigzag">
           {events.map((event, index) => {
             const isLeft = index % 2 === 0;
+            const isLast = index === events.length - 1;
             return (
-              <div key={event.id} className={`timeline-item ${isLeft ? 'left' : 'right'}`}>
-                <div className="timeline-dot" />
-                {isLeft && event.photo && (
-                  <div className="timeline-photo right-photo">
+              <div key={event.id} className="tl-block">
+                {/* Vertical line */}
+                <div className={`tl-line-v ${isLeft ? 'line-left' : 'line-right'}`} />
+
+                {/* Year divider */}
+                {event.year && (
+                  <div className="tl-year">{event.year}</div>
+                )}
+
+                {/* Photo */}
+                {event.photo && (
+                  <div className="tl-photo">
                     <img src={event.photo} alt="" />
                   </div>
                 )}
-                {!isLeft && event.photo && (
-                  <div className="timeline-photo left-photo">
-                    <img src={event.photo} alt="" />
-                  </div>
-                )}
-                <div className="timeline-card">
-                  <span className="timeline-date">{event.date || '날짜'}</span>
-                  <h3 className="timeline-title">{event.title || '제목을 입력하세요'}</h3>
+
+                {/* Content */}
+                <div className={`tl-content ${isLeft ? 'align-left' : 'align-right'}`}>
+                  <div className="tl-dot" />
+                  {event.showDate !== false && event.date && (
+                    <span className="tl-date">{event.date}</span>
+                  )}
+                  <h3 className="tl-title">{event.title || '제목을 입력하세요'}</h3>
                   {event.description && (
-                    <p className="timeline-desc">{event.description}</p>
+                    <p className="tl-desc" style={{ whiteSpace: 'pre-wrap' }}>{event.description}</p>
                   )}
                 </div>
+
+                {/* Horizontal connector to next block (zigzag) */}
+                {!isLast && (
+                  <div className={`tl-line-h ${isLeft ? 'h-to-right' : 'h-to-left'}`} />
+                )}
               </div>
             );
           })}
@@ -87,109 +101,114 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
           transition: max-height 0.5s ease;
         }
         .timeline-body.open {
-          max-height: 2000px;
+          max-height: 20000px;
         }
-        .timeline-track {
+        .tl-zigzag {
+          padding: 30px 20px 20px;
+          margin: 0 -24px;
+          background: color-mix(in srgb, var(--wedding-main) 5%, var(--wedding-bg));
+        }
+        .tl-block {
           position: relative;
-          padding: 24px 0 4px;
+          padding-bottom: 0;
         }
-        .timeline-track::before {
-          content: '';
+
+        /* Vertical line */
+        .tl-line-v {
           position: absolute;
-          left: 50%;
           top: 0;
           bottom: 0;
           width: 2px;
           background: var(--wedding-border);
-          transform: translateX(-50%);
         }
-        .timeline-item {
+        .tl-line-v.line-left { left: 16px; }
+        .tl-line-v.line-right { right: 16px; }
+
+        /* Horizontal connector */
+        .tl-line-h {
           position: relative;
-          display: flex;
-          margin-bottom: 32px;
-          align-items: flex-start;
+          height: 2px;
+          background: var(--wedding-border);
+          margin: 20px 0;
         }
-        .timeline-item:last-child {
-          margin-bottom: 0;
+        .tl-line-h.h-to-right {
+          margin-left: 16px;
+          margin-right: 16px;
         }
-        .timeline-item.left {
-          justify-content: flex-start;
-          padding-right: calc(50% + 16px);
-          padding-left: 0;
+        .tl-line-h.h-to-left {
+          margin-left: 16px;
+          margin-right: 16px;
         }
-        .timeline-item.right {
-          justify-content: flex-end;
-          padding-left: calc(50% + 16px);
-          padding-right: 0;
-        }
-        .timeline-dot {
-          position: absolute;
-          left: 50%;
-          top: 8px;
+
+        /* Dot */
+        .tl-dot {
           width: 12px;
           height: 12px;
           background: var(--wedding-main);
           border: 3px solid var(--wedding-card-bg, #fff);
           border-radius: 50%;
-          transform: translateX(-50%);
-          z-index: 1;
           box-shadow: 0 0 0 3px var(--wedding-border);
+          margin-bottom: 14px;
         }
-        .timeline-card {
-          background: var(--wedding-card-bg);
-          border: 1px solid var(--wedding-border);
+        .align-left .tl-dot { margin-right: auto; }
+        .align-right .tl-dot { margin-left: auto; }
+
+        /* Year divider */
+        .tl-year {
+          font-size: 2.2em;
+          font-weight: 300;
+          color: var(--wedding-text-main);
+          letter-spacing: 6px;
+          text-align: center;
+          padding: 10px 0 20px;
+          font-family: 'Cormorant Garamond', serif;
+          opacity: 0.7;
+        }
+
+        /* Photo */
+        .tl-photo {
+          margin-bottom: 16px;
           border-radius: 14px;
-          padding: 14px 16px;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-          width: 100%;
+          overflow: hidden;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
-        .timeline-date {
+        .tl-photo img {
+          width: 100%;
+          display: block;
+        }
+
+        /* Content */
+        .tl-content {
+          padding: 0 0 0 0;
+        }
+        .tl-content.align-left {
+          text-align: left;
+          padding-left: 30px;
+        }
+        .tl-content.align-right {
+          text-align: right;
+          padding-right: 30px;
+        }
+        .tl-date {
           display: inline-block;
-          font-size: 0.75em;
-          font-weight: 700;
-          color: var(--wedding-main);
-          background: var(--wedding-bg);
-          padding: 3px 10px;
-          border-radius: 20px;
+          font-size: 0.78em;
+          font-weight: 600;
+          color: var(--wedding-text-sub);
           margin-bottom: 8px;
           letter-spacing: 0.5px;
         }
-        .timeline-title {
-          font-size: 0.95em;
+        .tl-title {
+          font-size: 1.1em;
           font-weight: 700;
           color: var(--wedding-text-main);
-          margin: 0 0 6px 0;
+          margin: 0 0 8px 0;
         }
-        .timeline-desc {
-          font-size: 0.85em;
-          line-height: 1.7;
+        .tl-desc {
+          font-size: 0.88em;
+          line-height: 1.8;
           color: var(--wedding-text-body);
           margin: 0;
           word-break: keep-all;
-        }
-        .timeline-item.left .timeline-card {
-          text-align: right;
-        }
-        .timeline-item.right .timeline-card {
-          text-align: left;
-        }
-        .timeline-photo {
-          position: absolute;
-          width: calc(50% - 24px);
-          top: 0;
-        }
-        .timeline-photo.right-photo {
-          left: calc(50% + 16px);
-        }
-        .timeline-photo.left-photo {
-          right: calc(50% + 16px);
-        }
-        .timeline-photo img {
-          width: 100%;
-          border-radius: 12px;
-          object-fit: cover;
-          border: 1px solid var(--wedding-border);
-          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
       `}</style>
     </section>

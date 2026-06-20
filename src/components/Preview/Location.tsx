@@ -16,62 +16,83 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
   const isEn = data.language === 'en';
   const venueName = isEn && data.en.venueName ? data.en.venueName : data.venueName;
   const venueAddress = isEn && data.en.venueAddress ? data.en.venueAddress : data.venueAddress;
-  
+
   const mapRef = useRef<HTMLDivElement>(null);
+  const coordsRef = useRef<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
-    if (!window.kakao || !window.kakao.maps) return;
+    if (!data.venueAddress || !mapRef.current) return;
+
+    if (!window.kakao?.maps?.Map) return;
 
     const container = mapRef.current;
     if (!container) return;
 
-    const options = {
-      center: new window.kakao.maps.LatLng(33.450701, 126.570667),
+    const map = new window.kakao.maps.Map(container, {
+      center: new window.kakao.maps.LatLng(37.5665, 126.9780),
       level: 3
-    };
+    });
 
-    const map = new window.kakao.maps.Map(container, options);
     const geocoder = new window.kakao.maps.services.Geocoder();
-
     geocoder.addressSearch(data.venueAddress, (result: any, status: any) => {
       if (status === window.kakao.maps.services.Status.OK) {
-        const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
-
-        const marker = new window.kakao.maps.Marker({
-          map: map,
-          position: coords
-        });
-
+        const lat = parseFloat(result[0].y);
+        const lng = parseFloat(result[0].x);
+        coordsRef.current = { lat, lng };
+        const coords = new window.kakao.maps.LatLng(lat, lng);
+        new window.kakao.maps.Marker({ map, position: coords });
         map.setCenter(coords);
       }
     });
   }, [data.venueAddress]);
 
+  const searchQuery = encodeURIComponent(data.venueAddress || venueName || '');
+  const nameQuery = encodeURIComponent(venueName || '');
+
   const navLinks = [
-    { name: isEn ? 'Kakao Navi' : '카카오내비', url: `https://map.kakao.com/link/to/${venueName},${data.venueAddress}` },
-    { name: isEn ? 'Naver Map' : '네이버 지도', url: `https://map.naver.com/index.nhn?slng=&slat=&stext=&elng=&elat=&etext=${encodeURIComponent(venueName)}&menu=route` },
-    { name: 'T-Map', url: `https://apis.openapi.sk.com/tmap/app/routes?appKey=YOUR_TMAP_APP_KEY&name=${encodeURIComponent(venueName)}` },
+    {
+      name: '카카오맵',
+      color: '#FEE500',
+      textColor: '#3C1E1E',
+      url: coordsRef.current
+        ? `https://map.kakao.com/link/to/${nameQuery},${coordsRef.current.lat},${coordsRef.current.lng}`
+        : `https://map.kakao.com/link/search/${searchQuery}`,
+    },
+    {
+      name: '네이버 지도',
+      color: '#03C75A',
+      textColor: '#fff',
+      url: `https://map.naver.com/v5/search/${searchQuery}`,
+    },
+    {
+      name: 'T맵',
+      color: '#EF4036',
+      textColor: '#fff',
+      url: `https://tmap.life/search?query=${searchQuery}`,
+    },
   ];
 
   return (
     <section className="location section">
       <h2>LOCATION</h2>
-      <p className="section-sub">예식이 진행되는 장소를 안내드립니다</p>
-      <div className="location-info">
-        <h3 className="venue-name">{venueName}</h3>
-        <p className="address">{venueAddress}</p>
-      </div>
+      <p className="section-sub">오시는 길</p>
+      {(venueName || venueAddress) && (
+        <div className="location-info">
+          {venueName && <h3 className="venue-name">{venueName}</h3>}
+          {venueAddress && <p className="address">{venueAddress}</p>}
+        </div>
+      )}
 
-      <div ref={mapRef} className="map-container"></div>
+      {data.venueAddress && <div ref={mapRef} className="map-container"></div>}
 
-      <div className="nav-grid">
+      {data.venueAddress && <div className="nav-grid">
         {navLinks.map((nav, index) => (
-          <a key={index} href={nav.url} target="_blank" rel="noreferrer" className="nav-item">
-            <Navigation size={18} />
+          <a key={index} href={nav.url} target="_blank" rel="noreferrer" className="nav-item" style={{ background: nav.color, color: nav.textColor, borderColor: nav.color }}>
+            <Navigation size={16} />
             <span>{nav.name}</span>
           </a>
         ))}
-      </div>
+      </div>}
 
       <div className="transport-info">
         <div className="transport-item">
@@ -118,6 +139,9 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
           border: 1px solid var(--wedding-border);
           border-radius: 16px;
           margin-bottom: 20px;
+          overflow: hidden;
+          position: relative;
+          z-index: 0;
         }
         .nav-grid {
           display: grid;
@@ -127,19 +151,19 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
         }
         .nav-item {
           padding: 12px 10px;
-          border: 1px solid var(--wedding-border);
-          background: var(--wedding-card-bg);
-          color: var(--wedding-text-body);
+          border: 1px solid;
           border-radius: 12px;
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 5px;
           font-size: 0.8em;
+          font-weight: 700;
           transition: all 0.2s ease;
         }
         .nav-item:hover {
-          background: var(--wedding-border);
+          filter: brightness(0.9);
+          transform: translateY(-1px);
         }
         .transport-info {
           text-align: left;

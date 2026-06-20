@@ -15,6 +15,8 @@ export interface Contact {
 export interface TimelineEvent {
   id: string;
   date: string;
+  showDate: boolean;
+  year: string;
   title: string;
   description: string;
   photo: string;
