@@ -479,7 +479,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
   return (
     <div className="editor-outer-layout">
       <aside className="editor-sidebar-slim">
-        <div className="sidebar-logo">WEDDING</div>
+        <div className="sidebar-logo">SONETT</div>
         <nav className="nav-menu-list">
           {navItems.map((item) => (
             <button
@@ -507,27 +507,25 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             </div>
             {expandedSections.share && (
               <div className="section-content">
-                <p className="section-desc">완성된 청첩장을 배포한 뒤, 아래 주소를 카카오톡이나 문자로 보내세요.</p>
+                <p className="section-desc">청첩장 주소를 설정하고 저장하면 하객에게 공유할 수 있습니다.</p>
                 <div className="input-group">
-                  <label>청첩장 URL</label>
-                  <input type="text" name="shareUrl" value={data.shareUrl} onChange={handleChange} className="modern-input" placeholder="https://example.com/wedding" />
-                  <span className="input-hint">배포된 청첩장 주소를 입력하면 공유 버튼에 자동 반영됩니다.</span>
+                  <label>청첩장 주소</label>
+                  <div className="slug-input-row">
+                    <span className="slug-prefix">/w/</span>
+                    <input type="text" name="slug" value={data.slug || ''} onChange={handleChange} className="modern-input" placeholder="jihyun-minji" />
+                  </div>
+                  <span className="input-hint">영문, 숫자, 하이픈만 사용 가능합니다. 이 주소로 청첩장이 공유됩니다.</span>
                 </div>
                 <div className="share-divider" />
                 <p className="section-desc">카카오톡으로 공유할 때 표시될 정보를 설정합니다.</p>
                 <div className="input-group">
-                  <label>카카오 앱 키</label>
-                  <input type="text" name="kakaoAppKey" value={data.kakaoAppKey} onChange={handleChange} className="modern-input" placeholder="JavaScript 앱 키를 입력하세요" />
-                  <span className="input-hint">카카오 개발자 사이트에서 발급받은 JavaScript 키</span>
-                </div>
-                <div className="input-group">
                   <label>공유 제목</label>
-                  <input type="text" name="shareTitle" value={data.shareTitle} onChange={handleChange} className="modern-input" placeholder="신랑 ♡ 신부 결혼합니다" />
+                  <input type="text" name="shareTitle" value={data.shareTitle} onChange={handleChange} className="modern-input" placeholder={`${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`} />
                   <span className="input-hint">비워두면 신랑/신부 이름으로 자동 생성됩니다.</span>
                 </div>
                 <div className="input-group">
                   <label>공유 설명</label>
-                  <textarea name="shareDescription" value={data.shareDescription} onChange={handleChange} rows={2} className="modern-input" placeholder="2026. 10. 24. SAT PM 12:30&#10;서울 웨딩 가든" />
+                  <textarea name="shareDescription" value={data.shareDescription} onChange={handleChange} rows={2} className="modern-input" placeholder={`${data.date || '날짜'} ${data.time || '시간'}\n${data.venueName || '장소'}`} />
                   <span className="input-hint">비워두면 일시와 장소로 자동 생성됩니다.</span>
                 </div>
                 <div className="share-preview-card">
@@ -1275,7 +1273,8 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
 
       <style>{`
         .editor-outer-layout { display: flex; flex: 1; overflow: hidden; background: #FFFFFF; }
-        .editor-sidebar-slim { width: 75px; background: #FFFFFF; border-right: 1px solid #F3F4F6; display: flex; flex-direction: column; align-items: center; padding: 25px 0; flex-shrink: 0; }
+        .editor-sidebar-slim { width: 75px; background: #FFFFFF; border-right: 1px solid #F3F4F6; display: flex; flex-direction: column; align-items: center; padding: 25px 0; flex-shrink: 0; overflow-y: auto; scrollbar-width: none; }
+        .editor-sidebar-slim::-webkit-scrollbar { display: none; }
         .sidebar-logo { font-size: 0.55rem; font-weight: 900; color: #D4A5C6; margin-bottom: 35px; letter-spacing: 2px; }
         .nav-menu-list { display: flex; flex-direction: column; gap: 12px; width: 100%; }
         .nav-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 12px 0; border: none; background: none; color: #A0A0A0; cursor: pointer; width: 100%; transition: all 0.2s; }
@@ -1381,6 +1380,9 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .interview-answer-box { display: flex; flex-direction: column; gap: 8px; }
         .interview-answer-box .person-type { align-self: flex-start; }
         .input-hint { display: block; font-size: 0.78rem; color: #9CA3AF; margin-top: 6px; }
+        .slug-input-row { display: flex; align-items: center; gap: 0; }
+        .slug-prefix { padding: 14px 0 14px 16px; background: #F3F4F6; border: 1px solid #E5E7EB; border-right: none; border-radius: 12px 0 0 12px; font-size: 0.9rem; font-weight: 700; color: #9CA3AF; white-space: nowrap; }
+        .slug-input-row .modern-input { border-radius: 0 12px 12px 0; }
         .share-divider { height: 1px; background: #F3F4F6; margin: 20px 0; }
         .share-preview-card { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 16px; overflow: hidden; }
         .share-preview-header { padding: 10px 16px; font-size: 0.75rem; font-weight: 800; color: #9CA3AF; border-bottom: 1px solid #F0F2F5; }

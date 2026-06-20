@@ -78,6 +78,7 @@ export interface InvitationData {
   };
   timeline: TimelineEvent[];
   interview: InterviewQA[];
+  slug: string;
   shareUrl: string;
   shareTitle: string;
   shareDescription: string;

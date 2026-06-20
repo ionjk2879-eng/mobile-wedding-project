@@ -14,6 +14,7 @@ import Contacts from './components/Preview/Contacts';
 import ScrollReveal, { ScrollRootContext } from './components/Preview/ScrollReveal';
 import Share from './components/Preview/Share';
 import { InvitationData } from './types';
+import { saveInvitation } from './firebase';
 
 const App: React.FC = () => {
   const [isFullPreview, setIsFullPreview] = useState(false);
@@ -97,6 +98,7 @@ const App: React.FC = () => {
     timeline: [],
     interview: [],
     sectionOrder: ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'accounts', 'contacts', 'share'],
+    slug: '',
     shareUrl: '',
     shareTitle: '',
     shareDescription: '',
@@ -424,8 +426,19 @@ const App: React.FC = () => {
         <div className="editor-panel">
           <header className="builder-header">
             <div className="header-main">
-              <h1>💍 Invitation Builder</h1>
-              <p>내용을 입력하면 오른쪽에서 실시간으로 확인할 수 있습니다.</p>
+              <h1>Sonett</h1>
+              <p>소중한 순간을 아름답게, 소네트 모바일 청첩장</p>
+            </div>
+            <div className="header-btns">
+              <button className="save-btn" onClick={async () => {
+                if (!data.slug) { alert('청첩장 주소를 먼저 설정해주세요.'); return; }
+                try {
+                  await saveInvitation(data.slug, data);
+                  alert(`저장 완료! 청첩장 주소: /w/${data.slug}\n관리 페이지: /admin/${data.slug}`);
+                } catch (err) { alert('저장에 실패했습니다.'); console.error(err); }
+              }}>저장하기</button>
+              {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="view-btn">청첩장 보기</a>}
+              {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="admin-link-btn">응답 확인</a>}
             </div>
           </header>
           <EditorContainer data={data} onChange={setData} onSectionClick={handleSectionScroll} />
@@ -481,8 +494,14 @@ const App: React.FC = () => {
           border-bottom: 1px solid #F0F2F5;
           background: #FFFFFF;
         }
+        .builder-header { display: flex; justify-content: space-between; align-items: center; }
         .builder-header h1 { font-size: 1.4rem; font-weight: 800; margin: 0; color: #111827; }
         .builder-header p { font-size: 0.85rem; color: #6B7280; margin: 0; }
+        .header-btns { display: flex; gap: 8px; }
+        .save-btn { padding: 10px 20px; background: #D4A5C6; color: white; border: none; border-radius: 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .save-btn:hover { filter: brightness(0.9); }
+        .view-btn, .admin-link-btn { padding: 10px 16px; border: 1px solid #E5E7EB; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #4B5563; text-decoration: none; transition: all 0.2s; display: flex; align-items: center; }
+        .view-btn:hover, .admin-link-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
         
         .preview-panel {
           flex: 0 0 450px;

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { X, Users, Utensils, Trash2 } from 'lucide-react';
+import { X, Users, Utensils, Trash2, RefreshCw } from 'lucide-react';
 import { RSVPResponse } from '../../types';
+import { db, collection, getDocs, query, orderBy } from '../../firebase';
 
 interface DashboardProps {
   onClose: () => void;
@@ -11,20 +12,24 @@ const COLORS = ['#b89c8e', '#e5d1c8', '#8c8581', '#f0eae5'];
 
 const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
   const [responses, setResponses] = useState<RSVPResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchResponses = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'rsvp'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RSVPResponse));
+      setResponses(data);
+    } catch (err) {
+      console.error('데이터 로드 실패:', err);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem('wedding_rsvp_responses');
-    if (saved) {
-      setResponses(JSON.parse(saved));
-    }
+    fetchResponses();
   }, []);
-
-  const handleClear = () => {
-    if (window.confirm('모든 응답 데이터를 삭제하시겠습니까?')) {
-      localStorage.removeItem('wedding_rsvp_responses');
-      setResponses([]);
-    }
-  };
 
   const attendingResponses = responses.filter(r => r.isAttending);
   const totalGuests = attendingResponses.reduce((acc, curr) => acc + curr.totalGuests, 0);
@@ -61,7 +66,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onClose }) => {
             <p>실시간으로 수집된 하객 데이터를 시각화하여 보여줍니다.</p>
           </div>
           <div className="header-actions">
-            <button className="clear-btn" onClick={handleClear} title="데이터 초기화"><Trash2 size={20} /></button>
+            <button className="clear-btn" onClick={fetchResponses} title="새로고침"><RefreshCw size={20} /></button>
             <button className="close-btn" onClick={onClose}><X size={24} /></button>
           </div>
         </header>

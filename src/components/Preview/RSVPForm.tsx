@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { InvitationData } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
+import { db, collection, addDoc } from '../../firebase';
 
 interface PreviewProps {
   data: InvitationData;
@@ -48,21 +49,20 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
   if (!data.isRSVPEnabled) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const newResponse = {
-      ...formData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
-    };
 
-    // Mock Backend: Save to localStorage
-    const existingResponses = JSON.parse(localStorage.getItem('wedding_rsvp_responses') || '[]');
-    localStorage.setItem('wedding_rsvp_responses', JSON.stringify([...existingResponses, newResponse]));
-
-    console.log('RSVP Submitted:', newResponse);
-    setSubmitted(true);
+    try {
+      const slug = data.slug || 'default';
+      await addDoc(collection(db, `invitations/${slug}/rsvp`), {
+        ...formData,
+        createdAt: new Date().toISOString()
+      });
+      setSubmitted(true);
+    } catch (err) {
+      console.error('RSVP 전송 실패:', err);
+      alert('전송에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   if (submitted) {
