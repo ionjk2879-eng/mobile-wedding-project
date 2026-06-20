@@ -111,39 +111,35 @@ const App: React.FC = () => {
     },
   });
 
-  const musicStarted = React.useRef(false);
+  const userPaused = React.useRef(false);
+  const autoPlayed = React.useRef(false);
 
   React.useEffect(() => {
     setIsMusicPlaying(false);
-    musicStarted.current = false;
+    userPaused.current = false;
+    autoPlayed.current = false;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
   }, [data.bgMusicUrl]);
 
-  const autoPlayDone = React.useRef(false);
-
   React.useEffect(() => {
-    if (!data.bgMusicUrl || autoPlayDone.current) return;
-
-    const removeAll = () => {
-      events.forEach(e => window.removeEventListener(e, tryAutoPlay, { capture: true }));
-    };
+    if (!data.bgMusicUrl) return;
 
     const tryAutoPlay = () => {
-      if (musicStarted.current || !audioRef.current) return;
+      if (autoPlayed.current || userPaused.current || !audioRef.current) return;
       audioRef.current.play().then(() => {
-        musicStarted.current = true;
-        autoPlayDone.current = true;
+        autoPlayed.current = true;
         setIsMusicPlaying(true);
-        removeAll();
       }).catch(() => {});
     };
 
     const events = ['click', 'touchstart', 'scroll', 'mousedown'] as const;
     events.forEach(e => window.addEventListener(e, tryAutoPlay, { capture: true }));
-    return removeAll;
+    return () => {
+      events.forEach(e => window.removeEventListener(e, tryAutoPlay, { capture: true }));
+    };
   }, [data.bgMusicUrl]);
 
   const toggleMusic = () => {
@@ -151,9 +147,11 @@ const App: React.FC = () => {
     if (isMusicPlaying) {
       audioRef.current.pause();
       setIsMusicPlaying(false);
+      userPaused.current = true;
     } else {
       audioRef.current.play().then(() => {
         setIsMusicPlaying(true);
+        userPaused.current = false;
       }).catch(() => {});
     }
   };
