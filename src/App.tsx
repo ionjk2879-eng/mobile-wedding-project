@@ -64,6 +64,7 @@ const App: React.FC = () => {
     accountStyle: 'style1',
     galleryStyle: 'grid',
     heroPhoto: '',
+    heroStyle: 'classic',
     photos: [],
     fontFamily: "'Pretendard', sans-serif",
     fontSize: 'medium',

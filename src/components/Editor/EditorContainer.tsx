@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, ChevronUp, ChevronDown, Clock, Palette, Info, MessageSquare, Heart, MapPin, Phone, CreditCard, Image as ImageIcon, ChevronRight, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown, Clock, Palette, Info, MessageSquare, Heart, MapPin, Phone, CreditCard, Image as ImageIcon, ChevronRight, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate } from 'lucide-react';
 import { InvitationData, TimelineEvent, InterviewQA } from '../../types';
 
 declare global {
@@ -16,6 +16,7 @@ interface EditorProps {
 
 const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick }) => {
   const sectionRefs = {
+    hero: React.useRef<HTMLDivElement>(null),
     theme: React.useRef<HTMLDivElement>(null),
     design: React.useRef<HTMLDivElement>(null),
     basic: React.useRef<HTMLDivElement>(null),
@@ -36,6 +37,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
   const workspaceRef = React.useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = React.useState('design');
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
+    hero: false,
     theme: true,
     design: true,
     basic: true,
@@ -101,7 +103,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     setExpandedSections(prev => ({ ...prev, [id]: true }));
     
     // Sync with preview (skip for non-preview sections)
-    if (onSectionClick && id !== 'share' && id !== 'order' && id !== 'music') onSectionClick(id);
+    if (onSectionClick && id !== 'share' && id !== 'order' && id !== 'music' && id !== 'hero') onSectionClick(id);
     
     setTimeout(() => {
       ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -442,6 +444,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
   // 순서: 프리뷰 기준 (Hero → Greeting → Calendar → PersonalMessage → Gallery → Location → RSVP → Money → Share)
   const navItems = [
     { id: 'share', name: '주소', icon: <Send size={18} />, ref: sectionRefs.share },
+    { id: 'hero', name: '메인화면', icon: <LayoutTemplate size={18} />, ref: sectionRefs.hero },
     { id: 'theme', name: '테마', icon: <Sparkles size={18} />, ref: sectionRefs.theme },
     { id: 'design', name: '디자인', icon: <Palette size={18} />, ref: sectionRefs.design },
     { id: 'basic', name: '기본정보', icon: <Info size={18} />, ref: sectionRefs.basic },
@@ -527,6 +530,56 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                       <strong>{data.shareTitle || `${data.groomName} ♡ ${data.brideName} 결혼합니다`}</strong>
                       <p>{data.shareDescription || `${data.date} ${data.time}\n${data.venueName}`}</p>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Hero Section */}
+          <div className={`editor-section-card ${expandedSections.hero ? 'expanded' : ''}`} ref={sectionRefs.hero}>
+            <div className="section-header" onClick={() => toggleSection('hero')}>
+              <div className="header-left">
+                <LayoutTemplate size={20} />
+                <h3>메인화면</h3>
+              </div>
+              <ChevronRight size={18} className="collapse-icon" />
+            </div>
+            {expandedSections.hero && (
+              <div className="section-content">
+                <div className="input-group">
+                  <label>메인 사진</label>
+                  <div className="modern-hero-upload">
+                    {data.heroPhoto ? (
+                      <>
+                        <img src={data.heroPhoto} alt="Hero" />
+                        <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden /></label>
+                      </>
+                    ) : (
+                      <label className="hero-empty-upload">
+                        <ImageIcon size={24} />
+                        <span>메인 사진 등록</span>
+                        <input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden />
+                      </label>
+                    )}
+                  </div>
+                </div>
+                <div className="input-group">
+                  <label>메인화면 스타일</label>
+                  <div className="hero-style-grid">
+                    {[
+                      { key: 'classic', name: '클래식', desc: '사진 위, 정보 아래' },
+                      { key: 'overlay', name: '오버레이', desc: '사진 위에 텍스트 겹침' },
+                      { key: 'minimal', name: '미니멀', desc: '이름과 날짜만 강조' },
+                      { key: 'editorial', name: '에디토리얼', desc: '매거진 느낌 레이아웃' },
+                      { key: 'fullscreen', name: '풀스크린', desc: '사진이 전체를 채움' },
+                      { key: 'split', name: '스플릿', desc: '좌우 분할 레이아웃' },
+                    ].map(s => (
+                      <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => onChange({ ...data, heroStyle: s.key as any })}>
+                        <strong>{s.name}</strong>
+                        <span>{s.desc}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -925,22 +978,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             {expandedSections.photos && (
               <div className="section-content">
                 <div className="modern-photo-editor">
-                  <div className="photo-label">메인 사진</div>
-                  <div className="modern-hero-upload">
-                    {data.heroPhoto ? (
-                      <>
-                        <img src={data.heroPhoto} alt="Hero" />
-                        <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden /></label>
-                      </>
-                    ) : (
-                      <label className="hero-empty-upload">
-                        <ImageIcon size={24} />
-                        <span>메인 사진 등록</span>
-                        <input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden />
-                      </label>
-                    )}
-                  </div>
-                  <div className="photo-label" style={{ marginTop: '30px' }}>갤러리 연출 방식</div>
+                  <div className="photo-label">갤러리 연출 방식</div>
                   <div className="account-style-grid" style={{ marginBottom: '20px' }}>
                     {[
                       { key: 'grid', name: '그리드', desc: '사진을 격자로 나열' },
@@ -1333,6 +1371,13 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .share-preview-info { flex: 1; min-width: 0; }
         .share-preview-info strong { display: block; font-size: 0.88rem; color: #1F2937; margin-bottom: 4px; word-break: keep-all; }
         .share-preview-info p { font-size: 0.78rem; color: #6B7280; margin: 0; line-height: 1.5; white-space: pre-line; word-break: keep-all; }
+        .hero-style-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .hero-style-btn { display: flex; flex-direction: column; gap: 2px; padding: 14px 10px; border-radius: 14px; border: 1px solid #E5E7EB; background: #F9FAFB; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .hero-style-btn:hover { border-color: #D1D5DB; background: #FAFAFA; }
+        .hero-style-btn.active { border-color: #D4A5C6; background: #FFF9FB; box-shadow: 0 2px 8px rgba(212,165,198,0.1); }
+        .hero-style-btn strong { font-size: 0.85rem; color: #1F2937; }
+        .hero-style-btn.active strong { color: #D4A5C6; }
+        .hero-style-btn span { font-size: 0.7rem; color: #9CA3AF; }
         .account-style-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .account-style-btn { display: flex; flex-direction: column; gap: 2px; padding: 14px 18px; border-radius: 14px; border: 1px solid #E5E7EB; background: #F9FAFB; text-align: left; cursor: pointer; transition: all 0.2s; }
         .account-style-btn:hover { border-color: #D1D5DB; background: #FAFAFA; }
@@ -1379,9 +1424,9 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .modern-list-item.col { flex-direction: column; align-items: stretch; padding: 15px; }
         .role-tag { background: #FCE7F3; color: #D4A5C6; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; white-space: nowrap; }
         .photo-label { font-size: 0.8rem; font-weight: 800; color: #9CA3AF; text-transform: uppercase; margin-bottom: 12px; }
-        .modern-hero-upload { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 20px; overflow: hidden; background: #F3F4F6; }
-        .modern-hero-upload img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-empty-upload { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #9CA3AF; cursor: pointer; border: 2px dashed #D1D5DB; border-radius: 20px; transition: all 0.2s; }
+        .modern-hero-upload { position: relative; width: 100%; min-height: 180px; border-radius: 20px; overflow: hidden; background: #F3F4F6; display: flex; align-items: center; justify-content: center; }
+        .modern-hero-upload img { width: 100%; display: block; }
+        .hero-empty-upload { width: 100%; min-height: 180px; display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #9CA3AF; cursor: pointer; border: 2px dashed #D1D5DB; border-radius: 20px; transition: all 0.2s; box-sizing: border-box; }
         .hero-empty-upload:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
         .hero-empty-upload span { font-size: 0.85rem; font-weight: 700; }
         .change-btn { position: absolute; bottom: 20px; right: 20px; background: white; color: #111827; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }

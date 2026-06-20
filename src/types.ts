@@ -48,6 +48,7 @@ export interface InvitationData {
   accountStyle: 'style1' | 'style2' | 'style3';
   galleryStyle: 'grid' | 'style2' | 'style3';
   heroPhoto: string;
+  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split';
   photos: string[];
   fontFamily: string;
   fontSize: 'small' | 'medium' | 'large';
