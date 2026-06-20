@@ -264,17 +264,20 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
 
             let subwayText = '';
             let busText = '';
+            let parkingText = '';
             let completed = 0;
+
+            const calcDist = (r: any) => Math.round(Math.sqrt(Math.pow((parseFloat(r.y) - lat) * 111000, 2) + Math.pow((parseFloat(r.x) - lng) * 88000, 2)));
 
             const tryUpdate = () => {
               completed++;
-              if (completed < 2) return;
+              if (completed < 3) return;
               onChange({
                 ...updatedData,
                 transport: {
                   subway: subwayText || updatedData.transport.subway,
                   bus: busText || updatedData.transport.bus,
-                  parking: updatedData.transport.parking
+                  parking: parkingText || updatedData.transport.parking
                 }
               });
             };
@@ -282,22 +285,25 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             places.keywordSearch('지하철역', (results: any, s: any) => {
               if (s === window.kakao.maps.services.Status.OK && results.length > 0) {
                 subwayText = results.slice(0, 2).map((r: any) => {
-                  const dist = Math.round(Math.sqrt(Math.pow((parseFloat(r.y) - lat) * 111000, 2) + Math.pow((parseFloat(r.x) - lng) * 88000, 2)));
+                  const dist = calcDist(r);
                   return `${r.place_name.replace(' ', '')} 도보 약 ${Math.ceil(dist / 80)}분 (${dist}m)`;
                 }).join('\n');
               }
               tryUpdate();
             }, { location, radius: 2000, sort: window.kakao.maps.services.SortBy.DISTANCE });
 
-            places.keywordSearch('버스정류장', (results: any, s: any) => {
+            places.keywordSearch('버스 정류장', (results: any, s: any) => {
               if (s === window.kakao.maps.services.Status.OK && results.length > 0) {
                 busText = results.slice(0, 2).map((r: any) => {
-                  const dist = Math.round(Math.sqrt(Math.pow((parseFloat(r.y) - lat) * 111000, 2) + Math.pow((parseFloat(r.x) - lng) * 88000, 2)));
-                  return `${r.place_name} 하차 (${dist}m)`;
+                  const dist = calcDist(r);
+                  return `${r.place_name} 도보 약 ${Math.ceil(dist / 80)}분 (${dist}m)`;
                 }).join('\n');
               }
               tryUpdate();
-            }, { location, radius: 1000, sort: window.kakao.maps.services.SortBy.DISTANCE });
+            }, { location, radius: 2000, sort: window.kakao.maps.services.SortBy.DISTANCE });
+
+            parkingText = `${venueNameFinal || '예식장'} 주차장 이용 가능 (직접 확인 권장)`;
+            tryUpdate();
           });
         }
       }

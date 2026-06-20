@@ -191,8 +191,9 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
         .transport-detail {
           font-size: 0.9em;
           color: var(--wedding-text-body);
-          line-height: 1.5;
+          line-height: 1.8;
           padding-left: 26px;
+          white-space: pre-line;
         }
       `}</style>
     </section>
