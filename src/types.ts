@@ -78,6 +78,7 @@ export interface InvitationData {
   shareTitle: string;
   shareDescription: string;
   kakaoAppKey: string;
+  sectionOrder: string[];
   videoUrl: string;
   language: 'ko' | 'en';
   en: Partial<InvitationData>;

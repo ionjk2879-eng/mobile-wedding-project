@@ -17,6 +17,10 @@ import { InvitationData } from './types';
 
 const App: React.FC = () => {
   const [isFullPreview, setIsFullPreview] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement>(null);
+
+
   const previewRefs = {
     theme: React.useRef<HTMLDivElement>(null),
     design: React.useRef<HTMLDivElement>(null),
@@ -91,6 +95,7 @@ const App: React.FC = () => {
     },
     timeline: [],
     interview: [],
+    sectionOrder: ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'accounts', 'contacts', 'share'],
     shareUrl: '',
     shareTitle: '',
     shareDescription: '',
@@ -104,6 +109,49 @@ const App: React.FC = () => {
       venueAddress: '123 Teheran-ro, Gangnam-gu, Seoul',
     },
   });
+
+  const musicStarted = React.useRef(false);
+
+  React.useEffect(() => {
+    setIsMusicPlaying(false);
+    musicStarted.current = false;
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [data.bgMusicUrl]);
+
+  React.useEffect(() => {
+    if (!data.bgMusicUrl) return;
+
+    const tryAutoPlay = () => {
+      if (musicStarted.current || !audioRef.current) return;
+      audioRef.current.play().then(() => {
+        musicStarted.current = true;
+        setIsMusicPlaying(true);
+      }).catch(() => {});
+    };
+
+    const events = ['click', 'touchstart', 'scroll', 'mousedown'] as const;
+    events.forEach(e => window.addEventListener(e, tryAutoPlay, { capture: true }));
+    return () => {
+      events.forEach(e => window.removeEventListener(e, tryAutoPlay, { capture: true }));
+    };
+  }, [data.bgMusicUrl]);
+
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+    if (isMusicPlaying) {
+      audioRef.current.pause();
+      setIsMusicPlaying(false);
+      musicStarted.current = false;
+    } else {
+      audioRef.current.play().then(() => {
+        setIsMusicPlaying(true);
+        musicStarted.current = true;
+      }).catch(() => {});
+    }
+  };
 
   const handleSectionScroll = (id: string) => {
     const ref = previewRefs[id as keyof typeof previewRefs];
@@ -159,6 +207,32 @@ const App: React.FC = () => {
       .confetti.c4 { background: #FFFFBA; border-radius: 50%; width: 5px; height: 5px; }
       .confetti.c5 { background: #E8BAFF; border-radius: 1px; }
       @keyframes confetti-fall { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(-10px); } 75% { transform: rotate(300deg) translateX(12px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
+
+      .music-float-btn {
+        position: sticky;
+        top: 12px;
+        float: right;
+        margin-right: 12px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--wedding-border);
+        background: var(--wedding-card-bg);
+        color: var(--wedding-main);
+        font-size: 1.1em;
+        cursor: pointer;
+        z-index: 100;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .music-float-btn:hover {
+        background: var(--wedding-main);
+        color: white;
+        border-color: var(--wedding-main);
+      }
     `}</style>
   );
 
@@ -243,26 +317,41 @@ const App: React.FC = () => {
           ))}
         </div>
       )}
+      {data.bgMusicUrl && (
+        <button className="music-float-btn" onClick={toggleMusic}>
+          {isMusicPlaying ? '⏸' : '▶'}
+        </button>
+      )}
       <div ref={previewRefs.theme} />
       <div ref={previewRefs.design} />
       <div ref={previewRefs.basic}><Hero data={data} /></div>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.greeting}><Greeting data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><Calendar data={data} /></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.message}><PersonalMessage data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><div ref={previewRefs.interview}><Interview data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><div ref={previewRefs.photos}><Gallery data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.timeline}><Timeline data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.location}><Location data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><div ref={previewRefs.rsvp}><RSVPForm data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={previewRefs.accounts}><Money data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={100}><div ref={previewRefs.contacts}><Contacts data={data} /></div></ScrollReveal>
-      <ScrollReveal effect={data.scrollEffect || 'none'} delay={0}><div ref={(el) => { (previewRefs.share as any).current = el; (previewRefs.music as any).current = el; }}><Share data={data} /></div></ScrollReveal>
+      {(data.sectionOrder || ['greeting','calendar','message','interview','photos','timeline','location','rsvp','accounts','contacts','share']).map((id, i) => {
+        const eff = data.scrollEffect || 'none';
+        const delay = i % 2 === 0 ? 0 : 100;
+        switch (id) {
+          case 'greeting': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.greeting}><Greeting data={data} /></div></ScrollReveal>;
+          case 'calendar': return <ScrollReveal key={id} effect={eff} delay={delay}><Calendar data={data} /></ScrollReveal>;
+          case 'message': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.message}><PersonalMessage data={data} /></div></ScrollReveal>;
+          case 'interview': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.interview}><Interview data={data} /></div></ScrollReveal>;
+          case 'photos': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.photos}><Gallery data={data} /></div></ScrollReveal>;
+          case 'timeline': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.timeline}><Timeline data={data} /></div></ScrollReveal>;
+          case 'location': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.location}><Location data={data} /></div></ScrollReveal>;
+          case 'rsvp': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.rsvp}><RSVPForm data={data} /></div></ScrollReveal>;
+          case 'accounts': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.accounts}><Money data={data} /></div></ScrollReveal>;
+          case 'contacts': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={previewRefs.contacts}><Contacts data={data} /></div></ScrollReveal>;
+          case 'share': return <ScrollReveal key={id} effect={eff} delay={delay}><div ref={(el) => { (previewRefs.share as any).current = el; (previewRefs.music as any).current = el; }}><Share data={data} /></div></ScrollReveal>;
+          default: return null;
+        }
+      })}
     </div>
   );
+
+  const audioElement = data.bgMusicUrl ? <audio ref={audioRef} src={data.bgMusicUrl} loop preload="auto" /> : null;
 
   if (isFullPreview) {
     return (
       <div className="full-preview-container" style={{ fontFamily: data.fontFamily }} ref={fullPreviewScrollRef}>
+        {audioElement}
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
         {sharedStyles}
         <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>🛠️ 편집기로 돌아가기</button>
@@ -311,6 +400,7 @@ const App: React.FC = () => {
 
   return (
     <div className="builder-layout">
+      {audioElement}
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
       {sharedStyles}
       

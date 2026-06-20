@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, ChevronUp, ChevronDown, Clock, Palette, Info, MessageSquare, Heart, MapPin, Phone, CreditCard, Image as ImageIcon, ChevronRight, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown, Clock, Palette, Info, MessageSquare, Heart, MapPin, Phone, CreditCard, Image as ImageIcon, ChevronRight, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered } from 'lucide-react';
 import { InvitationData, TimelineEvent, InterviewQA } from '../../types';
 
 declare global {
@@ -29,6 +29,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     interview: React.useRef<HTMLDivElement>(null),
     rsvp: React.useRef<HTMLDivElement>(null),
     share: React.useRef<HTMLDivElement>(null),
+    order: React.useRef<HTMLDivElement>(null),
     music: React.useRef<HTMLDivElement>(null),
   };
 
@@ -48,6 +49,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     interview: false,
     rsvp: false,
     share: false,
+    order: false,
     music: false,
   });
   
@@ -99,7 +101,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     setExpandedSections(prev => ({ ...prev, [id]: true }));
     
     // Sync with preview (skip for non-preview sections)
-    if (onSectionClick && id !== 'share') onSectionClick(id);
+    if (onSectionClick && id !== 'share' && id !== 'order' && id !== 'music') onSectionClick(id);
     
     setTimeout(() => {
       ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -401,6 +403,31 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     onChange({ ...data, interview: (data.interview || []).filter(q => q.id !== id) });
   };
 
+  const defaultOrder = ['greeting','calendar','message','interview','photos','timeline','location','rsvp','accounts','contacts','share'];
+  const sectionOrder = data.sectionOrder && data.sectionOrder.length > 0 ? data.sectionOrder : defaultOrder;
+
+  const sectionLabels: Record<string, string> = {
+    greeting: '인사말',
+    calendar: '캘린더',
+    message: '신랑/신부 한마디',
+    interview: '인터뷰',
+    photos: '갤러리',
+    timeline: '타임라인',
+    location: '장소',
+    rsvp: '참석의사',
+    accounts: '계좌정보',
+    contacts: '연락처',
+    share: '공유',
+  };
+
+  const moveSection = (index: number, dir: -1 | 1) => {
+    const newOrder = [...sectionOrder];
+    const target = index + dir;
+    if (target < 0 || target >= newOrder.length) return;
+    [newOrder[index], newOrder[target]] = [newOrder[target], newOrder[index]];
+    onChange({ ...data, sectionOrder: newOrder });
+  };
+
   const fonts = [
     { name: '기본 (Pretendard)', value: "'Pretendard', sans-serif" },
     { name: 'Cormorant Garamond (럭셔리 세리프)', value: "'Cormorant Garamond', serif" },
@@ -425,6 +452,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     { id: 'location', name: '장소', icon: <MapPin size={18} />, ref: sectionRefs.location },
     { id: 'rsvp', name: '참석의사', icon: <CalendarCheck size={18} />, ref: sectionRefs.rsvp },
     { id: 'accounts', name: '계좌', icon: <CreditCard size={18} />, ref: sectionRefs.accounts },
+    { id: 'order', name: '순서관리', icon: <ListOrdered size={18} />, ref: sectionRefs.order },
     { id: 'music', name: '배경음악', icon: <Music size={18} />, ref: sectionRefs.music },
   ];
 
@@ -1088,6 +1116,38 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             )}
           </div>
 
+          {/* Order Section */}
+          <div className={`editor-section-card ${expandedSections.order ? 'expanded' : ''}`} ref={sectionRefs.order}>
+            <div className="section-header" onClick={() => toggleSection('order')}>
+              <div className="header-left">
+                <ListOrdered size={20} />
+                <h3>순서 관리</h3>
+              </div>
+              <ChevronRight size={18} className="collapse-icon" />
+            </div>
+            {expandedSections.order && (
+              <div className="section-content">
+                <p className="section-desc">미리보기에 표시되는 섹션 순서를 변경할 수 있습니다.</p>
+                <div className="order-list">
+                  {sectionOrder.map((id, index) => (
+                    <div key={id} className="order-item">
+                      <span className="order-num">{index + 1}</span>
+                      <span className="order-label">{sectionLabels[id] || id}</span>
+                      <div className="order-btns">
+                        <button type="button" className="order-btn" disabled={index === 0} onClick={() => moveSection(index, -1)}>
+                          <ChevronUp size={16} />
+                        </button>
+                        <button type="button" className="order-btn" disabled={index === sectionOrder.length - 1} onClick={() => moveSection(index, 1)}>
+                          <ChevronDown size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Music Section */}
           <div className={`editor-section-card ${expandedSections.music ? 'expanded' : ''}`} ref={sectionRefs.music}>
             <div className="section-header" onClick={() => toggleSection('music')}>
@@ -1224,6 +1284,14 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
         .account-style-btn strong { font-size: 0.88rem; color: #1F2937; }
         .account-style-btn.active strong { color: #D4A5C6; }
         .account-style-btn span { font-size: 0.78rem; color: #9CA3AF; }
+        .order-list { display: flex; flex-direction: column; gap: 6px; }
+        .order-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 12px; }
+        .order-num { width: 24px; height: 24px; border-radius: 50%; background: #D4A5C6; color: white; font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .order-label { flex: 1; font-size: 0.88rem; font-weight: 700; color: #1F2937; }
+        .order-btns { display: flex; gap: 4px; }
+        .order-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #E5E7EB; background: white; color: #6B7280; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; padding: 0; }
+        .order-btn:hover:not(:disabled) { background: #F3F4F6; color: #D4A5C6; border-color: #D4A5C6; }
+        .order-btn:disabled { opacity: 0.3; cursor: default; }
         .rsvp-info-box { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 14px; padding: 18px 20px; }
         .rsvp-info-box p { margin: 0 0 6px 0; font-size: 0.85rem; color: #6B7280; line-height: 1.6; }
         .rsvp-info-box p:last-child { margin-bottom: 0; }
