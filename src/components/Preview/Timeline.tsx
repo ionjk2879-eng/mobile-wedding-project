@@ -16,8 +16,7 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
       <h2>{data.language === 'en' ? 'Our Story' : '우리의 이야기'}</h2>
 
       <button type="button" className={`timeline-toggle ${open ? 'open' : ''}`} onClick={() => setOpen(!open)}>
-        <span>{open ? (data.language === 'en' ? 'Close' : '닫기') : (data.language === 'en' ? 'View Our Story' : '이야기 보기')}</span>
-        <span className="timeline-toggle-arrow">{open ? '−' : '+'}</span>
+        {open ? (data.language === 'en' ? 'Close' : '닫기') : (data.language === 'en' ? 'View Our Story' : '이야기 보기')}
       </button>
 
       <div className={`timeline-body ${open ? 'open' : ''}`}>
@@ -45,30 +44,28 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
           z-index: 2;
         }
         .timeline-toggle {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px 20px;
-          background: var(--wedding-card-bg);
-          border: 1px solid var(--wedding-border);
-          border-radius: 14px;
+          display: inline-block;
+          padding: 12px 32px;
+          background: var(--wedding-main);
+          border: none;
+          border-radius: 30px;
           font-size: 0.9em;
           font-weight: 700;
-          color: var(--wedding-text-main);
+          color: white;
           cursor: pointer;
           transition: all 0.25s;
+          margin-bottom: 4px;
+          box-shadow: 0 4px 12px color-mix(in srgb, var(--wedding-main) 30%, transparent);
+        }
+        .timeline-toggle:hover {
+          filter: brightness(0.9);
+          transform: translateY(-1px);
         }
         .timeline-toggle.open {
-          border-radius: 14px 14px 0 0;
-          border-bottom-color: transparent;
-          color: var(--wedding-main);
-        }
-        .timeline-toggle-arrow {
-          font-size: 1.2em;
-          font-weight: 400;
-          color: var(--wedding-main);
-          line-height: 1;
+          background: var(--wedding-bg);
+          color: var(--wedding-text-sub);
+          border: 1px solid var(--wedding-border);
+          box-shadow: none;
         }
         .timeline-body {
           max-height: 0;
@@ -80,13 +77,7 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
         }
         .timeline-track {
           position: relative;
-          padding: 20px 0;
-          border: 1px solid var(--wedding-border);
-          border-top: none;
-          border-radius: 0 0 14px 14px;
-          background: var(--wedding-bg);
-          padding-left: 14px;
-          padding-right: 14px;
+          padding: 24px 0 4px;
         }
         .timeline-track::before {
           content: '';

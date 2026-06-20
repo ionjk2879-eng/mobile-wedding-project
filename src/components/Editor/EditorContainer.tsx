@@ -420,7 +420,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
     { id: 'greeting', name: '인사말', icon: <MessageSquare size={18} />, ref: sectionRefs.greeting },
     { id: 'message', name: '한마디', icon: <Heart size={18} />, ref: sectionRefs.message },
     { id: 'interview', name: '인터뷰', icon: <MessagesSquare size={18} />, ref: sectionRefs.interview },
-    { id: 'photos', name: '사진', icon: <ImageIcon size={18} />, ref: sectionRefs.photos },
+    { id: 'photos', name: '갤러리', icon: <ImageIcon size={18} />, ref: sectionRefs.photos },
     { id: 'timeline', name: '타임라인', icon: <Milestone size={18} />, ref: sectionRefs.timeline },
     { id: 'location', name: '장소', icon: <MapPin size={18} />, ref: sectionRefs.location },
     { id: 'rsvp', name: '참석의사', icon: <CalendarCheck size={18} />, ref: sectionRefs.rsvp },
@@ -891,7 +891,7 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
             <div className="section-header" onClick={() => toggleSection('photos')}>
               <div className="header-left">
                 <ImageIcon size={20} />
-                <h3>사진 관리</h3>
+                <h3>갤러리 관리</h3>
               </div>
               <ChevronRight size={18} className="collapse-icon" />
             </div>
@@ -913,7 +913,20 @@ const EditorContainer: React.FC<EditorProps> = ({ data, onChange, onSectionClick
                       </label>
                     )}
                   </div>
-                  <div className="photo-label" style={{ marginTop: '30px' }}>갤러리 (다중 선택 가능)</div>
+                  <div className="photo-label" style={{ marginTop: '30px' }}>갤러리 연출 방식</div>
+                  <div className="account-style-grid" style={{ marginBottom: '20px' }}>
+                    {[
+                      { key: 'grid', name: '그리드', desc: '사진을 격자로 나열' },
+                      { key: 'style2', name: '슬라이드', desc: '한 장씩 좌우로 넘기기' },
+                      { key: 'style3', name: '메이슨리', desc: '가로세로 느낌을 살린 배치' },
+                    ].map(s => (
+                      <button key={s.key} type="button" className={`account-style-btn ${data.galleryStyle === s.key ? 'active' : ''}`} onClick={() => onChange({ ...data, galleryStyle: s.key as any })}>
+                        <strong>{s.name}</strong>
+                        <span>{s.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="photo-label">갤러리 사진 (다중 선택 가능)</div>
                   <div className="modern-gallery-grid">
                     <label className="add-photo-card"><div className="plus">+</div><span>사진 추가</span><input type="file" multiple accept="image/*" onChange={handlePhotoUpload} hidden /></label>
                     {data.photos.map((photo, index) => (
