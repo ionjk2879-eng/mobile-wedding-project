@@ -215,7 +215,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
             onMouseUp={lbDrag.onEnd}
             onMouseLeave={lbDrag.onEnd}
           >
-            <div className="lightbox-slide-track" ref={lbTrackRef} style={{ transform: `translateX(-${selectedIndex * 100}%)` }}>
+            <div className="lightbox-slide-track" ref={lbTrackRef} style={{ transform: `translateX(-${(selectedIndex ?? 0) * 100}%)` }}>
               {data.photos.map((src, i) => (
                 <div key={i} className="lightbox-slide-item">
                   <img src={src} alt={`Full ${i + 1}`} draggable="false" />
@@ -223,7 +223,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
               ))}
             </div>
           </div>
-          <div className="index-indicator">{selectedIndex + 1} / {data.photos.length}</div>
+          <div className="index-indicator">{selectedIndex! + 1} / {data.photos.length}</div>
         </div>
       )}
 

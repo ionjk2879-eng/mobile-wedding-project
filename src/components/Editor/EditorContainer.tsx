@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate } from 'lucide-react';
+import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen } from 'lucide-react';
 import '../../styles/editor.css';
 import SectionCard from './SectionCard';
 import ShareSection from './sections/ShareSection';
@@ -17,6 +17,7 @@ import RSVPSection from './sections/RSVPSection';
 import AccountsSection from './sections/AccountsSection';
 import MusicSection from './sections/MusicSection';
 import OrderSection from './sections/OrderSection';
+import GuestbookSection from './sections/GuestbookSection';
 
 interface EditorProps {
   onSectionClick?: (id: string) => void;
@@ -37,6 +38,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     timeline: React.useRef<HTMLDivElement>(null),
     interview: React.useRef<HTMLDivElement>(null),
     rsvp: React.useRef<HTMLDivElement>(null),
+    guestbook: React.useRef<HTMLDivElement>(null),
     share: React.useRef<HTMLDivElement>(null),
     order: React.useRef<HTMLDivElement>(null),
     music: React.useRef<HTMLDivElement>(null),
@@ -48,7 +50,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     hero: false, theme: true, design: true, basic: true,
     greeting: false, message: false, location: false, contacts: false,
     accounts: false, photos: false, timeline: false, interview: false,
-    rsvp: false, share: false, order: false, music: false,
+    rsvp: false, guestbook: false, share: false, order: false, music: false,
   });
 
   const isScrollingRef = React.useRef(false);
@@ -105,6 +107,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     { id: 'timeline', name: '타임라인', icon: <Milestone size={18} />, ref: sectionRefs.timeline },
     { id: 'location', name: '장소', icon: <MapPin size={18} />, ref: sectionRefs.location },
     { id: 'rsvp', name: '참석의사', icon: <CalendarCheck size={18} />, ref: sectionRefs.rsvp },
+    { id: 'guestbook', name: '방명록', icon: <BookOpen size={18} />, ref: sectionRefs.guestbook },
     { id: 'accounts', name: '계좌', icon: <CreditCard size={18} />, ref: sectionRefs.accounts },
     { id: 'music', name: '배경음악', icon: <Music size={18} />, ref: sectionRefs.music },
     { id: 'order', name: '순서관리', icon: <ListOrdered size={18} />, ref: sectionRefs.order },
@@ -123,6 +126,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     { id: 'timeline', title: '타임라인', icon: <Milestone size={20} />, content: <TimelineSection /> },
     { id: 'location', title: '장소 및 교통 정보', icon: <MapPin size={20} />, content: <LocationSection /> },
     { id: 'rsvp', title: '참석의사 (RSVP)', icon: <CalendarCheck size={20} />, content: <RSVPSection /> },
+    { id: 'guestbook', title: '방명록', icon: <BookOpen size={20} />, content: <GuestbookSection /> },
     { id: 'accounts', title: '계좌 정보', icon: <CreditCard size={20} />, content: <AccountsSection /> },
     { id: 'music', title: '배경음악', icon: <Music size={20} />, content: <MusicSection /> },
     { id: 'order', title: '순서 관리', icon: <ListOrdered size={20} />, content: <OrderSection /> },

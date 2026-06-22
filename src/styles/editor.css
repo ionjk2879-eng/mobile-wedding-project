@@ -32,13 +32,13 @@
 
 /* Basic info cards */
 .basic-cards { display: flex; flex-direction: column; gap: 16px; }
-.basic-card { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 16px; overflow: hidden; }
-.basic-card-header { padding: 14px 20px; border-bottom: 1px solid #F0F2F5; }
+.basic-card { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 16px; }
+.basic-card-header { padding: 14px 20px; border-bottom: 1px solid #F0F2F5; border-radius: 16px 16px 0 0; }
 .basic-card-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 .basic-field label { display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 8px; }
 .basic-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.person-type { display: inline-block; background: #EFF6FF; color: #3B82F6; padding: 5px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
-.person-type.bride { background: #FFF1F2; color: #F43F5E; }
+.person-type { display: inline-block; color: #3B82F6; padding: 5px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; border: none; background: #EFF6FF; }
+.person-type.bride { color: #F43F5E; background: #FEF2F3; }
 .person-type.date { background: #F0FDF4; color: #16A34A; }
 .date-time-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start; }
 .time-picker-flat { display: flex; align-items: center; gap: 4px; width: 100%; padding: 0; height: 48px; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; justify-content: center; }
@@ -68,7 +68,7 @@
 .input-group { margin-bottom: 25px; }
 .input-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #4B5563; margin-bottom: 10px; }
 .input-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.modern-input { width: 100%; padding: 14px 16px; border: 1px solid #E5E7EB; border-radius: 12px; background: #F9FAFB; color: #1F2937; font-size: 0.95rem; transition: all 0.2s; box-sizing: border-box; }
+.modern-input { width: 100%; padding: 14px 16px; border: 1px solid #E5E7EB; border-radius: 12px; background: #FFFFFF; color: #1F2937; font-size: 0.95rem; transition: all 0.2s; box-sizing: border-box; }
 .modern-input:focus { outline: none; border-color: #D4A5C6; background: #FFF; box-shadow: 0 0 0 4px rgba(212, 165, 198, 0.1); }
 .modern-input.readonly { background: #F3F4F6; cursor: default; color: #6B7280; }
 .modern-input.transparent { background: transparent; border-color: transparent; padding: 8px 12px; }
@@ -199,9 +199,10 @@
 .modern-list-item.col { flex-direction: column; align-items: stretch; padding: 15px; }
 .role-tag { background: #FCE7F3; color: #D4A5C6; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; white-space: nowrap; }
 .photo-label { font-size: 0.8rem; font-weight: 800; color: #9CA3AF; text-transform: uppercase; margin-bottom: 12px; }
-.modern-hero-upload { position: relative; width: 100%; min-height: 180px; border-radius: 20px; overflow: hidden; background: #F3F4F6; display: flex; align-items: center; justify-content: center; }
+.modern-hero-upload { position: relative; width: 100%; min-height: 180px; border-radius: 20px; display: flex; align-items: center; justify-content: center; }
+.modern-hero-upload:has(img) { overflow: hidden; background: #F3F4F6; }
 .modern-hero-upload img { width: 100%; display: block; }
-.hero-empty-upload { width: 100%; min-height: 180px; display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #9CA3AF; cursor: pointer; border: 2px dashed #D1D5DB; border-radius: 20px; transition: all 0.2s; box-sizing: border-box; }
+.hero-empty-upload { width: 100%; min-height: 180px; display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #9CA3AF; cursor: pointer; border: 2px dashed #D1D5DB; border-radius: 20px; transition: all 0.2s; box-sizing: border-box; background: #F9FAFB; }
 .hero-empty-upload:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
 .hero-empty-upload span { font-size: 0.85rem; font-weight: 700; }
 .change-btn { position: absolute; bottom: 20px; right: 20px; background: white; color: #111827; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }

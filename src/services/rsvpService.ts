@@ -1,21 +1,11 @@
-import { collection, addDoc, getDocs, setDoc, doc, query, orderBy, where, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from './index';
 import { RSVPResponse } from '../types';
 
 export const submitRSVP = async (slug: string, formData: Omit<RSVPResponse, 'id' | 'createdAt'>) => {
-  const rsvpRef = collection(db, `invitations/${slug}/rsvp`);
-  const existing = await getDocs(query(rsvpRef, where('guestName', '==', formData.guestName)));
-  if (!existing.empty) {
-    const existingDoc = existing.docs[0];
-    await setDoc(doc(db, `invitations/${slug}/rsvp`, existingDoc.id), {
-      ...formData,
-      createdAt: existingDoc.data().createdAt,
-      updatedAt: serverTimestamp(),
-    });
-    return 'updated';
-  }
-  await addDoc(rsvpRef, { ...formData, createdAt: serverTimestamp() });
-  return 'created';
+  const docId = formData.guestName.trim().replace(/\s+/g, '_');
+  const ref = doc(db, `invitations/${slug}/rsvp`, docId);
+  await setDoc(ref, { ...formData, createdAt: serverTimestamp() }, { merge: true });
 };
 
 export const fetchRSVPResponses = async (slug: string): Promise<RSVPResponse[]> => {

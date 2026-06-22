@@ -33,6 +33,7 @@ export interface GuestMessage {
   id: string;
   name: string;
   content: string;
+  password: string;
   createdAt: string;
 }
 
@@ -85,6 +86,8 @@ export interface ContentData {
 
 export interface FeatureConfig {
   isRSVPEnabled: boolean;
+  isGuestbookEnabled: boolean;
+  guestbookPassword: string;
   bgMusicUrl: string;
   sectionOrder: string[];
   language: 'ko' | 'en';

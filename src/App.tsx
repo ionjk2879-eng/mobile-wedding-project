@@ -5,19 +5,37 @@ import ToastContainer from './components/Toast';
 import { ScrollRootContext } from './components/Preview/ScrollReveal';
 import useInvitationStore from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
-import { saveInvitation, checkSlugAvailable } from './firebase';
-import { getFirebaseErrorMessage, withRetry } from './utils/firebaseError';
-import { Edit3, Eye, Loader2 } from 'lucide-react';
+import { saveInvitation, checkSlugAvailable, loadInvitation } from './firebase';
+import { getFirebaseErrorMessage } from './utils/firebaseError';
+import { Edit3, Eye, Save, ExternalLink, ClipboardList } from 'lucide-react';
 import './styles/effects.css';
 import './styles/builder.css';
 
 const App: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
+  const setData = useInvitationStore((s) => s.setData);
   const [isFullPreview, setIsFullPreview] = useState(false);
   const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [loadingData, setLoadingData] = useState(true);
   const hasSavedOnceRef = useRef(false);
+
+  const loadedRef = useRef(false);
+  useEffect(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+    const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
+    const lastSlug = mySlugs[mySlugs.length - 1];
+    if (!lastSlug) { setLoadingData(false); return; }
+    loadInvitation(lastSlug).then((saved) => {
+      if (saved) {
+        setData(saved);
+        hasSavedOnceRef.current = true;
+        toast.info(`'${lastSlug}' 청첩장을 불러왔습니다.`);
+      }
+    }).catch(() => {}).finally(() => setLoadingData(false));
+  }, []);
   const saveStatusRef = useRef(saveStatus);
   saveStatusRef.current = saveStatus;
   const dataRef = useRef(data);
@@ -34,14 +52,14 @@ const App: React.FC = () => {
       const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
       const isOwner = mySlugs.includes(d.slug);
       if (!isOwner) {
-        const available = await withRetry(() => checkSlugAvailable(d.slug));
+        const available = await checkSlugAvailable(d.slug);
         if (!available) {
           if (!silent) toast.warning('이미 사용 중인 주소입니다. 다른 주소를 입력해주세요.');
           setSaveStatus('idle');
           return;
         }
       }
-      await withRetry(() => saveInvitation(d.slug, d));
+      await saveInvitation(d.slug, d);
       if (!isOwner) {
         mySlugs.push(d.slug);
         localStorage.setItem('sonett_my_slugs', JSON.stringify(mySlugs));
@@ -79,6 +97,7 @@ const App: React.FC = () => {
     timeline: React.useRef<HTMLDivElement>(null),
     location: React.useRef<HTMLDivElement>(null),
     rsvp: React.useRef<HTMLDivElement>(null),
+    guestbook: React.useRef<HTMLDivElement>(null),
     contacts: React.useRef<HTMLDivElement>(null),
     accounts: React.useRef<HTMLDivElement>(null),
     share: React.useRef<HTMLDivElement>(null),
@@ -86,6 +105,14 @@ const App: React.FC = () => {
   };
   const previewScrollRef = React.useRef<HTMLDivElement>(null);
   const fullPreviewScrollRef = React.useRef<HTMLDivElement>(null);
+
+  if (loadingData) {
+    return (
+      <div style={{ width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", color: '#9CA3AF' }}>
+        <p>불러오는 중...</p>
+      </div>
+    );
+  }
 
   const handleSectionScroll = (id: string) => {
     const ref = previewRefs[id as keyof typeof previewRefs];
@@ -124,8 +151,8 @@ const App: React.FC = () => {
         <div className={`editor-panel ${mobileView === 'preview' ? 'mobile-hidden' : ''}`}>
           <header className="builder-header">
             <div className="header-main">
-              <h1>Sonett</h1>
-              <p>소중한 순간을 아름답게, 소네트 모바일 청첩장</p>
+              <h1 className="header-logo">Sonett</h1>
+              <p className="header-desc">소네트 모바일 청첩장</p>
             </div>
             <div className="header-btns">
               <button className="save-btn" disabled={saveStatus === 'saving'} onClick={() => {
@@ -133,13 +160,14 @@ const App: React.FC = () => {
                 if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) { toast.warning('주소는 영문 소문자, 숫자, 하이픈만 사용 가능합니다.'); return; }
                 performSave(false);
               }}>
-                {saveStatus === 'saving' ? <><Loader2 size={16} className="spin" /> 저장 중...</> : saveStatus === 'success' ? '저장 완료!' : saveStatus === 'error' ? '저장 실패' : '저장하기'}
+                <Save size={15} />
+                {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
               </button>
               <button className={`autosave-toggle ${autoSaveEnabled ? 'active' : ''}`} onClick={() => setAutoSaveEnabled(!autoSaveEnabled)} title={autoSaveEnabled ? '자동 저장 켜짐' : '자동 저장 꺼짐'}>
-                {autoSaveEnabled ? '자동저장 ON' : '자동저장 OFF'}
+                {autoSaveEnabled ? 'Auto ON' : 'Auto OFF'}
               </button>
-              {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="view-btn">청첩장 보기</a>}
-              {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="admin-link-btn">응답 확인</a>}
+              {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-icon-btn" title="청첩장 보기"><ExternalLink size={16} /></a>}
+              {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-icon-btn" title="응답 확인"><ClipboardList size={16} /></a>}
             </div>
           </header>
           <EditorContainer onSectionClick={handleSectionScroll} />

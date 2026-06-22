@@ -1,98 +1,46 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { InvitationData, RSVPResponse } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
 import { submitRSVP } from '../../firebase';
 import { toast } from '../../stores/useToastStore';
 import { getFirebaseErrorMessage } from '../../utils/firebaseError';
-import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { PreviewOverlay } from '../../hooks/usePreviewPopup';
 
-interface PreviewProps {
-  data: InvitationData;
-}
+interface PreviewProps { data: InvitationData; }
 
 const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
-  
   const [formData, setFormData] = useState<Omit<RSVPResponse, 'id' | 'createdAt'>>({
-    guestName: '',
-    isAttending: true,
-    totalGuests: 1,
-    wantsMeal: true,
-    relation: 'groom',
-    message: ''
+    guestName: '', isAttending: true, totalGuests: 1, wantsMeal: true, relation: 'groom', message: ''
   });
-
   const [submitted, setSubmitted] = useState(false);
-  const [wasUpdated, setWasUpdated] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
-  const trapRef = useFocusTrap(formOpen);
-
-  useEffect(() => {
-    if (!formOpen || !sectionRef.current) return;
-    const scrollParent = sectionRef.current.closest('.preview-content-scroll');
-    if (scrollParent) {
-      const rect = scrollParent.getBoundingClientRect();
-      setPopupStyle({
-        position: 'fixed',
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height,
-      });
-    } else {
-      setPopupStyle({
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-      });
-    }
-  }, [formOpen]);
+  const sectionRef = useRef<HTMLElement>(null);
 
   if (!data.isRSVPEnabled) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      const slug = data.slug || 'default';
-      const result = await submitRSVP(slug, formData);
-      setWasUpdated(result === 'updated');
+      await submitRSVP(data.slug || 'default', formData);
       setSubmitted(true);
-    } catch (err) {
-      console.error('RSVP 전송 실패:', err);
-      toast.error(getFirebaseErrorMessage(err));
-    }
+      setFormOpen(false);
+    } catch (err) { toast.error(getFirebaseErrorMessage(err)); }
   };
 
   if (submitted) {
     return (
       <section className="rsvp-section section" aria-label="참석 의사">
-        <div className="success-message" role="status">
+        <div className="rsvp-success" role="status">
           <CheckCircle2 size={48} style={{ color: 'var(--wedding-main)' }} />
-          <h3>{isEn ? (wasUpdated ? 'Response Updated' : 'Response Submitted') : (wasUpdated ? '응답이 수정되었습니다' : '참석 응답이 전달되었습니다')}</h3>
-          <p>{isEn ? 'Thank you for your response.' : '소중한 응답 감사합니다.'}</p>
-          <button className="reset-btn" onClick={() => { setSubmitted(false); setWasUpdated(false); }}>
-            {isEn ? 'Edit Response' : '다시 입력하기'}
-          </button>
+          <h3>{isEn ? 'Response Submitted' : '참석 응답이 전달되었습니다'}</h3>
+          <p>{isEn ? 'Thank you.' : '소중한 응답 감사합니다.'}</p>
+          <button className="rsvp-reset" onClick={() => setSubmitted(false)}>{isEn ? 'Edit' : '다시 입력하기'}</button>
         </div>
         <style>{`
-          .success-message {
-            padding: 40px 20px;
-            background: var(--wedding-card-bg);
-            border-radius: 24px;
-            border: 1px solid var(--wedding-border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-          }
-          .success-message h3 { color: var(--wedding-main); margin: 0; }
-          .success-message p { color: var(--wedding-text-sub); margin: 0; }
-          .reset-btn { margin-top: 10px; font-size: 0.8em; color: var(--wedding-text-sub); text-decoration: underline; background: none; border: none; cursor: pointer; }
+          .rsvp-success { padding: 40px 20px; background: var(--wedding-card-bg); border-radius: 24px; border: 1px solid var(--wedding-border); display: flex; flex-direction: column; align-items: center; gap: 15px; }
+          .rsvp-success h3 { color: var(--wedding-main); margin: 0; } .rsvp-success p { color: var(--wedding-text-sub); margin: 0; }
+          .rsvp-reset { font-size: 0.8em; color: var(--wedding-text-sub); text-decoration: underline; background: none; border: none; cursor: pointer; }
         `}</style>
       </section>
     );
@@ -101,343 +49,59 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
     <section className="rsvp-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef} aria-label="참석 의사">
       <h2>RSVP</h2>
-      <p className="section-sub">참석 여부를 알려주세요</p>
-      <p className="rsvp-desc">
-        {isEn
-          ? 'Please let us know if you can join us\nby providing your name below.'
-          : '축하의 마음으로 참석해주시는\n모든 분들의 성함을 남겨주세요.'}
+      <p className="section-sub">{isEn ? 'Please let us know' : '참석 여부를 알려주세요'}</p>
+      <p style={{ fontSize: '0.9em', color: 'var(--wedding-text-sub)', lineHeight: 1.6, marginBottom: 24, whiteSpace: 'pre-line' }}>
+        {isEn ? 'Please let us know if you can join us\nby providing your name below.' : '축하의 마음으로 참석해주시는\n모든 분들의 성함을 남겨주세요.'}
       </p>
-
-      <button type="button" className="rsvp-open-btn" onClick={() => setFormOpen(true)}>
+      <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>
         {isEn ? 'Submit RSVP' : '참석 의사 전달하기'}
       </button>
 
-      {formOpen && (
-      <div className="rsvp-overlay" style={popupStyle} onClick={(e) => { if (e.target === e.currentTarget) setFormOpen(false); }}>
-      <div className="rsvp-modal" role="dialog" aria-modal="true" aria-label="참석 의사 전달" ref={trapRef}
-        onKeyDown={(e) => { if (e.key === 'Escape') setFormOpen(false); }}
-      >
-        <button type="button" className="rsvp-close-btn" onClick={() => setFormOpen(false)} aria-label="닫기">×</button>
-        <div className="rsvp-modal-scroll">
-        <div className="rsvp-modal-header">
-          <h3>RSVP</h3>
-          <p>참석 여부를 알려주세요</p>
-        </div>
-      <form className="rsvp-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="section-label">{isEn ? 'Side' : '구분'}</label>
-          <div className="tab-group">
-            <button 
-              type="button" 
-              className={`tab-btn ${formData.relation === 'groom' ? 'active' : ''}`}
-              onClick={() => setFormData({...formData, relation: 'groom'})}
-            >
-              {isEn ? "Groom's" : '신랑측'}
-            </button>
-            <button 
-              type="button" 
-              className={`tab-btn ${formData.relation === 'bride' ? 'active' : ''}`}
-              onClick={() => setFormData({...formData, relation: 'bride'})}
-            >
-              {isEn ? "Bride's" : '신부측'}
-            </button>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label className="section-label">{isEn ? 'Attendance' : '참석 여부'}</label>
-          <div className="attendance-toggle">
-            <button 
-              type="button" 
-              className={`toggle-btn ${formData.isAttending ? 'active' : ''}`}
-              onClick={() => setFormData({...formData, isAttending: true})}
-            >
-              {isEn ? 'Attending' : '참석합니다'}
-            </button>
-            <button 
-              type="button" 
-              className={`toggle-btn ${!formData.isAttending ? 'active-refuse' : ''}`}
-              onClick={() => setFormData({...formData, isAttending: false})}
-            >
-              {isEn ? 'Unable to Attend' : '참석이 어렵습니다'}
-            </button>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <input 
-            type="text" 
-            placeholder={isEn ? "Guest Name" : "성함을 입력해 주세요"} 
-            className="rsvp-input"
-            required
-            value={formData.guestName}
-            onChange={(e) => setFormData({...formData, guestName: e.target.value})}
-          />
-        </div>
-
-        {formData.isAttending && (
-          <div className="form-row">
-            <div className="form-group flex-1">
-              <label><Users size={14} /> {isEn ? 'Number of Guests' : '동반 인원'}</label>
-              <select 
-                className="rsvp-select"
-                value={formData.totalGuests}
-                onChange={(e) => setFormData({...formData, totalGuests: parseInt(e.target.value)})}
-              >
-                {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}{isEn ? '' : '명'} ({isEn ? 'incl. self' : '본인포함'})</option>)}
-              </select>
-            </div>
-            <div className="form-group flex-1">
-              <label><Utensils size={14} /> {isEn ? 'Meal' : '식사 여부'}</label>
-              <select 
-                className="rsvp-select"
-                value={formData.wantsMeal ? 'yes' : 'no'}
-                onChange={(e) => setFormData({...formData, wantsMeal: e.target.value === 'yes'})}
-              >
-                <option value="yes">{isEn ? 'Will eat' : '식사 함'}</option>
-                <option value="no">{isEn ? "Won't eat" : '식사 안함'}</option>
-              </select>
+      <PreviewOverlay open={formOpen} onClose={() => setFormOpen(false)} anchorRef={sectionRef} title={isEn ? 'RSVP' : '참석 여부를 알려주세요'}>
+        <form onSubmit={handleSubmit}>
+          <div className="pf-group">
+            <label className="pf-label">{isEn ? 'Side' : '구분'}</label>
+            <div className="pf-tabs">
+              <button type="button" className={`pf-tab ${formData.relation === 'groom' ? 'active' : ''}`} onClick={() => setFormData({...formData, relation: 'groom'})}>{isEn ? "Groom's" : '신랑측'}</button>
+              <button type="button" className={`pf-tab ${formData.relation === 'bride' ? 'active' : ''}`} onClick={() => setFormData({...formData, relation: 'bride'})}>{isEn ? "Bride's" : '신부측'}</button>
             </div>
           </div>
-        )}
-
-        <div className="form-group">
-          <textarea 
-            placeholder={
-              formData.isAttending 
-                ? (isEn ? "Congratulatory Message (Optional)" : "축하 메시지 (선택사항)") 
-                : (isEn ? "Share your warm wishes" : "축하 메시지 및 아쉬운 마음을 전해주세요")
-            } 
-            className="rsvp-textarea"
-            rows={3}
-            value={formData.message}
-            onChange={(e) => setFormData({...formData, message: e.target.value})}
-          />
-        </div>
-
-        <button type="submit" className="submit-btn">
-          {formData.isAttending ? (isEn ? 'Submit' : '참석 의사 전달하기') : (isEn ? 'Submit' : '답변 전달하기')}
-        </button>
-      </form>
-      </div>
-      </div>
-      </div>
-      )}
+          <div className="pf-group">
+            <label className="pf-label">{isEn ? 'Attendance' : '참석 여부'}</label>
+            <div className="pf-tabs">
+              <button type="button" className={`pf-tab ${formData.isAttending ? 'active' : ''}`} onClick={() => setFormData({...formData, isAttending: true})}>{isEn ? 'Attending' : '참석합니다'}</button>
+              <button type="button" className={`pf-tab refuse ${!formData.isAttending ? 'active' : ''}`} onClick={() => setFormData({...formData, isAttending: false})}>{isEn ? 'Unable' : '불참'}</button>
+            </div>
+          </div>
+          <div className="pf-group">
+            <label className="pf-label">{isEn ? 'Name' : '성함'}</label>
+            <input type="text" className="pf-input" required value={formData.guestName} onChange={(e) => setFormData({...formData, guestName: e.target.value})} placeholder={isEn ? 'Guest Name' : '성함을 입력해주세요'} />
+          </div>
+          {formData.isAttending && (
+            <div className="pf-row">
+              <div className="pf-group"><label className="pf-label"><Users size={14} /> {isEn ? 'Guests' : '인원'}</label>
+                <select className="pf-input" value={formData.totalGuests} onChange={(e) => setFormData({...formData, totalGuests: parseInt(e.target.value)})}>{[1,2,3,4,5].map(n => <option key={n} value={n}>{n}{isEn ? '' : '명'}</option>)}</select>
+              </div>
+              <div className="pf-group"><label className="pf-label"><Utensils size={14} /> {isEn ? 'Meal' : '식사'}</label>
+                <select className="pf-input" value={formData.wantsMeal ? 'yes' : 'no'} onChange={(e) => setFormData({...formData, wantsMeal: e.target.value === 'yes'})}><option value="yes">{isEn ? 'Yes' : '식사 함'}</option><option value="no">{isEn ? 'No' : '식사 안함'}</option></select>
+              </div>
+            </div>
+          )}
+          <div className="pf-group">
+            <label className="pf-label">{isEn ? 'Message' : '메시지'}</label>
+            <textarea className="pf-input" rows={3} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} placeholder={isEn ? 'Message (optional)' : '축하 메시지 (선택사항)'} />
+          </div>
+          <button type="submit" className="pf-submit">{formData.isAttending ? (isEn ? 'Submit' : '참석 의사 전달하기') : (isEn ? 'Submit' : '답변 전달하기')}</button>
+        </form>
+      </PreviewOverlay>
 
       <style>{`
-        .rsvp-section {
-          background-color: transparent;
-        }
-        .rsvp-desc {
-          font-size: 0.9em;
-          color: var(--wedding-text-sub);
-          line-height: 1.6;
-          margin-bottom: 24px;
-          white-space: pre-line;
-        }
-        .rsvp-open-btn {
-          width: 100%;
-          padding: 16px;
-          background: var(--wedding-main);
-          color: white;
-          border: none;
-          border-radius: 30px;
-          font-size: 0.95em;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.25s;
-        }
-        .rsvp-open-btn:hover {
-          filter: brightness(0.9);
-          transform: translateY(-1px);
-        }
-        .rsvp-overlay {
-          background: rgba(0,0,0,0.45);
-          z-index: 10000;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          border-radius: inherit;
-          animation: rsvp-fade-in 0.2s ease;
-        }
-        @keyframes rsvp-fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .rsvp-modal {
-          position: relative;
-          width: 92%;
-          max-width: 400px;
-          max-height: 90%;
-          background: var(--wedding-bg, #fff);
-          border-radius: 20px;
-          overflow: hidden;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-          animation: rsvp-pop-in 0.3s ease;
-        }
-        @keyframes rsvp-pop-in {
-          from { opacity: 0; transform: scale(0.95) translateY(10px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .rsvp-modal-scroll {
-          max-height: calc(90vh - 40px);
-          overflow-y: auto;
-          padding: 0 20px 24px;
-          scrollbar-width: none;
-        }
-        .rsvp-modal-scroll::-webkit-scrollbar { display: none; }
-        .rsvp-modal-header {
-          text-align: center;
-          padding: 36px 0 24px;
-        }
-        .rsvp-modal-header h3 {
-          margin: 0 0 8px;
-          font-size: 0.8em;
-          font-weight: 600;
-          color: var(--wedding-text-sub);
-          letter-spacing: 4px;
-        }
-        .rsvp-modal-header p {
-          margin: 0;
-          font-size: 1.1em;
-          font-weight: 700;
-          color: var(--wedding-text-main);
-        }
-        .rsvp-close-btn {
-          position: absolute;
-          top: 14px;
-          right: 14px;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          border: none;
-          z-index: 2;
-          background: var(--wedding-border);
-          color: var(--wedding-text-sub);
-          font-size: 1.3em;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s;
-        }
-        .rsvp-close-btn:hover {
-          background: var(--wedding-main);
-          color: white;
-        }
-        .section-label {
-          display: block;
-          font-size: 0.75em;
-          font-weight: 700;
-          color: var(--wedding-main);
-          margin-bottom: 10px;
-        }
-        .attendance-toggle {
-          display: flex;
-          gap: 10px;
-        }
-        .toggle-btn {
-          flex: 1;
-          padding: 12px;
-          border-radius: 12px;
-          border: 1px solid var(--wedding-border);
-          background: var(--wedding-bg);
-          font-size: 0.85em;
-          color: var(--wedding-text-sub);
-          transition: all 0.2s;
-          cursor: pointer;
-        }
-        .toggle-btn.active {
-          background: var(--wedding-main);
-          color: white;
-          border-color: var(--wedding-main);
-          font-weight: 700;
-        }
-        .toggle-btn.active-refuse {
-          background: #8c8581;
-          color: white;
-          border-color: #8c8581;
-          font-weight: 700;
-        }
-        .rsvp-form {
-          text-align: left;
-        }
-        .form-group { margin-bottom: 20px; }
-        .form-row { display: flex; gap: 15px; }
-        .flex-1 { flex: 1; }
-        .form-group label {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 0.75em;
-          font-weight: 600;
-          color: var(--wedding-main);
-          margin-bottom: 8px;
-        }
-        .tab-group {
-          display: flex;
-          background: var(--wedding-bg);
-          padding: 4px;
-          border-radius: 12px;
-        }
-        .tab-btn {
-          flex: 1;
-          padding: 10px;
-          border-radius: 8px;
-          font-size: 0.85em;
-          color: var(--wedding-text-sub);
-          transition: all 0.2s;
-          border: none;
-          background: none;
-          cursor: pointer;
-        }
-        .tab-btn.active {
-          background: var(--wedding-card-bg);
-          color: var(--wedding-main);
-          font-weight: 700;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .rsvp-input, .rsvp-select, .rsvp-textarea {
-          width: 100%;
-          padding: 14px;
-          border: 1px solid var(--wedding-border);
-          border-radius: 12px;
-          background: var(--wedding-bg);
-          color: var(--wedding-text-body);
-          font-size: 0.9em;
-          box-sizing: border-box;
-          font-family: inherit;
-        }
-        .rsvp-input:focus, .rsvp-select:focus, .rsvp-textarea:focus {
-          outline: none;
-          border-color: var(--wedding-main);
-        }
-        .submit-btn {
-          width: 100%;
-          padding: 16px;
-          background: var(--wedding-main);
-          color: white;
-          border-radius: 30px;
-          font-weight: 700;
-          font-size: 1em;
-          margin-top: 10px;
-          transition: all 0.2s ease;
-          border: none;
-          cursor: pointer;
-        }
-        .submit-btn:hover { 
-          filter: brightness(0.9);
-          transform: translateY(-1px);
-        }
+        .rsvp-section { background-color: transparent; }
+        .pf-open-btn { width: 100%; padding: 16px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: all 0.25s; }
+        .pf-open-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
       `}</style>
     </section>
   );
-}, (prev, next) =>
-  prev.data.isRSVPEnabled === next.data.isRSVPEnabled
-  && prev.data.slug === next.data.slug
-  && prev.data.language === next.data.language
-  && prev.data.fontFamily === next.data.fontFamily
-);
+}, (prev, next) => prev.data.isRSVPEnabled === next.data.isRSVPEnabled && prev.data.slug === next.data.slug && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily);
 
 export default RSVPForm;

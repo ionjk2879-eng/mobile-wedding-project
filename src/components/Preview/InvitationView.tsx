@@ -12,6 +12,7 @@ import RSVPForm from './RSVPForm';
 import Money from './Money';
 import Contacts from './Contacts';
 import Share from './Share';
+import Guestbook from './Guestbook';
 import ScrollReveal from './ScrollReveal';
 import BackgroundEffects from './BackgroundEffects';
 import MusicPlayer from './MusicPlayer';
@@ -35,6 +36,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
     case 'rsvp': return wrap(<RSVPForm data={data} />);
     case 'accounts': return wrap(<Money data={data} />);
     case 'contacts': return wrap(<Contacts data={data} />);
+    case 'guestbook': return wrap(<Guestbook data={data} />);
     case 'share': return wrap(<Share data={data} />);
     default: return null;
   }

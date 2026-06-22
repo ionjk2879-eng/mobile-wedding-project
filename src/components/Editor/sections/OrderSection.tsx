@@ -5,7 +5,7 @@ import useInvitationStore from '../../../stores/useInvitationStore';
 const SECTION_LABELS: Record<string, string> = {
   greeting: '인사말', calendar: '캘린더', message: '신랑/신부 한마디', interview: '인터뷰',
   photos: '갤러리', timeline: '타임라인', location: '장소', rsvp: '참석의사',
-  accounts: '계좌정보', contacts: '연락처', share: '공유',
+  guestbook: '방명록', accounts: '계좌정보', contacts: '연락처', share: '공유',
 };
 
 const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'accounts', 'contacts', 'share'];

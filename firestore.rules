@@ -53,6 +53,23 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // 방명록 (서브컬렉션)
+    match /invitations/{slug}/guestbook/{docId} {
+      allow read: if true;
+
+      allow create: if true
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 50
+        && request.resource.data.content is string
+        && request.resource.data.content.size() > 0
+        && request.resource.data.content.size() <= 500
+        && request.resource.data.password is string
+        && request.resource.data.password.size() == 4;
+
+      allow delete: if true;
+    }
+
     // 그 외 모든 경로 차단
     match /{document=**} {
       allow read, write: if false;

@@ -56,8 +56,8 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
           border: 1px solid var(--wedding-border);
           box-shadow: 0 10px 30px rgba(74, 69, 67, 0.05);
         }
-        .groom { border-left: 4px solid var(--wedding-accent); border-right: none; }
-        .bride { border-right: 4px solid var(--wedding-main); border-left: none; }
+        .message-box.groom { border-left: 4px solid var(--wedding-accent); border-right: none; }
+        .message-box.bride { border-right: 4px solid var(--wedding-main); border-left: none; }
         .msg-profile-row.reverse { flex-direction: row; }
         .msg-profile-row.reverse .msg-content { text-align: center; }
         .msg-profile-row {

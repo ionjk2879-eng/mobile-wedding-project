@@ -2,29 +2,56 @@
 .builder-layout { height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; font-family: 'Pretendard', sans-serif; }
 .builder-main-container { display: flex; width: 100%; max-width: 1400px; height: 95vh; gap: 30px; padding: 0 20px; justify-content: center; }
 .editor-panel { flex: 0 0 700px; display: flex; flex-direction: column; background: #FFFFFF; border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid #E5E7EB; }
-.builder-header { padding: 24px 35px; border-bottom: 1px solid #F0F2F5; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; }
-.builder-header h1 { font-size: 1.4rem; font-weight: 800; margin: 0; color: #111827; }
-.builder-header p { font-size: 0.85rem; color: #6B7280; margin: 0; }
-.header-btns { display: flex; gap: 8px; }
-.save-btn { padding: 10px 20px; background: #D4A5C6; color: white; border: none; border-radius: 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+.builder-header { padding: 14px 24px; border-bottom: 1px solid #F0F2F5; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.header-main { min-width: 0; }
+.header-logo { font-size: 1.1rem; font-weight: 800; margin: 0; color: #111827; white-space: nowrap; }
+.header-desc { font-size: 0.75rem; color: #9CA3AF; margin: 2px 0 0; white-space: nowrap; }
+.header-btns { display: flex; gap: 6px; align-items: center; }
+.save-btn { padding: 8px 16px; background: #D4A5C6; color: white; border: none; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
 .save-btn:hover:not(:disabled) { filter: brightness(0.9); }
 .save-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 .save-btn .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.autosave-toggle { padding: 10px 14px; border: 1px solid #E5E7EB; border-radius: 12px; font-size: 0.78rem; font-weight: 700; color: #9CA3AF; background: #F9FAFB; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.autosave-toggle { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.75rem; font-weight: 700; color: #9CA3AF; background: #F9FAFB; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
 .autosave-toggle.active { color: #16A34A; border-color: #BBF7D0; background: #F0FDF4; }
-.view-btn, .admin-link-btn { padding: 10px 16px; border: 1px solid #E5E7EB; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #4B5563; text-decoration: none; transition: all 0.2s; display: flex; align-items: center; }
-.view-btn:hover, .admin-link-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
+.header-icon-btn { width: 36px; height: 36px; border: 1px solid #E5E7EB; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6B7280; text-decoration: none; transition: all 0.2s; background: #FFFFFF; }
+.header-icon-btn:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
 
 /* Preview panel */
 .preview-panel { flex: 0 0 450px; display: flex; flex-direction: column; height: 100%; justify-content: center; }
-.preview-container-box { width: 100%; height: 100%; background: white; border-radius: 28px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #E5E7EB; display: flex; flex-direction: column; }
+.preview-container-box { width: 100%; height: 100%; background: white; border-radius: 28px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #E5E7EB; display: flex; flex-direction: column; position: relative; }
 .preview-header-bar { display: flex; align-items: center; justify-content: space-between; padding: 15px 25px; border-bottom: 1px solid #F0F2F5; background: white; }
 .preview-label { font-size: 0.75rem; font-weight: 800; color: #B2A4B0; text-transform: uppercase; letter-spacing: 1.5px; }
 .full-preview-btn-mini { background: #F3F4F6; border: none; color: #4B5563; padding: 8px 18px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
 .full-preview-btn-mini:hover { background: #E5E7EB; color: #111827; }
-.preview-content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; }
+.preview-content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; }
 .preview-content-scroll::-webkit-scrollbar { display: none; }
+
+/* Preview overlay (portal to body, fixed over preview area) */
+.pv-overlay-root { animation: pv-overlay-in 0.2s ease; }
+@keyframes pv-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+.pv-overlay-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 24px; border-bottom: 1px solid var(--wedding-border, #F0F2F5);
+  flex-shrink: 0;
+}
+.pv-overlay-header span { font-size: 1em; font-weight: 700; color: var(--wedding-text-main, #1F2937); }
+.pv-overlay-header button { background: none; border: none; color: var(--wedding-text-sub, #6B7280); cursor: pointer; padding: 4px; font-size: 1.1em; display: flex; align-items: center; transition: color 0.2s; }
+.pv-overlay-header button:hover { color: var(--wedding-text-main, #1F2937); }
+.pv-overlay-body { padding: 24px; flex: 1; overflow-y: auto; }
+.pf-group { margin-bottom: 14px; }
+.pf-label { display: flex; align-items: center; gap: 5px; font-size: 0.72em; font-weight: 700; color: var(--wedding-main); margin-bottom: 6px; }
+.pf-input { width: 100%; padding: 12px; border: 1px solid var(--wedding-border); border-radius: 10px; background: var(--wedding-card-bg, #fff); color: var(--wedding-text-body); font-size: 0.88em; box-sizing: border-box; font-family: inherit; }
+.pf-input:focus { outline: none; border-color: var(--wedding-main); }
+.pf-row { display: flex; gap: 10px; }
+.pf-row .pf-group { flex: 1; }
+.pf-tabs { display: flex; gap: 8px; }
+.pf-tab { flex: 1; padding: 11px; border-radius: 10px; border: 1px solid var(--wedding-border); background: var(--wedding-bg); font-size: 0.85em; color: var(--wedding-text-sub); cursor: pointer; transition: all 0.2s; font-weight: 600; }
+.pf-tab.active { background: var(--wedding-main); color: white; border-color: var(--wedding-main); }
+.pf-tab.refuse.active { background: #8c8581; color: white; border-color: #8c8581; }
+.pf-submit { width: 100%; padding: 14px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.9em; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
+.pf-submit:hover:not(:disabled) { filter: brightness(0.9); }
+.pf-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Full preview */
 .full-preview-container { width: 100vw; height: 100vh; background: #F0F2F5; display: flex; justify-content: center; align-items: flex-start; overflow-y: scroll; padding: 0; margin: 0; }
@@ -88,13 +115,11 @@
   .mobile-tab-btn svg { width: 20px; height: 20px; }
 
   .preview-container-box { border-radius: 0; border: none; box-shadow: none; height: 100%; }
-  .builder-header { padding: 16px 20px; }
-  .header-btns { flex-wrap: wrap; }
+  .builder-header { padding: 12px 16px; }
 }
 
 /* Phone */
 @media (max-width: 640px) {
-  .builder-header { flex-direction: column; gap: 12px; align-items: flex-start; }
-  .header-btns { width: 100%; }
-  .save-btn, .view-btn, .admin-link-btn { flex: 1; justify-content: center; font-size: 0.78rem; padding: 10px 12px; }
+  .builder-header { gap: 8px; }
+  .header-logo { font-size: 1rem; }
 }
