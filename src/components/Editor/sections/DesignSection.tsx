@@ -29,6 +29,28 @@ const SCROLL_EFFECTS: { key: NonNullable<InvitationData['scrollEffect']>; name: 
   { key: 'fade-in', name: '페이드 인', icon: '◎' }, { key: 'slide-in', name: '슬라이드', icon: '→' },
 ];
 
+const BG_COLORS = [
+  { name: '없음', value: '' },
+  { name: '아이보리', value: '#FFFDF5' },
+  { name: '연분홍', value: '#FFF5F6' },
+  { name: '라벤더', value: '#F7F5FA' },
+  { name: '민트', value: '#F2FAF7' },
+  { name: '스카이', value: '#F3F7FC' },
+  { name: '크림', value: '#FBF8F0' },
+  { name: '쿨그레이', value: '#F5F6F8' },
+];
+
+const ACCENT_COLORS = [
+  { name: '없음', value: '' },
+  { name: '로즈', value: '#D4918E' },
+  { name: '골드', value: '#C8A97E' },
+  { name: '세이지', value: '#8BA888' },
+  { name: '네이비', value: '#4A5E7A' },
+  { name: '버건디', value: '#8B3A4A' },
+  { name: '라벤더', value: '#9B8BB8' },
+  { name: '코럴', value: '#E08B7A' },
+];
+
 const DesignSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
@@ -49,6 +71,30 @@ const DesignSection: React.FC = () => {
             {FONTS.map(font => <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>{font.name}</option>)}
           </select>
         </div>
+      </div>
+      <div className="input-group">
+        <label>배경 색상</label>
+        <div className="color-pick-grid">
+          {BG_COLORS.map(c => (
+            <button key={c.name} type="button" className={`color-pick-btn ${(data.customBgColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customBgColor', c.value)} title={c.name}>
+              <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
+              <span className="color-pick-name">{c.name}</span>
+            </button>
+          ))}
+        </div>
+        <span className="input-hint">'없음'은 테마 배경색을 따릅니다.</span>
+      </div>
+      <div className="input-group">
+        <label>강조 색상</label>
+        <div className="color-pick-grid">
+          {ACCENT_COLORS.map(c => (
+            <button key={c.name} type="button" className={`color-pick-btn ${(data.customAccentColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customAccentColor', c.value)} title={c.name}>
+              <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
+              <span className="color-pick-name">{c.name}</span>
+            </button>
+          ))}
+        </div>
+        <span className="input-hint">'없음'은 테마 강조색을 따릅니다.</span>
       </div>
       <div className="input-group">
         <label>배경 재질</label>

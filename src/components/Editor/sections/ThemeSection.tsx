@@ -15,14 +15,14 @@ const THEMES: { key: NonNullable<InvitationData['theme']>; name: string; colors:
 
 const ThemeSection: React.FC = () => {
   const theme = useInvitationStore((s) => s.data.theme);
-  const updateField = useInvitationStore((s) => s.updateField);
+  const updateFields = useInvitationStore((s) => s.updateFields);
 
   return (
     <div className="input-group">
       <label>테마 선택</label>
       <div className="theme-select-grid modern">
         {THEMES.map(t => (
-          <button key={t.key} type="button" className={`theme-chip-v2 ${theme === t.key ? 'active' : ''}`} style={theme === t.key ? { borderColor: t.colors[2] } : {}} onClick={() => updateField('theme', t.key)}>
+          <button key={t.key} type="button" className={`theme-chip-v2 ${theme === t.key ? 'active' : ''}`} style={theme === t.key ? { borderColor: t.colors[2] } : {}} onClick={() => updateFields({ theme: t.key, customBgColor: '', customAccentColor: '' })}>
             <div className="theme-chip-info">
               <span className="dot" style={{ background: t.colors[2] }}></span>
               <span className="theme-chip-name" style={theme === t.key ? { color: t.colors[2] } : {}}>{t.name}</span>

@@ -59,6 +59,8 @@ export interface BasicInfo {
 
 export interface DesignConfig {
   theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern';
+  customBgColor?: string;
+  customAccentColor?: string;
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';
   bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';

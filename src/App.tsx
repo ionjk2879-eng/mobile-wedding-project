@@ -200,13 +200,23 @@ const App: React.FC = () => {
     }
   };
 
+  const getCustomColorVars = (): React.CSSProperties => {
+    const vars: Record<string, string> = {};
+    if (data.customBgColor) vars['--wedding-bg'] = data.customBgColor;
+    if (data.customAccentColor) {
+      vars['--wedding-main'] = data.customAccentColor;
+      vars['--wedding-accent'] = data.customAccentColor;
+    }
+    return vars as React.CSSProperties;
+  };
+
   if (isFullPreview) {
     return (
       <div className="full-preview-container" style={{ fontFamily: data.fontFamily }} ref={fullPreviewScrollRef}>
         <ToastContainer />
-        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Dancing+Script&display=swap" rel="stylesheet" />
         <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>편집기로 돌아가기</button>
-        <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize() }}>
+        <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
           <ScrollRootContext.Provider value={fullPreviewScrollRef}>
             <InvitationView data={data} showOpening />
           </ScrollRootContext.Provider>
@@ -218,7 +228,7 @@ const App: React.FC = () => {
   return (
     <div className="builder-layout">
       <ToastContainer />
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Dancing+Script&display=swap" rel="stylesheet" />
 
       <div className="builder-topbar-wrap"><header className="builder-topbar">
         <div className="topbar-left" onClick={() => {
@@ -254,7 +264,7 @@ const App: React.FC = () => {
               <div className="preview-label">Live Preview</div>
               <button className="full-preview-btn-mini" onClick={() => setIsFullPreview(true)}>전체화면 보기</button>
             </div>
-            <div className={`preview-content-scroll theme-${data.theme || 'blush'}`} ref={previewScrollRef} style={{ fontFamily: data.fontFamily, fontSize: getBaseFontSize() }}>
+            <div className={`preview-content-scroll theme-${data.theme || 'blush'}`} ref={previewScrollRef} style={{ fontFamily: data.fontFamily, fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
               <ScrollRootContext.Provider value={previewScrollRef}>
                 <InvitationView data={data} previewRefs={previewRefs} />
               </ScrollRootContext.Provider>
