@@ -35,14 +35,14 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
             {formatParent(groomFather)}{groomFather?.name && groomMother?.name ? ' · ' : ''}{formatParent(groomMother)}
             <span className="child-label">{isEn ? 'Son' : '의 아들'}</span>
           </span>
-          <span className="child-name">{data.groomName}</span>
+          <span className="child-name">{data.groomName || '신랑'}</span>
         </div>
         <div className="family-block">
           <span className="parent-names">
             {formatParent(brideFather)}{brideFather?.name && brideMother?.name ? ' · ' : ''}{formatParent(brideMother)}
             <span className="child-label">{isEn ? 'Daughter' : '의 딸'}</span>
           </span>
-          <span className="child-name">{data.brideName}</span>
+          <span className="child-name">{data.brideName || '신부'}</span>
         </div>
       </div>
 

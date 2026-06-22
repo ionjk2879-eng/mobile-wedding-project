@@ -36,7 +36,7 @@ const ViewPage: React.FC = () => {
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize() }}>
         <ScrollRootContext.Provider value={scrollRef}>
-          <InvitationView data={data} />
+          <InvitationView data={data} showOpening />
         </ScrollRootContext.Provider>
       </div>
 

@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { InvitationData, TimelineEvent, InterviewQA } from '../types';
 
 export const initialData: InvitationData = {
-  groomName: '신랑',
-  brideName: '신부',
+  groomName: '',
+  brideName: '',
   date: '2026. 10. 24. SAT',
   time: 'PM 12:30',
   venueName: '',
@@ -11,8 +11,8 @@ export const initialData: InvitationData = {
   greetingTitle: '초대합니다',
   greetingContent: '곁에 있을 때 가장 나다운 모습이 되게 하는 사람,\n꿈을 꾸게 하고, 그 꿈을 함께 나누고 싶은 사람을 만났습니다.\n\n서로의 다름을 인정하며,\n서로의 부족함을 채워주는 사랑으로\n행복한 가정을 일구어 나가겠습니다.\n\n저희의 시작을 축복해 주시면 감사하겠습니다.',
   contacts: [
-    { role: '신랑', name: '신랑', phone: '' },
-    { role: '신부', name: '신부', phone: '' },
+    { role: '신랑', name: '', phone: '' },
+    { role: '신부', name: '', phone: '' },
   ],
   accounts: [
     { side: '신랑', bank: '', number: '', owner: '' },
@@ -37,6 +37,15 @@ export const initialData: InvitationData = {
   isRSVPEnabled: true,
   isGuestbookEnabled: true,
   guestbookPassword: '',
+  opening: {
+    openingEnabled: false,
+    openingStyle: 'curtain',
+    openingColorMode: 'theme',
+    openingBgColor: '#1F2937',
+    openingBgOpacity: 0.95,
+    openingText: '',
+    openingSubText: '',
+  },
   theme: 'blush',
   bgTexture: 'none',
   bgEffect: 'none',

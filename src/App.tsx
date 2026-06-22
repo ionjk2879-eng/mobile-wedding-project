@@ -140,6 +140,7 @@ const App: React.FC = () => {
     theme: React.useRef<HTMLDivElement>(null),
     design: React.useRef<HTMLDivElement>(null),
     basic: React.useRef<HTMLDivElement>(null),
+    datetime: React.useRef<HTMLDivElement>(null),
     greeting: React.useRef<HTMLDivElement>(null),
     message: React.useRef<HTMLDivElement>(null),
     interview: React.useRef<HTMLDivElement>(null),
@@ -206,7 +207,7 @@ const App: React.FC = () => {
         <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>편집기로 돌아가기</button>
         <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize() }}>
           <ScrollRootContext.Provider value={fullPreviewScrollRef}>
-            <InvitationView data={data} />
+            <InvitationView data={data} showOpening />
           </ScrollRootContext.Provider>
         </div>
       </div>

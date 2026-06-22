@@ -84,10 +84,21 @@ export interface ContentData {
   videoUrl: string;
 }
 
+export interface OpeningConfig {
+  openingEnabled: boolean;
+  openingStyle: 'curtain' | 'circle';
+  openingColorMode: 'theme' | 'custom';
+  openingBgColor: string;
+  openingBgOpacity: number;
+  openingText: string;
+  openingSubText: string;
+}
+
 export interface FeatureConfig {
   isRSVPEnabled: boolean;
   isGuestbookEnabled: boolean;
   guestbookPassword: string;
+  opening: OpeningConfig;
   bgMusicUrl: string;
   sectionOrder: string[];
   language: 'ko' | 'en';

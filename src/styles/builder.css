@@ -45,6 +45,19 @@
 .preview-content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; }
 .preview-content-scroll::-webkit-scrollbar { display: none; }
 
+/* Preview section edit button */
+.preview-section-wrap { position: relative; }
+.preview-edit-btn {
+  position: absolute; top: 6px; left: 6px; z-index: 10;
+  padding: 4px 10px; border-radius: 8px;
+  background: rgba(255,255,255,0.8); border: 1px solid var(--wedding-border, #E5E7EB);
+  color: var(--wedding-main, #D4A5C6); cursor: pointer;
+  font-size: 0.68rem; font-weight: 700; white-space: nowrap;
+  opacity: 0.7; transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+.preview-edit-btn:hover { background: var(--wedding-main, #D4A5C6); color: white; border-color: var(--wedding-main, #D4A5C6); opacity: 1; }
+
 /* Preview overlay (portal to body, fixed over preview area) */
 .pv-overlay-root { animation: pv-overlay-in 0.2s ease; }
 @keyframes pv-overlay-in { from { opacity: 0; } to { opacity: 1; } }

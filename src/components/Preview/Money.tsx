@@ -117,6 +117,9 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
   };
 
   const hasContent = (acc: typeof data.accounts[0]) => acc.bank || acc.number || acc.owner;
+  const hasAnyAccount = data.accounts.some(hasContent);
+
+  if (!hasAnyAccount) return null;
 
   const renderAccountItem = (acc: typeof data.accounts[0], index: number) => (
     <div key={index} className="account-item">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen } from 'lucide-react';
+import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen, Clock, Clapperboard } from 'lucide-react';
 import '../../styles/editor.css';
 import SectionCard from './SectionCard';
 import ShareSection from './sections/ShareSection';
@@ -18,6 +18,8 @@ import AccountsSection from './sections/AccountsSection';
 import MusicSection from './sections/MusicSection';
 import OrderSection from './sections/OrderSection';
 import GuestbookSection from './sections/GuestbookSection';
+import DateTimeSection from './sections/DateTimeSection';
+import OpeningSection from './sections/OpeningSection';
 
 interface EditorProps {
   onSectionClick?: (id: string) => void;
@@ -26,9 +28,11 @@ interface EditorProps {
 const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
   const sectionRefs = {
     hero: React.useRef<HTMLDivElement>(null),
+    opening: React.useRef<HTMLDivElement>(null),
     theme: React.useRef<HTMLDivElement>(null),
     design: React.useRef<HTMLDivElement>(null),
     basic: React.useRef<HTMLDivElement>(null),
+    datetime: React.useRef<HTMLDivElement>(null),
     greeting: React.useRef<HTMLDivElement>(null),
     message: React.useRef<HTMLDivElement>(null),
     location: React.useRef<HTMLDivElement>(null),
@@ -47,7 +51,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
   const workspaceRef = React.useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = React.useState('design');
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
-    hero: false, theme: true, design: true, basic: true,
+    hero: false, opening: false, theme: true, design: true, basic: true, datetime: true,
     greeting: false, message: false, location: false, contacts: false,
     accounts: false, photos: false, timeline: false, interview: false,
     rsvp: false, guestbook: false, share: false, order: false, music: false,
@@ -97,9 +101,11 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
   const navItems = [
     { id: 'share', name: '주소', icon: <Send size={18} />, ref: sectionRefs.share },
     { id: 'hero', name: '메인화면', icon: <LayoutTemplate size={18} />, ref: sectionRefs.hero },
+    { id: 'opening', name: '오프닝', icon: <Clapperboard size={18} />, ref: sectionRefs.opening },
     { id: 'theme', name: '테마', icon: <Sparkles size={18} />, ref: sectionRefs.theme },
     { id: 'design', name: '디자인', icon: <Palette size={18} />, ref: sectionRefs.design },
     { id: 'basic', name: '기본정보', icon: <Info size={18} />, ref: sectionRefs.basic },
+    { id: 'datetime', name: '예식일시', icon: <Clock size={18} />, ref: sectionRefs.datetime },
     { id: 'greeting', name: '인사말', icon: <MessageSquare size={18} />, ref: sectionRefs.greeting },
     { id: 'message', name: '한마디', icon: <Heart size={18} />, ref: sectionRefs.message },
     { id: 'interview', name: '인터뷰', icon: <MessagesSquare size={18} />, ref: sectionRefs.interview },
@@ -116,9 +122,11 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
   const sections = [
     { id: 'share', title: '청첩장 주소', icon: <Send size={20} />, content: <ShareSection /> },
     { id: 'hero', title: '메인화면', icon: <LayoutTemplate size={20} />, content: <HeroSection /> },
+    { id: 'opening', title: '오프닝 애니메이션', icon: <Clapperboard size={20} />, content: <OpeningSection /> },
     { id: 'theme', title: '청첩장 테마', icon: <Sparkles size={20} />, content: <ThemeSection /> },
     { id: 'design', title: '디자인 및 스타일', icon: <Palette size={20} />, content: <DesignSection /> },
     { id: 'basic', title: '기본 정보', icon: <Info size={20} />, content: <BasicInfoSection /> },
+    { id: 'datetime', title: '예식 일시', icon: <Clock size={20} />, content: <DateTimeSection /> },
     { id: 'greeting', title: '인사말', icon: <MessageSquare size={20} />, content: <GreetingSection /> },
     { id: 'message', title: '신랑/신부 한마디', icon: <Heart size={20} />, content: <MessageSection /> },
     { id: 'interview', title: '인터뷰', icon: <MessagesSquare size={20} />, content: <InterviewSection /> },

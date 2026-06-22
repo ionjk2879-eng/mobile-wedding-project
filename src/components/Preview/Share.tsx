@@ -24,7 +24,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
   const handleKakaoShare = () => {
     if (!window.Kakao) return;
 
-    const title = data.shareTitle || `${data.groomName} ♡ ${data.brideName} 결혼합니다`;
+    const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
     const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
 
     window.Kakao.Share.sendDefault({
@@ -64,7 +64,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
       </div>
 
       <footer className="footer">
-        <p>Copyright © 2026 {data.groomName} & {data.brideName}. All rights reserved.</p>
+        <p>Copyright © 2026 {data.groomName || '신랑'} & {data.brideName || '신부'}. All rights reserved.</p>
       </footer>
 
       <style>{`

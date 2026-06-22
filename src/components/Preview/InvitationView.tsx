@@ -16,10 +16,12 @@ import Guestbook from './Guestbook';
 import ScrollReveal from './ScrollReveal';
 import BackgroundEffects from './BackgroundEffects';
 import MusicPlayer from './MusicPlayer';
+import Opening from './Opening';
 
 interface InvitationViewProps {
   data: InvitationData;
   previewRefs?: Record<string, React.RefObject<HTMLDivElement>>;
+  showOpening?: boolean;
 }
 
 const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement> }> = ({ id, data, refEl }) => {
@@ -27,7 +29,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 
   switch (id) {
     case 'greeting': return wrap(<Greeting data={data} />);
-    case 'calendar': return <Calendar data={data} />;
+    case 'calendar': return wrap(<Calendar data={data} />);
     case 'message': return wrap(<PersonalMessage data={data} />);
     case 'interview': return wrap(<Interview data={data} />);
     case 'photos': return wrap(<Gallery data={data} />);
@@ -42,13 +44,14 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
   }
 };
 
-const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'accounts', 'contacts', 'share'];
+const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'share'];
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening }) => {
   const sectionOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
 
   return (
     <article className={`preview-wrapper texture-${data.bgTexture || 'none'}`} aria-label="청첩장">
+      {showOpening && data.opening?.openingEnabled && <Opening opening={data.opening} groomName={data.groomName} brideName={data.brideName} date={data.date} theme={data.theme} />}
       <BackgroundEffects effect={data.bgEffect} />
       <MusicPlayer url={data.bgMusicUrl} />
       {previewRefs?.basic ? (

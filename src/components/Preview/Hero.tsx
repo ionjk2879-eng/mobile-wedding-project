@@ -8,8 +8,8 @@ interface PreviewProps {
 
 const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
-  const groomName = isEn && data.en.groomName ? data.en.groomName : data.groomName;
-  const brideName = isEn && data.en.brideName ? data.en.brideName : data.brideName;
+  const groomName = isEn && data.en.groomName ? data.en.groomName : (data.groomName || '신랑');
+  const brideName = isEn && data.en.brideName ? data.en.brideName : (data.brideName || '신부');
   const venueName = isEn && data.en.venueName ? data.en.venueName : data.venueName;
   const dateStr = isEn && data.en.date ? data.en.date : data.date;
   const timeStr = isEn && data.en.time ? data.en.time : data.time;

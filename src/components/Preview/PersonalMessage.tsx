@@ -19,7 +19,7 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
               <div className="msg-profile-empty" />
             )}
             <div className="msg-content">
-              <span className="message-name">신랑 {data.groomName}</span>
+              <span className="message-name">신랑 {data.groomName || '신랑'}</span>
               <p>{data.groomMessage}</p>
             </div>
           </div>
@@ -27,7 +27,7 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="message-box bride">
           <div className="msg-profile-row reverse">
             <div className="msg-content">
-              <span className="message-name">신부 {data.brideName}</span>
+              <span className="message-name">신부 {data.brideName || '신부'}</span>
               <p>{data.brideMessage}</p>
             </div>
             {data.bridePhoto ? (
