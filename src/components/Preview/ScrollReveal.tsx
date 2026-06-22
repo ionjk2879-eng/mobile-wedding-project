@@ -44,6 +44,20 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({ effect, children, delay = 0
 
     let revealed = false;
 
+    const checkAlreadyPassed = () => {
+      const el = ref.current;
+      const cont = scrollRoot?.current;
+      if (!el || !cont) return false;
+      const containerRect = cont.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      return elRect.bottom < containerRect.bottom;
+    };
+
+    if (checkAlreadyPassed()) {
+      setVisible(true);
+      return;
+    }
+
     const onScroll = () => {
       if (revealed) return;
       if (checkVisibility()) {

@@ -164,10 +164,10 @@ const App: React.FC = () => {
                 {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
               </button>
               <button className={`autosave-toggle ${autoSaveEnabled ? 'active' : ''}`} onClick={() => setAutoSaveEnabled(!autoSaveEnabled)} title={autoSaveEnabled ? '자동 저장 켜짐' : '자동 저장 꺼짐'}>
-                {autoSaveEnabled ? 'Auto ON' : 'Auto OFF'}
+                {autoSaveEnabled ? '자동저장 ON' : '자동저장 OFF'}
               </button>
-              {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-icon-btn" title="청첩장 보기"><ExternalLink size={16} /></a>}
-              {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-icon-btn" title="응답 확인"><ClipboardList size={16} /></a>}
+              {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-text-btn"><ExternalLink size={15} /> 청첩장 보기</a>}
+              {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> 응답 확인</a>}
             </div>
           </header>
           <EditorContainer onSectionClick={handleSectionScroll} />

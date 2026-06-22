@@ -5,6 +5,7 @@ import { InvitationData } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
 import { ScrollRootContext } from '../components/Preview/ScrollReveal';
+import '../styles/effects.css';
 
 const ViewPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -31,6 +32,7 @@ const ViewPage: React.FC = () => {
 
   return (
     <div className="view-container" style={{ fontFamily: data.fontFamily }} ref={scrollRef}>
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize() }}>
         <ScrollRootContext.Provider value={scrollRef}>

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Play, Pause } from 'lucide-react';
 
 interface MusicPlayerProps {
   url: string;
@@ -58,7 +59,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
     <>
       <audio ref={audioRef} src={url} loop preload="auto" />
       <button className="music-float-btn" onClick={toggle}>
-        {isPlaying ? '⏸' : '▶'}
+        {isPlaying ? <Pause size={18} /> : <Play size={18} style={{ marginLeft: 2 }} />}
       </button>
     </>
   );
