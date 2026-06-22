@@ -27,8 +27,8 @@ const MusicSection: React.FC = () => {
     try {
       const url = await uploadFile(file, `music/${slug || 'temp'}/${Date.now()}_${file.name}`);
       updateField('bgMusicUrl', url);
-    } catch (err) {
-      alert('음악 업로드에 실패했습니다.');
+    } catch {
+      alert('음악 처리에 실패했습니다.');
     } finally {
       setUploading(false);
       e.target.value = '';

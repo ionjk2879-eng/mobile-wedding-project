@@ -23,8 +23,8 @@ const TimelineSection: React.FC = () => {
     try {
       const url = await uploadImage(file, `images/${slug || 'temp'}/timeline/${eventId}_${Date.now()}_${file.name}`);
       updateTimelineEvent(eventId, 'photo', url);
-    } catch (err) {
-      alert('사진 업로드에 실패했습니다.');
+    } catch {
+      alert('사진 처리에 실패했습니다.');
     } finally {
       setUploadingId(null);
       e.target.value = '';

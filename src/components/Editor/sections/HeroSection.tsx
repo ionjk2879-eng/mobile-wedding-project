@@ -16,8 +16,8 @@ const HeroSection: React.FC = () => {
     try {
       const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`);
       updateField('heroPhoto', url);
-    } catch (err) {
-      alert('사진 업로드에 실패했습니다.');
+    } catch {
+      alert('사진 처리에 실패했습니다.');
     } finally {
       setUploading(false);
       e.target.value = '';

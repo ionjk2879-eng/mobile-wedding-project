@@ -15,8 +15,8 @@ const MessageSection: React.FC = () => {
     try {
       const url = await uploadImage(file, `images/${data.slug || 'temp'}/profile/${field}_${Date.now()}_${file.name}`);
       updateField(field, url);
-    } catch (err) {
-      alert('사진 업로드에 실패했습니다.');
+    } catch {
+      alert('사진 처리에 실패했습니다.');
     } finally {
       setUploadingField(null);
       e.target.value = '';
