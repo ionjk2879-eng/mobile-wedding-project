@@ -6,7 +6,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const Gallery: React.FC<PreviewProps> = ({ data }) => {
+const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const touchStartX = useRef<number | null>(null);
@@ -158,7 +158,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
           <div className="pv-preview-track" ref={pvTrackRef2} style={{ transform: `translateX(-${previewIdx * 100}%)` }}>
             {data.photos.map((src, i) => (
               <div key={i} className="pv-preview-item">
-                <img src={src} alt={`Preview ${i}`} draggable="false" />
+                <img src={src} alt={`Preview ${i}`} draggable="false" loading="lazy" decoding="async" />
               </div>
             ))}
           </div>
@@ -201,7 +201,7 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
                 <div className="gallery-slide-track" ref={slideTrackRef} style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
                   {data.photos.map((src, index) => (
                     <div key={index} className="gallery-slide-item">
-                      <img src={src} alt={`Gallery ${index}`} draggable="false" />
+                      <img src={src} alt={`Gallery ${index}`} draggable="false" loading="lazy" decoding="async" />
                     </div>
                   ))}
                 </div>
@@ -351,7 +351,12 @@ const Gallery: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) =>
+  prev.data.photos === next.data.photos
+  && prev.data.galleryStyle === next.data.galleryStyle
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 interface MasonryProps {
   photos: string[];
@@ -393,7 +398,7 @@ const MasonryGrid: React.FC<MasonryProps> = ({ photos, previewIdx, onThumbClick 
         <div key={ci} className="masonry-col">
           {col.map(i => (
             <div key={i} className={`masonry-item ${i === previewIdx ? 'selected' : ''}`} onClick={() => onThumbClick(i)}>
-              <img src={photos[i]} alt={`Gallery ${i}`} />
+              <img src={photos[i]} alt={`Gallery ${i}`} loading="lazy" decoding="async" />
             </div>
           ))}
         </div>

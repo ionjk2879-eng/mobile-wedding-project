@@ -7,7 +7,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
+const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   
   const [formData, setFormData] = useState({
@@ -427,6 +427,11 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </div>
   );
-};
+}, (prev, next) =>
+  prev.data.isRSVPEnabled === next.data.isRSVPEnabled
+  && prev.data.slug === next.data.slug
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 export default RSVPForm;

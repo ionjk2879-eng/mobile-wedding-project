@@ -154,7 +154,12 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) =>
+  prev.data.contacts === next.data.contacts
+  && prev.data.parents === next.data.parents
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 interface CarouselProps {
   contacts: ContactEntry[];
@@ -231,11 +236,6 @@ const Carousel: React.FC<CarouselProps> = ({ contacts, isEn }) => {
       )}
     </>
   );
-}, (prev, next) =>
-  prev.data.contacts === next.data.contacts
-  && prev.data.parents === next.data.parents
-  && prev.data.language === next.data.language
-  && prev.data.fontFamily === next.data.fontFamily
-);
+};
 
 export default Contacts;

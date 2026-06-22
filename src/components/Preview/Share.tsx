@@ -12,7 +12,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const Share: React.FC<PreviewProps> = ({ data }) => {
+const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
   useEffect(() => {
     if (data.kakaoAppKey && window.Kakao && !window.Kakao.isInitialized()) {
       window.Kakao.init(data.kakaoAppKey);
@@ -116,6 +116,19 @@ const Share: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) =>
+  prev.data.slug === next.data.slug
+  && prev.data.shareTitle === next.data.shareTitle
+  && prev.data.shareDescription === next.data.shareDescription
+  && prev.data.heroPhoto === next.data.heroPhoto
+  && prev.data.groomName === next.data.groomName
+  && prev.data.brideName === next.data.brideName
+  && prev.data.date === next.data.date
+  && prev.data.time === next.data.time
+  && prev.data.venueName === next.data.venueName
+  && prev.data.kakaoAppKey === next.data.kakaoAppKey
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 export default Share;
