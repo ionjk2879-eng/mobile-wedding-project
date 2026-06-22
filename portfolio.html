@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sonett - 프로젝트 포트폴리오</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #B88DA0;
+      --primary-light: #F5EDF0;
+      --primary-dark: #8B6577;
+      --accent: #D4A5C6;
+      --bg: #FAFAFA;
+      --card: #FFFFFF;
+      --text: #1F2937;
+      --text-secondary: #6B7280;
+      --text-muted: #9CA3AF;
+      --border: #F0F0F0;
+      --gradient-1: linear-gradient(135deg, #B88DA0 0%, #D4A5C6 50%, #A8C0D0 100%);
+      --gradient-2: linear-gradient(135deg, #F5EDF0 0%, #FDF8FA 100%);
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-1);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      color: white;
+      padding: 40px 20px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 8px 24px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 600;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      font-weight: 300;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.8;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta-item {
+      text-align: center;
+    }
+
+    .hero-meta-item .label {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 4px;
+    }
+
+    .hero-meta-item .value {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      animation: bounce 2s infinite;
+    }
+
+    .scroll-indicator .arrow {
+      width: 20px;
+      height: 20px;
+      border-right: 2px solid rgba(255,255,255,0.5);
+      border-bottom: 2px solid rgba(255,255,255,0.5);
+      transform: rotate(45deg);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+
+    /* Main Layout */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Section */
+    .section {
+      padding: 100px 0;
+    }
+
+    .section-header {
+      margin-bottom: 60px;
+    }
+
+    .section-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 600;
+      letter-spacing: 3px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .section-desc {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.8;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    /* Tech Stack */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .tech-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: all 0.3s;
+    }
+
+    .tech-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+      border-color: var(--primary-light);
+    }
+
+    .tech-card .category {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .tech-card .tech-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .tech-card .tech-detail {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Features */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+      border-color: var(--primary-light);
+    }
+
+    .feature-icon {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--gradient-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .feature-body {
+      flex: 1;
+    }
+
+    .feature-body h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .feature-body p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .feature-tag {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Section Content Table */
+    .content-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .content-table th {
+      text-align: left;
+      padding: 16px 24px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: var(--gradient-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .content-table td {
+      padding: 16px 24px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .content-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .content-table td:first-child {
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    /* Architecture */
+    .arch-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .arch-container { grid-template-columns: 1fr; }
+      .feature-card { flex-direction: column; }
+      .hero-meta { gap: 24px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+
+    .arch-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .arch-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .arch-card .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    .file-tree {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 2;
+    }
+
+    .file-tree .folder {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .file-tree .comment {
+      color: var(--text-muted);
+      font-style: italic;
+      margin-left: 8px;
+    }
+
+    /* Data Flow */
+    .flow-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      margin-top: 32px;
+    }
+
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .flow-step-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .flow-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gradient-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .flow-line {
+      width: 2px;
+      flex: 1;
+      min-height: 24px;
+      background: var(--border);
+      margin-top: 8px;
+    }
+
+    .flow-step:last-child .flow-line {
+      display: none;
+    }
+
+    .flow-content h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .flow-content p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+
+    .stat-card .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Engineering Points */
+    .eng-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .eng-grid { grid-template-columns: 1fr; }
+    }
+
+    .eng-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.3s;
+    }
+
+    .eng-card:hover {
+      border-color: var(--primary-light);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+    }
+
+    .eng-card .eng-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .eng-card h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .eng-card p {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .eng-card ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 12px;
+    }
+
+    .eng-card ul li {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .eng-card ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 12px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary-light);
+    }
+
+    /* Route Table */
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .route-grid { grid-template-columns: 1fr; }
+    }
+
+    .route-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .route-card:hover {
+      border-color: var(--primary-light);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+    }
+
+    .route-path {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 6px 16px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+
+    .route-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .route-card p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Theme Preview */
+    .theme-showcase {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .theme-showcase { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .theme-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .theme-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    .theme-palette {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .theme-palette .swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .theme-chip .name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 80px 24px;
+      background: var(--gradient-2);
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .footer-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .footer-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .footer-tag {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .footer-copy {
+      margin-top: 48px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Print */
+    @media print {
+      .hero { min-height: auto; padding: 60px 20px; }
+      .section { padding: 40px 0; }
+      .feature-card:hover, .tech-card:hover { transform: none; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Frontend Portfolio</div>
+      <h1 class="hero-title">Sonett</h1>
+      <p class="hero-subtitle">
+        코딩 없이 누구나 아름다운 모바일 청첩장을 제작하고<br>
+        고유 URL로 하객에게 공유할 수 있는 웹 기반 청첩장 빌더
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <div class="label">Type</div>
+          <div class="value">Full-Stack SPA</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="label">Frontend</div>
+          <div class="value">React + TypeScript</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="label">Backend</div>
+          <div class="value">Firebase</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="label">Build</div>
+          <div class="value">Vite 4</div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span>SCROLL</span>
+      <div class="arrow"></div>
+    </div>
+  </section>
+
+  <div class="main">
+
+    <!-- Stats -->
+    <section class="section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">22</div>
+          <div class="stat-label">Components</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">11</div>
+          <div class="stat-label">Content Sections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">8</div>
+          <div class="stat-label">Color Themes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Page Routes</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <h2 class="section-title">Tech Stack</h2>
+        <p class="section-desc">React 18 기반 SPA에 Firebase 백엔드를 결합한 풀스택 구성</p>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="category">Frontend</div>
+          <div class="tech-name">React 18</div>
+          <div class="tech-detail">Hooks, Context API 기반 상태관리</div>
+        </div>
+        <div class="tech-card">
+          <div class="category">Language</div>
+          <div class="tech-name">TypeScript</div>
+          <div class="tech-detail">인터페이스 기반 타입 안정성 확보</div>
+        </div>
+        <div class="tech-card">
+          <div class="category">Build</div>
+          <div class="tech-name">Vite 4</div>
+          <div class="tech-detail">HMR, ESBuild 기반 빠른 개발 환경</div>
+        </div>
+        <div class="tech-card">
+          <div class="category">Animation</div>
+          <div class="tech-name">Framer Motion</div>
+          <div class="tech-detail">선언형 애니메이션 및 전환 효과</div>
+        </div>
+        <div class="tech-card">
+          <div class="category">Routing</div>
+          <div class="tech-name">React Router v7</div>
+          <div class="tech-detail">SPA 라우팅 및 동적 slug 파라미터</div>
+        </div>
+        <div class="tech-card">
+          <div class="category">Backend / DB</div>
+          <div class="tech-name">Firebase</div>
+          <div class="tech-detail">Firestore 기반 실시간 데이터 저장</div>
+        </div>
+        <div class="tech-card">
+          <div class="category">Map / Address</div>
+          <div class="tech-name">Kakao Maps API</div>
+          <div class="tech-detail">지도, 좌표변환, 주변 교통정보 탐색</div>
+        </div>
+        <div class="tech-card">
+          <div class="category">Charts</div>
+          <div class="tech-name">Recharts</div>
+          <div class="tech-detail">RSVP 통계 데이터 시각화</div>
+        </div>
+        <div class="tech-card">
+          <div class="category">Icons</div>
+          <div class="tech-name">Lucide React</div>
+          <div class="tech-detail">경량 SVG 아이콘 라이브러리</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Features -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <h2 class="section-title">Key Features</h2>
+        <p class="section-desc">실시간 에디터부터 RSVP 수집, 관리자 대시보드까지 웨딩 플랫폼의 핵심 기능</p>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-card">
+          <div class="feature-icon">&#9998;</div>
+          <div class="feature-body">
+            <h3>실시간 WYSIWYG 에디터</h3>
+            <p>좌측 에디터 패널에서 콘텐츠를 편집하면 우측 프리뷰에 즉시 반영됩니다. 에디터-프리뷰 간 섹션 동기 스크롤을 지원하며, 사이드바 네비게이션으로 15개 섹션 간 빠른 이동이 가능합니다.</p>
+            <div class="feature-tags">
+              <span class="feature-tag">Live Preview</span>
+              <span class="feature-tag">Sync Scroll</span>
+              <span class="feature-tag">Fullscreen Mode</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">&#127912;</div>
+          <div class="feature-body">
+            <h3>테마 및 디자인 시스템</h3>
+            <p>CSS 변수 기반 8가지 컬러 테마, 6가지 배경 재질(SVG 필터), 7가지 파티클 효과(CSS 애니메이션), 4가지 스크롤 등장 효과(IntersectionObserver)를 외부 라이브러리 없이 구현했습니다.</p>
+            <div class="feature-tags">
+              <span class="feature-tag">8 Themes</span>
+              <span class="feature-tag">6 Textures</span>
+              <span class="feature-tag">7 Particle Effects</span>
+              <span class="feature-tag">CSS Variables</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">&#128444;</div>
+          <div class="feature-body">
+            <h3>Hero 레이아웃 6가지</h3>
+            <p>Classic, Overlay, Minimal, Editorial, Fullscreen, Split 중 선택 가능. D-Day 자동 카운트다운과 커스텀 메인 사진 업로드를 지원합니다.</p>
+            <div class="feature-tags">
+              <span class="feature-tag">6 Layouts</span>
+              <span class="feature-tag">D-Day Counter</span>
+              <span class="feature-tag">Photo Upload</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">&#128506;</div>
+          <div class="feature-body">
+            <h3>장소 및 교통정보 자동 생성</h3>
+            <p>Daum Postcode API로 주소 검색 후 Kakao Maps API를 통해 주변 지하철역, 버스 정류장을 자동 탐색하고 도보 거리를 계산하여 교통정보를 자동 생성합니다.</p>
+            <div class="feature-tags">
+              <span class="feature-tag">Kakao Maps</span>
+              <span class="feature-tag">Geocoder</span>
+              <span class="feature-tag">Auto Transport Info</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">&#128203;</div>
+          <div class="feature-body">
+            <h3>RSVP 수집 + 관리자 대시보드</h3>
+            <p>하객의 참석의사, 인원수, 식사여부, 메시지를 Firebase에 실시간 저장합니다. 관리자 페이지에서 신랑측/신부측 참석 통계, 식사 인원을 한눈에 확인할 수 있습니다.</p>
+            <div class="feature-tags">
+              <span class="feature-tag">Firebase Firestore</span>
+              <span class="feature-tag">Real-time Stats</span>
+              <span class="feature-tag">Admin Dashboard</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">&#127908;</div>
+          <div class="feature-body">
+            <h3>갤러리, 타임라인, 인터뷰, 배경음악</h3>
+            <p>슬라이드/메이슨리 갤러리 + 라이트박스, 연애 타임라인, 신랑/신부 Q&A 인터뷰, 내장 배경음악 프리셋 및 자동 재생을 지원합니다. 섹션 순서도 자유롭게 변경 가능합니다.</p>
+            <div class="feature-tags">
+              <span class="feature-tag">Lightbox Viewer</span>
+              <span class="feature-tag">Touch Swipe</span>
+              <span class="feature-tag">Section Reorder</span>
+              <span class="feature-tag">i18n (KO/EN)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Content Sections -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <h2 class="section-title">11 Content Sections</h2>
+        <p class="section-desc">에디터에서 편집 가능한 청첩장 구성 요소</p>
+      </div>
+      <table class="content-table">
+        <thead>
+          <tr><th>Section</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Greeting</td><td>자유 편집 가능한 인사 메시지</td></tr>
+          <tr><td>Calendar</td><td>예식일 달력 자동 생성, 시간 선택 UI</td></tr>
+          <tr><td>Personal Message</td><td>프로필 사진 + 신랑/신부 개인 메시지</td></tr>
+          <tr><td>Interview</td><td>Q&A 형식 인터뷰, 동적 추가/삭제</td></tr>
+          <tr><td>Gallery</td><td>슬라이드 / 메이슨리, 라이트박스 뷰어, 터치 스와이프</td></tr>
+          <tr><td>Timeline</td><td>연애~결혼 과정 기록, 사진 첨부, 연도 구분</td></tr>
+          <tr><td>Location</td><td>Daum 주소검색 + Kakao Maps 연동, 교통정보 자동 생성</td></tr>
+          <tr><td>RSVP</td><td>참석/불참, 인원수, 식사여부, 메시지 수집</td></tr>
+          <tr><td>Money</td><td>축의금 계좌 3가지 UI 스타일, 계좌번호 복사</td></tr>
+          <tr><td>Contacts</td><td>신랑/신부 + 양가 부모님 연락처, 전화/문자 연결</td></tr>
+          <tr><td>Share</td><td>카카오톡 공유, URL 복사</td></tr>
+        </tbody>
+      </table>
+
+      <!-- Theme Showcase -->
+      <div style="margin-top:48px;">
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;">8 Color Themes</h3>
+        <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:16px;">CSS 변수 기반 클래스 전환으로 적용되는 테마 팔레트</p>
+        <div class="theme-showcase">
+          <div class="theme-chip">
+            <div class="theme-palette">
+              <div class="swatch" style="background:#FFF5F6"></div>
+              <div class="swatch" style="background:#F3CDCC"></div>
+              <div class="swatch" style="background:#D4918E"></div>
+            </div>
+            <div class="name">Blush Pink</div>
+          </div>
+          <div class="theme-chip">
+            <div class="theme-palette">
+              <div class="swatch" style="background:#FBF8F3"></div>
+              <div class="swatch" style="background:#E8DFD2"></div>
+              <div class="swatch" style="background:#C8A97E"></div>
+            </div>
+            <div class="name">Champagne</div>
+          </div>
+          <div class="theme-chip">
+            <div class="theme-palette">
+              <div class="swatch" style="background:#F5F7F4"></div>
+              <div class="swatch" style="background:#D6DED0"></div>
+              <div class="swatch" style="background:#8BA888"></div>
+            </div>
+            <div class="name">Sage Green</div>
+          </div>
+          <div class="theme-chip">
+            <div class="theme-palette">
+              <div class="swatch" style="background:#F3F5F9"></div>
+              <div class="swatch" style="background:#D0D8E8"></div>
+              <div class="swatch" style="background:#4A5E7A"></div>
+            </div>
+            <div class="name">Classic Navy</div>
+          </div>
+          <div class="theme-chip">
+            <div class="theme-palette">
+              <div class="swatch" style="background:#FBF5F5"></div>
+              <div class="swatch" style="background:#E8D4D4"></div>
+              <div class="swatch" style="background:#8B3A4A"></div>
+            </div>
+            <div class="name">Burgundy Wine</div>
+          </div>
+          <div class="theme-chip">
+            <div class="theme-palette">
+              <div class="swatch" style="background:#F7F5FA"></div>
+              <div class="swatch" style="background:#E3DFEE"></div>
+              <div class="swatch" style="background:#9B8BB8"></div>
+            </div>
+            <div class="name">Lavender</div>
+          </div>
+          <div class="theme-chip">
+            <div class="theme-palette">
+              <div class="swatch" style="background:#FAF5F3"></div>
+              <div class="swatch" style="background:#E8D8D4"></div>
+              <div class="swatch" style="background:#B67A82"></div>
+            </div>
+            <div class="name">Dusty Rose</div>
+          </div>
+          <div class="theme-chip">
+            <div class="theme-palette">
+              <div class="swatch" style="background:#FAFAFA"></div>
+              <div class="swatch" style="background:#E8E8E8"></div>
+              <div class="swatch" style="background:#888888"></div>
+            </div>
+            <div class="name">Modern White</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Architecture -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <h2 class="section-title">Architecture</h2>
+        <p class="section-desc">컴포넌트 기반 아키텍처와 단방향 데이터 흐름</p>
+      </div>
+
+      <!-- Routes -->
+      <div class="route-grid">
+        <div class="route-card">
+          <div class="route-path">/</div>
+          <h4>Editor (Builder)</h4>
+          <p>제작자용 청첩장 에디터</p>
+        </div>
+        <div class="route-card">
+          <div class="route-path">/w/:slug</div>
+          <h4>View Page</h4>
+          <p>하객용 청첩장 열람</p>
+        </div>
+        <div class="route-card">
+          <div class="route-path">/admin/:slug</div>
+          <h4>Admin Dashboard</h4>
+          <p>RSVP 응답 관리</p>
+        </div>
+      </div>
+
+      <!-- File Structure -->
+      <div class="arch-container" style="margin-top:32px;">
+        <div class="arch-card">
+          <h4><span class="dot"></span> Project Structure</h4>
+          <div class="file-tree">
+            <span class="folder">src/</span><br>
+            &nbsp;&nbsp;main.tsx <span class="comment">Routing</span><br>
+            &nbsp;&nbsp;App.tsx <span class="comment">Editor + Preview</span><br>
+            &nbsp;&nbsp;types.ts <span class="comment">TypeScript Interfaces</span><br>
+            &nbsp;&nbsp;firebase.ts <span class="comment">Firebase CRUD</span><br>
+            &nbsp;&nbsp;<span class="folder">pages/</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;ViewPage.tsx <span class="comment">Guest View</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;AdminPage.tsx <span class="comment">RSVP Admin</span><br>
+            &nbsp;&nbsp;<span class="folder">components/Editor/</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;EditorContainer.tsx <span class="comment">1,400+ lines</span><br>
+            &nbsp;&nbsp;<span class="folder">components/Preview/</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;Hero, Gallery, Calendar...<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;ScrollReveal.tsx <span class="comment">HOC</span>
+          </div>
+        </div>
+        <div class="arch-card">
+          <h4><span class="dot"></span> Key Patterns</h4>
+          <div class="file-tree">
+            <strong>State Management</strong><br>
+            &nbsp;&nbsp;useState(InvitationData)<br>
+            &nbsp;&nbsp;Props drilling to Preview<br><br>
+            <strong>Context</strong><br>
+            &nbsp;&nbsp;ScrollRootContext<br>
+            &nbsp;&nbsp;Scroll container ref sharing<br><br>
+            <strong>Data Persistence</strong><br>
+            &nbsp;&nbsp;Firestore document per slug<br>
+            &nbsp;&nbsp;RSVP subcollection<br><br>
+            <strong>External APIs</strong><br>
+            &nbsp;&nbsp;Daum Postcode + Kakao Maps
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Flow -->
+      <div class="flow-container">
+        <h4 style="font-size:1.05rem;font-weight:700;margin-bottom:28px;">Data Flow</h4>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-indicator"><div class="flow-dot">1</div><div class="flow-line"></div></div>
+            <div class="flow-content">
+              <h4>Editor Input</h4>
+              <p>에디터에서 입력 &rarr; useState(InvitationData) 상태 업데이트 &rarr; 프리뷰 실시간 렌더링</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-indicator"><div class="flow-dot">2</div><div class="flow-line"></div></div>
+            <div class="flow-content">
+              <h4>Save to Firebase</h4>
+              <p>저장 버튼 클릭 &rarr; Firestore에 slug 기반 문서로 저장</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-indicator"><div class="flow-dot">3</div><div class="flow-line"></div></div>
+            <div class="flow-content">
+              <h4>Guest View</h4>
+              <p>하객이 /w/slug 접속 &rarr; Firestore에서 데이터 로드 &rarr; 동일한 Preview 컴포넌트로 렌더링</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-indicator"><div class="flow-dot">4</div><div class="flow-line"></div></div>
+            <div class="flow-content">
+              <h4>RSVP Collection</h4>
+              <p>하객 RSVP 제출 &rarr; Firestore 서브컬렉션에 응답 저장</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-indicator"><div class="flow-dot">5</div></div>
+            <div class="flow-content">
+              <h4>Admin Analytics</h4>
+              <p>관리자 페이지에서 참석 통계 조회 및 응답 목록 관리</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Engineering -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <h2 class="section-title">Engineering Highlights</h2>
+        <p class="section-desc">프로젝트에서 활용한 주요 기술적 접근</p>
+      </div>
+      <div class="eng-grid">
+        <div class="eng-card">
+          <div class="eng-label">Theme System</div>
+          <h4>CSS-in-JS 없이 구현한 테마</h4>
+          <p>CSS 변수와 클래스 전환만으로 8개 테마를 적용합니다.</p>
+          <ul>
+            <li>--wedding-main, --wedding-bg 등 CSS 변수 활용</li>
+            <li>SVG 필터 기반 배경 재질 효과</li>
+            <li>@keyframes 파티클 애니메이션 (라이브러리 미사용)</li>
+          </ul>
+        </div>
+        <div class="eng-card">
+          <div class="eng-label">Scroll Interaction</div>
+          <h4>IntersectionObserver 기반 인터랙션</h4>
+          <p>에디터 섹션 자동 하이라이트와 스크롤 등장 효과를 구현합니다.</p>
+          <ul>
+            <li>ScrollRootContext로 컨테이너 참조 공유</li>
+            <li>ScrollReveal HOC 분리 설계</li>
+            <li>에디터-프리뷰 동기 스크롤</li>
+          </ul>
+        </div>
+        <div class="eng-card">
+          <div class="eng-label">External API</div>
+          <h4>Kakao Maps + Daum Postcode 연동</h4>
+          <p>주소 검색부터 교통정보 자동 생성까지 연결합니다.</p>
+          <ul>
+            <li>주소 &rarr; 좌표 변환 (Geocoder)</li>
+            <li>주변 지하철/버스 정류장 자동 탐색</li>
+            <li>도보 거리 계산 및 교통정보 자동 생성</li>
+          </ul>
+        </div>
+        <div class="eng-card">
+          <div class="eng-label">Layout</div>
+          <h4>반응형 에디터 레이아웃</h4>
+          <p>데스크탑 분할 뷰와 모바일 시뮬레이션을 제공합니다.</p>
+          <ul>
+            <li>에디터(700px) + 프리뷰(450px) 분할</li>
+            <li>모바일 프리뷰 최대 480px 폭 제한</li>
+            <li>전체화면 프리뷰 모드 전환</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-title">Sonett</div>
+    <p class="footer-desc">소중한 순간을 아름답게, 모바일 청첩장 빌더</p>
+    <div class="footer-tags">
+      <span class="footer-tag">React 18</span>
+      <span class="footer-tag">TypeScript</span>
+      <span class="footer-tag">Vite</span>
+      <span class="footer-tag">Firebase</span>
+      <span class="footer-tag">Framer Motion</span>
+      <span class="footer-tag">Kakao Maps</span>
+      <span class="footer-tag">Recharts</span>
+      <span class="footer-tag">React Router</span>
+      <span class="footer-tag">Lucide React</span>
+      <span class="footer-tag">Playwright</span>
+    </div>
+    <p class="footer-copy">&copy; 2024 Sonett. Personal Portfolio Project.</p>
+  </footer>
+
+</body>
+</html>
