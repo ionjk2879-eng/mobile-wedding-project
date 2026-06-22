@@ -64,6 +64,7 @@ const initialData: InvitationData = {
   shareDescription: '',
   kakaoAppKey: '',
   videoUrl: '',
+  adminPassword: '',
   language: 'ko',
   en: {
     groomName: 'Groom',

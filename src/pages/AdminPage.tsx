@@ -1,13 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { db, collection, getDocs, query, orderBy } from '../firebase';
+import { db, collection, getDocs, query, orderBy, verifyAdminPassword } from '../firebase';
 import { RSVPResponse } from '../types';
-import { Users, Utensils, X, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Users, Utensils, X, RefreshCw, ArrowLeft, Lock } from 'lucide-react';
 
 const AdminPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [responses, setResponses] = useState<RSVPResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [checking, setChecking] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!slug || !password) return;
+    setChecking(true);
+    setAuthError('');
+    const valid = await verifyAdminPassword(slug, password);
+    if (valid) {
+      setAuthenticated(true);
+    } else {
+      setAuthError('비밀번호가 일치하지 않습니다.');
+    }
+    setChecking(false);
+  };
 
   const fetchResponses = async () => {
     setLoading(true);
@@ -21,7 +39,48 @@ const AdminPage: React.FC = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchResponses(); }, [slug]);
+  useEffect(() => {
+    if (authenticated) fetchResponses();
+  }, [slug, authenticated]);
+
+  if (!authenticated) {
+    return (
+      <div className="admin-login-page">
+        <div className="admin-login-card">
+          <div className="login-icon"><Lock size={32} /></div>
+          <h2>응답 확인</h2>
+          <p>관리자 비밀번호를 입력해주세요.</p>
+          <form onSubmit={handleLogin}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호"
+              className="login-input"
+              autoFocus
+            />
+            {authError && <p className="login-error">{authError}</p>}
+            <button type="submit" className="login-btn" disabled={checking}>
+              {checking ? '확인 중...' : '확인'}
+            </button>
+          </form>
+        </div>
+        <style>{`
+          .admin-login-page { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: #F0F2F5; font-family: 'Pretendard', sans-serif; }
+          .admin-login-card { background: white; border-radius: 24px; padding: 48px 40px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.06); border: 1px solid #E5E7EB; max-width: 380px; width: 90%; }
+          .login-icon { color: #D4A5C6; margin-bottom: 20px; }
+          .admin-login-card h2 { margin: 0 0 8px; font-size: 1.3rem; color: #1F2937; }
+          .admin-login-card > p { margin: 0 0 28px; font-size: 0.88rem; color: #6B7280; }
+          .login-input { width: 100%; padding: 14px 16px; border: 1px solid #E5E7EB; border-radius: 12px; background: #F9FAFB; font-size: 0.95rem; text-align: center; letter-spacing: 2px; box-sizing: border-box; }
+          .login-input:focus { outline: none; border-color: #D4A5C6; box-shadow: 0 0 0 4px rgba(212,165,198,0.1); }
+          .login-error { color: #EF4444; font-size: 0.82rem; margin: 10px 0 0; }
+          .login-btn { width: 100%; margin-top: 16px; padding: 14px; background: #D4A5C6; color: white; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+          .login-btn:hover { filter: brightness(0.9); }
+          .login-btn:disabled { opacity: 0.6; cursor: default; }
+        `}</style>
+      </div>
+    );
+  }
 
   const attending = responses.filter(r => r.isAttending);
   const totalGuests = attending.reduce((a, r) => a + r.totalGuests, 0);

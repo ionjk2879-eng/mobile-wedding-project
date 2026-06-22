@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { InvitationData } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
-import { db, collection, addDoc } from '../../firebase';
+import { submitRSVP } from '../../firebase';
 
 interface PreviewProps {
   data: InvitationData;
@@ -20,6 +20,7 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [wasUpdated, setWasUpdated] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
@@ -54,10 +55,8 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
 
     try {
       const slug = data.slug || 'default';
-      await addDoc(collection(db, `invitations/${slug}/rsvp`), {
-        ...formData,
-        createdAt: new Date().toISOString()
-      });
+      const result = await submitRSVP(slug, formData);
+      setWasUpdated(result === 'updated');
       setSubmitted(true);
     } catch (err) {
       console.error('RSVP 전송 실패:', err);
@@ -70,9 +69,9 @@ const RSVPForm: React.FC<PreviewProps> = ({ data }) => {
       <div className="rsvp-section section">
         <div className="success-message">
           <CheckCircle2 size={48} style={{ color: 'var(--wedding-main)' }} />
-          <h3>{isEn ? 'Response Submitted' : '참석 응답이 전달되었습니다'}</h3>
+          <h3>{isEn ? (wasUpdated ? 'Response Updated' : 'Response Submitted') : (wasUpdated ? '응답이 수정되었습니다' : '참석 응답이 전달되었습니다')}</h3>
           <p>{isEn ? 'Thank you for your response.' : '소중한 응답 감사합니다.'}</p>
-          <button className="reset-btn" onClick={() => setSubmitted(false)}>
+          <button className="reset-btn" onClick={() => { setSubmitted(false); setWasUpdated(false); }}>
             {isEn ? 'Edit Response' : '다시 입력하기'}
           </button>
         </div>

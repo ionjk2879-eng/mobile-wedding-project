@@ -32,8 +32,18 @@ service cloud.firestore {
         && request.resource.data.totalGuests <= 10
         && (!('message' in request.resource.data) || request.resource.data.message.size() <= 500);
 
-      // 수정/삭제 불가
-      allow update, delete: if false;
+      // 같은 이름으로 재제출 시 덮어쓰기 허용
+      allow update: if true
+        && request.resource.data.guestName is string
+        && request.resource.data.guestName.size() > 0
+        && request.resource.data.guestName.size() <= 50
+        && request.resource.data.isAttending is bool
+        && request.resource.data.totalGuests is int
+        && request.resource.data.totalGuests >= 1
+        && request.resource.data.totalGuests <= 10
+        && (!('message' in request.resource.data) || request.resource.data.message.size() <= 500);
+
+      allow delete: if false;
     }
 
     // 그 외 모든 경로 차단

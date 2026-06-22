@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, query, orderBy } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, query, orderBy, where, deleteDoc } from 'firebase/firestore';
 import { InvitationData } from './types';
 
 const firebaseConfig = {
@@ -28,4 +28,26 @@ export const checkSlugAvailable = async (slug: string): Promise<boolean> => {
   return !snap.exists();
 };
 
-export { db, collection, addDoc, getDocs, query, orderBy, doc };
+export const submitRSVP = async (slug: string, formData: any) => {
+  const rsvpRef = collection(db, `invitations/${slug}/rsvp`);
+  const existing = await getDocs(query(rsvpRef, where('guestName', '==', formData.guestName)));
+  if (!existing.empty) {
+    const existingDoc = existing.docs[0];
+    await setDoc(doc(db, `invitations/${slug}/rsvp`, existingDoc.id), {
+      ...formData,
+      createdAt: existingDoc.data().createdAt,
+      updatedAt: new Date().toISOString(),
+    });
+    return 'updated';
+  }
+  await addDoc(rsvpRef, { ...formData, createdAt: new Date().toISOString() });
+  return 'created';
+};
+
+export const verifyAdminPassword = async (slug: string, password: string): Promise<boolean> => {
+  const snap = await getDoc(doc(db, 'invitations', slug));
+  if (!snap.exists()) return false;
+  return snap.data().adminPassword === password;
+};
+
+export { db, collection, addDoc, getDocs, query, orderBy, doc, where, deleteDoc };
