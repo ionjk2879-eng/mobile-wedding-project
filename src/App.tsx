@@ -3,7 +3,7 @@ import EditorContainer from './components/Editor/EditorContainer';
 import InvitationView from './components/Preview/InvitationView';
 import { ScrollRootContext } from './components/Preview/ScrollReveal';
 import useInvitationStore from './stores/useInvitationStore';
-import { saveInvitation } from './firebase';
+import { saveInvitation, checkSlugAvailable } from './firebase';
 
 const App: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -139,7 +139,20 @@ const App: React.FC = () => {
               <button className="save-btn" onClick={async () => {
                 if (!data.slug) { alert('청첩장 주소를 먼저 설정해주세요.'); return; }
                 try {
+                  const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
+                  const isOwner = mySlugs.includes(data.slug);
+                  if (!isOwner) {
+                    const available = await checkSlugAvailable(data.slug);
+                    if (!available) {
+                      alert('이미 사용 중인 주소입니다. 다른 주소를 입력해주세요.');
+                      return;
+                    }
+                  }
                   await saveInvitation(data.slug, data);
+                  if (!isOwner) {
+                    mySlugs.push(data.slug);
+                    localStorage.setItem('sonett_my_slugs', JSON.stringify(mySlugs));
+                  }
                   alert(`저장 완료! 청첩장 주소: /w/${data.slug}\n관리 페이지: /admin/${data.slug}`);
                 } catch (err) { alert('저장에 실패했습니다.'); console.error(err); }
               }}>저장하기</button>
