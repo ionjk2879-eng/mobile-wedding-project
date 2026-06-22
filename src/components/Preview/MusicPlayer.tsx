@@ -8,6 +8,7 @@ interface MusicPlayerProps {
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
   const userPaused = useRef(false);
   const autoPlayed = useRef(false);
 
@@ -24,6 +25,13 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
   useEffect(() => {
     if (!url) return;
 
+    const previewArea =
+      btnRef.current?.closest('.preview-content-scroll') ||
+      btnRef.current?.closest('.full-preview-container') ||
+      btnRef.current?.closest('.view-container');
+
+    if (!previewArea) return;
+
     const tryAutoPlay = () => {
       if (autoPlayed.current || userPaused.current || !audioRef.current) return;
       audioRef.current.play().then(() => {
@@ -32,10 +40,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
       }).catch(() => {});
     };
 
-    const events = ['click', 'touchstart', 'scroll', 'mousedown'] as const;
-    events.forEach(e => window.addEventListener(e, tryAutoPlay, { capture: true }));
+    const events = ['click', 'touchstart', 'scroll'] as const;
+    events.forEach(e => previewArea.addEventListener(e, tryAutoPlay, { capture: true }));
     return () => {
-      events.forEach(e => window.removeEventListener(e, tryAutoPlay, { capture: true }));
+      events.forEach(e => previewArea.removeEventListener(e, tryAutoPlay, { capture: true }));
     };
   }, [url]);
 
@@ -58,7 +66,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
   return (
     <>
       <audio ref={audioRef} src={url} loop preload="auto" />
-      <button className="music-float-btn" onClick={toggle}>
+      <button className="music-float-btn" onClick={toggle} ref={btnRef}>
         {isPlaying ? <Pause size={18} /> : <Play size={18} style={{ marginLeft: 2 }} />}
       </button>
     </>

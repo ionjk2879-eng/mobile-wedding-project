@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { InvitationData, TimelineEvent, InterviewQA } from '../types';
 
-const initialData: InvitationData = {
+export const initialData: InvitationData = {
   groomName: '신랑',
   brideName: '신부',
   date: '2026. 10. 24. SAT',

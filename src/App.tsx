@@ -3,11 +3,11 @@ import EditorContainer from './components/Editor/EditorContainer';
 import InvitationView from './components/Preview/InvitationView';
 import ToastContainer from './components/Toast';
 import { ScrollRootContext } from './components/Preview/ScrollReveal';
-import useInvitationStore from './stores/useInvitationStore';
+import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
-import { saveInvitation, checkSlugAvailable, loadInvitation } from './firebase';
+import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation } from './firebase';
 import { getFirebaseErrorMessage } from './utils/firebaseError';
-import { Edit3, Eye, Save, ExternalLink, ClipboardList } from 'lucide-react';
+import { Edit3, Eye, Save, ExternalLink, ClipboardList, RotateCcw, Trash2 } from 'lucide-react';
 import './styles/effects.css';
 import './styles/builder.css';
 
@@ -18,7 +18,8 @@ const App: React.FC = () => {
   const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
-  const [loadingData, setLoadingData] = useState(true);
+  const [loadingData, setLoadingData] = useState(false);
+  const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
   const hasSavedOnceRef = useRef(false);
 
   const loadedRef = useRef(false);
@@ -26,16 +27,65 @@ const App: React.FC = () => {
     if (loadedRef.current) return;
     loadedRef.current = true;
     const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
-    const lastSlug = mySlugs[mySlugs.length - 1];
-    if (!lastSlug) { setLoadingData(false); return; }
-    loadInvitation(lastSlug).then((saved) => {
+    if (mySlugs.length > 0) {
+      history.replaceState({ screen: 'start' }, '', '/');
+      setShowStartScreen(mySlugs);
+    }
+  }, []);
+
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      const screen = e.state?.screen;
+      if (screen === 'start') {
+        const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
+        if (mySlugs.length > 0) setShowStartScreen(mySlugs);
+      } else if (screen === 'editor') {
+        setShowStartScreen(null);
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  const handleLoadExisting = async (slug: string) => {
+    setShowStartScreen(null);
+    history.pushState({ screen: 'editor' }, '', '/');
+    setLoadingData(true);
+    try {
+      const saved = await loadInvitation(slug);
       if (saved) {
         setData(saved);
         hasSavedOnceRef.current = true;
-        toast.info(`'${lastSlug}' 청첩장을 불러왔습니다.`);
+        toast.info(`'${slug}' 청첩장을 불러왔습니다.`);
       }
-    }).catch(() => {}).finally(() => setLoadingData(false));
-  }, []);
+    } catch { /* ignore */ }
+    setLoadingData(false);
+  };
+
+  const handleStartNew = () => {
+    setShowStartScreen(null);
+    history.pushState({ screen: 'editor' }, '', '/');
+    setData(initialData);
+    hasSavedOnceRef.current = false;
+  };
+
+  const handleDeleteSlug = (slug: string) => {
+    if (!confirm(`'${slug}' 청첩장을 삭제하시겠습니까?\nFirebase 데이터도 함께 삭제됩니다.`)) return;
+    const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]').filter((s: string) => s !== slug);
+    localStorage.setItem('sonett_my_slugs', JSON.stringify(mySlugs));
+    if (mySlugs.length > 0) setShowStartScreen(mySlugs);
+    else setShowStartScreen(null);
+    toast.success(`'${slug}' 청첩장이 삭제되었습니다.`);
+    deleteInvitation(slug).catch(() => {});
+  };
+
+  const handleReset = () => {
+    if (!confirm('현재 편집 중인 내용이 초기화됩니다. 계속하시겠습니까?')) return;
+    setData(initialData);
+    hasSavedOnceRef.current = false;
+    setSaveStatus('idle');
+    toast.info('에디터가 초기화되었습니다.');
+  };
   const saveStatusRef = useRef(saveStatus);
   saveStatusRef.current = saveStatus;
   const dataRef = useRef(data);
@@ -108,8 +158,29 @@ const App: React.FC = () => {
 
   if (loadingData) {
     return (
-      <div style={{ width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", color: '#9CA3AF' }}>
-        <p>불러오는 중...</p>
+      <div className="start-screen"><p>불러오는 중...</p></div>
+    );
+  }
+
+  if (showStartScreen) {
+    return (
+      <div className="start-screen">
+        <h1>Sonett</h1>
+        <p className="start-desc">소네트 모바일 청첩장</p>
+        <div className="start-options">
+          <button className="start-btn new" onClick={handleStartNew}>새로 만들기</button>
+          <div className="start-divider">또는 이전 청첩장 이어서 편집</div>
+          {showStartScreen.map((slug) => (
+            <div key={slug} className="start-item">
+              <button className="start-btn load" onClick={() => handleLoadExisting(slug)}>
+                /w/{slug}
+              </button>
+              <button className="start-delete" onClick={() => handleDeleteSlug(slug)} title="삭제">
+                <Trash2 size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -150,7 +221,12 @@ const App: React.FC = () => {
       <main className="builder-main-container">
         <div className={`editor-panel ${mobileView === 'preview' ? 'mobile-hidden' : ''}`}>
           <header className="builder-header">
-            <div className="header-main">
+            <div className="header-main" onClick={() => {
+              const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
+              history.pushState({ screen: 'start' }, '', '/');
+              if (mySlugs.length > 0) setShowStartScreen(mySlugs);
+              else { setData(initialData); hasSavedOnceRef.current = false; }
+            }} style={{ cursor: 'pointer' }}>
               <h1 className="header-logo">Sonett</h1>
               <p className="header-desc">소네트 모바일 청첩장</p>
             </div>
@@ -168,6 +244,7 @@ const App: React.FC = () => {
               </button>
               {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-text-btn"><ExternalLink size={15} /> 청첩장 보기</a>}
               {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> 응답 확인</a>}
+              <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> 초기화</button>
             </div>
           </header>
           <EditorContainer onSectionClick={handleSectionScroll} />

@@ -20,7 +20,7 @@ service cloud.firestore {
         && request.resource.data.brideName is string
         && request.resource.data.slug == slug;
 
-      allow delete: if false;
+      allow delete: if true;
     }
 
     // RSVP 응답 (서브컬렉션)

@@ -1,3 +1,19 @@
+/* Start screen */
+.start-screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pretendard', sans-serif; gap: 8px; }
+.start-screen h1 { font-size: 2rem; font-weight: 800; color: #D4A5C6; letter-spacing: 3px; margin: 0; }
+.start-screen .start-desc { color: #9CA3AF; font-size: 0.9rem; margin: 0 0 24px; }
+.start-options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+.start-btn { padding: 14px 20px; border-radius: 14px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; }
+.start-btn.new { background: #D4A5C6; color: white; }
+.start-btn.new:hover { filter: brightness(0.9); }
+.start-btn.load { background: #F9FAFB; border: 1px solid #E5E7EB; color: #4B5563; text-align: left; }
+.start-btn.load:hover { border-color: #D4A5C6; color: #D4A5C6; }
+.start-divider { text-align: center; font-size: 0.78rem; color: #9CA3AF; padding: 8px 0; }
+.start-item { display: flex; gap: 6px; }
+.start-item .start-btn.load { flex: 1; }
+.start-delete { width: 44px; border: 1px solid #E5E7EB; border-radius: 14px; background: #FFFFFF; color: #9CA3AF; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.start-delete:hover { border-color: #EF4444; color: #EF4444; background: #FEF2F2; }
+
 /* Builder layout */
 .builder-layout { height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; font-family: 'Pretendard', sans-serif; }
 .builder-main-container { display: flex; width: 100%; max-width: 1400px; height: 95vh; gap: 30px; padding: 0 20px; justify-content: center; }
@@ -16,6 +32,8 @@
 .autosave-toggle.active { color: #16A34A; border-color: #BBF7D0; background: #F0FDF4; }
 .header-text-btn { padding: 8px 14px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.78rem; font-weight: 700; color: #6B7280; text-decoration: none; transition: all 0.2s; background: #FFFFFF; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
 .header-text-btn:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
+.header-text-btn.reset { color: #9CA3AF; }
+.header-text-btn.reset:hover { border-color: #EF4444; color: #EF4444; background: #FEF2F2; }
 
 /* Preview panel */
 .preview-panel { flex: 0 0 450px; display: flex; flex-direction: column; height: 100%; justify-content: center; }
