@@ -138,7 +138,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
         {data.photos.length > 1 && (
           <div className="gallery-slide-dots">
             {data.photos.map((_, i) => (
-              <button key={i} className={`gallery-slide-dot ${i === previewIdx ? 'active' : ''}`} onClick={() => setPreviewIdx(i)} />
+              <button key={i} className={`gallery-slide-dot ${i === previewIdx ? 'active' : ''}`} onClick={() => setPreviewIdx(i)} aria-label={`사진 ${i + 1}`} />
             ))}
           </div>
         )}
@@ -149,7 +149,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
   const style = data.galleryStyle === 'style3' ? 'style3' : 'slide';
 
   return (
-    <section className="gallery section">
+    <section className="gallery section" aria-label="갤러리">
       <h2>GALLERY</h2>
       <p className="section-sub">소중한 순간을 담은 우리의 사진들</p>
       {data.photos.length > 0 ? (
@@ -181,7 +181,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
               {data.photos.length > 1 && (
                 <div className="gallery-slide-dots">
                   {data.photos.map((_, i) => (
-                    <button key={i} className={`gallery-slide-dot ${i === slideIdx ? 'active' : ''}`} onClick={() => setSlideIdx(i)} />
+                    <button key={i} className={`gallery-slide-dot ${i === slideIdx ? 'active' : ''}`} onClick={() => setSlideIdx(i)} aria-label={`사진 ${i + 1}`} />
                   ))}
                 </div>
               )}
@@ -199,9 +199,9 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
       )}
 
       {selectedIndex !== null && (
-        <div className="lightbox-overlay">
-          <div className="lightbox-backdrop" />
-          <button className="close-btn" onClick={closeLightbox}><X size={32} /></button>
+        <div className="lightbox-overlay" role="dialog" aria-modal="true" aria-label="사진 확대 보기">
+          <div className="lightbox-backdrop" onClick={closeLightbox} />
+          <button className="close-btn" onClick={closeLightbox} aria-label="닫기"><X size={32} /></button>
           <div
             className="lightbox-slide-vp"
             ref={lbVpRef}

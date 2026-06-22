@@ -1,6 +1,6 @@
 import React from 'react';
 import { Phone, MessageSquare } from 'lucide-react';
-import { InvitationData } from '../../types';
+import { InvitationData, Contact } from '../../types';
 
 interface PreviewProps {
   data: InvitationData;
@@ -9,7 +9,7 @@ interface PreviewProps {
 const ParentsContact: React.FC<PreviewProps> = ({ data }) => {
   const isEn = data.language === 'en';
   
-  const renderParentSide = (title: string, parents: any[]) => (
+  const renderParentSide = (title: string, parents: Contact[]) => (
     <div className="parent-card">
       <h3 className="parent-side-title">{title}</h3>
       <div className="parent-list">
@@ -20,10 +20,10 @@ const ParentsContact: React.FC<PreviewProps> = ({ data }) => {
               <span className="parent-name">{parent.name}</span>
             </div>
             <div className="parent-actions">
-              <a href={`tel:${parent.phone}`} className="parent-action-btn">
+              <a href={`tel:${parent.phone}`} className="parent-action-btn" aria-label={`${parent.name}에게 전화하기`}>
                 <Phone size={18} />
               </a>
-              <a href={`sms:${parent.phone}`} className="parent-action-btn">
+              <a href={`sms:${parent.phone}`} className="parent-action-btn" aria-label={`${parent.name}에게 문자하기`}>
                 <MessageSquare size={18} />
               </a>
             </div>

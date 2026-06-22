@@ -1,16 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
+import { uploadImage } from '../../../firebase';
 
 const TimelineSection: React.FC = () => {
   const timeline = useInvitationStore((s) => s.data.timeline);
+  const slug = useInvitationStore((s) => s.data.slug);
   const addTimelineEvent = useInvitationStore((s) => s.addTimelineEvent);
   const updateTimelineEvent = useInvitationStore((s) => s.updateTimelineEvent);
   const removeTimelineEvent = useInvitationStore((s) => s.removeTimelineEvent);
   const setData = useInvitationStore((s) => s.setData);
   const data = useInvitationStore((s) => s.data);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
 
   const toggleShowDate = (id: string) => {
     setData({ ...data, timeline: (data.timeline || []).map(e => e.id === id ? { ...e, showDate: !(e.showDate !== false) } : e) });
+  };
+
+  const handleTimelinePhotoUpload = async (eventId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingId(eventId);
+    try {
+      const url = await uploadImage(file, `images/${slug || 'temp'}/timeline/${eventId}_${Date.now()}_${file.name}`);
+      updateTimelineEvent(eventId, 'photo', url);
+    } catch (err) {
+      alert('사진 업로드에 실패했습니다.');
+    } finally {
+      setUploadingId(null);
+      e.target.value = '';
+    }
   };
 
   return (
@@ -48,7 +66,9 @@ const TimelineSection: React.FC = () => {
               </div>
               <div className="input-group">
                 <label>사진 (선택)</label>
-                {event.photo ? (
+                {uploadingId === event.id ? (
+                  <div className="timeline-photo-upload" style={{ opacity: 0.6 }}><span>업로드 중...</span></div>
+                ) : event.photo ? (
                   <div className="timeline-photo-preview">
                     <img src={event.photo} alt="" />
                     <button type="button" className="timeline-remove-btn" onClick={() => updateTimelineEvent(event.id, 'photo', '')}>×</button>
@@ -56,13 +76,7 @@ const TimelineSection: React.FC = () => {
                 ) : (
                   <label className="timeline-photo-upload">
                     <span>사진 추가</span>
-                    <input type="file" accept="image/*" hidden onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = (ev) => updateTimelineEvent(event.id, 'photo', ev.target?.result as string);
-                      reader.readAsDataURL(file);
-                    }} />
+                    <input type="file" accept="image/*" hidden onChange={(e) => handleTimelinePhotoUpload(event.id, e)} />
                   </label>
                 )}
               </div>

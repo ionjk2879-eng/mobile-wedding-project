@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { InvitationData } from '../../types';
+import { InvitationData, RSVPResponse } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
 import { submitRSVP } from '../../firebase';
 
@@ -10,7 +10,7 @@ interface PreviewProps {
 const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<RSVPResponse, 'id' | 'createdAt'>>({
     guestName: '',
     isAttending: true,
     totalGuests: 1,
@@ -66,8 +66,8 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   if (submitted) {
     return (
-      <div className="rsvp-section section">
-        <div className="success-message">
+      <section className="rsvp-section section" aria-label="참석 의사">
+        <div className="success-message" role="status">
           <CheckCircle2 size={48} style={{ color: 'var(--wedding-main)' }} />
           <h3>{isEn ? (wasUpdated ? 'Response Updated' : 'Response Submitted') : (wasUpdated ? '응답이 수정되었습니다' : '참석 응답이 전달되었습니다')}</h3>
           <p>{isEn ? 'Thank you for your response.' : '소중한 응답 감사합니다.'}</p>
@@ -90,12 +90,12 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
           .success-message p { color: var(--wedding-text-sub); margin: 0; }
           .reset-btn { margin-top: 10px; font-size: 0.8em; color: var(--wedding-text-sub); text-decoration: underline; background: none; border: none; cursor: pointer; }
         `}</style>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="rsvp-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef}>
+    <section className="rsvp-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef} aria-label="참석 의사">
       <h2>RSVP</h2>
       <p className="section-sub">참석 여부를 알려주세요</p>
       <p className="rsvp-desc">
@@ -109,9 +109,11 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
       </button>
 
       {formOpen && (
-      <div className="rsvp-overlay" style={popupStyle}>
-      <div className="rsvp-modal">
-        <button type="button" className="rsvp-close-btn" onClick={() => setFormOpen(false)}>×</button>
+      <div className="rsvp-overlay" style={popupStyle} onClick={(e) => { if (e.target === e.currentTarget) setFormOpen(false); }}>
+      <div className="rsvp-modal" role="dialog" aria-modal="true" aria-label="참석 의사 전달"
+        onKeyDown={(e) => { if (e.key === 'Escape') setFormOpen(false); }}
+      >
+        <button type="button" className="rsvp-close-btn" onClick={() => setFormOpen(false)} aria-label="닫기">×</button>
         <div className="rsvp-modal-scroll">
         <div className="rsvp-modal-header">
           <h3>RSVP</h3>
@@ -425,7 +427,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
           transform: translateY(-1px);
         }
       `}</style>
-    </div>
+    </section>
   );
 }, (prev, next) =>
   prev.data.isRSVPEnabled === next.data.isRSVPEnabled

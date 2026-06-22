@@ -42,7 +42,7 @@ const BasicInfoSection: React.FC = () => {
   const renderPersonCard = (type: 'groom' | 'bride') => {
     const isGroom = type === 'groom';
     const label = isGroom ? '신랑' : '신부';
-    const nameField = isGroom ? 'groomName' : 'brideName';
+    const nameField: 'groomName' | 'brideName' = isGroom ? 'groomName' : 'brideName';
     const parentSide: 'groomParents' | 'brideParents' = isGroom ? 'groomParents' : 'brideParents';
     const contactIdx = data.contacts.findIndex(c => c.role === label);
 
@@ -55,7 +55,7 @@ const BasicInfoSection: React.FC = () => {
           <div className="basic-field-row">
             <div className="basic-field">
               <label>이름</label>
-              <input type="text" value={(data as any)[nameField]} onChange={(e) => updateField(nameField as any, e.target.value)} className="modern-input" placeholder="이름" />
+              <input type="text" value={data[nameField]} onChange={(e) => updateField(nameField, e.target.value)} className="modern-input" placeholder="이름" />
             </div>
             <div className="basic-field">
               <label>연락처</label>

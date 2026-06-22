@@ -7,7 +7,7 @@ interface PreviewProps {
 
 const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
-    <section className="personal-message section" style={{ fontFamily: data.fontFamily }}>
+    <section className="personal-message section" style={{ fontFamily: data.fontFamily }} aria-label="신랑 신부 한마디">
       <h2>MESSAGE</h2>
       <p className="section-sub">서로에게 전하는 한마디</p>
       <div className="message-container">

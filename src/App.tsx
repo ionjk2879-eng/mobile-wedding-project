@@ -63,7 +63,7 @@ const App: React.FC = () => {
     <div className="builder-layout">
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
 
-      <div className="builder-main-container">
+      <main className="builder-main-container">
         <div className={`editor-panel ${mobileView === 'preview' ? 'mobile-hidden' : ''}`}>
           <header className="builder-header">
             <div className="header-main">
@@ -111,18 +111,18 @@ const App: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
-      <div className="mobile-tab-bar">
-        <button className={`mobile-tab-btn ${mobileView === 'editor' ? 'active' : ''}`} onClick={() => setMobileView('editor')}>
+      <nav className="mobile-tab-bar" aria-label="보기 전환">
+        <button className={`mobile-tab-btn ${mobileView === 'editor' ? 'active' : ''}`} onClick={() => setMobileView('editor')} aria-pressed={mobileView === 'editor'}>
           <Edit3 size={20} />
           <span>편집</span>
         </button>
-        <button className={`mobile-tab-btn ${mobileView === 'preview' ? 'active' : ''}`} onClick={() => setMobileView('preview')}>
+        <button className={`mobile-tab-btn ${mobileView === 'preview' ? 'active' : ''}`} onClick={() => setMobileView('preview')} aria-pressed={mobileView === 'preview'}>
           <Eye size={20} />
           <span>미리보기</span>
         </button>
-      </div>
+      </nav>
     </div>
   );
 };

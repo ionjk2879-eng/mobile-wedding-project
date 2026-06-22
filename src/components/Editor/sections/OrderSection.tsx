@@ -15,17 +15,27 @@ const OrderSection: React.FC = () => {
   const moveSection = useInvitationStore((s) => s.moveSection);
   const order = sectionOrder?.length ? sectionOrder : DEFAULT_ORDER;
 
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'ArrowUp' && index > 0) {
+      e.preventDefault();
+      moveSection(index, -1);
+    } else if (e.key === 'ArrowDown' && index < order.length - 1) {
+      e.preventDefault();
+      moveSection(index, 1);
+    }
+  };
+
   return (
     <>
       <p className="section-desc">미리보기에 표시되는 섹션 순서를 변경할 수 있습니다.</p>
-      <div className="order-list">
+      <div className="order-list" role="list" aria-label="섹션 순서 관리">
         {order.map((id, index) => (
-          <div key={id} className="order-item">
+          <div key={id} className="order-item" role="listitem" tabIndex={0} onKeyDown={(e) => handleKeyDown(e, index)} aria-label={`${index + 1}. ${SECTION_LABELS[id] || id}`}>
             <span className="order-num">{index + 1}</span>
             <span className="order-label">{SECTION_LABELS[id] || id}</span>
             <div className="order-btns">
-              <button type="button" className="order-btn" disabled={index === 0} onClick={() => moveSection(index, -1)}><ChevronUp size={16} /></button>
-              <button type="button" className="order-btn" disabled={index === order.length - 1} onClick={() => moveSection(index, 1)}><ChevronDown size={16} /></button>
+              <button type="button" className="order-btn" disabled={index === 0} onClick={() => moveSection(index, -1)} aria-label={`${SECTION_LABELS[id] || id} 위로 이동`}><ChevronUp size={16} /></button>
+              <button type="button" className="order-btn" disabled={index === order.length - 1} onClick={() => moveSection(index, 1)} aria-label={`${SECTION_LABELS[id] || id} 아래로 이동`}><ChevronDown size={16} /></button>
             </div>
           </div>
         ))}

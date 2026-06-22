@@ -82,7 +82,8 @@ const InvitationView: React.FC<{ data: InvitationData }> = ({ data }) => {
       <MusicPlayer url={data.bgMusicUrl} />
       <Hero data={data} />
       {sectionOrder.map((id, i) => (
-        <ScrollReveal key={id} effect={data.scrollEffect} delay={...}>
+        <ScrollReveal key={id} effect={data.scrollEffect} delay={...
+        }>
           <SectionComponent id={id} data={data} />
         </ScrollReveal>
       ))}

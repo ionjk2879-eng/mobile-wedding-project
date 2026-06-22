@@ -21,8 +21,8 @@ const ViewPage: React.FC = () => {
     }).catch(() => { setError(true); setLoading(false); });
   }, [slug]);
 
-  if (loading) return <div className="view-loading"><p>청첩장을 불러오는 중...</p></div>;
-  if (error || !data) return <div className="view-error"><h2>청첩장을 찾을 수 없습니다</h2><p>주소를 다시 확인해주세요.</p></div>;
+  if (loading) return <div className="view-loading" role="status" aria-live="polite"><p>청첩장을 불러오는 중...</p></div>;
+  if (error || !data) return <div className="view-error" role="alert"><h2>청첩장을 찾을 수 없습니다</h2><p>주소를 다시 확인해주세요.</p></div>;
 
   const getBaseFontSize = () => {
     switch (data.fontSize) { case 'small': return '14px'; case 'large': return '19px'; default: return '16.5px'; }

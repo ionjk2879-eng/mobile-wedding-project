@@ -12,11 +12,11 @@ const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
   if (events.length === 0) return null;
 
   return (
-    <section className="timeline-section section" style={{ fontFamily: data.fontFamily }}>
+    <section className="timeline-section section" style={{ fontFamily: data.fontFamily }} aria-label="타임라인">
       <h2>OUR STORY</h2>
       <p className="section-sub">처음 만남부터 결혼까지, 우리의 여정</p>
 
-      <button type="button" className={`timeline-toggle ${open ? 'open' : ''}`} onClick={() => setOpen(!open)}>
+      <button type="button" className={`timeline-toggle ${open ? 'open' : ''}`} onClick={() => setOpen(!open)} aria-expanded={open}>
         {open ? (data.language === 'en' ? 'Close' : '닫기') : (data.language === 'en' ? 'View Our Story' : '이야기 보기')}
       </button>
 

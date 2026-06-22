@@ -1,5 +1,5 @@
 import React from 'react';
-import { InvitationData } from '../../types';
+import { InvitationData, Contact } from '../../types';
 
 interface PreviewProps {
   data: InvitationData;
@@ -14,13 +14,13 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
   const brideFather = data.parents.brideParents.find(p => p.role === '아버지');
   const brideMother = data.parents.brideParents.find(p => p.role === '어머니');
 
-  const formatParent = (parent: any) => {
+  const formatParent = (parent: Contact | undefined) => {
     if (!parent || !parent.name) return '';
     return parent.isDeceased ? `故 ${parent.name}` : parent.name;
   };
 
   return (
-    <section className="greeting section" style={{ fontFamily: data.fontFamily }}>
+    <section className="greeting section" style={{ fontFamily: data.fontFamily }} aria-label="인사말">
       <div className="greeting-text">
         <h2>INVITATION</h2>
         <p className="section-sub">소중한 분들을 초대합니다</p>

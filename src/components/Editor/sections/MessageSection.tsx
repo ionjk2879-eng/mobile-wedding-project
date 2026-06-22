@@ -1,17 +1,26 @@
-import React from 'react';
-import { Image as ImageIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { Image as ImageIcon, Loader2 } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
+import { uploadImage } from '../../../firebase';
 
 const MessageSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
 
-  const handleProfilePhotoUpload = (field: 'groomPhoto' | 'bridePhoto', e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePhotoUpload = async (field: 'groomPhoto' | 'bridePhoto', e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => updateField(field, event.target?.result as string);
-    reader.readAsDataURL(file);
+    setUploadingField(field);
+    try {
+      const url = await uploadImage(file, `images/${data.slug || 'temp'}/profile/${field}_${Date.now()}_${file.name}`);
+      updateField(field, url);
+    } catch (err) {
+      alert('사진 업로드에 실패했습니다.');
+    } finally {
+      setUploadingField(null);
+      e.target.value = '';
+    }
   };
 
   const renderCard = (type: 'groom' | 'bride') => {
@@ -20,6 +29,7 @@ const MessageSection: React.FC = () => {
     const photoField = isGroom ? 'groomPhoto' : 'bridePhoto' as const;
     const msgField = isGroom ? 'groomMessage' : 'brideMessage' as const;
     const photo = data[photoField];
+    const isUploading = uploadingField === photoField;
     const placeholder = isGroom ? '항상 곁에서 힘이 되어주는 든든한 남편이 되겠습니다.' : '서로 아끼고 배려하며 예쁘게 잘 살겠습니다.';
 
     return (
@@ -27,7 +37,9 @@ const MessageSection: React.FC = () => {
         <div className="profile-msg-header"><span className={`person-type ${isGroom ? '' : 'bride'}`}>{label}</span></div>
         <div className="profile-msg-body">
           <div className="profile-upload-area">
-            {photo ? (
+            {isUploading ? (
+              <div className="profile-empty"><Loader2 size={20} className="spin" /><span>업로드...</span></div>
+            ) : photo ? (
               <div className="profile-thumb">
                 <img src={photo} alt={label} />
                 <label className="profile-change-btn"><ImageIcon size={12} /><input type="file" accept="image/*" onChange={(e) => handleProfilePhotoUpload(photoField, e)} hidden /></label>

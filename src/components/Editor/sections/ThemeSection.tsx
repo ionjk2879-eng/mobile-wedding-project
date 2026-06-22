@@ -1,7 +1,8 @@
 import React from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
+import { InvitationData } from '../../../types';
 
-const THEMES = [
+const THEMES: { key: NonNullable<InvitationData['theme']>; name: string; colors: string[] }[] = [
   { key: 'blush', name: '블러시 핑크', colors: ['#FFF5F6', '#F3CDCC', '#D4918E', '#E8A0A0', '#3C2B2B'] },
   { key: 'champagne', name: '샴페인', colors: ['#FBF8F3', '#E8DFD2', '#C8A97E', '#D4B896', '#3B3228'] },
   { key: 'sage', name: '세이지 그린', colors: ['#F5F7F4', '#D6DED0', '#8BA888', '#A3B59E', '#2B3328'] },
@@ -21,7 +22,7 @@ const ThemeSection: React.FC = () => {
       <label>테마 선택</label>
       <div className="theme-select-grid modern">
         {THEMES.map(t => (
-          <button key={t.key} type="button" className={`theme-chip-v2 ${theme === t.key ? 'active' : ''}`} style={theme === t.key ? { borderColor: t.colors[2] } : {}} onClick={() => updateField('theme', t.key as any)}>
+          <button key={t.key} type="button" className={`theme-chip-v2 ${theme === t.key ? 'active' : ''}`} style={theme === t.key ? { borderColor: t.colors[2] } : {}} onClick={() => updateField('theme', t.key)}>
             <div className="theme-chip-info">
               <span className="dot" style={{ background: t.colors[2] }}></span>
               <span className="theme-chip-name" style={theme === t.key ? { color: t.colors[2] } : {}}>{t.name}</span>

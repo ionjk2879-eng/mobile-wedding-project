@@ -37,7 +37,7 @@ const Interview: React.FC<PreviewProps> = React.memo(({ data }) => {
   if (qaList.length === 0) return null;
 
   return (
-    <section className="interview-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef}>
+    <section className="interview-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef} aria-label="인터뷰">
       <h2>INTERVIEW</h2>
       <p className="section-sub">두 사람에게 물어본 이야기</p>
 
@@ -46,9 +46,11 @@ const Interview: React.FC<PreviewProps> = React.memo(({ data }) => {
       </button>
 
       {open && (
-        <div className="itv-popup-dim" style={popupStyle}>
-          <div className="itv-popup">
-            <button type="button" className="itv-popup-close" onClick={() => setOpen(false)}>×</button>
+        <div className="itv-popup-dim" style={popupStyle} onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
+          <div className="itv-popup" role="dialog" aria-modal="true" aria-label="인터뷰"
+            onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
+          >
+            <button type="button" className="itv-popup-close" onClick={() => setOpen(false)} aria-label="닫기">×</button>
             <div className="itv-popup-scroll">
               <div className="itv-popup-top">
                 <h3>INTERVIEW</h3>

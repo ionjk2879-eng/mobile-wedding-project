@@ -2,12 +2,6 @@ import React, { useEffect } from 'react';
 import { Share2, Link } from 'lucide-react';
 import { InvitationData } from '../../types';
 
-declare global {
-  interface Window {
-    Kakao: any;
-  }
-}
-
 interface PreviewProps {
   data: InvitationData;
 }
@@ -56,7 +50,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
   };
 
   return (
-    <section className="share section" style={{ fontFamily: data.fontFamily }}>
+    <section className="share section" style={{ fontFamily: data.fontFamily }} aria-label="공유">
       <div className="share-buttons">
         <button className="share-btn kakao" onClick={handleKakaoShare}>
           <Share2 size={20} />

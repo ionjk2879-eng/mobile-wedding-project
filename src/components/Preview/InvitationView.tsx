@@ -46,7 +46,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs }) =>
   const sectionOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
 
   return (
-    <div className={`preview-wrapper texture-${data.bgTexture || 'none'}`}>
+    <article className={`preview-wrapper texture-${data.bgTexture || 'none'}`} aria-label="청첩장">
       <BackgroundEffects effect={data.bgEffect} />
       <MusicPlayer url={data.bgMusicUrl} />
       {previewRefs?.basic ? (
@@ -64,7 +64,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs }) =>
           </ScrollReveal>
         );
       })}
-    </div>
+    </article>
   );
 };
 

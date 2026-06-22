@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
+import { uploadFile } from '../../../firebase';
 
 const MUSIC_PRESETS = [
   { name: '없음', url: '' },
@@ -15,7 +16,24 @@ const MUSIC_PRESETS = [
 
 const MusicSection: React.FC = () => {
   const bgMusicUrl = useInvitationStore((s) => s.data.bgMusicUrl);
+  const slug = useInvitationStore((s) => s.data.slug);
   const updateField = useInvitationStore((s) => s.updateField);
+  const [uploading, setUploading] = useState(false);
+
+  const handleMusicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadFile(file, `music/${slug || 'temp'}/${Date.now()}_${file.name}`);
+      updateField('bgMusicUrl', url);
+    } catch (err) {
+      alert('음악 업로드에 실패했습니다.');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
 
   return (
     <>
@@ -32,15 +50,9 @@ const MusicSection: React.FC = () => {
       </div>
       <div className="input-group">
         <label>또는 파일 업로드</label>
-        <label className="music-upload-btn">
-          <span>{bgMusicUrl && bgMusicUrl.startsWith('data:') ? '업로드됨' : 'mp3 파일 선택'}</span>
-          <input type="file" accept="audio/mpeg,audio/mp3" hidden onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => updateField('bgMusicUrl', ev.target?.result as string);
-            reader.readAsDataURL(file);
-          }} />
+        <label className={`music-upload-btn ${uploading ? 'uploading' : ''}`}>
+          <span>{uploading ? '업로드 중...' : bgMusicUrl && !bgMusicUrl.startsWith('/music/') ? '업로드됨' : 'mp3 파일 선택'}</span>
+          <input type="file" accept="audio/mpeg,audio/mp3" hidden onChange={handleMusicUpload} disabled={uploading} />
         </label>
       </div>
     </>

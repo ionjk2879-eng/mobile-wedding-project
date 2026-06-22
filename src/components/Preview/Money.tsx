@@ -186,7 +186,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
           {currentAccounts.length > 1 && (
             <div className="carousel-dots">
               {currentAccounts.map((_, i) => (
-                <button key={i} className={`carousel-dot ${i === cardIndex ? 'active' : ''}`} onClick={() => setCardIndex(i)} />
+                <button key={i} className={`carousel-dot ${i === cardIndex ? 'active' : ''}`} onClick={() => setCardIndex(i)} aria-label={`계좌 ${i + 1}`} />
               ))}
             </div>
           )}
@@ -222,9 +222,9 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="account-list style3">
           {groomAccounts.length > 0 && (
             <div className="accordion-group">
-              <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={() => setGroomOpen(!groomOpen)}>
+              <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={() => setGroomOpen(!groomOpen)} aria-expanded={groomOpen}>
                 <span>{isEn ? "Groom's Side" : '신랑측'}</span>
-                <span className="accordion-arrow">{groomOpen ? '−' : '+'}</span>
+                <span className="accordion-arrow" aria-hidden="true">{groomOpen ? '−' : '+'}</span>
               </button>
               <div className={`accordion-body ${groomOpen ? 'open' : ''}`}>
                 <div className="accordion-inner">
@@ -235,9 +235,9 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
           )}
           {brideAccounts.length > 0 && (
             <div className="accordion-group">
-              <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={() => setBrideOpen(!brideOpen)}>
+              <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={() => setBrideOpen(!brideOpen)} aria-expanded={brideOpen}>
                 <span>{isEn ? "Bride's Side" : '신부측'}</span>
-                <span className="accordion-arrow">{brideOpen ? '−' : '+'}</span>
+                <span className="accordion-arrow" aria-hidden="true">{brideOpen ? '−' : '+'}</span>
               </button>
               <div className={`accordion-body ${brideOpen ? 'open' : ''}`}>
                 <div className="accordion-inner">
@@ -258,7 +258,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
   };
 
   return (
-    <section className="money section" style={{ fontFamily: data.fontFamily }}>
+    <section className="money section" style={{ fontFamily: data.fontFamily }} aria-label="축의금">
       <h2>GIFT</h2>
       <p className="section-sub">축하의 마음을 전하실 수 있습니다</p>
       <p className="money-desc">

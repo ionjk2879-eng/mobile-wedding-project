@@ -86,7 +86,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
   const cSeconds = totalSeconds % 60;
 
   return (
-    <section className="calendar-section">
+    <section className="calendar-section" aria-label="캘린더">
       <div className="calendar-container">
         <div className="calendar-header">
           <p className="month-name">{monthNames[month]}</p>

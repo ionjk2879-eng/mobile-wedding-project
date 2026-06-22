@@ -13,13 +13,13 @@ interface SectionCardProps {
 const SectionCard: React.FC<SectionCardProps> = ({ title, icon, expanded, onToggle, sectionRef, children }) => {
   return (
     <div className={`editor-section-card ${expanded ? 'expanded' : ''}`} ref={sectionRef}>
-      <div className="section-header" onClick={onToggle}>
+      <button type="button" className="section-header" onClick={onToggle} aria-expanded={expanded}>
         <div className="header-left">
           {icon}
           <h3>{title}</h3>
         </div>
         <ChevronRight size={18} className="collapse-icon" />
-      </div>
+      </button>
       {expanded && (
         <div className="section-content">
           {children}

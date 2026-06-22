@@ -1,5 +1,6 @@
 import React from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
+import { InvitationData } from '../../../types';
 
 const FONTS = [
   { name: '기본 (Pretendard)', value: "'Pretendard', sans-serif" },
@@ -11,19 +12,19 @@ const FONTS = [
   { name: 'Dancing Script (영문 필기체)', value: "'Dancing Script', cursive" },
 ];
 
-const TEXTURES = [
+const TEXTURES: { key: NonNullable<InvitationData['bgTexture']>; name: string }[] = [
   { key: 'none', name: '없음' }, { key: 'paper', name: '한지' }, { key: 'linen', name: '린넨' },
   { key: 'pattern', name: '도트' }, { key: 'silk', name: '실크' }, { key: 'watercolor', name: '수채화' },
 ];
 
-const EFFECTS = [
+const EFFECTS: { key: NonNullable<InvitationData['bgEffect']>; name: string; icon: string }[] = [
   { key: 'none', name: '없음', icon: '—' }, { key: 'cherry-blossom', name: '벚꽃', icon: '🌸' },
   { key: 'snow', name: '함박눈', icon: '❄️' }, { key: 'stars', name: '별빛', icon: '✨' },
   { key: 'leaves', name: '나뭇잎', icon: '🍃' }, { key: 'hearts', name: '하트', icon: '💕' },
   { key: 'firefly', name: '반딧불', icon: '🔅' }, { key: 'confetti', name: '꽃가루', icon: '🎊' },
 ];
 
-const SCROLL_EFFECTS = [
+const SCROLL_EFFECTS: { key: NonNullable<InvitationData['scrollEffect']>; name: string; icon: string }[] = [
   { key: 'none', name: '없음', icon: '—' }, { key: 'fade-up', name: '페이드 업', icon: '↑' },
   { key: 'fade-in', name: '페이드 인', icon: '◎' }, { key: 'slide-in', name: '슬라이드', icon: '→' },
 ];
@@ -53,7 +54,7 @@ const DesignSection: React.FC = () => {
         <label>배경 재질</label>
         <div className="theme-select-grid modern">
           {TEXTURES.map(t => (
-            <button key={t.key} type="button" className={`theme-chip ${(data.bgTexture || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgTexture', t.key as any)}>
+            <button key={t.key} type="button" className={`theme-chip ${(data.bgTexture || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgTexture', t.key)}>
               <span className={`texture-preview tex-${t.key}`}></span>{t.name}
             </button>
           ))}
@@ -63,7 +64,7 @@ const DesignSection: React.FC = () => {
         <label>흩날리는 효과</label>
         <div className="theme-select-grid modern">
           {EFFECTS.map(t => (
-            <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgEffect', t.key as any)}>
+            <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgEffect', t.key)}>
               <span className="effect-icon">{t.icon}</span>{t.name}
             </button>
           ))}
@@ -73,7 +74,7 @@ const DesignSection: React.FC = () => {
         <label>스크롤 등장 효과 <span className="label-hint">(전체화면으로 확인해보세요!)</span></label>
         <div className="theme-select-grid modern">
           {SCROLL_EFFECTS.map(t => (
-            <button key={t.key} type="button" className={`theme-chip ${(data.scrollEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('scrollEffect', t.key as any)}>
+            <button key={t.key} type="button" className={`theme-chip ${(data.scrollEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('scrollEffect', t.key)}>
               <span className="effect-icon">{t.icon}</span>{t.name}
             </button>
           ))}

@@ -38,7 +38,7 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   if (allGroups.length === 0) return null;
 
   return (
-    <section className="contacts-section section" style={{ fontFamily: data.fontFamily }}>
+    <section className="contacts-section section" style={{ fontFamily: data.fontFamily }} aria-label="연락처">
       <h2>CONTACT</h2>
       <p className="section-sub">축하의 마음을 직접 전해보세요</p>
       {allGroups.map((group, gi) => (
@@ -218,8 +218,8 @@ const Carousel: React.FC<CarouselProps> = ({ contacts }) => {
               {c.phone && <span className="contact-card-phone">{c.phone}</span>}
               {c.phone && (
                 <div className="contact-card-btns">
-                  <a href={`tel:${c.phone}`} className="contact-action-btn"><Phone size={18} /></a>
-                  <a href={`sms:${c.phone}`} className="contact-action-btn"><MessageSquare size={18} /></a>
+                  <a href={`tel:${c.phone}`} className="contact-action-btn" aria-label={`${c.name}에게 전화하기`}><Phone size={18} /></a>
+                  <a href={`sms:${c.phone}`} className="contact-action-btn" aria-label={`${c.name}에게 문자하기`}><MessageSquare size={18} /></a>
                 </div>
               )}
             </div>
@@ -229,7 +229,7 @@ const Carousel: React.FC<CarouselProps> = ({ contacts }) => {
       {contacts.length > 1 && (
         <div className="contact-dots">
           {contacts.map((_, i) => (
-            <button key={i} className={`contact-dot ${i === idx ? 'active' : ''}`} onClick={() => setIdx(i)} />
+            <button key={i} className={`contact-dot ${i === idx ? 'active' : ''}`} onClick={() => setIdx(i)} aria-label={`연락처 ${i + 1}`} />
           ))}
         </div>
       )}

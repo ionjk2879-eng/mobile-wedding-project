@@ -2,12 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Navigation, Train, Bus, Car } from 'lucide-react';
 import { InvitationData } from '../../types';
 
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
-
 interface PreviewProps {
   data: InvitationData;
 }
@@ -34,7 +28,7 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
     });
 
     const geocoder = new window.kakao.maps.services.Geocoder();
-    geocoder.addressSearch(data.venueAddress, (result: any, status: any) => {
+    geocoder.addressSearch(data.venueAddress, (result, status) => {
       if (status === window.kakao.maps.services.Status.OK) {
         const lat = parseFloat(result[0].y);
         const lng = parseFloat(result[0].x);
@@ -73,7 +67,7 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
   ];
 
   return (
-    <section className="location section">
+    <section className="location section" aria-label="오시는 길">
       <h2>LOCATION</h2>
       <p className="section-sub">오시는 길</p>
       {(venueName || venueAddress) && (

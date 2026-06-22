@@ -138,7 +138,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   );
 
   return (
-    <section className="hero" style={{ fontFamily: data.fontFamily }}>
+    <section className="hero" style={{ fontFamily: data.fontFamily }} aria-label="메인">
       <motion.div
         key={`${groomName}-${brideName}-${style}`}
         initial={{ opacity: 0, y: 20 }}

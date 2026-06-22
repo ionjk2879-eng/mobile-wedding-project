@@ -130,14 +130,15 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
 
   return (
     <div className="editor-outer-layout">
-      <aside className="editor-sidebar-slim">
+      <aside className="editor-sidebar-slim" aria-label="에디터 네비게이션">
         <div className="sidebar-logo">SONETT</div>
-        <nav className="nav-menu-list">
+        <nav className="nav-menu-list" aria-label="섹션 네비게이션">
           {navItems.map((item) => (
             <button
               key={item.id}
               className={`nav-menu-item ${activeSection === item.id ? 'active' : ''}`}
               onClick={() => scrollToSection(item.id, item.ref)}
+              aria-current={activeSection === item.id ? 'true' : undefined}
             >
               <div className="menu-icon">{item.icon}</div>
               <span className="menu-text">{item.name}</span>

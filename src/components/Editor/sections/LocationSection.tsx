@@ -2,13 +2,6 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 
-declare global {
-  interface Window {
-    daum: any;
-    kakao: any;
-  }
-}
-
 const LocationSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
@@ -17,7 +10,7 @@ const LocationSection: React.FC = () => {
 
   const handleAddressSearch = () => {
     new window.daum.Postcode({
-      oncomplete: (searchData: any) => {
+      oncomplete: (searchData: DaumPostcodeData) => {
         let fullAddress = searchData.address;
         let extraAddress = '';
         if (searchData.addressType === 'R') {
@@ -39,28 +32,28 @@ const LocationSection: React.FC = () => {
 
         if (window.kakao?.maps?.services) {
           const geocoder = new window.kakao.maps.services.Geocoder();
-          geocoder.addressSearch(fullAddress, (result: any, status: any) => {
+          geocoder.addressSearch(fullAddress, (result, status) => {
             if (status !== window.kakao.maps.services.Status.OK || !result[0]) return;
             const lat = parseFloat(result[0].y);
             const lng = parseFloat(result[0].x);
             const location = new window.kakao.maps.LatLng(lat, lng);
             let subwayText = '', busText = '', parkingText = '';
             let completed = 0;
-            const calcDist = (r: any) => Math.round(Math.sqrt(Math.pow((parseFloat(r.y) - lat) * 111000, 2) + Math.pow((parseFloat(r.x) - lng) * 88000, 2)));
+            const calcDist = (r: kakao.maps.services.PlaceResult) => Math.round(Math.sqrt(Math.pow((parseFloat(r.y) - lat) * 111000, 2) + Math.pow((parseFloat(r.x) - lng) * 88000, 2)));
             const places = new window.kakao.maps.services.Places();
             const tryUpdate = () => {
               completed++;
               if (completed < 3) return;
               setData({ ...updatedData, transport: { subway: subwayText || updatedData.transport.subway, bus: busText || updatedData.transport.bus, parking: parkingText || updatedData.transport.parking } });
             };
-            places.keywordSearch('지하철역', (results: any, s: any) => {
+            places.keywordSearch('지하철역', (results, s) => {
               if (s === window.kakao.maps.services.Status.OK && results.length > 0)
-                subwayText = results.slice(0, 2).map((r: any) => { const dist = calcDist(r); return `${r.place_name.replace(' ', '')} 도보 약 ${Math.ceil(dist / 80)}분 (${dist}m)`; }).join('\n');
+                subwayText = results.slice(0, 2).map((r) => { const dist = calcDist(r); return `${r.place_name.replace(' ', '')} 도보 약 ${Math.ceil(dist / 80)}분 (${dist}m)`; }).join('\n');
               tryUpdate();
             }, { location, radius: 2000, sort: window.kakao.maps.services.SortBy.DISTANCE });
-            places.keywordSearch('버스 정류장', (results: any, s: any) => {
+            places.keywordSearch('버스 정류장', (results, s) => {
               if (s === window.kakao.maps.services.Status.OK && results.length > 0)
-                busText = results.slice(0, 2).map((r: any) => { const dist = calcDist(r); return `${r.place_name} 도보 약 ${Math.ceil(dist / 80)}분 (${dist}m)`; }).join('\n');
+                busText = results.slice(0, 2).map((r) => { const dist = calcDist(r); return `${r.place_name} 도보 약 ${Math.ceil(dist / 80)}분 (${dist}m)`; }).join('\n');
               tryUpdate();
             }, { location, radius: 2000, sort: window.kakao.maps.services.SortBy.DISTANCE });
             parkingText = `${venueNameFinal || '예식장'} 주차장 이용 가능 (직접 확인 권장)`;
