@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { uploadImage } from '../../../firebase';
+import { toast } from '../../../stores/useToastStore';
+import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
 
 const TimelineSection: React.FC = () => {
   const timeline = useInvitationStore((s) => s.data.timeline);
@@ -23,8 +25,8 @@ const TimelineSection: React.FC = () => {
     try {
       const url = await uploadImage(file, `images/${slug || 'temp'}/timeline/${eventId}_${Date.now()}_${file.name}`);
       updateTimelineEvent(eventId, 'photo', url);
-    } catch {
-      alert('사진 처리에 실패했습니다.');
+    } catch (err) {
+      toast.error(getFirebaseErrorMessage(err));
     } finally {
       setUploadingId(null);
       e.target.value = '';

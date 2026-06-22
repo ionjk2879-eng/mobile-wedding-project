@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Image as ImageIcon, Loader2 } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { uploadImage } from '../../../firebase';
+import { toast } from '../../../stores/useToastStore';
+import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
 
 const MessageSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -15,8 +17,8 @@ const MessageSection: React.FC = () => {
     try {
       const url = await uploadImage(file, `images/${data.slug || 'temp'}/profile/${field}_${Date.now()}_${file.name}`);
       updateField(field, url);
-    } catch {
-      alert('사진 처리에 실패했습니다.');
+    } catch (err) {
+      toast.error(getFirebaseErrorMessage(err));
     } finally {
       setUploadingField(null);
       e.target.value = '';

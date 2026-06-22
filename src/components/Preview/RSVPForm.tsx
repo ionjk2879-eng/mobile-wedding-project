@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { InvitationData, RSVPResponse } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
 import { submitRSVP } from '../../firebase';
+import { toast } from '../../stores/useToastStore';
+import { getFirebaseErrorMessage } from '../../utils/firebaseError';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 interface PreviewProps {
   data: InvitationData;
@@ -24,6 +27,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
   const [formOpen, setFormOpen] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
+  const trapRef = useFocusTrap(formOpen);
 
   useEffect(() => {
     if (!formOpen || !sectionRef.current) return;
@@ -60,7 +64,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
       setSubmitted(true);
     } catch (err) {
       console.error('RSVP 전송 실패:', err);
-      alert('전송에 실패했습니다. 다시 시도해주세요.');
+      toast.error(getFirebaseErrorMessage(err));
     }
   };
 
@@ -110,7 +114,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
 
       {formOpen && (
       <div className="rsvp-overlay" style={popupStyle} onClick={(e) => { if (e.target === e.currentTarget) setFormOpen(false); }}>
-      <div className="rsvp-modal" role="dialog" aria-modal="true" aria-label="참석 의사 전달"
+      <div className="rsvp-modal" role="dialog" aria-modal="true" aria-label="참석 의사 전달" ref={trapRef}
         onKeyDown={(e) => { if (e.key === 'Escape') setFormOpen(false); }}
       >
         <button type="button" className="rsvp-close-btn" onClick={() => setFormOpen(false)} aria-label="닫기">×</button>

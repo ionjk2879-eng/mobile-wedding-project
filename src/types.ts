@@ -36,58 +36,70 @@ export interface GuestMessage {
   createdAt: string;
 }
 
-export interface InvitationData {
+export interface BasicInfo {
   groomName: string;
   brideName: string;
   date: string;
   time: string;
+  weddingDateISO: string;
   venueName: string;
   venueAddress: string;
-  greetingTitle: string;
-  greetingContent: string;
   contacts: Contact[];
-  accounts: Account[];
-  accountStyle: 'style1' | 'style2' | 'style3';
-  galleryStyle: 'slide' | 'style3';
-  heroPhoto: string;
-  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split';
-  photos: string[];
-  fontFamily: string;
-  fontSize: 'small' | 'medium' | 'large';
-  bgMusicUrl: string;
-  groomMessage: string;
-  brideMessage: string;
-  groomPhoto: string;
-  bridePhoto: string;
-  isRSVPEnabled: boolean;
-  theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern';
-  bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';
-  bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti';
-  scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
-  
-  // New features
-  weddingDateISO: string;
+  parents: {
+    groomParents: Contact[];
+    brideParents: Contact[];
+  };
   transport: {
     subway: string;
     bus: string;
     parking: string;
   };
-  parents: {
-    groomParents: Contact[];
-    brideParents: Contact[];
-  };
+}
+
+export interface DesignConfig {
+  theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern';
+  bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';
+  bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti';
+  scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
+  heroPhoto: string;
+  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split';
+  fontFamily: string;
+  fontSize: 'small' | 'medium' | 'large';
+}
+
+export interface ContentData {
+  greetingTitle: string;
+  greetingContent: string;
+  groomMessage: string;
+  brideMessage: string;
+  groomPhoto: string;
+  bridePhoto: string;
+  photos: string[];
+  galleryStyle: 'slide' | 'style3';
   timeline: TimelineEvent[];
   interview: InterviewQA[];
+  accounts: Account[];
+  accountStyle: 'style1' | 'style2' | 'style3';
+  videoUrl: string;
+}
+
+export interface FeatureConfig {
+  isRSVPEnabled: boolean;
+  bgMusicUrl: string;
+  sectionOrder: string[];
+  language: 'ko' | 'en';
+  en: Partial<InvitationData>;
+}
+
+export interface SharingConfig {
   slug: string;
   shareUrl: string;
   shareTitle: string;
   shareDescription: string;
   kakaoAppKey: string;
-  sectionOrder: string[];
-  videoUrl: string;
-  language: 'ko' | 'en';
-  en: Partial<InvitationData>;
 }
+
+export type InvitationData = BasicInfo & DesignConfig & ContentData & FeatureConfig & SharingConfig;
 
 export interface RSVPResponse {
   id?: string;

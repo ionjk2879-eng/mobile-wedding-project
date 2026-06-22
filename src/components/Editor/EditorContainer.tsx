@@ -132,12 +132,37 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     <div className="editor-outer-layout">
       <aside className="editor-sidebar-slim" aria-label="에디터 네비게이션">
         <div className="sidebar-logo">SONETT</div>
-        <nav className="nav-menu-list" aria-label="섹션 네비게이션">
+        <nav className="nav-menu-list" role="menubar" aria-label="섹션 네비게이션" aria-orientation="vertical" onKeyDown={(e) => {
+          const items = navItems;
+          const currentIdx = items.findIndex((item) => item.id === activeSection);
+          if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            e.preventDefault();
+            const next = (currentIdx + 1) % items.length;
+            scrollToSection(items[next].id, items[next].ref);
+            (e.currentTarget.children[next] as HTMLElement)?.focus();
+          } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            const prev = (currentIdx - 1 + items.length) % items.length;
+            scrollToSection(items[prev].id, items[prev].ref);
+            (e.currentTarget.children[prev] as HTMLElement)?.focus();
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            scrollToSection(items[0].id, items[0].ref);
+            (e.currentTarget.children[0] as HTMLElement)?.focus();
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            const last = items.length - 1;
+            scrollToSection(items[last].id, items[last].ref);
+            (e.currentTarget.children[last] as HTMLElement)?.focus();
+          }
+        }}>
           {navItems.map((item) => (
             <button
               key={item.id}
+              role="menuitem"
               className={`nav-menu-item ${activeSection === item.id ? 'active' : ''}`}
               onClick={() => scrollToSection(item.id, item.ref)}
+              tabIndex={activeSection === item.id ? 0 : -1}
               aria-current={activeSection === item.id ? 'true' : undefined}
             >
               <div className="menu-icon">{item.icon}</div>

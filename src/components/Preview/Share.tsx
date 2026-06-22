@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Share2, Link } from 'lucide-react';
 import { InvitationData } from '../../types';
+import { toast } from '../../stores/useToastStore';
 
 interface PreviewProps {
   data: InvitationData;
@@ -17,7 +18,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
-    alert('링크가 복사되었습니다.');
+    toast.success('링크가 복사되었습니다.');
   };
 
   const handleKakaoShare = () => {

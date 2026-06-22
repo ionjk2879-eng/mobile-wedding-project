@@ -3,6 +3,8 @@ import { Image as ImageIcon, Loader2 } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { InvitationData } from '../../../types';
 import { uploadImage } from '../../../firebase';
+import { toast } from '../../../stores/useToastStore';
+import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
 
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -16,8 +18,8 @@ const HeroSection: React.FC = () => {
     try {
       const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`);
       updateField('heroPhoto', url);
-    } catch {
-      alert('사진 처리에 실패했습니다.');
+    } catch (err) {
+      toast.error(getFirebaseErrorMessage(err));
     } finally {
       setUploading(false);
       e.target.value = '';

@@ -1,27 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { db, collection, getDocs, query, orderBy } from '../firebase';
+import { fetchRSVPResponses, loadInvitation } from '../firebase';
+import { signInWithGoogle, signOut } from '../services/auth';
 import { RSVPResponse } from '../types';
-import { Users, Utensils, X, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut } from 'lucide-react';
+import useAuthStore from '../stores/useAuthStore';
 
 const AdminPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const user = useAuthStore((s) => s.user);
+  const authLoading = useAuthStore((s) => s.loading);
   const [responses, setResponses] = useState<RSVPResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (authLoading || !slug) return;
+    if (!user) { setAuthorized(false); setLoading(false); return; }
+    loadInvitation(slug).then((inv) => {
+      if (!inv) { setAuthorized(false); setLoading(false); return; }
+      const ownerUid = (inv as unknown as Record<string, unknown>).ownerUid as string | undefined;
+      setAuthorized(!ownerUid || ownerUid === user.uid);
+    });
+  }, [user, authLoading, slug]);
 
   const fetchResponses = async () => {
+    if (!slug) return;
     setLoading(true);
     try {
-      const q = query(collection(db, `invitations/${slug}/rsvp`), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      setResponses(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RSVPResponse)));
+      setResponses(await fetchRSVPResponses(slug));
     } catch (err) {
       console.error('데이터 로드 실패:', err);
     }
     setLoading(false);
   };
 
-  useEffect(() => { fetchResponses(); }, [slug]);
+  useEffect(() => { if (authorized) fetchResponses(); }, [slug, authorized]);
 
   const attending = responses.filter(r => r.isAttending);
   const totalGuests = attending.reduce((a, r) => a + r.totalGuests, 0);
@@ -29,6 +43,39 @@ const AdminPage: React.FC = () => {
   const groomGuests = attending.filter(r => r.relation === 'groom').reduce((a, r) => a + r.totalGuests, 0);
   const brideGuests = attending.filter(r => r.relation === 'bride').reduce((a, r) => a + r.totalGuests, 0);
   const notAttending = responses.filter(r => !r.isAttending).length;
+
+  if (authLoading) return <div className="admin-page"><p className="admin-loading">인증 확인 중...</p></div>;
+
+  if (!user) return (
+    <div className="admin-page">
+      <div className="admin-login">
+        <h1>SONETT</h1>
+        <p>관리 페이지에 접근하려면 로그인이 필요합니다.</p>
+        <button onClick={() => signInWithGoogle()} className="admin-btn login-btn"><LogIn size={18} /> Google로 로그인</button>
+      </div>
+      <style>{`
+        .admin-login { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; text-align: center; font-family: 'Pretendard', sans-serif; }
+        .admin-login h1 { color: #D4A5C6; letter-spacing: 3px; margin: 0; }
+        .admin-login p { color: #6B7280; margin: 0; }
+        .login-btn { background: #4285F4 !important; color: white !important; border: none !important; padding: 12px 24px !important; border-radius: 12px !important; font-weight: 700 !important; cursor: pointer; }
+      `}</style>
+    </div>
+  );
+
+  if (authorized === false) return (
+    <div className="admin-page">
+      <div className="admin-login">
+        <h1>SONETT</h1>
+        <p>이 청첩장의 관리 권한이 없습니다.</p>
+        <button onClick={() => signOut()} className="admin-btn"><LogOut size={18} /> 다른 계정으로 로그인</button>
+      </div>
+      <style>{`
+        .admin-login { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; text-align: center; font-family: 'Pretendard', sans-serif; }
+        .admin-login h1 { color: #D4A5C6; letter-spacing: 3px; margin: 0; }
+        .admin-login p { color: #6B7280; margin: 0; }
+      `}</style>
+    </div>
+  );
 
   return (
     <div className="admin-page">
@@ -40,6 +87,7 @@ const AdminPage: React.FC = () => {
         <div className="admin-actions">
           <button onClick={fetchResponses} className="admin-btn"><RefreshCw size={18} /> 새로고침</button>
           <Link to={`/w/${slug}`} className="admin-btn"><ArrowLeft size={18} /> 청첩장 보기</Link>
+          <button onClick={() => signOut()} className="admin-btn"><LogOut size={18} /> 로그아웃</button>
         </div>
       </header>
 

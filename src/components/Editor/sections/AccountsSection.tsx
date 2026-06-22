@@ -30,7 +30,7 @@ const AccountsSection: React.FC = () => {
               <span className="role-tag">{account.side}</span>
               <input type="text" placeholder="예금주" value={account.owner} onChange={(e) => updateAccount(index, 'owner', e.target.value)} className="modern-input transparent" />
             </div>
-            <input type="text" placeholder="계좌번호" value={account.number} onChange={(e) => updateAccount(index, 'number', e.target.value)} className="modern-input transparent full" />
+            <input type="text" placeholder="계좌번호" value={account.number} onChange={(e) => updateAccount(index, 'number', e.target.value.replace(/[^0-9-]/g, ''))} className="modern-input transparent full" inputMode="numeric" />
             <input type="text" placeholder="은행명" value={account.bank} onChange={(e) => updateAccount(index, 'bank', e.target.value)} className="modern-input transparent full" />
           </div>
         ))}

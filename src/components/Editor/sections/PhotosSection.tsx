@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { InvitationData } from '../../../types';
 import { uploadImage } from '../../../firebase';
+import { toast } from '../../../stores/useToastStore';
+import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
 
 const PhotosSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -20,8 +22,8 @@ const PhotosSection: React.FC = () => {
       );
       const urls = await Promise.all(uploads);
       addPhotos(urls);
-    } catch {
-      alert('사진 처리에 실패했습니다.');
+    } catch (err) {
+      toast.error(getFirebaseErrorMessage(err));
     } finally {
       setUploading(false);
       e.target.value = '';

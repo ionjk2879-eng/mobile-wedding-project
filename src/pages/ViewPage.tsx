@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { loadInvitation } from '../firebase';
 import { InvitationData } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
+import ToastContainer from '../components/Toast';
 import { ScrollRootContext } from '../components/Preview/ScrollReveal';
 
 const ViewPage: React.FC = () => {
@@ -30,6 +31,7 @@ const ViewPage: React.FC = () => {
 
   return (
     <div className="view-container" style={{ fontFamily: data.fontFamily }} ref={scrollRef}>
+      <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize() }}>
         <ScrollRootContext.Provider value={scrollRef}>
           <InvitationView data={data} />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 
 const BasicInfoSection: React.FC = () => {
@@ -7,6 +7,20 @@ const BasicInfoSection: React.FC = () => {
   const updateFields = useInvitationStore((s) => s.updateFields);
   const updateContact = useInvitationStore((s) => s.updateContact);
   const updateParent = useInvitationStore((s) => s.updateParent);
+
+  const formatPhone = (value: string): string => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  };
+
+  const isPastDate = useMemo(() => {
+    if (!data.weddingDateISO) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return new Date(data.weddingDateISO) < today;
+  }, [data.weddingDateISO]);
 
   const parseTime = (timeStr: string) => {
     const parts = timeStr.match(/(AM|PM)\s(\d+):(\d+)/);
@@ -59,7 +73,7 @@ const BasicInfoSection: React.FC = () => {
             </div>
             <div className="basic-field">
               <label>연락처</label>
-              <input type="text" value={data.contacts.find(c => c.role === label)?.phone || ''} onChange={(e) => updateContact(contactIdx, 'phone', e.target.value)} className="modern-input" placeholder="010-0000-0000" />
+              <input type="tel" value={data.contacts.find(c => c.role === label)?.phone || ''} onChange={(e) => updateContact(contactIdx, 'phone', formatPhone(e.target.value))} className="modern-input" placeholder="010-0000-0000" />
             </div>
           </div>
           {['아버지', '어머니'].map(role => (
@@ -73,7 +87,7 @@ const BasicInfoSection: React.FC = () => {
               </div>
               <div className="basic-field">
                 <label>{role} 연락처</label>
-                <input type="text" value={getParentPhone(parentSide, role)} onChange={(e) => updateParent(parentSide, role, 'phone', e.target.value)} className="modern-input" placeholder="010-0000-0000" />
+                <input type="tel" value={getParentPhone(parentSide, role)} onChange={(e) => updateParent(parentSide, role, 'phone', formatPhone(e.target.value))} className="modern-input" placeholder="010-0000-0000" />
               </div>
             </div>
           ))}
@@ -92,7 +106,8 @@ const BasicInfoSection: React.FC = () => {
           <div className="date-time-row">
             <div className="basic-field date-field">
               <label>예식일</label>
-              <input type="date" value={data.weddingDateISO} onChange={(e) => handleDateChange(e.target.value)} className="modern-input" />
+              <input type="date" value={data.weddingDateISO} onChange={(e) => handleDateChange(e.target.value)} className={`modern-input ${isPastDate ? 'input-warning' : ''}`} />
+              {isPastDate && <span className="input-hint hint-warning">과거 날짜가 선택되었습니다.</span>}
             </div>
             <div className="basic-field date-field">
               <label>표시 날짜</label>

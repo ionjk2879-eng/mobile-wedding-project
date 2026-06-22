@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { InvitationData } from '../../types';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 interface PreviewProps {
   data: InvitationData;
@@ -8,6 +9,7 @@ interface PreviewProps {
 
 const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const lightboxTrapRef = useFocusTrap(selectedIndex !== null);
 
   const [previewIdx, setPreviewIdx] = useState(0);
 
@@ -199,7 +201,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
       )}
 
       {selectedIndex !== null && (
-        <div className="lightbox-overlay" role="dialog" aria-modal="true" aria-label="사진 확대 보기">
+        <div className="lightbox-overlay" role="dialog" aria-modal="true" aria-label="사진 확대 보기" ref={lightboxTrapRef}>
           <div className="lightbox-backdrop" onClick={closeLightbox} />
           <button className="close-btn" onClick={closeLightbox} aria-label="닫기"><X size={32} /></button>
           <div

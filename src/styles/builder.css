@@ -6,8 +6,13 @@
 .builder-header h1 { font-size: 1.4rem; font-weight: 800; margin: 0; color: #111827; }
 .builder-header p { font-size: 0.85rem; color: #6B7280; margin: 0; }
 .header-btns { display: flex; gap: 8px; }
-.save-btn { padding: 10px 20px; background: #D4A5C6; color: white; border: none; border-radius: 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-.save-btn:hover { filter: brightness(0.9); }
+.save-btn { padding: 10px 20px; background: #D4A5C6; color: white; border: none; border-radius: 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+.save-btn:hover:not(:disabled) { filter: brightness(0.9); }
+.save-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.save-btn .spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.autosave-toggle { padding: 10px 14px; border: 1px solid #E5E7EB; border-radius: 12px; font-size: 0.78rem; font-weight: 700; color: #9CA3AF; background: #F9FAFB; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.autosave-toggle.active { color: #16A34A; border-color: #BBF7D0; background: #F0FDF4; }
 .view-btn, .admin-link-btn { padding: 10px 16px; border: 1px solid #E5E7EB; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #4B5563; text-decoration: none; transition: all 0.2s; display: flex; align-items: center; }
 .view-btn:hover, .admin-link-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
 

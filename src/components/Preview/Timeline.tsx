@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { InvitationData } from '../../types';
 
 interface PreviewProps {
@@ -8,6 +8,21 @@ interface PreviewProps {
 const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
   const events = data.timeline || [];
   const [open, setOpen] = useState(false);
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  const handleToggle = useCallback(() => {
+    const el = bodyRef.current;
+    if (!el) { setOpen(v => !v); return; }
+    if (open) {
+      el.style.maxHeight = el.scrollHeight + 'px';
+      requestAnimationFrame(() => { el.style.maxHeight = '0px'; });
+    } else {
+      el.style.maxHeight = el.scrollHeight + 'px';
+      const onEnd = () => { el.style.maxHeight = ''; el.removeEventListener('transitionend', onEnd); };
+      el.addEventListener('transitionend', onEnd);
+    }
+    setOpen(v => !v);
+  }, [open]);
 
   if (events.length === 0) return null;
 
@@ -16,11 +31,11 @@ const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
       <h2>OUR STORY</h2>
       <p className="section-sub">처음 만남부터 결혼까지, 우리의 여정</p>
 
-      <button type="button" className={`timeline-toggle ${open ? 'open' : ''}`} onClick={() => setOpen(!open)} aria-expanded={open}>
+      <button type="button" className={`timeline-toggle ${open ? 'open' : ''}`} onClick={handleToggle} aria-expanded={open}>
         {open ? (data.language === 'en' ? 'Close' : '닫기') : (data.language === 'en' ? 'View Our Story' : '이야기 보기')}
       </button>
 
-      <div className={`timeline-body ${open ? 'open' : ''}`}>
+      <div className={`timeline-body ${open ? 'open' : ''}`} ref={bodyRef}>
         <div className="tl-zigzag">
           {events.map((event, index) => {
             const isLeft = index % 2 === 0;
@@ -98,10 +113,10 @@ const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
         .timeline-body {
           max-height: 0;
           overflow: hidden;
-          transition: max-height 0.5s ease;
+          transition: max-height 0.4s ease;
         }
         .timeline-body.open {
-          max-height: 20000px;
+          max-height: none;
         }
         .tl-zigzag {
           padding: 30px 20px 20px;
