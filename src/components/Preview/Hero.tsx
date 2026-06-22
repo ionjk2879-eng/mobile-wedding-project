@@ -166,7 +166,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         .hero-info { display: flex; flex-direction: column; align-items: center; gap: 6px; }
         .hero-quote { font-size: 0.85em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 12px; opacity: 0.8; }
         .hero-dday { display: inline-block; padding: 4px 12px; background: color-mix(in srgb, var(--wedding-accent) 10%, transparent); color: var(--wedding-accent); border: 1px solid var(--wedding-accent); border-radius: 4px; font-size: 0.75em; font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; }
-        .hero-label { font-size: 0.7em; letter-spacing: 3px; color: var(--wedding-text-sub); opacity: 0.8; margin: 0; }
+        .hero-label { font-size: 0.7em; letter-spacing: 3px; color: var(--wedding-main); opacity: 0.7; margin: 0; font-weight: 600; }
         .hero-names { font-size: 1.8em; font-weight: 400; color: var(--wedding-text-main); margin: 10px 0; letter-spacing: 0.05em; }
         .hero-names .amp { font-size: 0.7em; color: var(--wedding-accent); opacity: 0.6; font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; }
         .hero-date { font-size: 1em; font-weight: 500; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; }

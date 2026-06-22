@@ -25,7 +25,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
   useEffect(() => {
-    const timer = setTimeout(() => setPhase('ready'), 300);
+    const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
   }, []);
 
@@ -44,7 +44,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const bride = brideName || '신부';
 
   const handleDismiss = () => {
-    if (phase === 'exit') return;
+    if (phase !== 'ready') return;
     setPhase('exit');
     setTimeout(() => setDismissed(true), isCurtain ? 1200 : 2200);
   };

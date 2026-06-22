@@ -7,7 +7,7 @@ import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation } from './firebase';
 import { getFirebaseErrorMessage } from './utils/firebaseError';
-import { Edit3, Eye, Save, ExternalLink, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
+import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
 import './styles/effects.css';
 import './styles/builder.css';
 
@@ -18,7 +18,7 @@ const App: React.FC = () => {
   const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
   const [previewNavOpen, setPreviewNavOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
-  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const autoSaveEnabled = true;
   const [loadingData, setLoadingData] = useState(false);
   const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
   const hasSavedOnceRef = useRef(false);
@@ -220,35 +220,31 @@ const App: React.FC = () => {
       <ToastContainer />
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Dancing+Script&display=swap" rel="stylesheet" />
 
+      <div className="builder-topbar-wrap"><header className="builder-topbar">
+        <div className="topbar-left" onClick={() => {
+          const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
+          history.pushState({ screen: 'start' }, '', '/');
+          if (mySlugs.length > 0) setShowStartScreen(mySlugs);
+          else { setData(initialData); hasSavedOnceRef.current = false; }
+        }} style={{ cursor: 'pointer' }}>
+          <h1 className="header-logo">Sonett</h1>
+        </div>
+        <div className="topbar-right">
+          <button className="save-btn" disabled={saveStatus === 'saving'} onClick={() => {
+            if (!data.slug) { toast.warning('청첩장 주소를 먼저 설정해주세요.'); return; }
+            if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) { toast.warning('주소는 영문 소문자, 숫자, 하이픈만 사용 가능합니다.'); return; }
+            performSave(false);
+          }}>
+            <Save size={15} />
+            {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
+          </button>
+          {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> 응답 확인</a>}
+          <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> 초기화</button>
+        </div>
+      </header></div>
+
       <main className="builder-main-container">
         <div className={`editor-panel ${mobileView === 'preview' ? 'mobile-hidden' : ''}`}>
-          <header className="builder-header">
-            <div className="header-main" onClick={() => {
-              const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
-              history.pushState({ screen: 'start' }, '', '/');
-              if (mySlugs.length > 0) setShowStartScreen(mySlugs);
-              else { setData(initialData); hasSavedOnceRef.current = false; }
-            }} style={{ cursor: 'pointer' }}>
-              <h1 className="header-logo">Sonett</h1>
-              <p className="header-desc">소네트 모바일 청첩장</p>
-            </div>
-            <div className="header-btns">
-              <button className="save-btn" disabled={saveStatus === 'saving'} onClick={() => {
-                if (!data.slug) { toast.warning('청첩장 주소를 먼저 설정해주세요.'); return; }
-                if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) { toast.warning('주소는 영문 소문자, 숫자, 하이픈만 사용 가능합니다.'); return; }
-                performSave(false);
-              }}>
-                <Save size={15} />
-                {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
-              </button>
-              <button className={`autosave-toggle ${autoSaveEnabled ? 'active' : ''}`} onClick={() => setAutoSaveEnabled(!autoSaveEnabled)} title={autoSaveEnabled ? '자동 저장 켜짐' : '자동 저장 꺼짐'}>
-                {autoSaveEnabled ? '자동저장 ON' : '자동저장 OFF'}
-              </button>
-              {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-text-btn"><ExternalLink size={15} /> 청첩장 보기</a>}
-              {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> 응답 확인</a>}
-              <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> 초기화</button>
-            </div>
-          </header>
           <EditorContainer onSectionClick={handleSectionScroll} />
         </div>
 

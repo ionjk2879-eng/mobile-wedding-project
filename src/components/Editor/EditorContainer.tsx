@@ -52,8 +52,8 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
   const [activeSection, setActiveSection] = React.useState('design');
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
-    hero: false, opening: false, theme: true, design: true, basic: true, datetime: true,
-    greeting: false, message: false, location: false, contacts: false,
+    hero: true, opening: false, theme: true, design: false, basic: true, datetime: true,
+    greeting: false, message: false, location: true, contacts: false,
     accounts: false, photos: false, timeline: false, interview: false,
     rsvp: false, guestbook: false, share: false, order: false, music: false,
   });
