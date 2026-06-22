@@ -34,6 +34,9 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ open, onClose, a
 
   if (!open || !rect) return null;
 
+  const themeEl = anchorRef.current?.closest('[class*="theme-"]');
+  const themeClass = themeEl ? Array.from(themeEl.classList).find(c => c.startsWith('theme-')) || '' : '';
+
   const style: React.CSSProperties = {
     position: 'fixed',
     top: rect.top,
@@ -49,7 +52,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ open, onClose, a
   };
 
   return ReactDOM.createPortal(
-    <div className="pv-overlay-root" style={style}>
+    <div className={`pv-overlay-root ${themeClass}`} style={style}>
       <div className="pv-overlay-header">
         <span>{title}</span>
         <button type="button" onClick={onClose} aria-label="닫기">✕</button>

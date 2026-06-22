@@ -68,7 +68,7 @@
 }
 .pv-overlay-header span { font-size: 1em; font-weight: 700; color: var(--wedding-text-main, #1F2937); }
 .pv-overlay-header button { background: none; border: none; color: var(--wedding-text-sub, #6B7280); cursor: pointer; padding: 4px; font-size: 1.1em; display: flex; align-items: center; transition: color 0.2s; }
-.pv-overlay-header button:hover { color: var(--wedding-text-main, #1F2937); }
+.pv-overlay-header button:hover { color: var(--wedding-main, #D4A5C6); }
 .pv-overlay-body { padding: 24px; flex: 1; overflow-y: auto; }
 .pf-group { margin-bottom: 14px; }
 .pf-label { display: flex; align-items: center; gap: 5px; font-size: 0.72em; font-weight: 700; color: var(--wedding-main); margin-bottom: 6px; }
