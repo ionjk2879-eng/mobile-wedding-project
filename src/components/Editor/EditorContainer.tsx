@@ -209,15 +209,17 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
       {mobileNavOpen && (
         <div className="mobile-nav-overlay" onClick={() => setMobileNavOpen(false)}>
           <div className="mobile-nav-panel" onClick={(e) => e.stopPropagation()}>
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                className={`mobile-nav-item ${activeSection === item.id ? 'active' : ''}`}
-                onClick={() => { scrollToSection(item.id, item.ref); setMobileNavOpen(false); }}
-              >
-                {item.icon}
-                <span>{item.name}</span>
-              </button>
+            {navItems.map((item, i) => (
+              <React.Fragment key={item.id}>
+                {i > 0 && i % 4 === 0 && <div className="mobile-nav-divider" />}
+                <button
+                  className={`mobile-nav-item ${activeSection === item.id ? 'active' : ''}`}
+                  onClick={() => { scrollToSection(item.id, item.ref); setMobileNavOpen(false); }}
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </button>
+              </React.Fragment>
             ))}
           </div>
         </div>

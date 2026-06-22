@@ -50,7 +50,7 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
           gap: 24px;
         }
         .message-box {
-          padding: 16px;
+          padding: 14px 16px;
           background: var(--wedding-card-bg);
           border-radius: 20px;
           border: 1px solid var(--wedding-border);
@@ -62,21 +62,21 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
         .msg-profile-row.reverse .msg-content { text-align: center; }
         .msg-profile-row {
           display: flex;
-          align-items: flex-start;
+          align-items: center;
           gap: 14px;
         }
         .msg-profile-img {
-          width: 130px;
-          height: 130px;
-          border-radius: 14px;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
           object-fit: cover;
           flex-shrink: 0;
           border: 2px solid var(--wedding-border);
         }
         .msg-profile-empty {
-          width: 130px;
-          height: 130px;
-          border-radius: 14px;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
           flex-shrink: 0;
           background: var(--wedding-border);
           opacity: 0.5;

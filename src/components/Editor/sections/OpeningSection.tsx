@@ -20,7 +20,7 @@ const OpeningSection: React.FC = () => {
       <div className="input-group">
         <label className="modern-checkbox">
           <input type="checkbox" checked={opening.openingEnabled} onChange={(e) => update({ openingEnabled: e.target.checked })} />
-          <span>오프닝 애니메이션 활성화</span>
+          <span>오프닝 애니메이션 활성화 <em style={{ fontWeight: 400, color: '#D4A5C6', fontSize: '0.85em' }}>(전체화면으로 확인해보세요!)</em></span>
         </label>
       </div>
 

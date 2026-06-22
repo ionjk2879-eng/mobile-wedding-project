@@ -54,7 +54,7 @@ const MessageSection: React.FC = () => {
             )}
           </div>
           <div className="profile-msg-input">
-            <textarea value={data[msgField]} onChange={(e) => updateField(msgField, e.target.value)} rows={2} className="modern-input" placeholder={placeholder} />
+            <textarea value={data[msgField]} onChange={(e) => updateField(msgField, e.target.value)} rows={3} className="modern-input" placeholder={placeholder} style={{ minHeight: 80 }} />
           </div>
         </div>
       </div>

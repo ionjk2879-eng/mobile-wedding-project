@@ -49,7 +49,7 @@
 /* Profile message */
 .profile-msg-card { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
 .profile-msg-header { padding: 14px 20px; border-bottom: 1px solid #F0F2F5; }
-.profile-msg-body { display: flex; gap: 16px; padding: 20px; align-items: flex-start; }
+.profile-msg-body { display: flex; gap: 16px; padding: 20px; align-items: center; }
 .profile-upload-area { flex-shrink: 0; }
 .profile-thumb { position: relative; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; }
 .profile-thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -259,8 +259,8 @@
     display: flex; align-items: center; justify-content: center;
     position: fixed; bottom: 90px; right: 16px; z-index: 9998;
     width: 48px; height: 48px; border-radius: 50%;
-    background: #D4A5C6; color: white; border: none;
-    box-shadow: 0 4px 16px rgba(212, 165, 198, 0.4);
+    background: color-mix(in srgb, var(--wedding-accent, #D4A5C6) 90%, white 10%); color: white; border: none;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--wedding-accent, #D4A5C6) 40%, transparent);
     cursor: pointer; transition: all 0.2s;
   }
   .mobile-nav-fab:active { transform: scale(0.92); }
@@ -291,8 +291,9 @@
     color: #4B5563; cursor: pointer; transition: all 0.15s;
     text-align: left;
   }
-  .mobile-nav-item:hover, .mobile-nav-item.active { background: #FFF5F7; color: #D4A5C6; }
+  .mobile-nav-item:hover, .mobile-nav-item.active { background: color-mix(in srgb, var(--wedding-accent, #D4A5C6) 10%, white); color: var(--wedding-main, #D4A5C6); }
   .mobile-nav-item svg { flex-shrink: 0; width: 16px; height: 16px; }
+  .mobile-nav-divider { height: 1px; background: #D9DCE0; margin: 4px 8px; }
   .basic-field-row { grid-template-columns: 1fr; }
   .date-time-row { grid-template-columns: 1fr; }
   .input-grid-2 { grid-template-columns: 1fr; }

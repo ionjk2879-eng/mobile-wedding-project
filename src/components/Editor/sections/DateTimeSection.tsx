@@ -60,14 +60,6 @@ const DateTimeSection: React.FC = () => {
           <button type="button" className="time-adj" onClick={() => adjustTime('minutes', 5)}>{timeParts.minutes.toString().padStart(2, '0')}</button>
         </div>
       </div>
-      <div className="basic-field">
-        <label>예식장 이름</label>
-        <input type="text" value={data.venueName} onChange={(e) => updateField('venueName', e.target.value)} className="modern-input" placeholder="예식장 이름" />
-      </div>
-      <div className="basic-field">
-        <label>예식장 주소</label>
-        <input type="text" value={data.venueAddress} onChange={(e) => updateField('venueAddress', e.target.value)} className="modern-input" placeholder="예식장 주소" />
-      </div>
     </div>
   );
 };

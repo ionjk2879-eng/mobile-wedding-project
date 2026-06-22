@@ -165,6 +165,22 @@ a {
   color: inherit;
 }
 
+/* Nanum Myeongjo readability fix */
+.preview-wrapper[style*="Nanum Myeongjo"],
+.invitation-page[style*="Nanum Myeongjo"] {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-size: 1.05em;
+  letter-spacing: 0.2px;
+}
+@media (max-width: 480px) {
+  .preview-wrapper[style*="Nanum Myeongjo"],
+  .invitation-page[style*="Nanum Myeongjo"] {
+    font-size: 1.1em;
+  }
+}
+
 /* Scroll Reveal Animations */
 .scroll-reveal {
   transition: opacity 0.8s ease, transform 0.8s ease;

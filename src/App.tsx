@@ -7,7 +7,7 @@ import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation } from './firebase';
 import { getFirebaseErrorMessage } from './utils/firebaseError';
-import { Edit3, Eye, Save, ExternalLink, ClipboardList, RotateCcw, Trash2 } from 'lucide-react';
+import { Edit3, Eye, Save, ExternalLink, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
 import './styles/effects.css';
 import './styles/builder.css';
 
@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const setData = useInvitationStore((s) => s.setData);
   const [isFullPreview, setIsFullPreview] = useState(false);
   const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
+  const [previewNavOpen, setPreviewNavOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [loadingData, setLoadingData] = useState(false);
@@ -263,6 +264,39 @@ const App: React.FC = () => {
               </ScrollRootContext.Provider>
             </div>
           </div>
+
+          <button className="preview-nav-fab" onClick={() => setPreviewNavOpen(!previewNavOpen)}>
+            {previewNavOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+          {previewNavOpen && (
+            <div className="preview-nav-overlay" onClick={() => setPreviewNavOpen(false)}>
+              <div className="preview-nav-panel" onClick={(e) => e.stopPropagation()}>
+                {[
+                  { id: 'basic', name: '메인/기본정보' },
+                  { id: 'greeting', name: '인사말' },
+                  { id: 'message', name: '한마디' },
+                  { id: 'interview', name: '인터뷰' },
+                  { id: 'photos', name: '갤러리' },
+                  { id: 'timeline', name: '타임라인' },
+                  { id: 'location', name: '장소' },
+                  { id: 'guestbook', name: '방명록' },
+                  { id: 'rsvp', name: '참석의사' },
+                  { id: 'accounts', name: '계좌' },
+                  { id: 'contacts', name: '연락처' },
+                  { id: 'share', name: '공유' },
+                ].map((item, i) => (
+                  <React.Fragment key={item.id}>
+                    {i > 0 && i % 4 === 0 && <div className="preview-nav-divider" />}
+                    <button className="preview-nav-item" onClick={() => {
+                      const ref = previewRefs[item.id as keyof typeof previewRefs];
+                      if (ref?.current) ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setPreviewNavOpen(false);
+                    }}>{item.name}</button>
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
