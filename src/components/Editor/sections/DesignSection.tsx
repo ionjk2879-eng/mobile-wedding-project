@@ -1,0 +1,86 @@
+import React from 'react';
+import useInvitationStore from '../../../stores/useInvitationStore';
+
+const FONTS = [
+  { name: '기본 (Pretendard)', value: "'Pretendard', sans-serif" },
+  { name: 'Cormorant Garamond (럭셔리 세리프)', value: "'Cormorant Garamond', serif" },
+  { name: 'Playfair Display (에디토리얼 세리프)', value: "'Playfair Display', serif" },
+  { name: '고운 바탕 (세리프)', value: "'Gowun Batang', serif" },
+  { name: '고운 돋움 (산세리프)', value: "'Gowun Dodum', sans-serif" },
+  { name: '나눔 명조 (클래식)', value: "'Nanum Myeongjo', serif" },
+  { name: 'Dancing Script (영문 필기체)', value: "'Dancing Script', cursive" },
+];
+
+const TEXTURES = [
+  { key: 'none', name: '없음' }, { key: 'paper', name: '한지' }, { key: 'linen', name: '린넨' },
+  { key: 'pattern', name: '도트' }, { key: 'silk', name: '실크' }, { key: 'watercolor', name: '수채화' },
+];
+
+const EFFECTS = [
+  { key: 'none', name: '없음', icon: '—' }, { key: 'cherry-blossom', name: '벚꽃', icon: '🌸' },
+  { key: 'snow', name: '함박눈', icon: '❄️' }, { key: 'stars', name: '별빛', icon: '✨' },
+  { key: 'leaves', name: '나뭇잎', icon: '🍃' }, { key: 'hearts', name: '하트', icon: '💕' },
+  { key: 'firefly', name: '반딧불', icon: '🔅' }, { key: 'confetti', name: '꽃가루', icon: '🎊' },
+];
+
+const SCROLL_EFFECTS = [
+  { key: 'none', name: '없음', icon: '—' }, { key: 'fade-up', name: '페이드 업', icon: '↑' },
+  { key: 'fade-in', name: '페이드 인', icon: '◎' }, { key: 'slide-in', name: '슬라이드', icon: '→' },
+];
+
+const DesignSection: React.FC = () => {
+  const data = useInvitationStore((s) => s.data);
+  const updateField = useInvitationStore((s) => s.updateField);
+
+  return (
+    <>
+      <div className="input-grid-2">
+        <div className="input-group">
+          <label>기본 언어</label>
+          <div className="tab-group modern">
+            <button className={`tab-btn ${data.language === 'ko' ? 'active' : ''}`} onClick={() => updateField('language', 'ko')}>KOREAN</button>
+            <button className={`tab-btn ${data.language === 'en' ? 'active' : ''}`} onClick={() => updateField('language', 'en')}>ENGLISH</button>
+          </div>
+        </div>
+        <div className="input-group">
+          <label>글꼴 선택</label>
+          <select value={data.fontFamily} onChange={(e) => updateField('fontFamily', e.target.value)} className="modern-input">
+            {FONTS.map(font => <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>{font.name}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="input-group">
+        <label>배경 재질</label>
+        <div className="theme-select-grid modern">
+          {TEXTURES.map(t => (
+            <button key={t.key} type="button" className={`theme-chip ${(data.bgTexture || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgTexture', t.key as any)}>
+              <span className={`texture-preview tex-${t.key}`}></span>{t.name}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="input-group">
+        <label>흩날리는 효과</label>
+        <div className="theme-select-grid modern">
+          {EFFECTS.map(t => (
+            <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgEffect', t.key as any)}>
+              <span className="effect-icon">{t.icon}</span>{t.name}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="input-group">
+        <label>스크롤 등장 효과 <span className="label-hint">(전체화면으로 확인해보세요!)</span></label>
+        <div className="theme-select-grid modern">
+          {SCROLL_EFFECTS.map(t => (
+            <button key={t.key} type="button" className={`theme-chip ${(data.scrollEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('scrollEffect', t.key as any)}>
+              <span className="effect-icon">{t.icon}</span>{t.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default DesignSection;

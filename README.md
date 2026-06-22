@@ -35,17 +35,7 @@
 - 사이드바 네비게이션으로 15개 편집 섹션 간 빠른 이동
 - 전체화면 프리뷰 모드 지원
 
-### 2. 테마 및 디자인 시스템
-- **8가지 컬러 테마:** Blush Pink, Champagne, Sage Green, Classic Navy, Burgundy Wine, Lavender, Dusty Rose, Modern White
-- **6가지 배경 재질:** 한지, 린넨, 도트, 실크, 수채화 (CSS SVG 필터 기반 구현)
-- **7가지 흩날리는 효과:** 벚꽃, 함박눈, 별빛, 나뭇잎, 하트, 반딧불, 꽃가루 (CSS 파티클 애니메이션)
-- **4가지 스크롤 등장 효과:** Fade Up, Fade In, Slide In (IntersectionObserver 기반)
-- CSS 변수 기반의 테마 시스템으로 일관된 색상 관리
-
-### 3. 메인화면 (Hero) 6가지 레이아웃
-- Classic, Overlay, Minimal, Editorial, Fullscreen, Split
-- D-Day 자동 카운트다운 표시
-- 커스텀 메인 사진 업로드
+/
 
 ### 4. 콘텐츠 섹션 (11개)
 | 섹션 | 설명 |

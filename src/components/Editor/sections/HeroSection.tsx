@@ -1,0 +1,58 @@
+import React from 'react';
+import { Image as ImageIcon } from 'lucide-react';
+import useInvitationStore from '../../../stores/useInvitationStore';
+
+const HeroSection: React.FC = () => {
+  const data = useInvitationStore((s) => s.data);
+  const updateField = useInvitationStore((s) => s.updateField);
+
+  const handleHeroPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => updateField('heroPhoto', event.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <>
+      <div className="input-group">
+        <label>메인 사진</label>
+        <div className="modern-hero-upload">
+          {data.heroPhoto ? (
+            <>
+              <img src={data.heroPhoto} alt="Hero" />
+              <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden /></label>
+            </>
+          ) : (
+            <label className="hero-empty-upload">
+              <ImageIcon size={24} />
+              <span>메인 사진 등록</span>
+              <input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden />
+            </label>
+          )}
+        </div>
+      </div>
+      <div className="input-group">
+        <label>메인화면 스타일</label>
+        <div className="hero-style-grid">
+          {[
+            { key: 'classic', name: '클래식', desc: '사진 위, 정보 아래' },
+            { key: 'overlay', name: '오버레이', desc: '사진 위에 텍스트 겹침' },
+            { key: 'minimal', name: '미니멀', desc: '이름과 날짜만 강조' },
+            { key: 'editorial', name: '에디토리얼', desc: '매거진 느낌 레이아웃' },
+            { key: 'fullscreen', name: '풀스크린', desc: '사진이 전체를 채움' },
+            { key: 'split', name: '스플릿', desc: '좌우 분할 레이아웃' },
+          ].map(s => (
+            <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key as any)}>
+              <strong>{s.name}</strong>
+              <span>{s.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default HeroSection;

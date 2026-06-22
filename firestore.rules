@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 청첩장 데이터
+    match /invitations/{slug} {
+      // 누구나 읽기 가능 (하객 열람)
+      allow read: if true;
+
+      // 쓰기: 문서 크기 제한 (1MB 이내)
+      allow create, update: if true
+        && request.resource.data.groomName is string
+        && request.resource.data.brideName is string
+        && request.resource.data.slug is string;
+
+      allow delete: if false;
+    }
+
+    // RSVP 응답 (서브컬렉션)
+    match /invitations/{slug}/rsvp/{docId} {
+      // 관리자: 읽기 가능
+      allow read: if true;
+
+      // 하객: 쓰기 가능 (유효성 검사)
+      allow create: if true
+        && request.resource.data.guestName is string
+        && request.resource.data.guestName.size() > 0
+        && request.resource.data.guestName.size() <= 50
+        && request.resource.data.isAttending is bool
+        && request.resource.data.totalGuests is int
+        && request.resource.data.totalGuests >= 1
+        && request.resource.data.totalGuests <= 10
+        && (!('message' in request.resource.data) || request.resource.data.message.size() <= 500);
+
+      // 수정/삭제 불가
+      allow update, delete: if false;
+    }
+
+    // 그 외 모든 경로 차단
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

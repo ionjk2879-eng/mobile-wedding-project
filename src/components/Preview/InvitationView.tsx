@@ -1,0 +1,71 @@
+import React from 'react';
+import { InvitationData } from '../../types';
+import Hero from './Hero';
+import Greeting from './Greeting';
+import Calendar from './Calendar';
+import PersonalMessage from './PersonalMessage';
+import Interview from './Interview';
+import Gallery from './Gallery';
+import Timeline from './Timeline';
+import Location from './Location';
+import RSVPForm from './RSVPForm';
+import Money from './Money';
+import Contacts from './Contacts';
+import Share from './Share';
+import ScrollReveal from './ScrollReveal';
+import BackgroundEffects from './BackgroundEffects';
+import MusicPlayer from './MusicPlayer';
+
+interface InvitationViewProps {
+  data: InvitationData;
+  previewRefs?: Record<string, React.RefObject<HTMLDivElement>>;
+}
+
+const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement> }> = ({ id, data, refEl }) => {
+  const wrap = (children: React.ReactNode) => refEl ? <div ref={refEl}>{children}</div> : <>{children}</>;
+
+  switch (id) {
+    case 'greeting': return wrap(<Greeting data={data} />);
+    case 'calendar': return <Calendar data={data} />;
+    case 'message': return wrap(<PersonalMessage data={data} />);
+    case 'interview': return wrap(<Interview data={data} />);
+    case 'photos': return wrap(<Gallery data={data} />);
+    case 'timeline': return wrap(<Timeline data={data} />);
+    case 'location': return wrap(<Location data={data} />);
+    case 'rsvp': return wrap(<RSVPForm data={data} />);
+    case 'accounts': return wrap(<Money data={data} />);
+    case 'contacts': return wrap(<Contacts data={data} />);
+    case 'share': return wrap(<Share data={data} />);
+    default: return null;
+  }
+};
+
+const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'accounts', 'contacts', 'share'];
+
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs }) => {
+  const sectionOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
+
+  return (
+    <div className={`preview-wrapper texture-${data.bgTexture || 'none'}`}>
+      <BackgroundEffects effect={data.bgEffect} />
+      <MusicPlayer url={data.bgMusicUrl} />
+      {previewRefs?.basic ? (
+        <div ref={previewRefs.basic}><Hero data={data} /></div>
+      ) : (
+        <Hero data={data} />
+      )}
+      {sectionOrder.map((id, i) => {
+        const eff = data.scrollEffect || 'none';
+        const delay = i % 2 === 0 ? 0 : 100;
+        const ref = previewRefs?.[id];
+        return (
+          <ScrollReveal key={id} effect={eff} delay={delay}>
+            <SectionComponent id={id} data={data} refEl={ref} />
+          </ScrollReveal>
+        );
+      })}
+    </div>
+  );
+};
+
+export default InvitationView;

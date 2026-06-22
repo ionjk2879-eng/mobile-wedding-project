@@ -3,12 +3,12 @@ import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, query, 
 import { InvitationData } from './types';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCBePNVNVFELc5YGEX8iuwRbSygr08efr8",
-  authDomain: "sonett-23064.firebaseapp.com",
-  projectId: "sonett-23064",
-  storageBucket: "sonett-23064.firebasestorage.app",
-  messagingSenderId: "425141601057",
-  appId: "1:425141601057:web:fe9329aa77cb96e6b83460"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
