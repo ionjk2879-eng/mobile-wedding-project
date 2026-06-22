@@ -5,7 +5,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const Interview: React.FC<PreviewProps> = ({ data }) => {
+const Interview: React.FC<PreviewProps> = React.memo(({ data }) => {
   const qaList = data.interview || [];
   const [open, setOpen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
@@ -259,6 +259,10 @@ const Interview: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) =>
+  prev.data.interview === next.data.interview
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 export default Interview;

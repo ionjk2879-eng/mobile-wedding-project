@@ -12,7 +12,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const Location: React.FC<PreviewProps> = ({ data }) => {
+const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const venueName = isEn && data.en.venueName ? data.en.venueName : data.venueName;
   const venueAddress = isEn && data.en.venueAddress ? data.en.venueAddress : data.venueAddress;
@@ -198,6 +198,12 @@ const Location: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) =>
+  prev.data.venueAddress === next.data.venueAddress
+  && prev.data.venueName === next.data.venueName
+  && prev.data.transport === next.data.transport
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 export default Location;

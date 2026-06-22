@@ -6,7 +6,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const Hero: React.FC<PreviewProps> = ({ data }) => {
+const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const groomName = isEn && data.en.groomName ? data.en.groomName : data.groomName;
   const brideName = isEn && data.en.brideName ? data.en.brideName : data.brideName;
@@ -246,6 +246,17 @@ const Hero: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) =>
+  prev.data.groomName === next.data.groomName
+  && prev.data.brideName === next.data.brideName
+  && prev.data.date === next.data.date
+  && prev.data.time === next.data.time
+  && prev.data.venueName === next.data.venueName
+  && prev.data.heroPhoto === next.data.heroPhoto
+  && prev.data.heroStyle === next.data.heroStyle
+  && prev.data.weddingDateISO === next.data.weddingDateISO
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 export default Hero;

@@ -6,7 +6,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const Money: React.FC<PreviewProps> = ({ data }) => {
+const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [activeSide, setActiveSide] = useState<'groom' | 'bride'>('groom');
@@ -508,6 +508,11 @@ const Money: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) =>
+  prev.data.accounts === next.data.accounts
+  && prev.data.accountStyle === next.data.accountStyle
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 export default Money;

@@ -12,7 +12,7 @@ interface ContactEntry {
   phone: string;
 }
 
-const Contacts: React.FC<PreviewProps> = ({ data }) => {
+const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
 
   const groomSelf = data.contacts.find(c => c.role === '신랑');
@@ -231,6 +231,11 @@ const Carousel: React.FC<CarouselProps> = ({ contacts, isEn }) => {
       )}
     </>
   );
-};
+}, (prev, next) =>
+  prev.data.contacts === next.data.contacts
+  && prev.data.parents === next.data.parents
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 export default Contacts;

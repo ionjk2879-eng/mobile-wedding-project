@@ -5,7 +5,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const Greeting: React.FC<PreviewProps> = ({ data }) => {
+const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const title = isEn ? 'INVITATION' : (data.greetingTitle || '초대합니다');
   const content = isEn && data.en.greetingContent ? data.en.greetingContent : data.greetingContent;
@@ -85,6 +85,14 @@ const Greeting: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) => {
+  return prev.data.greetingTitle === next.data.greetingTitle
+    && prev.data.greetingContent === next.data.greetingContent
+    && prev.data.language === next.data.language
+    && prev.data.groomName === next.data.groomName
+    && prev.data.brideName === next.data.brideName
+    && prev.data.fontFamily === next.data.fontFamily
+    && prev.data.parents === next.data.parents;
+});
 
 export default Greeting;

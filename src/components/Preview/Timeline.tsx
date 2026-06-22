@@ -5,7 +5,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const Timeline: React.FC<PreviewProps> = ({ data }) => {
+const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
   const events = data.timeline || [];
   const [open, setOpen] = useState(false);
 
@@ -213,6 +213,10 @@ const Timeline: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) =>
+  prev.data.timeline === next.data.timeline
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+);
 
 export default Timeline;

@@ -5,7 +5,7 @@ interface PreviewProps {
   data: InvitationData;
 }
 
-const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
+const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
     <section className="personal-message section" style={{ fontFamily: data.fontFamily }}>
       <h2>MESSAGE</h2>
@@ -103,6 +103,14 @@ const PersonalMessage: React.FC<PreviewProps> = ({ data }) => {
       `}</style>
     </section>
   );
-};
+}, (prev, next) => {
+  return prev.data.groomName === next.data.groomName
+    && prev.data.brideName === next.data.brideName
+    && prev.data.groomMessage === next.data.groomMessage
+    && prev.data.brideMessage === next.data.brideMessage
+    && prev.data.groomPhoto === next.data.groomPhoto
+    && prev.data.bridePhoto === next.data.bridePhoto
+    && prev.data.fontFamily === next.data.fontFamily;
+});
 
 export default PersonalMessage;
