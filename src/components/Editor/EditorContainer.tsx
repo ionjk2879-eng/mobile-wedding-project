@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen, Clock, Clapperboard } from 'lucide-react';
+import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen, Clock, Clapperboard, Menu, X } from 'lucide-react';
 import '../../styles/editor.css';
 import SectionCard from './SectionCard';
 import ShareSection from './sections/ShareSection';
@@ -50,6 +50,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
 
   const workspaceRef = React.useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = React.useState('design');
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
     hero: false, opening: false, theme: true, design: true, basic: true, datetime: true,
     greeting: false, message: false, location: false, contacts: false,
@@ -200,6 +201,27 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
           ))}
         </div>
       </div>
+
+      <button className="mobile-nav-fab" onClick={() => setMobileNavOpen(!mobileNavOpen)}>
+        {mobileNavOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
+
+      {mobileNavOpen && (
+        <div className="mobile-nav-overlay" onClick={() => setMobileNavOpen(false)}>
+          <div className="mobile-nav-panel" onClick={(e) => e.stopPropagation()}>
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                className={`mobile-nav-item ${activeSection === item.id ? 'active' : ''}`}
+                onClick={() => { scrollToSection(item.id, item.ref); setMobileNavOpen(false); }}
+              >
+                {item.icon}
+                <span>{item.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -248,8 +248,51 @@
   .section-content { padding: 0 20px 20px 20px; padding-top: 20px; }
 }
 
+/* Mobile floating nav */
+.mobile-nav-fab { display: none; }
+.mobile-nav-overlay { display: none; }
+
 @media (max-width: 640px) {
   .editor-sidebar-slim { display: none; }
+
+  .mobile-nav-fab {
+    display: flex; align-items: center; justify-content: center;
+    position: fixed; bottom: 90px; right: 16px; z-index: 9998;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #D4A5C6; color: white; border: none;
+    box-shadow: 0 4px 16px rgba(212, 165, 198, 0.4);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .mobile-nav-fab:active { transform: scale(0.92); }
+
+  .mobile-nav-overlay {
+    display: block;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3); z-index: 9997;
+    animation: mnav-fade 0.15s ease;
+  }
+  @keyframes mnav-fade { from { opacity: 0; } to { opacity: 1; } }
+
+  .mobile-nav-panel {
+    position: fixed; bottom: 144px; right: 16px; z-index: 9998;
+    background: white; border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    padding: 8px; width: 180px; max-height: 60vh;
+    overflow-y: auto; scrollbar-width: none;
+    animation: mnav-pop 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .mobile-nav-panel::-webkit-scrollbar { display: none; }
+  @keyframes mnav-pop { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  .mobile-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 10px 12px; border: none; background: none;
+    border-radius: 10px; font-size: 0.82rem; font-weight: 600;
+    color: #4B5563; cursor: pointer; transition: all 0.15s;
+    text-align: left;
+  }
+  .mobile-nav-item:hover, .mobile-nav-item.active { background: #FFF5F7; color: #D4A5C6; }
+  .mobile-nav-item svg { flex-shrink: 0; width: 16px; height: 16px; }
   .basic-field-row { grid-template-columns: 1fr; }
   .date-time-row { grid-template-columns: 1fr; }
   .input-grid-2 { grid-template-columns: 1fr; }
