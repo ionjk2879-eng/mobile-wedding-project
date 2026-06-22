@@ -44,7 +44,7 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
       {allGroups.map((group, gi) => (
         <div key={gi} className="contact-group">
           <p className="contact-group-label">{group.label}</p>
-          <Carousel contacts={group.contacts} isEn={isEn} />
+          <Carousel contacts={group.contacts} />
         </div>
       ))}
 
@@ -163,10 +163,9 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
 
 interface CarouselProps {
   contacts: ContactEntry[];
-  isEn: boolean;
 }
 
-const Carousel: React.FC<CarouselProps> = ({ contacts, isEn }) => {
+const Carousel: React.FC<CarouselProps> = ({ contacts }) => {
   const [idx, setIdx] = useState(0);
   const dragStartX = useRef(0);
   const dragDelta = useRef(0);

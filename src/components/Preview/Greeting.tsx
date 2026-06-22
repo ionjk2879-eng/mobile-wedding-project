@@ -7,7 +7,6 @@ interface PreviewProps {
 
 const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
-  const title = isEn ? 'INVITATION' : (data.greetingTitle || '초대합니다');
   const content = isEn && data.en.greetingContent ? data.en.greetingContent : data.greetingContent;
 
   const groomFather = data.parents.groomParents.find(p => p.role === '아버지');

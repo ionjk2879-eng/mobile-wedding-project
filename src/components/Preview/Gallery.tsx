@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X } from 'lucide-react';
 import { InvitationData } from '../../types';
 
 interface PreviewProps {
@@ -7,19 +7,9 @@ interface PreviewProps {
 }
 
 const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
-  const isEn = data.language === 'en';
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
-  const isDragging = useRef(false);
-  const minSwipeDistance = 50;
 
   const [previewIdx, setPreviewIdx] = useState(0);
-  const pvDragStartX = useRef(0);
-  const pvDragDelta = useRef(0);
-  const pvDragging = useRef(false);
-  const pvTrackRef = useRef<HTMLDivElement>(null);
-  const pvVpRef = useRef<HTMLDivElement>(null);
 
   const lbDragStartX = useRef(0);
   const lbDragDelta = useRef(0);
@@ -68,10 +58,6 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
     },
   });
 
-  const previewIdxRef = useRef(previewIdx);
-  previewIdxRef.current = previewIdx;
-  const pvDrag = makeDrag(previewIdxRef, setPreviewIdx, pvDragDelta, pvDragStartX, pvDragging, pvTrackRef, pvVpRef, data.photos.length);
-
   const slideIdxRef = useRef(slideIdx);
   slideIdxRef.current = slideIdx;
   const slDrag = makeDrag(slideIdxRef, setSlideIdx, slideDragDelta, slideDragStartX, slideDragging, slideTrackRef, slideVpRef, data.photos.length);
@@ -92,24 +78,9 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedIndex]);
 
-  const openLightbox = (index: number) => { setSelectedIndex(index); document.body.style.overflow = 'hidden'; };
   const closeLightbox = () => { setSelectedIndex(null); document.body.style.overflow = 'auto'; };
   const nextImage = () => { if (selectedIndex !== null) setSelectedIndex((selectedIndex + 1) % data.photos.length); };
   const prevImage = () => { if (selectedIndex !== null) setSelectedIndex((selectedIndex - 1 + data.photos.length) % data.photos.length); };
-
-  const onTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.targetTouches[0].clientX; touchEndX.current = null; };
-  const onTouchMove = (e: React.TouchEvent) => { touchEndX.current = e.targetTouches[0].clientX; };
-  const onTouchEnd = () => { handleSwipe(); };
-  const onMouseDown = (e: React.MouseEvent) => { touchStartX.current = e.clientX; isDragging.current = true; };
-  const onMouseMove = (e: React.MouseEvent) => { if (isDragging.current) touchEndX.current = e.clientX; };
-  const onMouseUp = () => { if (isDragging.current) { isDragging.current = false; handleSwipe(); } };
-  const handleSwipe = () => {
-    if (!touchStartX.current || !touchEndX.current) return;
-    const d = touchStartX.current - touchEndX.current;
-    if (d > minSwipeDistance) nextImage();
-    else if (d < -minSwipeDistance) prevImage();
-    touchStartX.current = null; touchEndX.current = null;
-  };
 
   const handleThumbClick = (index: number) => {
     setPreviewIdx(index);

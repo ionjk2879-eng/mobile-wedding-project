@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { MapPin, Navigation, Train, Bus, Car } from 'lucide-react';
+import { Navigation, Train, Bus, Car } from 'lucide-react';
 import { InvitationData } from '../../types';
 
 declare global {
