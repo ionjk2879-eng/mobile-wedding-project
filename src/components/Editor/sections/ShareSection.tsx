@@ -16,11 +16,6 @@ const ShareSection: React.FC = () => {
         </div>
         <span className="input-hint">영문, 숫자, 하이픈만 사용 가능합니다. 이 주소로 청첩장이 공유됩니다.</span>
       </div>
-      <div className="input-group">
-        <label>관리자 비밀번호</label>
-        <input type="password" value={data.adminPassword || ''} onChange={(e) => updateField('adminPassword', e.target.value)} className="modern-input" placeholder="응답 확인 페이지 접속 시 필요합니다" />
-        <span className="input-hint">관리자 페이지(/admin)에 접속할 때 이 비밀번호가 필요합니다.</span>
-      </div>
       <div className="share-divider" />
       <p className="section-desc">카카오톡으로 공유할 때 표시될 정보를 설정합니다.</p>
       <div className="input-group">

@@ -87,7 +87,6 @@ export interface InvitationData {
   videoUrl: string;
   language: 'ko' | 'en';
   en: Partial<InvitationData>;
-  adminPassword: string;
 }
 
 export interface RSVPResponse {

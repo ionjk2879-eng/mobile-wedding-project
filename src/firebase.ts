@@ -44,10 +44,4 @@ export const submitRSVP = async (slug: string, formData: any) => {
   return 'created';
 };
 
-export const verifyAdminPassword = async (slug: string, password: string): Promise<boolean> => {
-  const snap = await getDoc(doc(db, 'invitations', slug));
-  if (!snap.exists()) return false;
-  return snap.data().adminPassword === password;
-};
-
 export { db, collection, addDoc, getDocs, query, orderBy, doc, where, deleteDoc };
