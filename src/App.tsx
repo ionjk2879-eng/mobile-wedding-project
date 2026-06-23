@@ -65,6 +65,7 @@ const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSe
             <div key={pi} className="ai-preset-page">
               {group.map((preset) => (
                 <button key={preset.id} className="ai-preset-card" onClick={() => handleCardClick(preset)}>
+                  <span className="ai-preset-category">{preset.category}</span>
                   <span className="ai-preset-emoji">{preset.emoji}</span>
                   <span className="ai-preset-name">{preset.name}</span>
                   <span className="ai-preset-desc">{preset.description}</span>
