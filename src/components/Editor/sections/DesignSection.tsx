@@ -82,7 +82,12 @@ const DesignSection: React.FC = () => {
             </button>
           ))}
         </div>
-        <span className="input-hint">'없음'은 테마 배경색을 따릅니다.</span>
+        <div className="color-custom-row">
+          <input type="color" value={data.customBgColor || '#FFFFFF'} onChange={(e) => updateField('customBgColor', e.target.value)} className="color-picker-input" />
+          <input type="text" value={data.customBgColor || ''} onChange={(e) => updateField('customBgColor', e.target.value)} placeholder="#FFFFFF" className="modern-input color-hex-input" />
+          {data.customBgColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customBgColor', '')}>초기화</button>}
+        </div>
+        <span className="input-hint">프리셋 선택 또는 팔레트/코드로 자유롭게 지정하세요.</span>
       </div>
       <div className="input-group">
         <label>강조 색상</label>
@@ -94,7 +99,12 @@ const DesignSection: React.FC = () => {
             </button>
           ))}
         </div>
-        <span className="input-hint">'없음'은 테마 강조색을 따릅니다.</span>
+        <div className="color-custom-row">
+          <input type="color" value={data.customAccentColor || '#D4A5C6'} onChange={(e) => updateField('customAccentColor', e.target.value)} className="color-picker-input" />
+          <input type="text" value={data.customAccentColor || ''} onChange={(e) => updateField('customAccentColor', e.target.value)} placeholder="#D4A5C6" className="modern-input color-hex-input" />
+          {data.customAccentColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customAccentColor', '')}>초기화</button>}
+        </div>
+        <span className="input-hint">프리셋 선택 또는 팔레트/코드로 자유롭게 지정하세요.</span>
       </div>
       <div className="input-group">
         <label>배경 재질</label>

@@ -7,7 +7,8 @@ import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, fetchMyInvitations } from './firebase';
 import { getFirebaseErrorMessage } from './utils/firebaseError';
-import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
+import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X, Sparkles } from 'lucide-react';
+import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import './styles/effects.css';
 import './styles/builder.css';
 
@@ -28,11 +29,11 @@ const App: React.FC = () => {
     if (loadedRef.current) return;
     loadedRef.current = true;
     fetchMyInvitations().then((items) => {
-      if (items.length > 0) {
-        history.replaceState({ screen: 'start' }, '', '/');
-        setShowStartScreen(items.map((item) => item.slug));
-      }
-    }).catch(() => {}).finally(() => setLoadingData(false));
+      history.replaceState({ screen: 'start' }, '', '/');
+      setShowStartScreen(items.map((item) => item.slug));
+    }).catch(() => {
+      setShowStartScreen([]);
+    }).finally(() => setLoadingData(false));
   }, []);
 
   useEffect(() => {
@@ -69,6 +70,13 @@ const App: React.FC = () => {
     setShowStartScreen(null);
     history.pushState({ screen: 'editor' }, '', '/');
     setData(initialData);
+    hasSavedOnceRef.current = false;
+  };
+
+  const handleStartWithPreset = (preset: AIPreset) => {
+    setShowStartScreen(null);
+    history.pushState({ screen: 'editor' }, '', '/');
+    setData(applyPreset(preset));
     hasSavedOnceRef.current = false;
   };
 
@@ -159,24 +167,46 @@ const App: React.FC = () => {
     );
   }
 
-  if (showStartScreen) {
+  if (showStartScreen !== null) {
     return (
       <div className="start-screen">
         <h1>Sonett</h1>
         <p className="start-desc">소네트 모바일 청첩장</p>
         <div className="start-options">
-          <button className="start-btn new" onClick={handleStartNew}>새로 만들기</button>
-          <div className="start-divider">또는 이전 청첩장 이어서 편집</div>
-          {showStartScreen.map((slug) => (
-            <div key={slug} className="start-item">
-              <button className="start-btn load" onClick={() => handleLoadExisting(slug)}>
-                /w/{slug}
-              </button>
-              <button className="start-delete" onClick={() => handleDeleteSlug(slug)} title="삭제">
-                <Trash2 size={15} />
-              </button>
+          <div className="ai-preset-section">
+            <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 스타일</div>
+            <div className="ai-preset-grid">
+              {AI_PRESETS.map((preset) => (
+                <button key={preset.id} className="ai-preset-card" onClick={() => handleStartWithPreset(preset)}>
+                  <span className="ai-preset-emoji">{preset.emoji}</span>
+                  <span className="ai-preset-name">{preset.name}</span>
+                  <span className="ai-preset-desc">{preset.description}</span>
+                  <div className="ai-preset-swatches">
+                    {preset.previewColors.map((color, i) => (
+                      <span key={i} className="ai-preset-swatch" style={{ background: color }} />
+                    ))}
+                  </div>
+                </button>
+              ))}
             </div>
-          ))}
+          </div>
+          <div className="start-divider">또는 직접 설정하기</div>
+          <button className="start-btn new" onClick={handleStartNew}>새로 만들기</button>
+          {showStartScreen.length > 0 && (
+            <>
+              <div className="start-divider">이전 청첩장 이어서 편집</div>
+              {showStartScreen.map((slug) => (
+                <div key={slug} className="start-item">
+                  <button className="start-btn load" onClick={() => handleLoadExisting(slug)}>
+                    /w/{slug}
+                  </button>
+                  <button className="start-delete" onClick={() => handleDeleteSlug(slug)} title="삭제">
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </div>
     );

@@ -85,6 +85,15 @@
 .color-pick-swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
 .color-pick-name { font-size: 0.65rem; font-weight: 700; color: #6B7280; }
 
+/* Color picker custom row */
+.color-custom-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.color-picker-input { width: 40px; height: 40px; border: 2px solid #E5E7EB; border-radius: 10px; padding: 2px; cursor: pointer; background: white; flex-shrink: 0; }
+.color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
+.color-picker-input::-webkit-color-swatch { border: none; border-radius: 6px; }
+.color-hex-input { flex: 1; font-family: monospace; font-size: 0.85rem; text-transform: uppercase; }
+.color-reset-btn { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 10px; background: white; color: #9CA3AF; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.color-reset-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
+
 /* Theme & design chips */
 .theme-select-grid.modern { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .theme-chip { padding: 10px 16px; border-radius: 14px; border: 1px solid #E5E7EB; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.8rem; font-weight: 700; color: #4B5563; transition: all 0.2s; }
