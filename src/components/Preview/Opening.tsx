@@ -112,14 +112,15 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         /* === Circle === */
         .op-circle {
           clip-path: circle(0% at 50% 50%);
-          transition: clip-path 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+          animation: op-circle-open 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
         }
-        .op-circle.op-phase-ready,
+        @keyframes op-circle-open {
+          to { clip-path: circle(150% at 50% 50%); }
+        }
         .op-circle.op-phase-exit {
+          animation: none;
           clip-path: circle(150% at 50% 50%);
-        }
-        .op-circle.op-phase-exit {
-          transition: clip-path 1.6s cubic-bezier(0.76, 0, 0.24, 1) 0.3s, opacity 0.5s ease 1.6s;
+          transition: clip-path 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.2s, opacity 0.4s ease 1.2s;
           clip-path: circle(0% at 50% 50%) !important;
           opacity: 0 !important;
         }
