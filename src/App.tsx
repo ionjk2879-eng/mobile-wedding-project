@@ -19,7 +19,7 @@ const App: React.FC = () => {
   const [previewNavOpen, setPreviewNavOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const autoSaveEnabled = true;
-  const [loadingData, setLoadingData] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
   const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
   const hasSavedOnceRef = useRef(false);
 
@@ -32,7 +32,7 @@ const App: React.FC = () => {
         history.replaceState({ screen: 'start' }, '', '/');
         setShowStartScreen(items.map((item) => item.slug));
       }
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => setLoadingData(false));
   }, []);
 
   useEffect(() => {
