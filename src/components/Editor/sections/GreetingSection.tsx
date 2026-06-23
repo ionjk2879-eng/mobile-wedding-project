@@ -50,7 +50,6 @@ const GreetingSection: React.FC = () => {
           <div className="greeting-template-grid">
             {GREETING_TEMPLATES.map((t) => (
               <button key={t.label} type="button" className="greeting-template-btn" onClick={() => { updateField('greetingContent', t.content); setShowTemplates(false); }}>
-                <span className="greeting-template-icon">{t.icon}</span>
                 <span className="greeting-template-label">{t.label}</span>
               </button>
             ))}
@@ -66,10 +65,9 @@ const GreetingSection: React.FC = () => {
         .greeting-template-toggle { width: 100%; padding: 10px; border: 1px dashed #D4A5C6; border-radius: 12px; background: #FFF9FB; color: #D4A5C6; font-size: 0.82em; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .greeting-template-toggle:hover { background: #F8EEF4; }
         .greeting-template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-        .greeting-template-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 8px; border: 1px solid #E5E7EB; border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s; }
+        .greeting-template-btn { display: flex; align-items: center; justify-content: center; padding: 10px 8px; border: 1px solid #E5E7EB; border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s; }
         .greeting-template-btn:hover { border-color: #D4A5C6; background: #FFF9FB; }
-        .greeting-template-icon { font-size: 1.3rem; }
-        .greeting-template-label { font-size: 0.75rem; font-weight: 600; color: #4B5563; }
+        .greeting-template-label { font-size: 0.78rem; font-weight: 600; color: #4B5563; }
       `}</style>
     </>
   );
