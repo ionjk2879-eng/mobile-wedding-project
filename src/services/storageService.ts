@@ -1,24 +1,6 @@
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from './index';
 
-let storageAvailable: boolean | null = null;
-
-const checkStorageAvailable = async (): Promise<boolean> => {
-  if (storageAvailable !== null) return storageAvailable;
-  try {
-    const testRef = storageRef(storage, '__ping__');
-    const result = await Promise.race([
-      getDownloadURL(testRef).then(() => true),
-      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 1500)),
-    ]);
-    storageAvailable = result || true;
-  } catch (err: unknown) {
-    const code = (err as { code?: string }).code;
-    storageAvailable = code === 'storage/object-not-found';
-  }
-  return storageAvailable;
-};
-
 const resizeImage = (file: File, maxSize: number): Promise<Blob> =>
   new Promise((resolve, reject) => {
     const img = new Image();
@@ -45,21 +27,25 @@ const toBase64 = (blob: Blob): Promise<string> =>
     reader.readAsDataURL(blob);
   });
 
+const tryUploadToStorage = async (blob: Blob, path: string): Promise<string> => {
+  const fileRef = storageRef(storage, path);
+  const snap = await uploadBytes(fileRef, blob);
+  return getDownloadURL(snap.ref);
+};
+
 export const uploadImage = async (file: File, path: string): Promise<string> => {
   const resized = await resizeImage(file, 1200);
-  if (await checkStorageAvailable()) {
-    const fileRef = storageRef(storage, path);
-    const snap = await uploadBytes(fileRef, resized);
-    return getDownloadURL(snap.ref);
+  try {
+    return await tryUploadToStorage(resized, path);
+  } catch {
+    return toBase64(resized);
   }
-  return toBase64(resized);
 };
 
 export const uploadFile = async (file: File, path: string): Promise<string> => {
-  if (await checkStorageAvailable()) {
-    const fileRef = storageRef(storage, path);
-    const snap = await uploadBytes(fileRef, file);
-    return getDownloadURL(snap.ref);
+  try {
+    return await tryUploadToStorage(file, path);
+  } catch {
+    return toBase64(file);
   }
-  return toBase64(file);
 };
