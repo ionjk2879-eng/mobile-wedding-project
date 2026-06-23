@@ -2,7 +2,7 @@ import { collection, addDoc, getDocs, getDoc, deleteDoc, doc, query, orderBy, se
 import { db } from './index';
 import { GuestMessage } from '../types';
 
-export const submitGuestMessage = async (slug: string, data: { name: string; content: string; password: string }) => {
+export const submitGuestMessage = async (slug: string, data: { name: string; content: string; password: string; side: 'groom' | 'bride' }) => {
   const ref = collection(db, `invitations/${slug}/guestbook`);
   await addDoc(ref, { ...data, createdAt: serverTimestamp() });
 };

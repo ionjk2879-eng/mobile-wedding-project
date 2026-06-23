@@ -34,6 +34,7 @@ export interface GuestMessage {
   name: string;
   content: string;
   password: string;
+  side: 'groom' | 'bride';
   createdAt: string;
 }
 
