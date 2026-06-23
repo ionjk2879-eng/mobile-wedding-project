@@ -21,8 +21,9 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!data.slug) return;
     try {
-      await submitRSVP(data.slug || 'default', formData);
+      await submitRSVP(data.slug, formData);
       setSubmitted(true);
       setFormOpen(false);
     } catch (err) { toast.error(getFirebaseErrorMessage(err)); }
@@ -53,9 +54,15 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
       <p style={{ fontSize: '0.9em', color: 'var(--wedding-text-sub)', lineHeight: 1.6, marginBottom: 24, whiteSpace: 'pre-line' }}>
         {isEn ? 'Please let us know if you can join us\nby providing your name below.' : '축하의 마음으로 참석해주시는\n모든 분들의 성함을 남겨주세요.'}
       </p>
-      <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>
-        {isEn ? 'Submit RSVP' : '참석 의사 전달하기'}
-      </button>
+      {data.slug ? (
+        <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>
+          {isEn ? 'Submit RSVP' : '참석 의사 전달하기'}
+        </button>
+      ) : (
+        <p style={{ fontSize: '0.82em', color: 'var(--wedding-text-sub)', textAlign: 'center', padding: '12px', background: 'var(--wedding-card-bg)', border: '1px dashed var(--wedding-border)', borderRadius: '12px' }}>
+          {isEn ? 'Save your invitation first to enable RSVP.' : '청첩장을 저장하면 참석 의사 기능이 활성화됩니다.'}
+        </p>
+      )}
 
       <PreviewOverlay open={formOpen} onClose={() => setFormOpen(false)} anchorRef={sectionRef} title={isEn ? 'RSVP' : '참석 여부를 알려주세요'}>
         <form onSubmit={handleSubmit}>
