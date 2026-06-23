@@ -32,6 +32,7 @@ const OpeningSection: React.FC = () => {
               {([
                 { key: 'curtain' as const, name: '커튼', desc: '위로 걷히며 청첩장이 나타남' },
                 { key: 'circle' as const, name: '원형 확산', desc: '중앙에서 원형으로 펼쳐짐' },
+                { key: 'fade' as const, name: '페이드', desc: '서서히 밝아지며 나타남' },
               ]).map(s => (
                 <button key={s.key} type="button" className={`account-style-btn ${opening.openingStyle === s.key ? 'active' : ''}`} onClick={() => update({ openingStyle: s.key })}>
                   <strong>{s.name}</strong><span>{s.desc}</span>

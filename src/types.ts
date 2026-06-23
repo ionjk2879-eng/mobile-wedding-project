@@ -59,14 +59,14 @@ export interface BasicInfo {
 }
 
 export interface DesignConfig {
-  theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern';
+  theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern' | 'mocha' | 'cloud' | 'emerald' | 'butter' | 'cobalt' | 'terracotta' | 'rosegold' | 'midnight';
   customBgColor?: string;
   customAccentColor?: string;
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';
   bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
-  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split';
+  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'elegant' | 'frame' | 'cinematic';
   fontFamily: string;
   fontSize: 'small' | 'medium' | 'large';
 }
@@ -89,7 +89,7 @@ export interface ContentData {
 
 export interface OpeningConfig {
   openingEnabled: boolean;
-  openingStyle: 'curtain' | 'circle';
+  openingStyle: 'curtain' | 'circle' | 'fade';
   openingColorMode: 'theme' | 'custom';
   openingBgColor: string;
   openingBgOpacity: number;

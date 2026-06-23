@@ -10,6 +10,14 @@ const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }>
   lavender:  { bg: '#2C2038', text: '#E3DFEE', accent: '#B5A4CC' },
   dusty:     { bg: '#38282A', text: '#E8D8D4', accent: '#C99498' },
   modern:    { bg: '#1A1A1A', text: '#E8E8E8', accent: '#AAAAAA' },
+  mocha:     { bg: '#2C1E16', text: '#E8DDD4', accent: '#A68B78' },
+  cloud:     { bg: '#1A2A34', text: '#D8E8F0', accent: '#7BA3B8' },
+  emerald:   { bg: '#0E2218', text: '#D0E8D8', accent: '#4A9E78' },
+  butter:    { bg: '#3A3010', text: '#F0E8C8', accent: '#D4B050' },
+  cobalt:    { bg: '#0A0E20', text: '#D0D8F0', accent: '#5070B0' },
+  terracotta:{ bg: '#2E1A10', text: '#E8D8C8', accent: '#D08860' },
+  rosegold:  { bg: '#3A2020', text: '#F0D8D0', accent: '#D4A090' },
+  midnight:  { bg: '#0E0E20', text: '#D0D0E8', accent: '#6A6AA0' },
 };
 
 interface OpeningProps {
@@ -46,7 +54,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const handleDismiss = () => {
     if (phase !== 'ready') return;
     setPhase('exit');
-    setTimeout(() => setDismissed(true), isCurtain ? 1200 : 2200);
+    const delay = isCurtain ? 1200 : opening.openingStyle === 'fade' ? 1000 : 2200;
+    setTimeout(() => setDismissed(true), delay);
   };
 
   const isCurtain = opening.openingStyle === 'curtain';
@@ -122,6 +131,20 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           clip-path: circle(150% at 50% 50%);
           transition: clip-path 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.2s, opacity 0.4s ease 1.2s;
           clip-path: circle(0% at 50% 50%) !important;
+          opacity: 0 !important;
+        }
+
+        /* === Fade === */
+        .op-fade {
+          opacity: 0;
+          animation: op-fade-open 2s ease 0.2s forwards;
+        }
+        @keyframes op-fade-open {
+          to { opacity: var(--op-opacity); }
+        }
+        .op-fade.op-phase-exit {
+          animation: none;
+          transition: opacity 0.8s ease;
           opacity: 0 !important;
         }
 

@@ -117,6 +117,94 @@
   --wedding-text-sub: #8A8A8A;
 }
 
+.theme-mocha {
+  --wedding-bg: #F5EDE4;
+  --wedding-card-bg: #FFFBF7;
+  --wedding-border: #E0D0C0;
+  --wedding-main: #8B6F5C;
+  --wedding-accent: #A68B78;
+  --wedding-text-main: #3E2C22;
+  --wedding-text-body: #5C4A3E;
+  --wedding-text-sub: #8A7A6E;
+}
+
+.theme-cloud {
+  --wedding-bg: #F8FAFB;
+  --wedding-card-bg: #FFFFFF;
+  --wedding-border: #D8E4EC;
+  --wedding-main: #7BA3B8;
+  --wedding-accent: #A8C4D6;
+  --wedding-text-main: #2A3E4A;
+  --wedding-text-body: #4A6070;
+  --wedding-text-sub: #8098A8;
+}
+
+.theme-emerald {
+  --wedding-bg: #EDF5F0;
+  --wedding-card-bg: #FAFFFE;
+  --wedding-border: #C0D8C8;
+  --wedding-main: #2E7D5B;
+  --wedding-accent: #4A9E78;
+  --wedding-text-main: #1A3D2E;
+  --wedding-text-body: #3A5A48;
+  --wedding-text-sub: #6A8A78;
+}
+
+.theme-butter {
+  --wedding-bg: #FFFCE8;
+  --wedding-card-bg: #FFFEF5;
+  --wedding-border: #E8E0B8;
+  --wedding-main: #C49A2A;
+  --wedding-accent: #D4B050;
+  --wedding-text-main: #4A4020;
+  --wedding-text-body: #6A5E3A;
+  --wedding-text-sub: #9A8E6A;
+}
+
+.theme-cobalt {
+  --wedding-bg: #EEF0F8;
+  --wedding-card-bg: #F8F9FF;
+  --wedding-border: #C8D0E8;
+  --wedding-main: #2E4A8A;
+  --wedding-accent: #5070B0;
+  --wedding-text-main: #121830;
+  --wedding-text-body: #3A4060;
+  --wedding-text-sub: #7080A0;
+}
+
+.theme-terracotta {
+  --wedding-bg: #FAF0E6;
+  --wedding-card-bg: #FFFAF5;
+  --wedding-border: #E0CDB8;
+  --wedding-main: #B86842;
+  --wedding-accent: #D08860;
+  --wedding-text-main: #4A2E1E;
+  --wedding-text-body: #6A4E3A;
+  --wedding-text-sub: #9A8068;
+}
+
+.theme-rosegold {
+  --wedding-bg: #FDF5F3;
+  --wedding-card-bg: #FFFAF8;
+  --wedding-border: #F0D8D0;
+  --wedding-main: #C4887A;
+  --wedding-accent: #D4A090;
+  --wedding-text-main: #3E2822;
+  --wedding-text-body: #5E4840;
+  --wedding-text-sub: #907870;
+}
+
+.theme-midnight {
+  --wedding-bg: #F0F0F5;
+  --wedding-card-bg: #F8F8FC;
+  --wedding-border: #D0D0E0;
+  --wedding-main: #2A2A5A;
+  --wedding-accent: #4A4A7A;
+  --wedding-text-main: #1A1A30;
+  --wedding-text-body: #3A3A58;
+  --wedding-text-sub: #707090;
+}
+
 body {
   margin: 0;
   padding: 0;
