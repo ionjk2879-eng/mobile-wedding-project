@@ -27,7 +27,7 @@ const ViewPage: React.FC = () => {
   if (error || !data) return <div className="view-error" role="alert"><h2>청첩장을 찾을 수 없습니다</h2><p>주소를 다시 확인해주세요.</p></div>;
 
   const getBaseFontSize = () => {
-    switch (data.fontSize) { case 'small': return '14px'; case 'large': return '19px'; default: return '16.5px'; }
+    switch (data.fontSize) { case 'small': return '12px'; case 'large': return '16px'; default: return '13px'; }
   };
 
   return (
