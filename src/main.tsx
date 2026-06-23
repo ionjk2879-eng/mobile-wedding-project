@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import AuthGate from './components/AuthGate'
 import './index.css'
 
 const App = React.lazy(() => import('./App'))
@@ -16,13 +17,15 @@ const Loading = () => (
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/w/:slug" element={<ViewPage />} />
-          <Route path="/admin/:slug" element={<AdminPage />} />
-        </Routes>
-      </Suspense>
+      <AuthGate>
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/w/:slug" element={<ViewPage />} />
+            <Route path="/admin/:slug" element={<AdminPage />} />
+          </Routes>
+        </Suspense>
+      </AuthGate>
     </BrowserRouter>
   </React.StrictMode>,
 )
