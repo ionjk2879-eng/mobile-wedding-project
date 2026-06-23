@@ -20,20 +20,29 @@ const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSe
   const [page, setPage] = useState(0);
   const startX = useRef(0);
   const dragging = useRef(false);
+  const didDrag = useRef(false);
   const [dragOffset, setDragOffset] = useState(0);
 
-  const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; dragging.current = true; };
-  const onTouchMove = (e: React.TouchEvent) => { if (dragging.current) setDragOffset(e.touches[0].clientX - startX.current); };
-  const onTouchEnd = () => {
+  const finishDrag = (offset: number) => {
     dragging.current = false;
-    if (dragOffset < -50 && page < totalPages - 1) setPage(page + 1);
-    else if (dragOffset > 50 && page > 0) setPage(page - 1);
+    didDrag.current = Math.abs(offset) > 10;
+    if (offset < -50 && page < totalPages - 1) setPage(page + 1);
+    else if (offset > 50 && page > 0) setPage(page - 1);
     setDragOffset(0);
   };
-  const onMouseDown = (e: React.MouseEvent) => { startX.current = e.clientX; dragging.current = true; };
+
+  const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; dragging.current = true; didDrag.current = false; };
+  const onTouchMove = (e: React.TouchEvent) => { if (dragging.current) setDragOffset(e.touches[0].clientX - startX.current); };
+  const onTouchEnd = () => finishDrag(dragOffset);
+  const onMouseDown = (e: React.MouseEvent) => { startX.current = e.clientX; dragging.current = true; didDrag.current = false; };
   const onMouseMove = (e: React.MouseEvent) => { if (dragging.current) { e.preventDefault(); setDragOffset(e.clientX - startX.current); } };
-  const onMouseUp = () => { if (dragging.current) { dragging.current = false; if (dragOffset < -50 && page < totalPages - 1) setPage(page + 1); else if (dragOffset > 50 && page > 0) setPage(page - 1); setDragOffset(0); } };
-  const onMouseLeave = () => { if (dragging.current) { dragging.current = false; if (dragOffset < -50 && page < totalPages - 1) setPage(page + 1); else if (dragOffset > 50 && page > 0) setPage(page - 1); setDragOffset(0); } };
+  const onMouseUp = () => { if (dragging.current) finishDrag(dragOffset); };
+  const onMouseLeave = () => { if (dragging.current) finishDrag(dragOffset); };
+
+  const handleCardClick = (preset: AIPreset) => {
+    if (didDrag.current) return;
+    onSelect(preset);
+  };
 
   const pages = Array.from({ length: totalPages }, (_, i) =>
     AI_PRESETS.slice(i * ITEMS_PER_PAGE, (i + 1) * ITEMS_PER_PAGE)
@@ -55,7 +64,7 @@ const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSe
           {pages.map((group, pi) => (
             <div key={pi} className="ai-preset-page">
               {group.map((preset) => (
-                <button key={preset.id} className="ai-preset-card" onClick={() => onSelect(preset)}>
+                <button key={preset.id} className="ai-preset-card" onClick={() => handleCardClick(preset)}>
                   <span className="ai-preset-emoji">{preset.emoji}</span>
                   <span className="ai-preset-name">{preset.name}</span>
                   <span className="ai-preset-desc">{preset.description}</span>
