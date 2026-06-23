@@ -217,12 +217,12 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         .fullscreen-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         .fullscreen-bg .hero-photo { height: 100%; object-fit: cover; }
         .fullscreen-bg .hero-photo-empty { height: 100%; aspect-ratio: auto; }
-        .fullscreen-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.35); color: white; gap: 12px; padding: 24px; }
+        .fullscreen-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.35); color: white; gap: 12px; padding: 24px; box-sizing: border-box; text-align: center; }
         .fullscreen-quote { font-size: 1.1em; font-family: 'Dancing Script', cursive; margin: 0 0 8px; opacity: 0.85; letter-spacing: 1px; }
         .fullscreen-label { font-size: 0.75em; letter-spacing: 6px; margin: 0; opacity: 0.8; }
-        .fullscreen-names { font-size: 2.5em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; text-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .fullscreen-names { font-size: 2.5em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; text-shadow: 0 2px 20px rgba(0,0,0,0.3); width: 100%; text-align: center; word-break: keep-all; }
         .fullscreen-names span { font-style: italic; opacity: 0.7; margin: 0 8px; }
-        .fullscreen-info { display: flex; flex-direction: column; gap: 2px; }
+        .fullscreen-info { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
         .fullscreen-info p { font-size: 0.9em; margin: 0; opacity: 0.9; letter-spacing: 1px; }
         .fullscreen-dday { display: inline-block; padding: 6px 16px; border: 1px solid rgba(255,255,255,0.6); border-radius: 4px; font-size: 0.8em; letter-spacing: 2px; margin-top: 8px; }
 
