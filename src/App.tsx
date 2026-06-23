@@ -12,6 +12,41 @@ import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import './styles/effects.css';
 import './styles/builder.css';
 
+const PRESETS_PER_PAGE = 6;
+
+const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSelect }) => {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.ceil(AI_PRESETS.length / PRESETS_PER_PAGE);
+  const paged = AI_PRESETS.slice(page * PRESETS_PER_PAGE, (page + 1) * PRESETS_PER_PAGE);
+
+  return (
+    <div className="ai-preset-section">
+      <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 샘플 청첩장</div>
+      <div className="ai-preset-grid">
+        {paged.map((preset) => (
+          <button key={preset.id} className="ai-preset-card" onClick={() => onSelect(preset)}>
+            <span className="ai-preset-emoji">{preset.emoji}</span>
+            <span className="ai-preset-name">{preset.name}</span>
+            <span className="ai-preset-desc">{preset.description}</span>
+            <div className="ai-preset-swatches">
+              {preset.previewColors.map((color, i) => (
+                <span key={i} className="ai-preset-swatch" style={{ background: color }} />
+              ))}
+            </div>
+          </button>
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className="ai-preset-dots">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button key={i} className={`ai-preset-dot ${page === i ? 'active' : ''}`} onClick={() => setPage(i)} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const setData = useInvitationStore((s) => s.setData);
@@ -173,23 +208,7 @@ const App: React.FC = () => {
         <h1>Sonett</h1>
         <p className="start-desc">소네트 모바일 청첩장</p>
         <div className="start-options">
-          <div className="ai-preset-section">
-            <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 샘플 청첩장</div>
-            <div className="ai-preset-grid">
-              {AI_PRESETS.map((preset) => (
-                <button key={preset.id} className="ai-preset-card" onClick={() => handleStartWithPreset(preset)}>
-                  <span className="ai-preset-emoji">{preset.emoji}</span>
-                  <span className="ai-preset-name">{preset.name}</span>
-                  <span className="ai-preset-desc">{preset.description}</span>
-                  <div className="ai-preset-swatches">
-                    {preset.previewColors.map((color, i) => (
-                      <span key={i} className="ai-preset-swatch" style={{ background: color }} />
-                    ))}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+          <PresetSlider onSelect={handleStartWithPreset} />
           <div className="start-divider">또는 직접 설정하기</div>
           <button className="start-btn new" onClick={handleStartNew}>새로 만들기</button>
           {showStartScreen.length > 0 && (
