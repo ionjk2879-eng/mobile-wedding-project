@@ -148,7 +148,7 @@ export const AI_PRESETS: AIPreset[] = [
     settings: {
       theme: 'lavender',
       fontFamily: "'Cormorant Garamond', serif",
-      fontSize: 'large',
+      fontSize: 'medium',
       customBgColor: '#EDE6F5',
       customAccentColor: '#7B5EA7',
       bgTexture: 'silk',
@@ -322,7 +322,7 @@ export const AI_PRESETS: AIPreset[] = [
     settings: {
       theme: 'navy',
       fontFamily: "'Playfair Display', serif",
-      fontSize: 'large',
+      fontSize: 'medium',
       customBgColor: '#EEF0F8',
       customAccentColor: '#2E4A8A',
       bgTexture: 'none',
