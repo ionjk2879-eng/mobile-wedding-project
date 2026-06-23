@@ -57,9 +57,9 @@ const HeroSection: React.FC = () => {
             { key: 'editorial', name: '에디토리얼', desc: '매거진 느낌 레이아웃' },
             { key: 'fullscreen', name: '풀스크린', desc: '사진이 전체를 채움' },
             { key: 'split', name: '스플릿', desc: '좌우 분할 레이아웃' },
-            { key: 'elegant', name: '엘레강스', desc: '세로형 고급 레이아웃' },
-            { key: 'frame', name: '프레임', desc: '액자 테두리 느낌' },
-            { key: 'cinematic', name: '시네마틱', desc: '영화 포스터 느낌' },
+            { key: 'centercard', name: '센터 카드', desc: '카드형 사진 중앙 배치' },
+            { key: 'gradation', name: '그라데이션', desc: '테마 색상 그라데이션 오버레이' },
+            { key: 'magcover', name: '매거진 커버', desc: '잡지 표지 스타일 볼드' },
           ] as { key: InvitationData['heroStyle']; name: string; desc: string }[]).map(s => (
             <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
               <strong>{s.name}</strong>

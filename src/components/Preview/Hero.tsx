@@ -137,51 +137,47 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     </div>
   );
 
-  const renderElegant = () => (
-    <div className="hero-elegant">
-      <div className="elegant-side">{groomName.split('').map((ch, i) => <span key={i}>{ch}</span>)}</div>
-      <div className="elegant-center">
-        <p className="elegant-label">WEDDING INVITATION</p>
-        <div className="hero-img-wrap elegant-img">{photoEl}</div>
-        <p className="elegant-date">{dateStr}</p>
-        <p className="elegant-time">{timeStr} · {venueName}</p>
-        <span className="elegant-dday">{calculateDDay()}</span>
+  const renderCentercard = () => (
+    <div className="hero-centercard">
+      <p className="cc-label">WEDDING INVITATION</p>
+      <div className="cc-card">
+        <div className="hero-img-wrap cc-img">{photoEl}</div>
       </div>
-      <div className="elegant-side">{brideName.split('').map((ch, i) => <span key={i}>{ch}</span>)}</div>
+      <h1 className="cc-names">{groomName} <span>&</span> {brideName}</h1>
+      <div className="cc-divider" />
+      <p className="cc-date">{dateStr}</p>
+      <p className="cc-time">{timeStr}</p>
+      <p className="cc-venue">{venueName}</p>
+      <span className="cc-dday">{calculateDDay()}</span>
     </div>
   );
 
-  const renderFrame = () => (
-    <div className="hero-frame">
-      <div className="frame-border">
-        <div className="frame-corner tl" /><div className="frame-corner tr" /><div className="frame-corner bl" /><div className="frame-corner br" />
-        <div className="frame-inner">
-          <p className="frame-quote">Together is a beautiful place to be</p>
-          <div className="hero-img-wrap frame-img">{photoEl}</div>
-          <h1 className="frame-names">{groomName} <span>&</span> {brideName}</h1>
-          <div className="frame-divider" />
-          <p className="frame-date">{dateStr}</p>
-          <p className="frame-time">{timeStr}</p>
-          <p className="frame-venue">{venueName}</p>
-          <span className="frame-dday">{calculateDDay()}</span>
+  const renderGradation = () => (
+    <div className="hero-gradation">
+      <div className="grad-bg">{photoEl}</div>
+      <div className="grad-overlay">
+        <div className="grad-bottom">
+          <p className="grad-quote">Forever starts here</p>
+          <h1 className="grad-names">{groomName} <span>&</span> {brideName}</h1>
+          <p className="grad-date">{dateStr} · {timeStr}</p>
+          <p className="grad-venue">{venueName}</p>
+          <span className="grad-dday">{calculateDDay()}</span>
         </div>
       </div>
     </div>
   );
 
-  const renderCinematic = () => (
-    <div className="hero-cinematic">
-      <div className="cinema-bg">{photoEl}</div>
-      <div className="cinema-letterbox top" />
-      <div className="cinema-letterbox bottom" />
-      <div className="cinema-overlay">
-        <p className="cinema-label">A FILM BY</p>
-        <h1 className="cinema-names">{groomName} <span>&</span> {brideName}</h1>
-        <div className="cinema-info">
-          <p>{dateStr} · {timeStr}</p>
-          <p>{venueName}</p>
+  const renderMagcover = () => (
+    <div className="hero-magcover">
+      <div className="mag-bg">{photoEl}</div>
+      <div className="mag-overlay">
+        <h1 className="mag-title">{groomName}<br /><span className="mag-amp">&</span><br />{brideName}</h1>
+        <div className="mag-bottom">
+          <p className="mag-label">WEDDING INVITATION</p>
+          <p className="mag-date">{dateStr} · {timeStr}</p>
+          <p className="mag-venue">{venueName}</p>
+          <span className="mag-dday">{calculateDDay()}</span>
         </div>
-        <span className="cinema-dday">{calculateDDay()}</span>
       </div>
     </div>
   );
@@ -200,9 +196,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'editorial' && renderEditorial()}
         {style === 'fullscreen' && renderFullscreen()}
         {style === 'split' && renderSplit()}
-        {style === 'elegant' && renderElegant()}
-        {style === 'frame' && renderFrame()}
-        {style === 'cinematic' && renderCinematic()}
+        {style === 'centercard' && renderCentercard()}
+        {style === 'gradation' && renderGradation()}
+        {style === 'magcover' && renderMagcover()}
       </motion.div>
 
       <style>{`
@@ -296,50 +292,46 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         .split-venue { font-size: 0.8em; color: var(--wedding-text-sub); margin: 0; }
         .split-dday { display: inline-block; margin-top: 10px; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.7em; letter-spacing: 1px; }
 
-        /* Elegant */
-        .hero-elegant { display: flex; align-items: center; min-height: 80vh; padding: 40px 0; }
-        .elegant-side { writing-mode: vertical-rl; font-size: 1.8em; font-weight: 300; letter-spacing: 8px; color: var(--wedding-text-main); font-family: 'Cormorant Garamond', serif; padding: 0 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .elegant-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        .elegant-label { font-size: 0.65em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0; }
-        .elegant-img { border-radius: 8px; aspect-ratio: 3/4; max-height: 50vh; overflow: hidden; }
-        .elegant-date { font-size: 1em; color: var(--wedding-text-main); margin: 0; letter-spacing: 2px; font-weight: 500; }
-        .elegant-time { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
-        .elegant-dday { display: inline-block; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
+        /* Center Card */
+        .hero-centercard { padding: 50px 24px 60px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .cc-label { font-size: 0.65em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0; }
+        .cc-card { width: 75%; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+        .cc-img { aspect-ratio: 3/4; }
+        .cc-names { font-size: 1.6em; font-weight: 400; color: var(--wedding-text-main); margin: 8px 0 0; letter-spacing: 2px; }
+        .cc-names span { font-size: 0.7em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; opacity: 0.6; }
+        .cc-divider { width: 30px; height: 1px; background: var(--wedding-border); }
+        .cc-date { font-size: 0.95em; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; font-weight: 500; }
+        .cc-time { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
+        .cc-venue { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
+        .cc-dday { display: inline-block; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
 
-        /* Frame */
-        .hero-frame { padding: 30px 20px 50px; }
-        .frame-border { position: relative; border: 2px solid var(--wedding-main); border-radius: 4px; padding: 30px 20px; }
-        .frame-corner { position: absolute; width: 20px; height: 20px; border-color: var(--wedding-main); border-style: solid; }
-        .frame-corner.tl { top: -4px; left: -4px; border-width: 3px 0 0 3px; }
-        .frame-corner.tr { top: -4px; right: -4px; border-width: 3px 3px 0 0; }
-        .frame-corner.bl { bottom: -4px; left: -4px; border-width: 0 0 3px 3px; }
-        .frame-corner.br { bottom: -4px; right: -4px; border-width: 0 3px 3px 0; }
-        .frame-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .frame-quote { font-size: 0.85em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0; opacity: 0.8; }
-        .frame-img { border-radius: 4px; margin: 10px 0; }
-        .frame-names { font-size: 1.6em; font-weight: 400; color: var(--wedding-text-main); margin: 0; letter-spacing: 2px; }
-        .frame-names span { font-size: 0.7em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; opacity: 0.6; }
-        .frame-divider { width: 40px; height: 1px; background: var(--wedding-border); }
-        .frame-date { font-size: 0.95em; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; }
-        .frame-time { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
-        .frame-venue { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
-        .frame-dday { display: inline-block; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; margin-top: 4px; }
+        /* Gradation */
+        .hero-gradation { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; max-height: 100vh; overflow: hidden; }
+        .grad-bg { position: absolute; inset: 0; }
+        .grad-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; }
+        .grad-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
+        .grad-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 30%, color-mix(in srgb, var(--wedding-main) 60%, black) 100%); display: flex; align-items: flex-end; }
+        .grad-bottom { width: 100%; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: white; text-align: center; }
+        .grad-quote { font-size: 0.9em; font-family: 'Dancing Script', cursive; margin: 0; opacity: 0.85; }
+        .grad-names { font-size: 2em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 4px; }
+        .grad-names span { font-style: italic; opacity: 0.7; margin: 0 6px; }
+        .grad-date { font-size: 0.85em; margin: 0; opacity: 0.9; letter-spacing: 1px; }
+        .grad-venue { font-size: 0.8em; margin: 0; opacity: 0.7; }
+        .grad-dday { display: inline-block; padding: 5px 14px; border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
 
-        /* Cinematic */
-        .hero-cinematic { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; max-height: 100vh; overflow: hidden; }
-        .cinema-bg { position: absolute; inset: 0; }
-        .cinema-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; }
-        .cinema-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
-        .cinema-letterbox { position: absolute; left: 0; width: 100%; height: 12%; background: #000; z-index: 1; }
-        .cinema-letterbox.top { top: 0; }
-        .cinema-letterbox.bottom { bottom: 0; }
-        .cinema-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); color: white; gap: 14px; padding: 24px; box-sizing: border-box; text-align: center; z-index: 2; }
-        .cinema-label { font-size: 0.7em; letter-spacing: 6px; margin: 0; opacity: 0.7; text-transform: uppercase; }
-        .cinema-names { font-size: 2.2em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; text-shadow: 0 2px 20px rgba(0,0,0,0.4); }
-        .cinema-names span { font-style: italic; opacity: 0.7; margin: 0 8px; }
-        .cinema-info { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .cinema-info p { font-size: 0.9em; margin: 0; opacity: 0.85; letter-spacing: 1px; }
-        .cinema-dday { display: inline-block; padding: 6px 16px; border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; font-size: 0.8em; letter-spacing: 2px; }
+        /* Magazine Cover */
+        .hero-magcover { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; max-height: 100vh; overflow: hidden; }
+        .mag-bg { position: absolute; inset: 0; }
+        .mag-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; }
+        .mag-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
+        .mag-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 50px 24px 40px; box-sizing: border-box; color: white; text-align: center; background: rgba(0,0,0,0.2); }
+        .mag-title { font-size: 3em; font-weight: 700; margin: 0; font-family: 'Playfair Display', serif; letter-spacing: 4px; text-shadow: 0 4px 30px rgba(0,0,0,0.4); line-height: 1.1; }
+        .mag-amp { font-size: 0.5em; font-weight: 300; font-family: 'Cormorant Garamond', serif; font-style: italic; opacity: 0.7; }
+        .mag-bottom { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .mag-label { font-size: 0.7em; letter-spacing: 6px; margin: 0; opacity: 0.8; }
+        .mag-date { font-size: 0.85em; margin: 0; opacity: 0.9; letter-spacing: 1px; }
+        .mag-venue { font-size: 0.8em; margin: 0; opacity: 0.7; }
+        .mag-dday { display: inline-block; padding: 5px 14px; border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
       `}</style>
     </section>
   );
