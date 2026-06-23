@@ -38,7 +38,7 @@ export default {
         ? `${groomName} ♥ ${brideName} 결혼합니다`
         : 'Sonett - 모바일 청첩장';
       const description = [date, venueName].filter(Boolean).join(' | ') || '소중한 날에 초대합니다.';
-      const image = heroPhoto || `${url.origin}/favicon.svg`;
+      const image = heroPhoto || `${url.origin}/og-image.svg`;
       const pageUrl = `${url.origin}/w/${slug}`;
 
       let html = await assetResponse.text();
