@@ -63,7 +63,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   return (
     <div
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      onClick={handleDismiss}
       style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
@@ -95,7 +94,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         .op-root {
           position: fixed; top: 0; left: 0; width: 100%; height: 100%;
           z-index: 99999; display: flex; align-items: center; justify-content: center;
-          cursor: pointer; overflow: hidden;
+          overflow: hidden;
           background: var(--op-bg); opacity: var(--op-opacity);
         }
 
