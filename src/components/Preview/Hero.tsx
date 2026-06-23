@@ -27,8 +27,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return `D-${diffDays}`;
   };
 
+  const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
   const photoEl = data.heroPhoto ? (
-    <img src={data.heroPhoto} alt="Wedding" className="hero-photo" />
+    <img src={data.heroPhoto} alt="Wedding" className="hero-photo" style={{ objectPosition: photoPos }} />
   ) : (
     <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>
   );
@@ -117,22 +118,26 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const renderSplit = () => (
     <div className="hero-split">
-      {data.heroPhoto && <div className="split-bg"><img src={data.heroPhoto} alt="" /></div>}
-      <div className="split-left">
-        <p className="split-quote">Happily ever after<br />starts here</p>
-        <p className="split-label">WEDDING<br />INVITATION</p>
-        <div className="split-divider" />
-        <h1 className="split-name">{groomName}</h1>
-        <p className="split-amp">&</p>
-        <h1 className="split-name">{brideName}</h1>
-        <div className="split-divider" />
-        <p className="split-date">{dateStr}</p>
-        <p className="split-time">{timeStr}</p>
-        <p className="split-venue">{venueName}</p>
-        <span className="split-dday">{calculateDDay()}</span>
+      <div className="split-row">
+        <div className="split-info">
+          <p className="split-label">GROOM</p>
+          <h1 className="split-name">{groomName}</h1>
+          <div className="split-divider" />
+          <p className="split-quote">Happily ever after<br />starts here</p>
+          <p className="split-date">{dateStr}</p>
+          <p className="split-time">{timeStr}</p>
+        </div>
+        <div className="split-photo">{photoEl}</div>
       </div>
-      <div className="split-right">
-        {photoEl}
+      <div className="split-row reverse">
+        <div className="split-photo">{photoEl}</div>
+        <div className="split-info">
+          <p className="split-label">BRIDE</p>
+          <h1 className="split-name">{brideName}</h1>
+          <div className="split-divider" />
+          <p className="split-venue">{venueName}</p>
+          <span className="split-dday">{calculateDDay()}</span>
+        </div>
       </div>
     </div>
   );
@@ -275,22 +280,21 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         .fullscreen-dday { display: inline-block; padding: 6px 16px; border: 1px solid rgba(255,255,255,0.6); border-radius: 4px; font-size: 0.8em; letter-spacing: 2px; margin-top: 8px; }
 
         /* Split */
-        .hero-split { display: flex; min-height: 80vh; position: relative; overflow: hidden; }
-        .split-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-        .split-bg img { width: 100%; height: 100%; object-fit: cover; }
-        .split-left { flex: 1; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: color-mix(in srgb, var(--wedding-bg) 82%, transparent); backdrop-filter: blur(6px); z-index: 1; }
-        .split-right { flex: 1; overflow: hidden; z-index: 1; }
-        .split-right .hero-photo { height: 100%; }
-        .split-right .hero-photo-empty { height: 100%; aspect-ratio: auto; border: none; border-radius: 0; }
-        .split-quote { font-size: 0.85em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 12px; opacity: 0.7; line-height: 1.6; }
-        .split-label { font-size: 0.65em; letter-spacing: 4px; color: var(--wedding-text-sub); margin: 0; line-height: 1.8; }
-        .split-divider { width: 24px; height: 1px; background: var(--wedding-border); margin: 12px 0; }
+        .hero-split { display: flex; flex-direction: column; }
+        .split-row { display: flex; min-height: 45vh; }
+        .split-row.reverse { flex-direction: row-reverse; }
+        .split-info { flex: 1; padding: 30px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: var(--wedding-bg); }
+        .split-photo { flex: 1; overflow: hidden; }
+        .split-photo .hero-photo { width: 100%; height: 100%; object-fit: cover; }
+        .split-photo .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; border: none; border-radius: 0; }
+        .split-quote { font-size: 0.8em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0; opacity: 0.7; line-height: 1.5; text-align: center; }
+        .split-label { font-size: 0.6em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0; }
+        .split-divider { width: 24px; height: 1px; background: var(--wedding-border); margin: 8px 0; }
         .split-name { font-size: 1.5em; font-weight: 300; color: var(--wedding-text-main); margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 3px; }
-        .split-amp { font-size: 1em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 4px 0; opacity: 0.5; }
         .split-date { font-size: 0.85em; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; }
         .split-time { font-size: 0.8em; color: var(--wedding-text-sub); margin: 0; }
         .split-venue { font-size: 0.8em; color: var(--wedding-text-sub); margin: 0; }
-        .split-dday { display: inline-block; margin-top: 10px; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.7em; letter-spacing: 1px; }
+        .split-dday { display: inline-block; margin-top: 6px; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.7em; letter-spacing: 1px; }
 
         /* Center Card */
         .hero-centercard { padding: 50px 24px 60px; display: flex; flex-direction: column; align-items: center; gap: 12px; }

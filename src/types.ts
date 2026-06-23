@@ -67,6 +67,8 @@ export interface DesignConfig {
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'gradation' | 'magcover';
+  heroPhotoX?: number;
+  heroPhotoY?: number;
   fontFamily: string;
   fontSize: 'small' | 'medium' | 'large';
 }

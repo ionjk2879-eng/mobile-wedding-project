@@ -169,6 +169,12 @@
 .share-preview-info p { font-size: 0.78rem; color: #6B7280; margin: 0; line-height: 1.5; white-space: pre-line; word-break: keep-all; }
 
 /* Hero style grid */
+.photo-pos-controls { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #F9FAFB; border-radius: 12px; }
+.photo-pos-row { display: flex; align-items: center; gap: 10px; }
+.photo-pos-label { font-size: 0.75rem; font-weight: 600; color: #6B7280; min-width: 28px; }
+.photo-pos-slider { flex: 1; accent-color: #D4A5C6; }
+.photo-pos-reset { padding: 6px 12px; border: 1px solid #E5E7EB; border-radius: 8px; background: white; font-size: 0.72rem; color: #9CA3AF; cursor: pointer; transition: all 0.2s; align-self: flex-end; }
+.photo-pos-reset:hover { border-color: #D4A5C6; color: #D4A5C6; }
 .hero-style-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .hero-style-btn { display: flex; flex-direction: column; gap: 2px; padding: 14px 10px; border-radius: 14px; border: 1px solid #E5E7EB; background: #F9FAFB; text-align: center; cursor: pointer; transition: all 0.2s; }
 .hero-style-btn:hover { border-color: #D1D5DB; background: #FAFAFA; }

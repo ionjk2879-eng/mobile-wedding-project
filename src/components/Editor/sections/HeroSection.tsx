@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Image as ImageIcon, Loader2, Move } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { InvitationData } from '../../../types';
 import { uploadImage } from '../../../firebase';
@@ -9,6 +9,7 @@ import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
+  const updateFields = useInvitationStore((s) => s.updateFields);
   const [uploading, setUploading] = useState(false);
 
   const handleHeroPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +48,22 @@ const HeroSection: React.FC = () => {
           )}
         </div>
       </div>
+      {data.heroPhoto && (
+        <div className="input-group">
+          <label><Move size={14} style={{ verticalAlign: 'middle' }} /> 사진 위치 조정</label>
+          <div className="photo-pos-controls">
+            <div className="photo-pos-row">
+              <span className="photo-pos-label">좌우</span>
+              <input type="range" min={0} max={100} value={data.heroPhotoX ?? 50} onChange={(e) => updateField('heroPhotoX', Number(e.target.value))} className="photo-pos-slider" />
+            </div>
+            <div className="photo-pos-row">
+              <span className="photo-pos-label">상하</span>
+              <input type="range" min={0} max={100} value={data.heroPhotoY ?? 50} onChange={(e) => updateField('heroPhotoY', Number(e.target.value))} className="photo-pos-slider" />
+            </div>
+            <button type="button" className="photo-pos-reset" onClick={() => updateFields({ heroPhotoX: 50, heroPhotoY: 50 })}>중앙으로 초기화</button>
+          </div>
+        </div>
+      )}
       <div className="input-group">
         <label>메인화면 스타일</label>
         <div className="hero-style-grid">

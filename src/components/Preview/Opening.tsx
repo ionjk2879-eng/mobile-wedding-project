@@ -54,7 +54,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const handleDismiss = () => {
     if (phase !== 'ready') return;
     setPhase('exit');
-    const delay = isCurtain ? 1200 : opening.openingStyle === 'fade' ? 1000 : 2200;
+    const delay = isCurtain ? 1200 : opening.openingStyle === 'fade' ? 1800 : 2200;
     setTimeout(() => setDismissed(true), delay);
   };
 
@@ -136,14 +136,14 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         /* === Fade === */
         .op-fade {
           opacity: 0;
-          animation: op-fade-open 2s ease 0.2s forwards;
+          animation: op-fade-open 3s ease 0.5s forwards;
         }
         @keyframes op-fade-open {
           to { opacity: var(--op-opacity); }
         }
         .op-fade.op-phase-exit {
           animation: none;
-          transition: opacity 0.8s ease;
+          transition: opacity 1.5s ease;
           opacity: 0 !important;
         }
 
