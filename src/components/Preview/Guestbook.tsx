@@ -90,21 +90,22 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!data.slug) return;
     if (!name.trim() || !content.trim()) return;
     if (password.length !== 4 || !/^\d{4}$/.test(password)) { toast.warning(isEn ? '4-digit PIN required.' : '4자리 숫자 비밀번호를 입력해주세요.'); return; }
     setSubmitting(true);
     try {
-      await submitGuestMessage(data.slug || 'default', { name: name.trim(), content: content.trim(), password, side });
+      await submitGuestMessage(data.slug, { name: name.trim(), content: content.trim(), password, side });
       setName(''); setContent(''); setPassword(''); setFormOpen(false);
       toast.success(isEn ? 'Message sent!' : '메시지가 등록되었습니다.');
-      fetchGuestMessages(data.slug || 'default').then(setMessages).catch(() => {});
+      fetchGuestMessages(data.slug).then(setMessages).catch(() => {});
     } catch (err) { toast.error(getFirebaseErrorMessage(err)); }
     finally { setSubmitting(false); }
   };
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
-    const slug = data.slug || 'default';
+    if (!deleteTarget || !data.slug) return;
+    const slug = data.slug;
     const isAdmin = data.guestbookPassword && deletePassword === data.guestbookPassword;
     try {
       const ok = await deleteGuestMessage(slug, deleteTarget, deletePassword);
@@ -124,7 +125,11 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
     <section className="guestbook-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef} aria-label="방명록">
       <h2>GUESTBOOK</h2>
       <p className="section-sub">{isEn ? 'Leave a message for the couple' : '방명록'}</p>
-      <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>{isEn ? 'Write a Message' : '방명록 작성하기'}</button>
+      {data.slug ? (
+        <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>{isEn ? 'Write a Message' : '방명록 작성하기'}</button>
+      ) : (
+        <p className="gb-preview-notice">{isEn ? 'Save your invitation first to enable the guestbook.' : '청첩장을 저장하면 방명록이 활성화됩니다.'}</p>
+      )}
 
       <div className="gb-tabs">
         <button className={`gb-tab ${activeTab === 'groom' ? 'active' : ''}`} onClick={() => setActiveTab('groom')}>
@@ -198,6 +203,7 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
         .gb-side-pick { display: flex; gap: 8px; }
         .gb-side-btn { flex: 1; padding: 10px; border: 1px solid var(--wedding-border); border-radius: 10px; background: var(--wedding-card-bg); font-size: 0.85em; font-weight: 600; color: var(--wedding-text-sub); cursor: pointer; transition: all 0.2s; }
         .gb-side-btn.active { border-color: var(--wedding-main); background: var(--wedding-main); color: white; }
+        .gb-preview-notice { font-size: 0.82em; color: var(--wedding-text-sub); text-align: center; padding: 12px; background: var(--wedding-card-bg); border: 1px dashed var(--wedding-border); border-radius: 12px; margin-top: 8px; }
       `}</style>
     </section>
   );
