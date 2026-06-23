@@ -7,20 +7,21 @@ service cloud.firestore {
       // 누구나 읽기 가능 (하객 열람)
       allow read: if true;
 
-      // 생성: slug 필드가 문서 ID와 일치해야 함
-      allow create: if true
-        && request.resource.data.groomName is string
-        && request.resource.data.brideName is string
+      // 생성: 로그인 필수, ownerUid가 본인이어야 함
+      allow create: if request.auth != null
+        && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.slug is string
         && request.resource.data.slug == slug;
 
-      // 수정: slug 변경 불가
-      allow update: if true
-        && request.resource.data.groomName is string
-        && request.resource.data.brideName is string
+      // 수정: 본인 데이터만
+      allow update: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.slug == slug;
 
-      allow delete: if true;
+      // 삭제: 본인 데이터만
+      allow delete: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid;
     }
 
     // RSVP 응답 (서브컬렉션)

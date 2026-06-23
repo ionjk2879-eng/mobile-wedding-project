@@ -5,7 +5,7 @@ import ToastContainer from './components/Toast';
 import { ScrollRootContext } from './components/Preview/ScrollReveal';
 import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
-import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation } from './firebase';
+import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, fetchMyInvitations } from './firebase';
 import { getFirebaseErrorMessage } from './utils/firebaseError';
 import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
 import './styles/effects.css';
@@ -27,19 +27,21 @@ const App: React.FC = () => {
   useEffect(() => {
     if (loadedRef.current) return;
     loadedRef.current = true;
-    const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
-    if (mySlugs.length > 0) {
-      history.replaceState({ screen: 'start' }, '', '/');
-      setShowStartScreen(mySlugs);
-    }
+    fetchMyInvitations().then((items) => {
+      if (items.length > 0) {
+        history.replaceState({ screen: 'start' }, '', '/');
+        setShowStartScreen(items.map((item) => item.slug));
+      }
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
     const onPopState = (e: PopStateEvent) => {
       const screen = e.state?.screen;
       if (screen === 'start') {
-        const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
-        if (mySlugs.length > 0) setShowStartScreen(mySlugs);
+        fetchMyInvitations().then((items) => {
+          if (items.length > 0) setShowStartScreen(items.map((item) => item.slug));
+        }).catch(() => {});
       } else if (screen === 'editor') {
         setShowStartScreen(null);
       }
@@ -70,14 +72,15 @@ const App: React.FC = () => {
     hasSavedOnceRef.current = false;
   };
 
-  const handleDeleteSlug = (slug: string) => {
+  const handleDeleteSlug = async (slug: string) => {
     if (!confirm(`'${slug}' 청첩장을 삭제하시겠습니까?\nFirebase 데이터도 함께 삭제됩니다.`)) return;
-    const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]').filter((s: string) => s !== slug);
-    localStorage.setItem('sonett_my_slugs', JSON.stringify(mySlugs));
-    if (mySlugs.length > 0) setShowStartScreen(mySlugs);
-    else setShowStartScreen(null);
-    toast.success(`'${slug}' 청첩장이 삭제되었습니다.`);
-    deleteInvitation(slug).catch(() => {});
+    try {
+      await deleteInvitation(slug);
+      toast.success(`'${slug}' 청첩장이 삭제되었습니다.`);
+      const items = await fetchMyInvitations();
+      if (items.length > 0) setShowStartScreen(items.map((item) => item.slug));
+      else setShowStartScreen(null);
+    } catch { toast.error('삭제에 실패했습니다.'); }
   };
 
   const handleReset = () => {
@@ -100,21 +103,13 @@ const App: React.FC = () => {
     if (saveStatusRef.current === 'saving') return;
     setSaveStatus('saving');
     try {
-      const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
-      const isOwner = mySlugs.includes(d.slug);
-      if (!isOwner) {
-        const available = await checkSlugAvailable(d.slug);
-        if (!available) {
-          if (!silent) toast.warning('이미 사용 중인 주소입니다. 다른 주소를 입력해주세요.');
-          setSaveStatus('idle');
-          return;
-        }
+      const available = await checkSlugAvailable(d.slug);
+      if (!available) {
+        if (!silent) toast.warning('이미 사용 중인 주소입니다. 다른 주소를 입력해주세요.');
+        setSaveStatus('idle');
+        return;
       }
       await saveInvitation(d.slug, d);
-      if (!isOwner) {
-        mySlugs.push(d.slug);
-        localStorage.setItem('sonett_my_slugs', JSON.stringify(mySlugs));
-      }
       hasSavedOnceRef.current = true;
       setSaveStatus('success');
       if (!silent) toast.success(`저장 완료! 청첩장 주소: /w/${d.slug}`);
@@ -232,10 +227,11 @@ const App: React.FC = () => {
 
       <div className="builder-topbar-wrap"><header className="builder-topbar">
         <div className="topbar-left" onClick={() => {
-          const mySlugs: string[] = JSON.parse(localStorage.getItem('sonett_my_slugs') || '[]');
-          history.pushState({ screen: 'start' }, '', '/');
-          if (mySlugs.length > 0) setShowStartScreen(mySlugs);
-          else { setData(initialData); hasSavedOnceRef.current = false; }
+          fetchMyInvitations().then((items) => {
+            history.pushState({ screen: 'start' }, '', '/');
+            if (items.length > 0) setShowStartScreen(items.map((item) => item.slug));
+            else { setData(initialData); hasSavedOnceRef.current = false; }
+          }).catch(() => {});
         }} style={{ cursor: 'pointer' }}>
           <h1 className="header-logo">Sonett</h1>
         </div>
