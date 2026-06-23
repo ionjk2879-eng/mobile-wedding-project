@@ -174,7 +174,7 @@ const App: React.FC = () => {
         <p className="start-desc">소네트 모바일 청첩장</p>
         <div className="start-options">
           <div className="ai-preset-section">
-            <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 스타일</div>
+            <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 샘플 청첩장</div>
             <div className="ai-preset-grid">
               {AI_PRESETS.map((preset) => (
                 <button key={preset.id} className="ai-preset-card" onClick={() => handleStartWithPreset(preset)}>
