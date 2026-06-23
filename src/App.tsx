@@ -12,57 +12,54 @@ import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import './styles/effects.css';
 import './styles/builder.css';
 
-const CARDS_PER_VIEW = 2;
-const CARD_GAP = 10;
-
 const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSelect }) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
-  const totalPages = Math.ceil(AI_PRESETS.length / CARDS_PER_VIEW);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    const onScroll = () => {
-      const cardW = (track.offsetWidth - CARD_GAP) / CARDS_PER_VIEW + CARD_GAP;
-      const idx = Math.round(track.scrollLeft / (cardW * CARDS_PER_VIEW));
-      setActiveIdx(Math.min(idx, totalPages - 1));
-    };
-    track.addEventListener('scroll', onScroll, { passive: true });
-    return () => track.removeEventListener('scroll', onScroll);
-  }, [totalPages]);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const idx = Number((entry.target as HTMLElement).dataset.idx);
+          if (!isNaN(idx)) setActiveIdx(idx);
+        }
+      });
+    }, { root: track, threshold: 0.6 });
+    track.querySelectorAll('.ai-preset-card').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
-  const scrollToPage = (idx: number) => {
+  const scrollTo = (idx: number) => {
     const track = trackRef.current;
     if (!track) return;
-    const cardW = (track.offsetWidth - CARD_GAP) / CARDS_PER_VIEW + CARD_GAP;
-    track.scrollTo({ left: idx * cardW * CARDS_PER_VIEW, behavior: 'smooth' });
+    const card = track.children[idx] as HTMLElement;
+    if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   };
 
   return (
     <div className="ai-preset-section">
       <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 샘플 청첩장</div>
       <div className="ai-preset-track" ref={trackRef}>
-        {AI_PRESETS.map((preset) => (
-          <button key={preset.id} className="ai-preset-card" onClick={() => onSelect(preset)}>
+        {AI_PRESETS.map((preset, i) => (
+          <button key={preset.id} data-idx={i} className="ai-preset-card" onClick={() => onSelect(preset)}>
             <span className="ai-preset-emoji">{preset.emoji}</span>
             <span className="ai-preset-name">{preset.name}</span>
             <span className="ai-preset-desc">{preset.description}</span>
             <div className="ai-preset-swatches">
-              {preset.previewColors.map((color, i) => (
-                <span key={i} className="ai-preset-swatch" style={{ background: color }} />
+              {preset.previewColors.map((color, ci) => (
+                <span key={ci} className="ai-preset-swatch" style={{ background: color }} />
               ))}
             </div>
           </button>
         ))}
       </div>
-      {totalPages > 1 && (
-        <div className="ai-preset-dots">
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button key={i} className={`ai-preset-dot ${activeIdx === i ? 'active' : ''}`} onClick={() => scrollToPage(i)} />
-          ))}
-        </div>
-      )}
+      <div className="ai-preset-dots">
+        {AI_PRESETS.map((_, i) => (
+          <button key={i} className={`ai-preset-dot ${activeIdx === i ? 'active' : ''}`} onClick={() => scrollTo(i)} />
+        ))}
+      </div>
     </div>
   );
 };
