@@ -1,6 +1,3 @@
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from './index';
-
 const resizeImage = (file: File, maxSize: number): Promise<Blob> =>
   new Promise((resolve, reject) => {
     const img = new Image();
@@ -27,25 +24,11 @@ const toBase64 = (blob: Blob): Promise<string> =>
     reader.readAsDataURL(blob);
   });
 
-const tryUploadToStorage = async (blob: Blob, path: string): Promise<string> => {
-  const fileRef = storageRef(storage, path);
-  const snap = await uploadBytes(fileRef, blob);
-  return getDownloadURL(snap.ref);
-};
-
-export const uploadImage = async (file: File, path: string): Promise<string> => {
+export const uploadImage = async (file: File, _path: string): Promise<string> => {
   const resized = await resizeImage(file, 1200);
-  try {
-    return await tryUploadToStorage(resized, path);
-  } catch {
-    return toBase64(resized);
-  }
+  return toBase64(resized);
 };
 
-export const uploadFile = async (file: File, path: string): Promise<string> => {
-  try {
-    return await tryUploadToStorage(file, path);
-  } catch {
-    return toBase64(file);
-  }
+export const uploadFile = async (file: File, _path: string): Promise<string> => {
+  return toBase64(file);
 };
