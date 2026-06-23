@@ -12,54 +12,71 @@ import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import './styles/effects.css';
 import './styles/builder.css';
 
+const ITEMS_PER_PAGE = 6;
+
 const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSelect }) => {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [activeIdx, setActiveIdx] = useState(0);
+  const totalPages = Math.ceil(AI_PRESETS.length / ITEMS_PER_PAGE);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [page, setPage] = useState(0);
+  const startX = useRef(0);
+  const dragging = useRef(false);
+  const [dragOffset, setDragOffset] = useState(0);
 
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const idx = Number((entry.target as HTMLElement).dataset.idx);
-          if (!isNaN(idx)) setActiveIdx(idx);
-        }
-      });
-    }, { root: track, threshold: 0.6 });
-    track.querySelectorAll('.ai-preset-card').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  const scrollTo = (idx: number) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const card = track.children[idx] as HTMLElement;
-    if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; dragging.current = true; };
+  const onTouchMove = (e: React.TouchEvent) => { if (dragging.current) setDragOffset(e.touches[0].clientX - startX.current); };
+  const onTouchEnd = () => {
+    dragging.current = false;
+    if (dragOffset < -50 && page < totalPages - 1) setPage(page + 1);
+    else if (dragOffset > 50 && page > 0) setPage(page - 1);
+    setDragOffset(0);
   };
+  const onMouseDown = (e: React.MouseEvent) => { startX.current = e.clientX; dragging.current = true; };
+  const onMouseMove = (e: React.MouseEvent) => { if (dragging.current) { e.preventDefault(); setDragOffset(e.clientX - startX.current); } };
+  const onMouseUp = () => { if (dragging.current) { dragging.current = false; if (dragOffset < -50 && page < totalPages - 1) setPage(page + 1); else if (dragOffset > 50 && page > 0) setPage(page - 1); setDragOffset(0); } };
+  const onMouseLeave = () => { if (dragging.current) { dragging.current = false; if (dragOffset < -50 && page < totalPages - 1) setPage(page + 1); else if (dragOffset > 50 && page > 0) setPage(page - 1); setDragOffset(0); } };
+
+  const pages = Array.from({ length: totalPages }, (_, i) =>
+    AI_PRESETS.slice(i * ITEMS_PER_PAGE, (i + 1) * ITEMS_PER_PAGE)
+  );
+
+  const translateX = -(page * 100) + (dragOffset / (containerRef.current?.offsetWidth || 320)) * 100;
 
   return (
     <div className="ai-preset-section">
       <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 샘플 청첩장</div>
-      <div className="ai-preset-track" ref={trackRef}>
-        {AI_PRESETS.map((preset, i) => (
-          <button key={preset.id} data-idx={i} className="ai-preset-card" onClick={() => onSelect(preset)}>
-            <span className="ai-preset-emoji">{preset.emoji}</span>
-            <span className="ai-preset-name">{preset.name}</span>
-            <span className="ai-preset-desc">{preset.description}</span>
-            <div className="ai-preset-swatches">
-              {preset.previewColors.map((color, ci) => (
-                <span key={ci} className="ai-preset-swatch" style={{ background: color }} />
+      <div className="ai-preset-viewport" ref={containerRef}
+        onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
+        onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}
+      >
+        <div className="ai-preset-track" style={{
+          transform: `translateX(${translateX}%)`,
+          transition: dragOffset ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+        }}>
+          {pages.map((group, pi) => (
+            <div key={pi} className="ai-preset-page">
+              {group.map((preset) => (
+                <button key={preset.id} className="ai-preset-card" onClick={() => onSelect(preset)}>
+                  <span className="ai-preset-emoji">{preset.emoji}</span>
+                  <span className="ai-preset-name">{preset.name}</span>
+                  <span className="ai-preset-desc">{preset.description}</span>
+                  <div className="ai-preset-swatches">
+                    {preset.previewColors.map((color, ci) => (
+                      <span key={ci} className="ai-preset-swatch" style={{ background: color }} />
+                    ))}
+                  </div>
+                </button>
               ))}
             </div>
-          </button>
-        ))}
+          ))}
+        </div>
       </div>
-      <div className="ai-preset-dots">
-        {AI_PRESETS.map((_, i) => (
-          <button key={i} className={`ai-preset-dot ${activeIdx === i ? 'active' : ''}`} onClick={() => scrollTo(i)} />
-        ))}
-      </div>
+      {totalPages > 1 && (
+        <div className="ai-preset-dots">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button key={i} className={`ai-preset-dot ${page === i ? 'active' : ''}`} onClick={() => setPage(i)} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
