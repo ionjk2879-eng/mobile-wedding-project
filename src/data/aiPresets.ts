@@ -78,6 +78,20 @@ export const AI_PRESETS: AIPreset[] = [
     settings: { ...base, theme: 'emerald', fontFamily: "'Playfair Display', serif", fontSize: 'medium', customBgColor: '#EDF5F0', customAccentColor: '#2E7D5B', bgTexture: 'silk', bgEffect: 'firefly', scrollEffect: 'fade-up', heroStyle: 'editorial', opening: { openingEnabled: true, openingStyle: 'curtain', openingColorMode: 'custom', openingBgColor: '#0E2218', openingBgOpacity: 0.95, openingText: 'Our New Beginning', openingSubText: '' } },
   },
 
+  {
+    id: 'terracotta-boho', name: '테라코타 보헤미안', category: '2026 트렌드',
+    description: '따뜻한 테라코타와 올리브의 보헤미안 감성',
+    emoji: '🏺', previewColors: ['#FAF0E6', '#B86842', '#4A2E1E'],
+    settings: { ...base, theme: 'terracotta', fontFamily: "'Gowun Batang', serif", fontSize: 'medium', customBgColor: '#FAF0E6', customAccentColor: '#B86842', bgTexture: 'paper', bgEffect: 'leaves', scrollEffect: 'fade-up', heroStyle: 'magcover', opening: { openingEnabled: true, openingStyle: 'curtain', openingColorMode: 'custom', openingBgColor: '#2E1A10', openingBgOpacity: 0.93, openingText: 'Two Hearts, One Love', openingSubText: '' } },
+  },
+  {
+    id: 'midnight-gala', name: '미드나잇 갈라', category: '2026 트렌드',
+    description: '딥 네이비와 별빛 골드의 우아한 이브닝 무드',
+    emoji: '🌙', previewColors: ['#F0F0F5', '#2A2A5A', '#1A1A30'],
+    settings: { ...base, theme: 'midnight', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F0F0F5', customAccentColor: '#2A2A5A', bgTexture: 'silk', bgEffect: 'stars', scrollEffect: 'fade-up', heroStyle: 'gradation', opening: { openingEnabled: true, openingStyle: 'circle', openingColorMode: 'custom', openingBgColor: '#0E0E20', openingBgOpacity: 0.97, openingText: 'A Night to Remember', openingSubText: '' } },
+  },
+
+  // === 2026 월별 ===
   // === 2026 3월 — 벚꽃 라일락 ===
   {
     id: 'march-lilac', name: '3월 라일락 블룸', category: '2026년 3월',
@@ -110,19 +124,6 @@ export const AI_PRESETS: AIPreset[] = [
     settings: { ...base, theme: 'cobalt', fontFamily: "'Playfair Display', serif", fontSize: 'medium', customBgColor: '#EEF0F8', customAccentColor: '#2E4A8A', bgTexture: 'none', bgEffect: 'stars', scrollEffect: 'fade-in', heroStyle: 'fullscreen', greetingContent: '여름 햇살처럼 찬란한 사랑이\n저희 두 사람을 하나로 이어주었습니다.\n\n뜨겁지만 시원한 바람처럼\n서로에게 쉼이 되어주는 사이,\n함께하는 인생의 여름을 시작합니다.', opening: { openingEnabled: true, openingStyle: 'circle', openingColorMode: 'custom', openingBgColor: '#0A0E20', openingBgOpacity: 0.97, openingText: 'Under the Stars', openingSubText: '' } },
   },
 
-  // === 2026 보너스 ===
-  {
-    id: 'terracotta-boho', name: '테라코타 보헤미안', category: '2026 트렌드',
-    description: '따뜻한 테라코타와 올리브의 보헤미안 감성',
-    emoji: '🏺', previewColors: ['#FAF0E6', '#B86842', '#4A2E1E'],
-    settings: { ...base, theme: 'terracotta', fontFamily: "'Gowun Batang', serif", fontSize: 'medium', customBgColor: '#FAF0E6', customAccentColor: '#B86842', bgTexture: 'paper', bgEffect: 'leaves', scrollEffect: 'fade-up', heroStyle: 'magcover', opening: { openingEnabled: true, openingStyle: 'curtain', openingColorMode: 'custom', openingBgColor: '#2E1A10', openingBgOpacity: 0.93, openingText: 'Two Hearts, One Love', openingSubText: '' } },
-  },
-  {
-    id: 'midnight-gala', name: '미드나잇 갈라', category: '2026 트렌드',
-    description: '딥 네이비와 별빛 골드의 우아한 이브닝 무드',
-    emoji: '🌙', previewColors: ['#F0F0F5', '#2A2A5A', '#1A1A30'],
-    settings: { ...base, theme: 'midnight', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F0F0F5', customAccentColor: '#2A2A5A', bgTexture: 'silk', bgEffect: 'stars', scrollEffect: 'fade-up', heroStyle: 'gradation', opening: { openingEnabled: true, openingStyle: 'circle', openingColorMode: 'custom', openingBgColor: '#0E0E20', openingBgOpacity: 0.97, openingText: 'A Night to Remember', openingSubText: '' } },
-  },
 ];
 
 export function applyPreset(preset: AIPreset): InvitationData {
