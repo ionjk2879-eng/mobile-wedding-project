@@ -12,18 +12,38 @@ import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import './styles/effects.css';
 import './styles/builder.css';
 
-const PRESETS_PER_PAGE = 6;
+const CARDS_PER_VIEW = 2;
+const CARD_GAP = 10;
 
 const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSelect }) => {
-  const [page, setPage] = useState(0);
-  const totalPages = Math.ceil(AI_PRESETS.length / PRESETS_PER_PAGE);
-  const paged = AI_PRESETS.slice(page * PRESETS_PER_PAGE, (page + 1) * PRESETS_PER_PAGE);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const totalPages = Math.ceil(AI_PRESETS.length / CARDS_PER_VIEW);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const onScroll = () => {
+      const cardW = (track.offsetWidth - CARD_GAP) / CARDS_PER_VIEW + CARD_GAP;
+      const idx = Math.round(track.scrollLeft / (cardW * CARDS_PER_VIEW));
+      setActiveIdx(Math.min(idx, totalPages - 1));
+    };
+    track.addEventListener('scroll', onScroll, { passive: true });
+    return () => track.removeEventListener('scroll', onScroll);
+  }, [totalPages]);
+
+  const scrollToPage = (idx: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const cardW = (track.offsetWidth - CARD_GAP) / CARDS_PER_VIEW + CARD_GAP;
+    track.scrollTo({ left: idx * cardW * CARDS_PER_VIEW, behavior: 'smooth' });
+  };
 
   return (
     <div className="ai-preset-section">
       <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 샘플 청첩장</div>
-      <div className="ai-preset-grid">
-        {paged.map((preset) => (
+      <div className="ai-preset-track" ref={trackRef}>
+        {AI_PRESETS.map((preset) => (
           <button key={preset.id} className="ai-preset-card" onClick={() => onSelect(preset)}>
             <span className="ai-preset-emoji">{preset.emoji}</span>
             <span className="ai-preset-name">{preset.name}</span>
@@ -39,7 +59,7 @@ const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSe
       {totalPages > 1 && (
         <div className="ai-preset-dots">
           {Array.from({ length: totalPages }, (_, i) => (
-            <button key={i} className={`ai-preset-dot ${page === i ? 'active' : ''}`} onClick={() => setPage(i)} />
+            <button key={i} className={`ai-preset-dot ${activeIdx === i ? 'active' : ''}`} onClick={() => scrollToPage(i)} />
           ))}
         </div>
       )}

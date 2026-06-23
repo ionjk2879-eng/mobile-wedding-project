@@ -18,8 +18,9 @@
 .start-screen { height: auto; min-height: 100vh; padding: 40px 20px; box-sizing: border-box; }
 .ai-preset-section { margin-bottom: 8px; }
 .ai-preset-label { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; color: #D4A5C6; margin-bottom: 10px; }
-.ai-preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.ai-preset-card { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px; border: 1px solid #E5E7EB; border-radius: 14px; background: white; cursor: pointer; transition: all 0.2s; text-align: left; }
+.ai-preset-track { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 4px 0; }
+.ai-preset-track::-webkit-scrollbar { display: none; }
+.ai-preset-card { flex: 0 0 calc((100% - 10px) / 2); scroll-snap-align: start; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px; border: 1px solid #E5E7EB; border-radius: 14px; background: white; cursor: pointer; transition: all 0.2s; text-align: left; box-sizing: border-box; min-width: 0; }
 .ai-preset-card:hover { border-color: #D4A5C6; box-shadow: 0 4px 12px rgba(212,165,198,0.15); transform: translateY(-1px); }
 .ai-preset-card:active { transform: scale(0.97); }
 .ai-preset-emoji { font-size: 1.4rem; line-height: 1; }
