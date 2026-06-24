@@ -131,7 +131,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         </div>
         <div className="split-photo">{photoEl}</div>
       </div>
-      <div className="split-row reverse">
+      <div className="split-row">
         <div className="split-photo">{photoEl}</div>
         <div className="split-info">
           <p className="split-label">BRIDE</p>

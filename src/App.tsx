@@ -8,7 +8,7 @@ import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, fetchMyInvitations } from './firebase';
 import { getFirebaseErrorMessage } from './utils/firebaseError';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X, Sparkles, ExternalLink, Copy } from 'lucide-react';
+import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X, Sparkles } from 'lucide-react';
 import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import './styles/effects.css';
 import './styles/builder.css';
@@ -352,8 +352,6 @@ const App: React.FC = () => {
             <Save size={15} />
             {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
           </button>
-          {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-text-btn"><ExternalLink size={15} /> 공유 링크</a>}
-          {data.slug && <button className="header-text-btn" onClick={() => { navigator.clipboard.writeText(`https://sonett.ionjk2879.workers.dev/w/${data.slug}`); toast.success('공유 링크가 복사되었습니다.'); }}><Copy size={15} /> 링크 복사</button>}
           {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> 응답 확인</a>}
           <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> 초기화</button>
         </div>
