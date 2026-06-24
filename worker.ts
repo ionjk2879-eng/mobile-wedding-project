@@ -154,10 +154,8 @@ export default {
       html = html.replace(/<link rel="modulepreload"[^>]*firebase[^>]*>/g, '');
 
       // Add loading indicator visible before JS renders
-      html = html.replace(
-        '<div id="root"></div>',
-        '<div id="root"><div style="width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#9CA3AF"><p>청첩장을 불러오는 중...</p></div></div>'
-      );
+      const loader = `<div id="root"><div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#FDFBFC 0%,#FDF6F9 100%);font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;gap:20px;z-index:1"><p style="font-size:1.5rem;font-weight:700;color:#B07A8E;letter-spacing:3px;margin:0">Sonett</p><div style="width:36px;height:36px;border:3px solid #F3E0E6;border-top-color:#B07A8E;border-radius:50%;animation:spin .8s linear infinite"></div><p style="font-size:.85rem;color:#9CA3AF;margin:0;letter-spacing:1px">청첩장을 불러오는 중...</p><style>@keyframes spin{to{transform:rotate(360deg)}}</style></div></div>`;
+      html = html.replace('<div id="root"></div>', loader);
 
       return new Response(html, {
         headers: { 'Content-Type': 'text/html;charset=UTF-8' },
