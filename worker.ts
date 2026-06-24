@@ -146,8 +146,18 @@ export default {
           });
         }
       }
-      const inlineScript = `<script>window.__INVITATION_DATA__=${JSON.stringify(inlineData)};</script>`;
+      const safeJson = JSON.stringify(inlineData).replace(/<\//g, '<\\/');
+      const inlineScript = `<script>window.__INVITATION_DATA__=${safeJson};</script>`;
       html = html.replace('</head>', `${inlineScript}\n  </head>`);
+
+      // ViewPage doesn't need firebase - remove heavy modulepreload
+      html = html.replace(/<link rel="modulepreload"[^>]*firebase[^>]*>/g, '');
+
+      // Add loading indicator visible before JS renders
+      html = html.replace(
+        '<div id="root"></div>',
+        '<div id="root"><div style="width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#9CA3AF"><p>청첩장을 불러오는 중...</p></div></div>'
+      );
 
       return new Response(html, {
         headers: { 'Content-Type': 'text/html;charset=UTF-8' },
