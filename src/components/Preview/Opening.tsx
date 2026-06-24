@@ -196,48 +196,50 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
         /* Names */
         .op-names {
-          margin: 0; font-size: 1.15em; letter-spacing: 6px;
-          font-weight: 400; color: #FFFFFF;
-          text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+          margin: 0; font-size: 1.1em; letter-spacing: 8px;
+          font-weight: 300; color: #FFFFFF;
+          font-family: 'Pretendard', -apple-system, sans-serif;
+          text-shadow: 0 1px 10px rgba(0,0,0,0.4);
         }
-        .op-amp { opacity: 0.7; font-weight: 300; }
+        .op-amp { opacity: 0.5; font-weight: 200; letter-spacing: 4px; }
 
         /* Main text */
         .op-main {
-          margin: 4px 0; font-size: 1.5em; font-weight: 300;
-          letter-spacing: 1.5px; line-height: 1.4;
-          font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+          margin: 8px 0; font-size: 1.4em; font-weight: 200;
+          letter-spacing: 3px; line-height: 1.5;
+          font-family: 'Pretendard', -apple-system, sans-serif;
           color: #FFFFFF;
-          text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+          text-shadow: 0 1px 10px rgba(0,0,0,0.4);
         }
 
         /* Sub text (날짜/장소) */
         .op-sub {
-          margin: 0; font-size: 1em; opacity: 0;
-          letter-spacing: 3px; font-weight: 400;
-          color: #FFFFFF;
-          text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+          margin: 0; font-size: 0.82em; opacity: 0;
+          letter-spacing: 4px; font-weight: 300;
+          color: rgba(255,255,255,0.8);
+          font-family: 'Pretendard', -apple-system, sans-serif;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.3);
           animation: op-fade-up 0.6s ease 2s forwards;
         }
         @keyframes op-fade-up {
           from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 0.85; transform: translateY(0); }
+          to { opacity: 0.8; transform: translateY(0); }
         }
 
         /* Enter button */
         .op-enter {
-          margin-top: 16px; padding: 14px 44px;
-          background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.6);
-          border-radius: 30px; color: #FFFFFF; font-size: 0.95em;
-          font-weight: 600; letter-spacing: 2px; cursor: pointer;
+          margin-top: 20px; padding: 13px 48px;
+          background: transparent; border: 1px solid rgba(255,255,255,0.4);
+          border-radius: 0; color: rgba(255,255,255,0.9); font-size: 0.78em;
+          font-weight: 400; letter-spacing: 4px; cursor: pointer;
+          font-family: 'Pretendard', -apple-system, sans-serif;
+          text-transform: uppercase;
           opacity: 0; animation: op-fade-up 0.6s ease 2.4s forwards;
           transition: all 0.3s;
-          text-shadow: 0 1px 4px rgba(0,0,0,0.4);
         }
         .op-enter:hover {
-          background: rgba(255,255,255,0.22);
-          border-color: #FFFFFF;
-          transform: translateY(-1px);
+          background: rgba(255,255,255,0.1);
+          border-color: rgba(255,255,255,0.7);
         }
       `}</style>
     </div>
