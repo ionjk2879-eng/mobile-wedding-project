@@ -35,12 +35,17 @@ const GREETING_TEMPLATES: { label: string; icon: string; content: string }[] = [
 ];
 
 const GreetingSection: React.FC = () => {
+  const greetingTitle = useInvitationStore((s) => s.data.greetingTitle);
   const greetingContent = useInvitationStore((s) => s.data.greetingContent);
   const updateField = useInvitationStore((s) => s.updateField);
   const [showTemplates, setShowTemplates] = useState(false);
 
   return (
     <>
+      <div className="input-group">
+        <label>인사말 제목</label>
+        <input type="text" value={greetingTitle} onChange={(e) => updateField('greetingTitle', e.target.value)} className="modern-input" placeholder="소중한 분들을 초대합니다" />
+      </div>
       <div className="input-group">
         <label>인사말 템플릿</label>
         <button type="button" className="greeting-template-toggle" onClick={() => setShowTemplates(!showTemplates)}>

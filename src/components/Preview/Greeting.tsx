@@ -27,7 +27,7 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
     <section className="greeting section" style={{ fontFamily: data.fontFamily }} aria-label="인사말">
       <div className="greeting-text">
         <h2>INVITATION</h2>
-        <p className="section-sub">소중한 분들을 초대합니다</p>
+        <p className="greeting-title">{data.greetingTitle || '소중한 분들을 초대합니다'}</p>
         <p style={{ whiteSpace: 'pre-wrap' }}>
           {content}
         </p>
@@ -51,6 +51,14 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
       </div>
 
       <style>{`
+        .greeting-title {
+          font-size: 1.35em;
+          font-weight: 600;
+          color: var(--wedding-text-main);
+          margin: 8px 0 24px;
+          letter-spacing: 1px;
+          line-height: 1.5;
+        }
         .greeting-text p {
           line-height: 2;
           color: var(--wedding-text-body);

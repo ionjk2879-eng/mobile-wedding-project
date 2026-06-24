@@ -288,9 +288,9 @@ const App: React.FC = () => {
 
   const getBaseFontSize = () => {
     switch (data.fontSize) {
-      case 'small': return '12px';
+      case 'small': return '13px';
       case 'large': return '16px';
-      default: return '13px';
+      default: return '14.5px';
     }
   };
 
