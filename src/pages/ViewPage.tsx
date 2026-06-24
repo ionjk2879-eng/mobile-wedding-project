@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { loadInvitation } from '../firebase';
 import { InvitationData } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
 import { ScrollRootContext } from '../components/Preview/ScrollReveal';
 import { loadFont } from '../utils/loadFont';
+import { loadInvitationPublic } from '../services/publicLoad';
 import '../styles/effects.css';
 
 const ViewPage: React.FC = () => {
@@ -17,7 +17,7 @@ const ViewPage: React.FC = () => {
 
   useEffect(() => {
     if (!slug) return;
-    loadInvitation(slug).then(d => {
+    loadInvitationPublic(slug).then(d => {
       if (d) {
         setData(d);
         loadFont(d.fontFamily);
