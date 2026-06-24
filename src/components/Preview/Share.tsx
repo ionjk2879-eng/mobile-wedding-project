@@ -1,22 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Share2, Link } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { toast } from '../../stores/useToastStore';
+import { loadKakaoSDK } from '../../utils/loadScript';
 
 interface PreviewProps {
   data: InvitationData;
 }
 
-const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
 
 const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
-  useEffect(() => {
-    if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init(KAKAO_APP_KEY);
-    }
-  }, []);
-
   const shareLink = data.slug ? `${SITE_ORIGIN}/w/${data.slug}` : window.location.href;
 
   const handleCopyLink = () => {
@@ -24,7 +18,10 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
     toast.success('링크가 복사되었습니다.');
   };
 
-  const handleKakaoShare = () => {
+  const handleKakaoShare = async () => {
+    try {
+      await loadKakaoSDK();
+    } catch { return; }
     if (!window.Kakao || !window.Kakao.isInitialized()) return;
 
     const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;

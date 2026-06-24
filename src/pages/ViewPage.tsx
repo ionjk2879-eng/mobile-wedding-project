@@ -5,6 +5,7 @@ import { InvitationData } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
 import { ScrollRootContext } from '../components/Preview/ScrollReveal';
+import { loadFont } from '../utils/loadFont';
 import '../styles/effects.css';
 
 const ViewPage: React.FC = () => {
@@ -17,7 +18,10 @@ const ViewPage: React.FC = () => {
   useEffect(() => {
     if (!slug) return;
     loadInvitation(slug).then(d => {
-      if (d) setData(d);
+      if (d) {
+        setData(d);
+        loadFont(d.fontFamily);
+      }
       else setError(true);
       setLoading(false);
     }).catch(() => { setError(true); setLoading(false); });
@@ -32,7 +36,6 @@ const ViewPage: React.FC = () => {
 
   return (
     <div className="view-container" style={{ fontFamily: data.fontFamily }} ref={scrollRef}>
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Dancing+Script&display=swap" rel="stylesheet" />
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor, '--wedding-accent': data.customAccentColor } as React.CSSProperties : {}) }}>
         <ScrollRootContext.Provider value={scrollRef}>

@@ -1,4 +1,5 @@
 declare namespace kakao.maps {
+  function load(callback: () => void): void;
   class Map {
     constructor(container: HTMLElement, options: { center: LatLng; level: number });
     setCenter(latlng: LatLng): void;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
+import { loadDaumPostcode, loadKakaoMaps } from '../../../utils/loadScript';
 
 const LocationSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -8,7 +9,9 @@ const LocationSection: React.FC = () => {
   const updateTransport = useInvitationStore((s) => s.updateTransport);
   const setData = useInvitationStore((s) => s.setData);
 
-  const handleAddressSearch = () => {
+  const handleAddressSearch = async () => {
+    await loadDaumPostcode();
+    await loadKakaoMaps().catch(() => {});
     new window.daum.Postcode({
       oncomplete: (searchData: DaumPostcodeData) => {
         let fullAddress = searchData.address;

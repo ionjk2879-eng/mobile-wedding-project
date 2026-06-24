@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Navigation, Train, Bus, Car } from 'lucide-react';
 import { InvitationData } from '../../types';
+import { loadKakaoMaps } from '../../utils/loadScript';
 
 interface PreviewProps {
   data: InvitationData;
@@ -16,28 +17,31 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   useEffect(() => {
     if (!data.venueAddress || !mapRef.current) return;
-
-    if (!window.kakao?.maps?.Map) return;
-
     const container = mapRef.current;
-    if (!container) return;
+    let cancelled = false;
 
-    const map = new window.kakao.maps.Map(container, {
-      center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-      level: 3
-    });
+    loadKakaoMaps().then(() => {
+      if (cancelled || !container) return;
 
-    const geocoder = new window.kakao.maps.services.Geocoder();
-    geocoder.addressSearch(data.venueAddress, (result, status) => {
-      if (status === window.kakao.maps.services.Status.OK) {
-        const lat = parseFloat(result[0].y);
-        const lng = parseFloat(result[0].x);
-        coordsRef.current = { lat, lng };
-        const coords = new window.kakao.maps.LatLng(lat, lng);
-        new window.kakao.maps.Marker({ map, position: coords });
-        map.setCenter(coords);
-      }
-    });
+      const map = new window.kakao.maps.Map(container, {
+        center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+        level: 3
+      });
+
+      const geocoder = new window.kakao.maps.services.Geocoder();
+      geocoder.addressSearch(data.venueAddress, (result, status) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const lat = parseFloat(result[0].y);
+          const lng = parseFloat(result[0].x);
+          coordsRef.current = { lat, lng };
+          const coords = new window.kakao.maps.LatLng(lat, lng);
+          new window.kakao.maps.Marker({ map, position: coords });
+          map.setCenter(coords);
+        }
+      });
+    }).catch(() => {});
+
+    return () => { cancelled = true; };
   }, [data.venueAddress]);
 
   const searchQuery = encodeURIComponent(data.venueAddress || venueName || '');

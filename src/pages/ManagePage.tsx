@@ -7,27 +7,27 @@ import { Edit3, Eye, ClipboardList, Trash2, Share2, Link as LinkIcon, X } from '
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
+import { loadKakaoSDK } from '../utils/loadScript';
 
 const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
-const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 
 const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
   const shareUrl = `${SITE_ORIGIN}/w/${slug}`;
   const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
   const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
 
-  useEffect(() => {
-    if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init(KAKAO_APP_KEY);
-    }
-  }, []);
-
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
     toast.success('링크가 복사되었습니다.');
   };
 
-  const handleKakaoShare = () => {
+  const handleKakaoShare = async () => {
+    try {
+      await loadKakaoSDK();
+    } catch {
+      toast.error('카카오 SDK 로딩에 실패했습니다.');
+      return;
+    }
     if (!window.Kakao || !window.Kakao.isInitialized()) {
       toast.error('카카오 SDK가 초기화되지 않았습니다.');
       return;

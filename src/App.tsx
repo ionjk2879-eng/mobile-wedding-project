@@ -7,6 +7,7 @@ import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, fetchMyInvitations } from './firebase';
 import { getFirebaseErrorMessage } from './utils/firebaseError';
+import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X, Sparkles } from 'lucide-react';
 import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
@@ -105,6 +106,8 @@ const App: React.FC = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
   const hasSavedOnceRef = useRef(false);
+
+  useEffect(() => { loadAllFonts(); }, []);
 
   const loadedRef = useRef(false);
   useEffect(() => {
@@ -317,7 +320,6 @@ const App: React.FC = () => {
     return (
       <div className="full-preview-container" style={{ fontFamily: data.fontFamily }} ref={fullPreviewScrollRef}>
         <ToastContainer />
-        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Dancing+Script&display=swap" rel="stylesheet" />
         <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>편집기로 돌아가기</button>
         <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
           <ScrollRootContext.Provider value={fullPreviewScrollRef}>
