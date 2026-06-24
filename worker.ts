@@ -98,10 +98,20 @@ export default {
       html = html.replace('</head>', `${ogTags}\n  </head>`);
 
       // Inline invitation data so client can render immediately without API call
+      // Skip base64 data: fields to keep HTML small
       const inlineData: Record<string, unknown> = {};
       for (const [key, val] of Object.entries(f)) {
         const v = val as Record<string, unknown>;
-        if ('stringValue' in v) inlineData[key] = v.stringValue;
+        if ('stringValue' in v) {
+          const s = v.stringValue as string;
+          if (s.startsWith('data:')) {
+            inlineData[key] = `${url.origin}/og/${slug}`;
+          } else if (s.length > 5000) {
+            continue;
+          } else {
+            inlineData[key] = s;
+          }
+        }
         else if ('booleanValue' in v) inlineData[key] = v.booleanValue;
         else if ('integerValue' in v) inlineData[key] = Number(v.integerValue);
         else if ('doubleValue' in v) inlineData[key] = v.doubleValue;
