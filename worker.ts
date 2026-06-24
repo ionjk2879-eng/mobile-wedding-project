@@ -97,6 +97,48 @@ export default {
 
       html = html.replace('</head>', `${ogTags}\n  </head>`);
 
+      // Inline invitation data so client can render immediately without API call
+      const inlineData: Record<string, unknown> = {};
+      for (const [key, val] of Object.entries(f)) {
+        const v = val as Record<string, unknown>;
+        if ('stringValue' in v) inlineData[key] = v.stringValue;
+        else if ('booleanValue' in v) inlineData[key] = v.booleanValue;
+        else if ('integerValue' in v) inlineData[key] = Number(v.integerValue);
+        else if ('doubleValue' in v) inlineData[key] = v.doubleValue;
+        else if ('mapValue' in v) {
+          const mv = v.mapValue as { fields?: Record<string, Record<string, unknown>> };
+          if (mv.fields) {
+            const obj: Record<string, unknown> = {};
+            for (const [mk, mv2] of Object.entries(mv.fields)) {
+              if ('stringValue' in mv2) obj[mk] = mv2.stringValue;
+              else if ('booleanValue' in mv2) obj[mk] = mv2.booleanValue;
+              else if ('integerValue' in mv2) obj[mk] = Number(mv2.integerValue);
+            }
+            inlineData[key] = obj;
+          }
+        } else if ('arrayValue' in v) {
+          const av = v.arrayValue as { values?: Record<string, unknown>[] };
+          inlineData[key] = (av.values || []).map((item) => {
+            if ('stringValue' in item) return item.stringValue;
+            if ('mapValue' in item) {
+              const mv = item.mapValue as { fields?: Record<string, Record<string, unknown>> };
+              if (mv.fields) {
+                const obj: Record<string, unknown> = {};
+                for (const [mk, mv2] of Object.entries(mv.fields)) {
+                  if ('stringValue' in mv2) obj[mk] = mv2.stringValue;
+                  else if ('booleanValue' in mv2) obj[mk] = mv2.booleanValue;
+                  else if ('integerValue' in mv2) obj[mk] = Number(mv2.integerValue);
+                }
+                return obj;
+              }
+            }
+            return null;
+          });
+        }
+      }
+      const inlineScript = `<script>window.__INVITATION_DATA__=${JSON.stringify(inlineData)};</script>`;
+      html = html.replace('</head>', `${inlineScript}\n  </head>`);
+
       return new Response(html, {
         headers: { 'Content-Type': 'text/html;charset=UTF-8' },
       });
