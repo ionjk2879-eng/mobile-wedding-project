@@ -54,7 +54,7 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
         </div>
 
         <div className="share-modal-qr">
-          <QRCodeSVG value={shareUrl} size={180} level="M" bgColor="transparent" fgColor="#1F2937" />
+          <QRCodeSVG value={shareUrl} size={140} level="M" bgColor="transparent" fgColor="#1F2937" className="share-qr-svg" />
           <p className="share-modal-qr-hint">QR 코드를 스캔하면 청첩장으로 이동합니다</p>
         </div>
 
@@ -231,7 +231,7 @@ const ManagePage: React.FC = () => {
         .manage-action.share:hover { background: #9B6A7E; }
         .manage-action.delete:hover { background: #FEE2E2; color: #DC2626; }
 
-        /* Share Modal */
+        /* Share Modal — PC: 크게, 모바일: 작게 */
         .share-modal-overlay {
           position: fixed;
           inset: 0;
@@ -245,8 +245,8 @@ const ManagePage: React.FC = () => {
         .share-modal {
           background: white;
           border-radius: 20px;
-          padding: 32px;
-          max-width: 400px;
+          padding: 36px;
+          max-width: 440px;
           width: 100%;
           box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         }
@@ -257,7 +257,7 @@ const ManagePage: React.FC = () => {
           margin-bottom: 28px;
         }
         .share-modal-header h3 {
-          font-size: 1.15rem;
+          font-size: 1.3rem;
           font-weight: 700;
           color: #1F2937;
           margin: 0;
@@ -273,13 +273,14 @@ const ManagePage: React.FC = () => {
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 24px;
+          padding: 28px;
           background: #FAFAFA;
           border-radius: 16px;
           margin-bottom: 20px;
         }
+        .share-qr-svg { width: 180px; height: 180px; }
         .share-modal-qr-hint {
-          font-size: 0.8rem;
+          font-size: 0.85rem;
           color: #9CA3AF;
           margin: 16px 0 0;
         }
@@ -288,10 +289,10 @@ const ManagePage: React.FC = () => {
         }
         .share-modal-url-input {
           width: 100%;
-          padding: 10px 14px;
+          padding: 12px 14px;
           border: 1px solid #E5E7EB;
           border-radius: 10px;
-          font-size: 0.82rem;
+          font-size: 0.88rem;
           color: #6B7280;
           background: #F9FAFB;
           box-sizing: border-box;
@@ -307,9 +308,9 @@ const ManagePage: React.FC = () => {
           align-items: center;
           justify-content: center;
           gap: 8px;
-          padding: 14px;
+          padding: 16px;
           border-radius: 12px;
-          font-size: 0.9rem;
+          font-size: 1rem;
           font-weight: 600;
           border: none;
           cursor: pointer;
@@ -337,7 +338,16 @@ const ManagePage: React.FC = () => {
             width: 100%;
             flex-wrap: wrap;
           }
-          .share-modal { padding: 24px; }
+          .share-modal { padding: 20px; max-width: 100%; }
+          .share-modal-header { margin-bottom: 16px; }
+          .share-modal-header h3 { font-size: 1rem; }
+          .share-modal-qr { padding: 16px; margin-bottom: 14px; }
+          .share-qr-svg { width: 130px; height: 130px; }
+          .share-modal-qr-hint { font-size: 0.72rem; margin: 10px 0 0; }
+          .share-modal-url { margin-bottom: 14px; }
+          .share-modal-url-input { padding: 8px 10px; font-size: 0.72rem; }
+          .share-modal-actions { gap: 8px; }
+          .share-modal-btn { padding: 12px 8px; font-size: 0.8rem; gap: 5px; }
         }
       `}</style>
     </div>
