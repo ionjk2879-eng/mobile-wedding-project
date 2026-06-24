@@ -165,7 +165,7 @@
 /* Full preview */
 .full-preview-container { width: 100vw; height: 100vh; background: #ffffff; display: flex; justify-content: center; align-items: flex-start; overflow-y: scroll; padding: 0; margin: 0; }
 .full-preview-container .invitation-page,
-.view-container .invitation-page { width: 100%; max-width: 480px; background-color: var(--wedding-bg); min-height: 100%; position: relative; }
+.view-container .invitation-page { width: 100%; max-width: 430px; background-color: var(--wedding-bg); min-height: 100%; position: relative; }
 .back-to-editor-btn { position: fixed; top: 20px; right: 20px; background: #B3A2C8; color: white; padding: 12px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 700; z-index: 9999; cursor: pointer; border: none; }
 
 /* Mobile tab toggle */
@@ -222,7 +222,7 @@
   .mobile-tab-btn.active { color: #D4A5C6; }
   .mobile-tab-btn svg { width: 20px; height: 20px; }
 
-  .preview-container-box { border-radius: 0; border: none; box-shadow: none; width: 100%; max-width: 480px; height: 100%; }
+  .preview-container-box { border-radius: 0; border: none; box-shadow: none; width: 100%; max-width: 430px; height: 100%; }
   .builder-topbar { padding: 10px 16px; gap: 12px; }
   .topbar-left { flex: 0 0 auto; padding-left: 0; }
   .topbar-right { flex: 1; justify-content: flex-end; }
