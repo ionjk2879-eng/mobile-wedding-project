@@ -351,6 +351,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.time === next.data.time
   && prev.data.venueName === next.data.venueName
   && prev.data.heroPhoto === next.data.heroPhoto
+  && prev.data.heroPhotoX === next.data.heroPhotoX
+  && prev.data.heroPhotoY === next.data.heroPhotoY
   && prev.data.heroStyle === next.data.heroStyle
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
