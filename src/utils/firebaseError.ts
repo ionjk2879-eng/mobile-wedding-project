@@ -28,6 +28,10 @@ export function getFirebaseErrorMessage(err: unknown): string {
     return '서버 응답이 없습니다. 잠시 후 다시 시도해주세요.';
   }
 
+  if (message?.includes('exceeds the maximum') || message?.includes('INVALID_ARGUMENT') || message?.includes('too large')) {
+    return '데이터가 너무 큽니다. 사진 용량을 줄여주세요.';
+  }
+
   return '오류가 발생했습니다. 다시 시도해주세요.';
 }
 

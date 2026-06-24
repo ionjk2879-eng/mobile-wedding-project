@@ -73,6 +73,14 @@ const DesignSection: React.FC = () => {
         </div>
       </div>
       <div className="input-group">
+        <label>글씨 크기</label>
+        <div className="tab-group modern">
+          <button className={`tab-btn ${data.fontSize === 'small' ? 'active' : ''}`} onClick={() => updateField('fontSize', 'small')}>작게</button>
+          <button className={`tab-btn ${data.fontSize === 'medium' ? 'active' : ''}`} onClick={() => updateField('fontSize', 'medium')}>중간</button>
+          <button className={`tab-btn ${data.fontSize === 'large' ? 'active' : ''}`} onClick={() => updateField('fontSize', 'large')}>크게</button>
+        </div>
+      </div>
+      <div className="input-group">
         <label>배경 색상</label>
         <div className="color-pick-grid">
           {BG_COLORS.map(c => (
