@@ -10,6 +10,7 @@ export interface Contact {
   name: string;
   phone: string;
   isDeceased?: boolean;
+  deceasedStyle?: 'text' | 'chrysanthemum' | 'ribbon';
 }
 
 export interface TimelineEvent {

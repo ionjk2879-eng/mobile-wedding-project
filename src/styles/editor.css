@@ -65,6 +65,10 @@
 .deceased-btn { padding: 8px 14px; border-radius: 10px; font-size: 0.78rem; font-weight: 800; color: #9CA3AF; background: #F3F4F6; border: 1px solid #E5E7EB; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
 .deceased-btn:hover { background: #E5E7EB; color: #6B7280; }
 .deceased-btn.active { background: #4B5563; color: #FFFFFF; border-color: #4B5563; }
+.deceased-style-row { display: flex; gap: 6px; margin-top: 6px; }
+.deceased-style-btn { padding: 5px 10px; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: #6B7280; background: #F9FAFB; border: 1px solid #E5E7EB; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.deceased-style-btn:hover { background: #F3F4F6; }
+.deceased-style-btn.active { background: #4B5563; color: #FFFFFF; border-color: #4B5563; }
 .input-group { margin-bottom: 25px; }
 .input-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #4B5563; margin-bottom: 10px; }
 .input-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }

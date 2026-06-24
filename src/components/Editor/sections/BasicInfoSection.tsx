@@ -14,9 +14,11 @@ const BasicInfoSection: React.FC = () => {
     return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
   };
 
-  const getParentValue = (side: 'groomParents' | 'brideParents', role: string) => data.parents[side].find(p => p.role === role)?.name || '';
-  const getParentDeceased = (side: 'groomParents' | 'brideParents', role: string) => data.parents[side].find(p => p.role === role)?.isDeceased || false;
-  const getParentPhone = (side: 'groomParents' | 'brideParents', role: string) => data.parents[side].find(p => p.role === role)?.phone || '';
+  const getParent = (side: 'groomParents' | 'brideParents', role: string) => data.parents[side].find(p => p.role === role);
+  const getParentValue = (side: 'groomParents' | 'brideParents', role: string) => getParent(side, role)?.name || '';
+  const getParentDeceased = (side: 'groomParents' | 'brideParents', role: string) => getParent(side, role)?.isDeceased || false;
+  const getParentDeceasedStyle = (side: 'groomParents' | 'brideParents', role: string) => getParent(side, role)?.deceasedStyle || 'text';
+  const getParentPhone = (side: 'groomParents' | 'brideParents', role: string) => getParent(side, role)?.phone || '';
 
   const renderPersonCard = (type: 'groom' | 'bride') => {
     const isGroom = type === 'groom';
@@ -49,6 +51,20 @@ const BasicInfoSection: React.FC = () => {
                   <input type="text" value={getParentValue(parentSide, role)} onChange={(e) => updateParent(parentSide, role, 'name', e.target.value)} className="modern-input" />
                   <button type="button" className={`deceased-btn ${getParentDeceased(parentSide, role) ? 'active' : ''}`} onClick={() => updateParent(parentSide, role, 'isDeceased', !getParentDeceased(parentSide, role))}>고인</button>
                 </div>
+                {getParentDeceased(parentSide, role) && (
+                  <div className="deceased-style-row">
+                    {([
+                      { key: 'text' as const, label: '故 텍스트' },
+                      { key: 'chrysanthemum' as const, label: '🏵️ 국화' },
+                      { key: 'ribbon' as const, label: '🎀 리본' },
+                    ]).map(s => (
+                      <button key={s.key} type="button"
+                        className={`deceased-style-btn ${getParentDeceasedStyle(parentSide, role) === s.key ? 'active' : ''}`}
+                        onClick={() => updateParent(parentSide, role, 'deceasedStyle', s.key)}
+                      >{s.label}</button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="basic-field">
                 <label>{role} 연락처</label>

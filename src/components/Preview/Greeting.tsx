@@ -15,8 +15,12 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
   const brideMother = data.parents.brideParents.find(p => p.role === '어머니');
 
   const formatParent = (parent: Contact | undefined) => {
-    if (!parent || !parent.name) return '';
-    return parent.isDeceased ? `故 ${parent.name}` : parent.name;
+    if (!parent || !parent.name) return null;
+    if (!parent.isDeceased) return <>{parent.name}</>;
+    const style = parent.deceasedStyle || 'text';
+    if (style === 'chrysanthemum') return <><span className="deceased-icon" title="고인">🏵️</span> {parent.name}</>;
+    if (style === 'ribbon') return <><span className="deceased-icon" title="고인">🎀</span> {parent.name}</>;
+    return <>故 {parent.name}</>;
   };
 
   return (
@@ -32,14 +36,14 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
       <div className="family-info">
         <div className="family-block">
           <span className="parent-names">
-            {formatParent(groomFather)}{groomFather?.name && groomMother?.name ? ' · ' : ''}{formatParent(groomMother)}
+            {formatParent(groomFather)}{groomFather?.name && groomMother?.name ? <> · </> : null}{formatParent(groomMother)}
             <span className="child-label">{isEn ? 'Son' : '의 아들'}</span>
           </span>
           <span className="child-name">{data.groomName || '신랑'}</span>
         </div>
         <div className="family-block">
           <span className="parent-names">
-            {formatParent(brideFather)}{brideFather?.name && brideMother?.name ? ' · ' : ''}{formatParent(brideMother)}
+            {formatParent(brideFather)}{brideFather?.name && brideMother?.name ? <> · </> : null}{formatParent(brideMother)}
             <span className="child-label">{isEn ? 'Daughter' : '의 딸'}</span>
           </span>
           <span className="child-name">{data.brideName || '신부'}</span>
@@ -69,6 +73,10 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
           font-size: 0.95em;
           color: var(--wedding-text-sub);
           letter-spacing: 1px;
+        }
+        .deceased-icon {
+          font-size: 0.85em;
+          vertical-align: middle;
         }
         .child-label {
           font-size: 0.85em;
