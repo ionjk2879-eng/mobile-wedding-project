@@ -8,14 +8,14 @@
     </radialGradient>
   </defs>
 
-  <g transform="translate(540, 180) scale(2.5)">
+  <g transform="translate(505, 25) scale(4)">
     <circle cx="32" cy="46" r="10" stroke="#B07A8E" stroke-width="4.5" fill="none"/>
     <path d="M42 14 C28 8 18 18 24 28 C28 35 38 35 41 41 C44 46 41 50 36 54" stroke="#B07A8E" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
 
-  <text x="600" y="430" text-anchor="middle" font-family="'Georgia', 'Times New Roman', serif" font-size="64" font-weight="700" fill="#B07A8E" letter-spacing="8">Sonett</text>
-  <text x="600" y="480" text-anchor="middle" font-family="'Arial', sans-serif" font-size="24" fill="#9B7A8A" letter-spacing="4">모바일 청첩장</text>
+  <text x="600" y="400" text-anchor="middle" font-family="'Georgia', 'Times New Roman', serif" font-size="99" font-weight="700" fill="#B07A8E" letter-spacing="10">Sonett</text>
+  <text x="600" y="470" text-anchor="middle" font-family="'Arial', sans-serif" font-size="45" fill="#9B7A8A" letter-spacing="7">모바일 청첩장</text>
 
-  <line x1="520" y1="510" x2="680" y2="510" stroke="#D4A5C6" stroke-width="1" opacity="0.5"/>
-  <text x="600" y="545" text-anchor="middle" font-family="'Arial', sans-serif" font-size="16" fill="#C0A0B0" letter-spacing="2">세련된 청첩장을 무료로 만들어보세요</text>
+  <line x1="420" y1="510" x2="780" y2="510" stroke="#D4A5C6" stroke-width="1" opacity="0.5"/>
+  <text x="600" y="565" text-anchor="middle" font-family="'Arial', sans-serif" font-size="42" font-weight="500" fill="#B07A8E" letter-spacing="5">소중한 순간을 영원히 간직하세요</text>
 </svg>
