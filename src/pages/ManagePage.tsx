@@ -3,13 +3,82 @@ import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation } from '../firebase';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Eye, ClipboardList, Trash2 } from 'lucide-react';
+import { Edit3, Eye, ClipboardList, Trash2, Share2, Link as LinkIcon, X } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
+
+const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
+const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
+
+const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
+  const shareUrl = `${SITE_ORIGIN}/w/${slug}`;
+  const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
+  const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
+
+  useEffect(() => {
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init(KAKAO_APP_KEY);
+    }
+  }, []);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('링크가 복사되었습니다.');
+  };
+
+  const handleKakaoShare = () => {
+    if (!window.Kakao || !window.Kakao.isInitialized()) {
+      toast.error('카카오 SDK가 초기화되지 않았습니다.');
+      return;
+    }
+    const imageUrl = data.heroPhoto && !data.heroPhoto.startsWith('data:') ? data.heroPhoto : `${SITE_ORIGIN}/og-image.png`;
+    window.Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title,
+        description,
+        imageUrl,
+        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+      },
+      buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+    });
+  };
+
+  return (
+    <div className="share-modal-overlay" onClick={onClose}>
+      <div className="share-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="share-modal-header">
+          <h3>청첩장 공유</h3>
+          <button className="share-modal-close" onClick={onClose}><X size={20} /></button>
+        </div>
+
+        <div className="share-modal-qr">
+          <QRCodeSVG value={shareUrl} size={180} level="M" bgColor="transparent" fgColor="#1F2937" />
+          <p className="share-modal-qr-hint">QR 코드를 스캔하면 청첩장으로 이동합니다</p>
+        </div>
+
+        <div className="share-modal-url">
+          <input type="text" readOnly value={shareUrl} className="share-modal-url-input" />
+        </div>
+
+        <div className="share-modal-actions">
+          <button className="share-modal-btn copy" onClick={handleCopyLink}>
+            <LinkIcon size={18} /> 링크 복사
+          </button>
+          <button className="share-modal-btn kakao" onClick={handleKakaoShare}>
+            <Share2 size={18} /> 카카오톡 공유
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ManagePage: React.FC = () => {
   const [invitations, setInvitations] = useState<{ slug: string; data: InvitationData }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shareSlug, setShareSlug] = useState<string | null>(null);
 
   const load = () => {
     fetchMyInvitations().then(setInvitations).catch(() => {}).finally(() => setLoading(false));
@@ -27,6 +96,8 @@ const ManagePage: React.FC = () => {
       toast.error('삭제에 실패했습니다.');
     }
   };
+
+  const shareTarget = shareSlug ? invitations.find((i) => i.slug === shareSlug) : null;
 
   return (
     <div className="manage">
@@ -55,9 +126,10 @@ const ManagePage: React.FC = () => {
                   {data.date && <p className="manage-card-date">{data.date}</p>}
                 </div>
                 <div className="manage-card-actions">
-                  <Link to={`/edit/${slug}`} className="manage-action" title="편집"><Edit3 size={16} /> 편집</Link>
-                  <Link to={`/w/${slug}`} target="_blank" className="manage-action" title="보기"><Eye size={16} /> 보기</Link>
-                  <Link to={`/admin/${slug}`} target="_blank" className="manage-action" title="응답 확인"><ClipboardList size={16} /> 응답</Link>
+                  <button className="manage-action share" onClick={() => setShareSlug(slug)}><Share2 size={16} /> 공유</button>
+                  <Link to={`/edit/${slug}`} className="manage-action"><Edit3 size={16} /> 편집</Link>
+                  <a href={`/w/${slug}`} target="_blank" rel="noopener noreferrer" className="manage-action"><Eye size={16} /> 보기</a>
+                  <a href={`/admin/${slug}`} target="_blank" rel="noopener noreferrer" className="manage-action"><ClipboardList size={16} /> 응답</a>
                   <button className="manage-action delete" onClick={() => handleDelete(slug)}><Trash2 size={16} /> 삭제</button>
                 </div>
               </div>
@@ -65,6 +137,10 @@ const ManagePage: React.FC = () => {
           </div>
         )}
       </main>
+
+      {shareTarget && (
+        <ShareModal slug={shareTarget.slug} data={shareTarget.data} onClose={() => setShareSlug(null)} />
+      )}
 
       <style>{`
         .manage {
@@ -150,14 +226,107 @@ const ManagePage: React.FC = () => {
           font-family: inherit;
           transition: all 0.15s;
         }
-        .manage-action:hover {
-          background: #E5E7EB;
+        .manage-action:hover { background: #E5E7EB; color: #374151; }
+        .manage-action.share { background: #B07A8E; color: white; }
+        .manage-action.share:hover { background: #9B6A7E; }
+        .manage-action.delete:hover { background: #FEE2E2; color: #DC2626; }
+
+        /* Share Modal */
+        .share-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 24px;
+        }
+        .share-modal {
+          background: white;
+          border-radius: 20px;
+          padding: 32px;
+          max-width: 400px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .share-modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 28px;
+        }
+        .share-modal-header h3 {
+          font-size: 1.15rem;
+          font-weight: 700;
+          color: #1F2937;
+          margin: 0;
+        }
+        .share-modal-close {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #9CA3AF;
+          padding: 4px;
+        }
+        .share-modal-qr {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 24px;
+          background: #FAFAFA;
+          border-radius: 16px;
+          margin-bottom: 20px;
+        }
+        .share-modal-qr-hint {
+          font-size: 0.8rem;
+          color: #9CA3AF;
+          margin: 16px 0 0;
+        }
+        .share-modal-url {
+          margin-bottom: 20px;
+        }
+        .share-modal-url-input {
+          width: 100%;
+          padding: 10px 14px;
+          border: 1px solid #E5E7EB;
+          border-radius: 10px;
+          font-size: 0.82rem;
+          color: #6B7280;
+          background: #F9FAFB;
+          box-sizing: border-box;
+          font-family: monospace;
+        }
+        .share-modal-actions {
+          display: flex;
+          gap: 10px;
+        }
+        .share-modal-btn {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 14px;
+          border-radius: 12px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          font-family: inherit;
+          transition: all 0.2s;
+        }
+        .share-modal-btn.copy {
+          background: #F3F4F6;
           color: #374151;
         }
-        .manage-action.delete:hover {
-          background: #FEE2E2;
-          color: #DC2626;
+        .share-modal-btn.copy:hover { background: #E5E7EB; }
+        .share-modal-btn.kakao {
+          background: #FEE500;
+          color: #3C1E1E;
         }
+        .share-modal-btn.kakao:hover { filter: brightness(0.95); }
+
         @media (max-width: 600px) {
           .manage-card {
             flex-direction: column;
@@ -166,8 +335,9 @@ const ManagePage: React.FC = () => {
           }
           .manage-card-actions {
             width: 100%;
-            justify-content: flex-start;
+            flex-wrap: wrap;
           }
+          .share-modal { padding: 24px; }
         }
       `}</style>
     </div>
