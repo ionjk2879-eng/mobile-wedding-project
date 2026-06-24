@@ -1,58 +1,73 @@
 interface Env {
-  ASSETS: { fetch: (request: Request | string) => Promise<Response> };
+  ASSETS: { fetch: (request: Request) => Promise<Response> };
 }
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-async function serveAsset(request: Request, env: Env): Promise<Response> {
-  try {
-    const response = await env.ASSETS.fetch(request);
-    if (response.status !== 404) return response;
-  } catch {}
+function isStaticAsset(pathname: string): boolean {
+  return pathname.startsWith('/assets/')
+    || pathname === '/favicon.svg'
+    || pathname === '/og-image.png'
+    || pathname === '/og-image.svg'
+    || pathname === '/_headers';
+}
+
+async function fetchIndexHtml(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
-  return env.ASSETS.fetch(`${url.origin}/index.html`);
+  url.pathname = '/index.html';
+  return env.ASSETS.fetch(new Request(url.toString()));
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-    const match = url.pathname.match(/^\/w\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
-
-    if (!match) {
-      return serveAsset(request, env);
-    }
-
-    const slug = match[1];
-    const assetResponse = await serveAsset(request, env);
-
     try {
-      const firestoreUrl = `https://firestore.googleapis.com/v1/projects/sonett-app-2026-b79e5/databases/(default)/documents/invitations/${slug}`;
-      const res = await fetch(firestoreUrl);
+      const url = new URL(request.url);
+      const pathname = url.pathname;
 
-      if (!res.ok) return assetResponse;
+      // Static assets → serve directly
+      if (isStaticAsset(pathname)) {
+        return await env.ASSETS.fetch(request);
+      }
 
-      const doc = await res.json() as { fields?: Record<string, { stringValue?: string }> };
-      const f = doc.fields;
-      if (!f) return assetResponse;
+      // Root → serve index.html directly
+      if (pathname === '/' || pathname === '/index.html') {
+        return await env.ASSETS.fetch(request);
+      }
 
-      const groomName = f.groomName?.stringValue || '';
-      const brideName = f.brideName?.stringValue || '';
-      const date = f.date?.stringValue || '';
-      const heroPhoto = f.heroPhoto?.stringValue || '';
-      const venueName = f.venueName?.stringValue || '';
+      // /w/{slug} → OG tag injection
+      const match = pathname.match(/^\/w\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+      if (match) {
+        const slug = match[1];
+        const htmlResponse = await fetchIndexHtml(request, env);
 
-      const title = groomName && brideName
-        ? `${groomName} ♥ ${brideName} 결혼합니다`
-        : 'Sonett - 모바일 청첩장';
-      const description = [date, venueName].filter(Boolean).join(' | ') || '소중한 날에 초대합니다.';
-      const image = heroPhoto || `${url.origin}/og-image.svg`;
-      const pageUrl = `${url.origin}/w/${slug}`;
+        try {
+          const firestoreUrl = `https://firestore.googleapis.com/v1/projects/sonett-app-2026-b79e5/databases/(default)/documents/invitations/${slug}`;
+          const res = await fetch(firestoreUrl);
 
-      let html = await assetResponse.text();
+          if (!res.ok) return htmlResponse;
 
-      const ogTags = `<title>${escapeHtml(title)} - Sonett</title>
+          const doc = await res.json() as { fields?: Record<string, { stringValue?: string }> };
+          const f = doc.fields;
+          if (!f) return htmlResponse;
+
+          const groomName = f.groomName?.stringValue || '';
+          const brideName = f.brideName?.stringValue || '';
+          const date = f.date?.stringValue || '';
+          const heroPhoto = f.heroPhoto?.stringValue || '';
+          const venueName = f.venueName?.stringValue || '';
+
+          const title = groomName && brideName
+            ? `${groomName} ♥ ${brideName} 결혼합니다`
+            : 'Sonett - 모바일 청첩장';
+          const description = [date, venueName].filter(Boolean).join(' | ') || '소중한 날에 초대합니다.';
+          const image = heroPhoto || `${url.origin}/og-image.svg`;
+          const pageUrl = `${url.origin}/w/${slug}`;
+
+          let html = await htmlResponse.text();
+
+          const ogTags = `<title>${escapeHtml(title)} - Sonett</title>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="${escapeHtml(title)}" />
     <meta property="og:description" content="${escapeHtml(description)}" />
@@ -63,13 +78,23 @@ export default {
     <meta name="twitter:description" content="${escapeHtml(description)}" />
     <meta name="twitter:image" content="${escapeHtml(image)}" />`;
 
-      html = html.replace(/<title>.*?<\/title>/, ogTags);
+          html = html.replace(/<title>.*?<\/title>/, ogTags);
 
-      return new Response(html, {
+          return new Response(html, {
+            headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+          });
+        } catch {
+          return htmlResponse;
+        }
+      }
+
+      // All other routes (SPA client-side routes) → serve index.html
+      return await fetchIndexHtml(request, env);
+
+    } catch {
+      return new Response(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/"></head><body></body></html>`, {
         headers: { 'Content-Type': 'text/html;charset=UTF-8' },
       });
-    } catch {
-      return assetResponse;
     }
   },
 };
