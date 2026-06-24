@@ -1,9 +1,18 @@
 interface Env {
-  ASSETS: { fetch: (request: Request) => Promise<Response> };
+  ASSETS: { fetch: (request: Request | string) => Promise<Response> };
 }
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function serveAsset(request: Request, env: Env): Promise<Response> {
+  try {
+    const response = await env.ASSETS.fetch(request);
+    if (response.status !== 404) return response;
+  } catch {}
+  const url = new URL(request.url);
+  return env.ASSETS.fetch(`${url.origin}/index.html`);
 }
 
 export default {
@@ -12,11 +21,11 @@ export default {
     const match = url.pathname.match(/^\/w\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
 
     if (!match) {
-      return env.ASSETS.fetch(request);
+      return serveAsset(request, env);
     }
 
     const slug = match[1];
-    const assetResponse = await env.ASSETS.fetch(request);
+    const assetResponse = await serveAsset(request, env);
 
     try {
       const firestoreUrl = `https://firestore.googleapis.com/v1/projects/sonett-app-2026-b79e5/databases/(default)/documents/invitations/${slug}`;
