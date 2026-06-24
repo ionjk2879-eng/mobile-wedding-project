@@ -184,41 +184,47 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
         /* Names */
         .op-names {
-          margin: 0; font-size: 0.9em; letter-spacing: 6px;
-          font-weight: 300; opacity: 0.85;
+          margin: 0; font-size: 1.15em; letter-spacing: 6px;
+          font-weight: 400; color: #FFFFFF;
+          text-shadow: 0 1px 8px rgba(0,0,0,0.5);
         }
-        .op-amp { opacity: 0.5; font-weight: 200; }
+        .op-amp { opacity: 0.7; font-weight: 300; }
 
         /* Main text */
         .op-main {
-          margin: 4px 0; font-size: 1.6em; font-weight: 300;
+          margin: 4px 0; font-size: 2em; font-weight: 300;
           letter-spacing: 1.5px; line-height: 1.4;
           font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+          color: #FFFFFF;
+          text-shadow: 0 1px 8px rgba(0,0,0,0.5);
         }
 
-        /* Sub text */
+        /* Sub text (날짜/장소) */
         .op-sub {
-          margin: 0; font-size: 0.85em; opacity: 0;
-          letter-spacing: 3px; font-weight: 300;
+          margin: 0; font-size: 1em; opacity: 0;
+          letter-spacing: 3px; font-weight: 400;
+          color: #FFFFFF;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.5);
           animation: op-fade-up 0.6s ease 2s forwards;
         }
         @keyframes op-fade-up {
           from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 0.5; transform: translateY(0); }
+          to { opacity: 0.85; transform: translateY(0); }
         }
 
         /* Enter button */
         .op-enter {
-          margin-top: 12px; padding: 12px 36px;
-          background: transparent; border: 1px solid var(--op-accent);
-          border-radius: 30px; color: var(--op-text); font-size: 0.82em;
-          font-weight: 600; letter-spacing: 1.5px; cursor: pointer;
+          margin-top: 16px; padding: 14px 44px;
+          background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.6);
+          border-radius: 30px; color: #FFFFFF; font-size: 0.95em;
+          font-weight: 600; letter-spacing: 2px; cursor: pointer;
           opacity: 0; animation: op-fade-up 0.6s ease 2.4s forwards;
           transition: all 0.3s;
+          text-shadow: 0 1px 4px rgba(0,0,0,0.4);
         }
         .op-enter:hover {
-          background: color-mix(in srgb, var(--op-text) 12%, transparent);
-          border-color: var(--op-text);
+          background: rgba(255,255,255,0.22);
+          border-color: #FFFFFF;
           transform: translateY(-1px);
         }
       `}</style>
