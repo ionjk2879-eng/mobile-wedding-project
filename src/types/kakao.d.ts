@@ -62,6 +62,7 @@ interface KakaoSDK {
         link: { mobileWebUrl: string; webUrl: string };
       }>;
     }): void;
+    sendScrap(settings: { requestUrl: string }): void;
   };
 }
 

@@ -10,10 +10,8 @@ import ToastContainer from '../components/Toast';
 const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 
-const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
+const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, onClose }) => {
   const shareUrl = `${SITE_ORIGIN}/w/${slug}`;
-  const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
-  const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
 
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
@@ -31,16 +29,8 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
       toast.error('카카오 SDK를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
       return;
     }
-    const imageUrl = `${SITE_ORIGIN}/og/${slug}`;
-    window.Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title,
-        description,
-        imageUrl,
-        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
-      },
-      buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+    window.Kakao.Share.sendScrap({
+      requestUrl: shareUrl,
     });
   };
 
