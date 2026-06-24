@@ -55,8 +55,8 @@ const BasicInfoSection: React.FC = () => {
                   <div className="deceased-style-row">
                     {([
                       { key: 'text' as const, label: '故 텍스트' },
-                      { key: 'chrysanthemum' as const, label: '🏵️ 국화' },
-                      { key: 'ribbon' as const, label: '🎀 리본' },
+                      { key: 'chrysanthemum' as const, label: '✿ 국화' },
+                      { key: 'ribbon' as const, label: '✦ 리본' },
                     ]).map(s => (
                       <button key={s.key} type="button"
                         className={`deceased-style-btn ${getParentDeceasedStyle(parentSide, role) === s.key ? 'active' : ''}`}

@@ -18,8 +18,8 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
     if (!parent || !parent.name) return null;
     if (!parent.isDeceased) return <>{parent.name}</>;
     const style = parent.deceasedStyle || 'text';
-    if (style === 'chrysanthemum') return <><span className="deceased-icon" title="고인">🏵️</span> {parent.name}</>;
-    if (style === 'ribbon') return <><span className="deceased-icon" title="고인">🎀</span> {parent.name}</>;
+    if (style === 'chrysanthemum') return <><span className="deceased-icon" title="고인">✿</span> {parent.name}</>;
+    if (style === 'ribbon') return <><span className="deceased-icon" title="고인">✦</span> {parent.name}</>;
     return <>故 {parent.name}</>;
   };
 
