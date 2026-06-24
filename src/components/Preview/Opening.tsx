@@ -37,6 +37,18 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (dismissed) return;
+    const scrollRoot = document.querySelector('.view-container') || document.body;
+    const prev = (scrollRoot as HTMLElement).style.overflow;
+    (scrollRoot as HTMLElement).style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      (scrollRoot as HTMLElement).style.overflow = prev;
+      document.body.style.overflow = '';
+    };
+  }, [dismissed]);
+
   if (!opening.openingEnabled || dismissed) return null;
 
   const mainText = opening.openingText || 'We\'re getting married';
@@ -94,7 +106,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         .op-root {
           position: fixed; top: 0; left: 0; width: 100%; height: 100%;
           z-index: 99999; display: flex; align-items: center; justify-content: center;
-          overflow: hidden;
+          overflow: hidden; touch-action: none; overscroll-behavior: none;
           background: var(--op-bg); opacity: var(--op-opacity);
         }
 
