@@ -337,6 +337,7 @@ const App: React.FC = () => {
             <Save size={15} />
             {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
           </button>
+          {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-text-btn"><Eye size={15} /> 청첩장 보기</a>}
           {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> 응답 확인</a>}
           <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> 초기화</button>
         </div>
