@@ -17,13 +17,6 @@ const ViewPage: React.FC = () => {
 
   useEffect(() => {
     if (!slug) return;
-    const inlined = (window as unknown as Record<string, unknown>).__INVITATION_DATA__ as InvitationData | undefined;
-    if (inlined) {
-      setData(inlined);
-      loadFont(inlined.fontFamily);
-      setLoading(false);
-      return;
-    }
     loadInvitationPublic(slug).then(d => {
       if (d) {
         setData(d);

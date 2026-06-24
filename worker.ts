@@ -97,63 +97,10 @@ export default {
 
       html = html.replace('</head>', `${ogTags}\n  </head>`);
 
-      // Inline invitation data so client can render immediately without API call
-      // Skip base64 data: fields to keep HTML small
-      const inlineData: Record<string, unknown> = {};
-      for (const [key, val] of Object.entries(f)) {
-        const v = val as Record<string, unknown>;
-        if ('stringValue' in v) {
-          const s = v.stringValue as string;
-          if (s.startsWith('data:')) {
-            inlineData[key] = `${url.origin}/og/${slug}`;
-          } else if (s.length > 5000) {
-            continue;
-          } else {
-            inlineData[key] = s;
-          }
-        }
-        else if ('booleanValue' in v) inlineData[key] = v.booleanValue;
-        else if ('integerValue' in v) inlineData[key] = Number(v.integerValue);
-        else if ('doubleValue' in v) inlineData[key] = v.doubleValue;
-        else if ('mapValue' in v) {
-          const mv = v.mapValue as { fields?: Record<string, Record<string, unknown>> };
-          if (mv.fields) {
-            const obj: Record<string, unknown> = {};
-            for (const [mk, mv2] of Object.entries(mv.fields)) {
-              if ('stringValue' in mv2) obj[mk] = mv2.stringValue;
-              else if ('booleanValue' in mv2) obj[mk] = mv2.booleanValue;
-              else if ('integerValue' in mv2) obj[mk] = Number(mv2.integerValue);
-            }
-            inlineData[key] = obj;
-          }
-        } else if ('arrayValue' in v) {
-          const av = v.arrayValue as { values?: Record<string, unknown>[] };
-          inlineData[key] = (av.values || []).map((item) => {
-            if ('stringValue' in item) return item.stringValue;
-            if ('mapValue' in item) {
-              const mv = item.mapValue as { fields?: Record<string, Record<string, unknown>> };
-              if (mv.fields) {
-                const obj: Record<string, unknown> = {};
-                for (const [mk, mv2] of Object.entries(mv.fields)) {
-                  if ('stringValue' in mv2) obj[mk] = mv2.stringValue;
-                  else if ('booleanValue' in mv2) obj[mk] = mv2.booleanValue;
-                  else if ('integerValue' in mv2) obj[mk] = Number(mv2.integerValue);
-                }
-                return obj;
-              }
-            }
-            return null;
-          });
-        }
-      }
-      const safeJson = JSON.stringify(inlineData).replace(/<\//g, '<\\/');
-      const inlineScript = `<script>window.__INVITATION_DATA__=${safeJson};</script>`;
-      html = html.replace('</head>', `${inlineScript}\n  </head>`);
-
-      // ViewPage doesn't need firebase - remove heavy modulepreload
+      // Remove heavy firebase modulepreload (ViewPage doesn't need it)
       html = html.replace(/<link rel="modulepreload"[^>]*firebase[^>]*>/g, '');
 
-      // Add loading indicator visible before JS renders
+      // Add branded loading indicator visible before JS renders
       const loader = `<div id="root"><div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#FDFBFC 0%,#FDF6F9 100%);font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;gap:20px;z-index:1"><p style="font-size:1.5rem;font-weight:700;color:#B07A8E;letter-spacing:3px;margin:0">Sonett</p><div style="width:36px;height:36px;border:3px solid #F3E0E6;border-top-color:#B07A8E;border-radius:50%;animation:spin .8s linear infinite"></div><p style="font-size:.85rem;color:#9CA3AF;margin:0;letter-spacing:1px">청첩장을 불러오는 중...</p><style>@keyframes spin{to{transform:rotate(360deg)}}</style></div></div>`;
       html = html.replace('<div id="root"></div>', loader);
 
