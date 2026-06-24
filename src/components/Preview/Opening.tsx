@@ -204,7 +204,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
         /* Main text */
         .op-main {
-          margin: 4px 0; font-size: 2em; font-weight: 300;
+          margin: 4px 0; font-size: 1.5em; font-weight: 300;
           letter-spacing: 1.5px; line-height: 1.4;
           font-family: 'Cormorant Garamond', 'Playfair Display', serif;
           color: #FFFFFF;
