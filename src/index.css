@@ -299,7 +299,7 @@ a {
 }
 .sr-fade-up { opacity: 0; transform: translateY(40px); }
 .sr-fade-up.sr-visible { opacity: 1; transform: translateY(0); }
-.sr-fade-in { opacity: 0; transform: scale(0.95); }
-.sr-fade-in.sr-visible { opacity: 1; transform: scale(1); }
+.sr-fade-in { opacity: 0; }
+.sr-fade-in.sr-visible { opacity: 1; }
 .sr-slide-in { opacity: 0; transform: translateX(-30px); }
 .sr-slide-in.sr-visible { opacity: 1; transform: translateX(0); }
