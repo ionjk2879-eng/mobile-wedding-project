@@ -2,16 +2,20 @@ import React, { useEffect } from 'react';
 import { Share2, Link } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { toast } from '../../stores/useToastStore';
-import { loadKakaoSDK } from '../../utils/loadScript';
 
 interface PreviewProps {
   data: InvitationData;
 }
 
+const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
 
 const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
-  useEffect(() => { loadKakaoSDK().catch(() => {}); }, []);
+  useEffect(() => {
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init(KAKAO_APP_KEY);
+    }
+  }, []);
 
   const shareLink = data.slug ? `${SITE_ORIGIN}/w/${data.slug}` : window.location.href;
 
@@ -107,6 +111,12 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
           margin-top: 40px;
           font-size: 0.75em;
           color: var(--wedding-text-sub);
+        }
+        @media (max-width: 480px) {
+          .share-btn { padding: 12px; font-size: 0.82em; gap: 7px; }
+          .share-btn svg { width: 16px; height: 16px; }
+          .share-buttons { gap: 8px; margin-bottom: 30px; }
+          .footer { font-size: 0.65em; margin-top: 30px; }
         }
       `}</style>
     </section>
