@@ -126,6 +126,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
           <p className="split-quote">Happily ever after<br />starts here</p>
           <p className="split-date">{dateStr}</p>
           <p className="split-time">{timeStr}</p>
+          <p className="split-venue">{venueName}</p>
+          <span className="split-dday">{calculateDDay()}</span>
         </div>
         <div className="split-photo">{photoEl}</div>
       </div>
@@ -135,6 +137,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
           <p className="split-label">BRIDE</p>
           <h1 className="split-name">{brideName}</h1>
           <div className="split-divider" />
+          <p className="split-quote">Happily ever after<br />starts here</p>
+          <p className="split-date">{dateStr}</p>
+          <p className="split-time">{timeStr}</p>
           <p className="split-venue">{venueName}</p>
           <span className="split-dday">{calculateDDay()}</span>
         </div>
