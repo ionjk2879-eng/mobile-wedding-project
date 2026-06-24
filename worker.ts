@@ -16,7 +16,7 @@ function isStaticAsset(pathname: string): boolean {
 
 async function fetchIndexHtml(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
-  url.pathname = '/index.html';
+  url.pathname = '/';
   return env.ASSETS.fetch(new Request(url.toString()));
 }
 
@@ -91,9 +91,10 @@ export default {
       // All other routes (SPA client-side routes) → serve index.html
       return await fetchIndexHtml(request, env);
 
-    } catch {
-      return new Response(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/"></head><body></body></html>`, {
-        headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+    } catch (e) {
+      return new Response(`Worker error: ${e instanceof Error ? e.message : 'unknown'}`, {
+        status: 500,
+        headers: { 'Content-Type': 'text/plain' },
       });
     }
   },
