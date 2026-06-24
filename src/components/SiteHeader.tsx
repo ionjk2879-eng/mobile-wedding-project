@@ -8,7 +8,7 @@ const SiteHeader: React.FC = () => {
     <header className="site-header">
       <Link to="/" className="site-logo">Sonett</Link>
       <nav className="site-nav">
-        <Link to="/editor" className={`site-nav-link ${pathname.startsWith('/editor') || pathname.startsWith('/edit') ? 'active' : ''}`}>모바일 청첩장</Link>
+        <Link to="/" className={`site-nav-link ${pathname === '/' ? 'active' : ''}`}>모바일 청첩장</Link>
         <Link to="/manage" className={`site-nav-link ${pathname === '/manage' ? 'active' : ''}`}>청첩장 관리</Link>
       </nav>
 
