@@ -1,5 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { OpeningConfig } from '../../types';
+
+const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
+  elegant: {
+    family: "'Noto Serif KR', serif",
+    url: 'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300&display=swap',
+    weights: '200',
+  },
+  simple: {
+    family: "'Noto Sans KR', sans-serif",
+    url: 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300&display=swap',
+    weights: '100',
+  },
+  clean: {
+    family: "'Gowun Batang', serif",
+    url: 'https://fonts.googleapis.com/css2?family=Gowun+Batang&display=swap',
+    weights: '400',
+  },
+};
 
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
   blush:     { bg: '#3C2B2B', text: '#F3CDCC', accent: '#D4918E' },
@@ -49,6 +67,20 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     };
   }, [dismissed]);
 
+  const fontStyle = opening.openingFontStyle || 'elegant';
+  const fontConfig = OPENING_FONTS[fontStyle] || OPENING_FONTS.elegant;
+  const fontLoadedRef = useRef(false);
+  useEffect(() => {
+    if (fontLoadedRef.current) return;
+    fontLoadedRef.current = true;
+    if (!document.querySelector(`link[href="${fontConfig.url}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = fontConfig.url;
+      document.head.appendChild(link);
+    }
+  }, [fontConfig.url]);
+
   if (!opening.openingEnabled || dismissed) return null;
 
   const mainText = opening.openingText || 'We\'re getting married';
@@ -75,7 +107,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   return (
     <div
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor } as React.CSSProperties}
+      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
@@ -197,17 +229,17 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         /* Names */
         .op-names {
           margin: 0; font-size: 1.1em; letter-spacing: 8px;
-          font-weight: 300; color: #FFFFFF;
-          font-family: 'Pretendard', -apple-system, sans-serif;
+          font-weight: var(--op-weight); color: #FFFFFF;
+          font-family: var(--op-font);
           text-shadow: 0 1px 10px rgba(0,0,0,0.4);
         }
-        .op-amp { opacity: 0.5; font-weight: 200; letter-spacing: 4px; }
+        .op-amp { opacity: 0.5; letter-spacing: 4px; }
 
         /* Main text */
         .op-main {
-          margin: 8px 0; font-size: 1.4em; font-weight: 200;
+          margin: 8px 0; font-size: 1.4em; font-weight: var(--op-weight);
           letter-spacing: 3px; line-height: 1.5;
-          font-family: 'Pretendard', -apple-system, sans-serif;
+          font-family: var(--op-font);
           color: #FFFFFF;
           text-shadow: 0 1px 10px rgba(0,0,0,0.4);
         }
@@ -217,7 +249,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           margin: 0; font-size: 0.82em; opacity: 0;
           letter-spacing: 4px; font-weight: 300;
           color: rgba(255,255,255,0.8);
-          font-family: 'Pretendard', -apple-system, sans-serif;
+          font-family: var(--op-font);
           text-shadow: 0 1px 6px rgba(0,0,0,0.3);
           animation: op-fade-up 0.6s ease 2s forwards;
         }
@@ -231,8 +263,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           margin-top: 20px; padding: 13px 48px;
           background: transparent; border: 1px solid rgba(255,255,255,0.4);
           border-radius: 0; color: rgba(255,255,255,0.9); font-size: 0.78em;
-          font-weight: 400; letter-spacing: 4px; cursor: pointer;
-          font-family: 'Pretendard', -apple-system, sans-serif;
+          font-weight: 300; letter-spacing: 4px; cursor: pointer;
+          font-family: var(--op-font);
           text-transform: uppercase;
           opacity: 0; animation: op-fade-up 0.6s ease 2.4s forwards;
           transition: all 0.3s;

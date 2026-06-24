@@ -101,6 +101,7 @@ export interface OpeningConfig {
   openingBgOpacity: number;
   openingText: string;
   openingSubText: string;
+  openingFontStyle?: 'elegant' | 'simple' | 'clean';
 }
 
 export interface FeatureConfig {
