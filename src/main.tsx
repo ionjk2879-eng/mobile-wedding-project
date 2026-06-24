@@ -21,6 +21,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<App />} />
+            <Route path="/edit/:slug" element={<App />} />
             <Route path="/w/:slug" element={<ViewPage />} />
             <Route path="/admin/:slug" element={<AdminPage />} />
           </Routes>

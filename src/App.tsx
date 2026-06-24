@@ -7,7 +7,8 @@ import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, fetchMyInvitations } from './firebase';
 import { getFirebaseErrorMessage } from './utils/firebaseError';
-import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X, Sparkles } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X, Sparkles, ExternalLink, Copy } from 'lucide-react';
 import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import './styles/effects.css';
 import './styles/builder.css';
@@ -92,6 +93,8 @@ const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSe
 };
 
 const App: React.FC = () => {
+  const { slug: urlSlug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const data = useInvitationStore((s) => s.data);
   const setData = useInvitationStore((s) => s.setData);
   const [isFullPreview, setIsFullPreview] = useState(false);
@@ -107,12 +110,24 @@ const App: React.FC = () => {
   useEffect(() => {
     if (loadedRef.current) return;
     loadedRef.current = true;
-    fetchMyInvitations().then((items) => {
-      history.replaceState({ screen: 'start' }, '', '/');
-      setShowStartScreen(items.map((item) => item.slug));
-    }).catch(() => {
-      setShowStartScreen([]);
-    }).finally(() => setLoadingData(false));
+    if (urlSlug) {
+      loadInvitation(urlSlug).then((saved) => {
+        if (saved) {
+          setData(saved);
+          hasSavedOnceRef.current = true;
+          setShowStartScreen(null);
+        } else {
+          setShowStartScreen([]);
+        }
+      }).catch(() => { setShowStartScreen([]); }).finally(() => setLoadingData(false));
+    } else {
+      fetchMyInvitations().then((items) => {
+        history.replaceState({ screen: 'start' }, '', '/');
+        setShowStartScreen(items.map((item) => item.slug));
+      }).catch(() => {
+        setShowStartScreen([]);
+      }).finally(() => setLoadingData(false));
+    }
   }, []);
 
   useEffect(() => {
@@ -132,7 +147,7 @@ const App: React.FC = () => {
 
   const handleLoadExisting = async (slug: string) => {
     setShowStartScreen(null);
-    history.pushState({ screen: 'editor' }, '', '/');
+    navigate(`/edit/${slug}`, { state: { screen: 'editor' } });
     setLoadingData(true);
     try {
       const saved = await loadInvitation(slug);
@@ -321,7 +336,7 @@ const App: React.FC = () => {
       <div className="builder-topbar-wrap"><header className="builder-topbar">
         <div className="topbar-left" onClick={() => {
           fetchMyInvitations().then((items) => {
-            history.pushState({ screen: 'start' }, '', '/');
+            navigate('/');
             if (items.length > 0) setShowStartScreen(items.map((item) => item.slug));
             else { setData(initialData); hasSavedOnceRef.current = false; }
           }).catch(() => {});
@@ -337,7 +352,8 @@ const App: React.FC = () => {
             <Save size={15} />
             {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
           </button>
-          {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-text-btn"><Eye size={15} /> 청첩장 보기</a>}
+          {data.slug && <a href={`/w/${data.slug}`} target="_blank" className="header-text-btn"><ExternalLink size={15} /> 공유 링크</a>}
+          {data.slug && <button className="header-text-btn" onClick={() => { navigator.clipboard.writeText(`https://sonett.ionjk2879.workers.dev/w/${data.slug}`); toast.success('공유 링크가 복사되었습니다.'); }}><Copy size={15} /> 링크 복사</button>}
           {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> 응답 확인</a>}
           <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> 초기화</button>
         </div>
