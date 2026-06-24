@@ -44,15 +44,9 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
     });
   };
 
-  const handleUrlShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text: description, url: shareUrl });
-      } catch {}
-    } else {
-      navigator.clipboard.writeText(shareUrl);
-      toast.success('링크가 복사되었습니다.');
-    }
+  const handleUrlShare = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('URL이 복사되었습니다. 붙여넣기로 공유하세요.');
   };
 
   return (
