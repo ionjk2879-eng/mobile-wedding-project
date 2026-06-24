@@ -31,7 +31,7 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
       toast.error('카카오 SDK를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
       return;
     }
-    const imageUrl = data.heroPhoto && !data.heroPhoto.startsWith('data:') ? data.heroPhoto : `${SITE_ORIGIN}/og-image.png`;
+    const imageUrl = `${SITE_ORIGIN}/og/${slug}`;
     window.Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
@@ -42,6 +42,17 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
       },
       buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
     });
+  };
+
+  const handleUrlShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text: description, url: shareUrl });
+      } catch {}
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('링크가 복사되었습니다.');
+    }
   };
 
   return (
@@ -65,8 +76,11 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
           <button className="share-modal-btn copy" onClick={handleCopyLink}>
             <LinkIcon size={18} /> 링크 복사
           </button>
+          <button className="share-modal-btn url-share" onClick={handleUrlShare}>
+            <Share2 size={18} /> URL 공유
+          </button>
           <button className="share-modal-btn kakao" onClick={handleKakaoShare}>
-            <Share2 size={18} /> 카카오톡 공유
+            <Share2 size={18} /> 카카오톡
           </button>
         </div>
       </div>
@@ -321,6 +335,11 @@ const ManagePage: React.FC = () => {
           color: #374151;
         }
         .share-modal-btn.copy:hover { background: #E5E7EB; }
+        .share-modal-btn.url-share {
+          background: #B07A8E;
+          color: white;
+        }
+        .share-modal-btn.url-share:hover { background: #9B6A7E; }
         .share-modal-btn.kakao {
           background: #FEE500;
           color: #3C1E1E;
