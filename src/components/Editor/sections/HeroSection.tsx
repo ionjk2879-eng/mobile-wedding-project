@@ -11,6 +11,7 @@ const HeroSection: React.FC = () => {
   const updateField = useInvitationStore((s) => s.updateField);
   const updateFields = useInvitationStore((s) => s.updateFields);
   const [uploading, setUploading] = useState(false);
+  const [uploading2, setUploading2] = useState(false);
 
   const handleHeroPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -23,6 +24,21 @@ const HeroSection: React.FC = () => {
       toast.error(getFirebaseErrorMessage(err));
     } finally {
       setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleHeroPhoto2Upload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading2(true);
+    try {
+      const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`);
+      updateField('heroPhoto2', url);
+    } catch (err) {
+      toast.error(getFirebaseErrorMessage(err));
+    } finally {
+      setUploading2(false);
       e.target.value = '';
     }
   };
@@ -63,6 +79,46 @@ const HeroSection: React.FC = () => {
             <button type="button" className="photo-pos-reset" onClick={() => updateFields({ heroPhotoX: 50, heroPhotoY: 50 })}>중앙으로 초기화</button>
           </div>
         </div>
+      )}
+      {data.heroStyle === 'split' && (
+        <>
+          <div className="input-group">
+            <label>신부 사진 (스플릿용)</label>
+            <div className="modern-hero-upload">
+              {uploading2 ? (
+                <div className="hero-empty-upload"><Loader2 size={24} className="spin" /><span>업로드 중...</span></div>
+              ) : data.heroPhoto2 ? (
+                <>
+                  <img src={data.heroPhoto2} alt="Bride" />
+                  <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhoto2Upload} hidden /></label>
+                </>
+              ) : (
+                <label className="hero-empty-upload">
+                  <ImageIcon size={24} />
+                  <span>신부 사진 등록</span>
+                  <input type="file" accept="image/*" onChange={handleHeroPhoto2Upload} hidden />
+                </label>
+              )}
+            </div>
+            <span className="input-hint">비워두면 메인 사진과 동일하게 표시됩니다.</span>
+          </div>
+          {data.heroPhoto2 && (
+            <div className="input-group">
+              <label><Move size={14} style={{ verticalAlign: 'middle' }} /> 신부 사진 위치 조정</label>
+              <div className="photo-pos-controls">
+                <div className="photo-pos-row">
+                  <span className="photo-pos-label">좌우</span>
+                  <input type="range" min={0} max={100} value={data.heroPhoto2X ?? 50} onChange={(e) => updateField('heroPhoto2X', Number(e.target.value))} className="photo-pos-slider" />
+                </div>
+                <div className="photo-pos-row">
+                  <span className="photo-pos-label">상하</span>
+                  <input type="range" min={0} max={100} value={data.heroPhoto2Y ?? 50} onChange={(e) => updateField('heroPhoto2Y', Number(e.target.value))} className="photo-pos-slider" />
+                </div>
+                <button type="button" className="photo-pos-reset" onClick={() => updateFields({ heroPhoto2X: 50, heroPhoto2Y: 50 })}>중앙으로 초기화</button>
+              </div>
+            </div>
+          )}
+        </>
       )}
       <div className="input-group">
         <label>메인화면 스타일</label>

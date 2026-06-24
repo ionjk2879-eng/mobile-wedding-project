@@ -69,6 +69,9 @@ export interface DesignConfig {
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'gradation' | 'magcover';
   heroPhotoX?: number;
   heroPhotoY?: number;
+  heroPhoto2?: string;
+  heroPhoto2X?: number;
+  heroPhoto2Y?: number;
   fontFamily: string;
   fontSize: 'small' | 'medium' | 'large';
 }

@@ -34,6 +34,11 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>
   );
 
+  const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
+  const photo2El = data.heroPhoto2 ? (
+    <img src={data.heroPhoto2} alt="Wedding" className="hero-photo" style={{ objectPosition: photo2Pos }} />
+  ) : photoEl;
+
   const renderClassic = () => (
     <div className="hero-classic">
       <div className="hero-img-wrap">{photoEl}</div>
@@ -132,7 +137,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="split-photo">{photoEl}</div>
       </div>
       <div className="split-row">
-        <div className="split-photo">{photoEl}</div>
+        <div className="split-photo">{photo2El}</div>
         <div className="split-info">
           <p className="split-label">BRIDE</p>
           <h1 className="split-name">{brideName}</h1>
@@ -353,6 +358,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhoto === next.data.heroPhoto
   && prev.data.heroPhotoX === next.data.heroPhotoX
   && prev.data.heroPhotoY === next.data.heroPhotoY
+  && prev.data.heroPhoto2 === next.data.heroPhoto2
+  && prev.data.heroPhoto2X === next.data.heroPhoto2X
+  && prev.data.heroPhoto2Y === next.data.heroPhoto2Y
   && prev.data.heroStyle === next.data.heroStyle
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
