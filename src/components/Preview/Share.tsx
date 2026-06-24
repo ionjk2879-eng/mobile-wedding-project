@@ -7,14 +7,17 @@ interface PreviewProps {
   data: InvitationData;
 }
 
+const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
+const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
+
 const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
   useEffect(() => {
-    if (data.kakaoAppKey && window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init(data.kakaoAppKey);
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init(KAKAO_APP_KEY);
     }
-  }, [data.kakaoAppKey]);
+  }, []);
 
-  const shareLink = data.shareUrl || window.location.href;
+  const shareLink = data.slug ? `${SITE_ORIGIN}/w/${data.slug}` : window.location.href;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -22,17 +25,18 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
   };
 
   const handleKakaoShare = () => {
-    if (!window.Kakao) return;
+    if (!window.Kakao || !window.Kakao.isInitialized()) return;
 
     const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
     const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
+    const imageUrl = data.heroPhoto && !data.heroPhoto.startsWith('data:') ? data.heroPhoto : `${SITE_ORIGIN}/og-image.png`;
 
     window.Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
         title,
         description,
-        imageUrl: data.heroPhoto.startsWith('data:') ? window.location.origin + '/src/assets/hero.png' : data.heroPhoto,
+        imageUrl,
         link: {
           mobileWebUrl: shareLink,
           webUrl: shareLink,
@@ -40,7 +44,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
       },
       buttons: [
         {
-          title: '모바일 청첩장 보기',
+          title: '청첩장 보기',
           link: {
             mobileWebUrl: shareLink,
             webUrl: shareLink,
@@ -121,7 +125,6 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.date === next.data.date
   && prev.data.time === next.data.time
   && prev.data.venueName === next.data.venueName
-  && prev.data.kakaoAppKey === next.data.kakaoAppKey
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
 );
