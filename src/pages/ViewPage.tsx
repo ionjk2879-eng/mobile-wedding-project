@@ -41,7 +41,7 @@ const ViewPage: React.FC = () => {
       </div>
 
       <style>{`
-        .view-container { width: 100vw; min-height: 100vh; background: #F0F2F5; display: flex; justify-content: center; overflow-y: scroll; }
+        .view-container { width: 100vw; min-height: 100vh; background: #ffffff; display: flex; justify-content: center; overflow-y: scroll; }
         .view-container .invitation-page { width: 100%; max-width: 480px; background-color: var(--wedding-bg); min-height: 100%; }
         .view-loading, .view-error { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pretendard', sans-serif; color: #6B7280; text-align: center; padding: 20px; box-sizing: border-box; }
         .view-error h2 { color: #1F2937; margin-bottom: 8px; }
