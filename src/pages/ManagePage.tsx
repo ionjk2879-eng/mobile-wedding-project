@@ -16,20 +16,16 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
   const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
   const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
 
+  useEffect(() => { loadKakaoSDK().catch(() => {}); }, []);
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
     toast.success('링크가 복사되었습니다.');
   };
 
-  const handleKakaoShare = async () => {
-    try {
-      await loadKakaoSDK();
-    } catch {
-      toast.error('카카오 SDK 로딩에 실패했습니다.');
-      return;
-    }
+  const handleKakaoShare = () => {
     if (!window.Kakao || !window.Kakao.isInitialized()) {
-      toast.error('카카오 SDK가 초기화되지 않았습니다.');
+      toast.error('카카오 SDK를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
       return;
     }
     const imageUrl = data.heroPhoto && !data.heroPhoto.startsWith('data:') ? data.heroPhoto : `${SITE_ORIGIN}/og-image.png`;
