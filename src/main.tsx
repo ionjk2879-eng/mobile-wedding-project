@@ -4,9 +4,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import AuthGate from './components/AuthGate'
 import './index.css'
 
+const LandingPage = React.lazy(() => import('./pages/LandingPage'))
 const App = React.lazy(() => import('./App'))
 const ViewPage = React.lazy(() => import('./pages/ViewPage'))
 const AdminPage = React.lazy(() => import('./pages/AdminPage'))
+const ManagePage = React.lazy(() => import('./pages/ManagePage'))
 
 const Loading = () => (
   <div style={{ width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", color: '#9CA3AF' }}>
@@ -17,16 +19,16 @@ const Loading = () => (
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthGate>
-        <Suspense fallback={<Loading />}>
-          <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/edit/:slug" element={<App />} />
-            <Route path="/w/:slug" element={<ViewPage />} />
-            <Route path="/admin/:slug" element={<AdminPage />} />
-          </Routes>
-        </Suspense>
-      </AuthGate>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/editor" element={<AuthGate><App /></AuthGate>} />
+          <Route path="/edit/:slug" element={<AuthGate><App /></AuthGate>} />
+          <Route path="/manage" element={<AuthGate><ManagePage /></AuthGate>} />
+          <Route path="/w/:slug" element={<ViewPage />} />
+          <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   </React.StrictMode>,
 )

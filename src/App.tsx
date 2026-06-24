@@ -334,13 +334,7 @@ const App: React.FC = () => {
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Dancing+Script&display=swap" rel="stylesheet" />
 
       <div className="builder-topbar-wrap"><header className="builder-topbar">
-        <div className="topbar-left" onClick={() => {
-          fetchMyInvitations().then((items) => {
-            navigate('/');
-            if (items.length > 0) setShowStartScreen(items.map((item) => item.slug));
-            else { setData(initialData); hasSavedOnceRef.current = false; }
-          }).catch(() => {});
-        }} style={{ cursor: 'pointer' }}>
+        <div className="topbar-left" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <h1 className="header-logo">Sonett</h1>
         </div>
         <div className="topbar-right">
