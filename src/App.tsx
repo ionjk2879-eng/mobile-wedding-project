@@ -102,7 +102,7 @@ const App: React.FC = () => {
   const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
   const [previewNavOpen, setPreviewNavOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
-  const autoSaveEnabled = true;
+  const [showSavedPopup, setShowSavedPopup] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
   const hasSavedOnceRef = useRef(false);
@@ -199,10 +199,7 @@ const App: React.FC = () => {
   saveStatusRef.current = saveStatus;
   const dataRef = useRef(data);
   dataRef.current = data;
-  const autoSaveRef = useRef(autoSaveEnabled);
-  autoSaveRef.current = autoSaveEnabled;
-
-  const performSave = useCallback(async (silent = false) => {
+  const performSave = useCallback(async () => {
     const d = dataRef.current;
     if (!d.slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(d.slug)) return;
     if (saveStatusRef.current === 'saving') return;
@@ -210,32 +207,23 @@ const App: React.FC = () => {
     try {
       const available = await checkSlugAvailable(d.slug);
       if (!available) {
-        if (!silent) toast.warning('이미 사용 중인 주소입니다. 다른 주소를 입력해주세요.');
+        toast.warning('이미 사용 중인 주소입니다. 다른 주소를 입력해주세요.');
         setSaveStatus('idle');
         return;
       }
       await saveInvitation(d.slug, d);
       hasSavedOnceRef.current = true;
       setSaveStatus('success');
-      if (!silent) toast.success(`저장 완료! 청첩장 주소: /w/${d.slug}`);
+      toast.success(`저장 완료! 청첩장 주소: /w/${d.slug}`);
+      setShowSavedPopup(true);
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (err) {
       setSaveStatus('error');
-      if (!silent) toast.error(getFirebaseErrorMessage(err));
+      toast.error(getFirebaseErrorMessage(err));
       console.error(err);
       setTimeout(() => setSaveStatus('idle'), 2000);
     }
   }, []);
-
-  useEffect(() => {
-    if (!autoSaveEnabled || !hasSavedOnceRef.current) return;
-    if (!data.slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) return;
-
-    const timer = setTimeout(() => {
-      performSave(true);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [data, autoSaveEnabled]);
 
   const previewRefs = {
     theme: React.useRef<HTMLDivElement>(null),
@@ -343,7 +331,7 @@ const App: React.FC = () => {
           <button className="save-btn" disabled={saveStatus === 'saving'} onClick={() => {
             if (!data.slug) { toast.warning('청첩장 주소를 먼저 설정해주세요.'); return; }
             if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) { toast.warning('주소는 영문 소문자, 숫자, 하이픈만 사용 가능합니다.'); return; }
-            performSave(false);
+            performSave();
           }}>
             <Save size={15} />
             {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
@@ -416,6 +404,19 @@ const App: React.FC = () => {
           <span>미리보기</span>
         </button>
       </nav>
+
+      {showSavedPopup && (
+        <div className="saved-popup-overlay" onClick={() => setShowSavedPopup(false)}>
+          <div className="saved-popup" onClick={(e) => e.stopPropagation()}>
+            <h3>저장 완료</h3>
+            <p>청첩장이 저장되었습니다.<br />청첩장 관리 페이지로 이동하시겠습니까?</p>
+            <div className="saved-popup-actions">
+              <button className="saved-popup-btn cancel" onClick={() => setShowSavedPopup(false)}>계속 편집</button>
+              <button className="saved-popup-btn confirm" onClick={() => navigate('/manage')}>관리 페이지로 이동</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
