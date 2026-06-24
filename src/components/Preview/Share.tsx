@@ -26,7 +26,19 @@ const Share: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const handleKakaoShare = () => {
     if (!window.Kakao || !window.Kakao.isInitialized()) return;
-    window.Kakao.Share.sendScrap({ requestUrl: shareLink });
+    const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
+    const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
+    const slug = data.slug || '';
+    window.Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title,
+        description,
+        imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
+        link: { mobileWebUrl: shareLink, webUrl: shareLink },
+      },
+      buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareLink, webUrl: shareLink } }],
+    });
   };
 
   return (
