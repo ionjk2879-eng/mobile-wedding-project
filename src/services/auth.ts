@@ -47,7 +47,7 @@ export const initiateNaverLogin = (returnUrl: string = '/manage') => {
   sessionStorage.setItem('oauth_nonce', nonce);
 
   const params = new URLSearchParams({
-    client_id: import.meta.env.VITE_NAVER_CLIENT_ID || '',
+    client_id: 'IIdKMJXjUkWkNqPv92KX',
     redirect_uri: `${window.location.origin}/auth/callback`,
     response_type: 'code',
     state,
