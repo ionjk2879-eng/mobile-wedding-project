@@ -1,5 +1,10 @@
 interface Env {
   ASSETS: { fetch: (request: Request) => Promise<Response> };
+  FIREBASE_SA_EMAIL: string;
+  FIREBASE_SA_PRIVATE_KEY: string;
+  KAKAO_REST_API_KEY: string;
+  NAVER_CLIENT_ID: string;
+  NAVER_CLIENT_SECRET: string;
 }
 
 function escapeHtml(str: string): string {
@@ -14,10 +19,200 @@ async function fetchInvitation(slug: string) {
   return doc.fields || null;
 }
 
+// --- Firebase Custom Token (JWT RS256) ---
+
+function base64url(data: string | ArrayBuffer): string {
+  const str = typeof data === 'string'
+    ? btoa(data)
+    : btoa(String.fromCharCode(...new Uint8Array(data)));
+  return str.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+
+async function importPrivateKey(pem: string): Promise<CryptoKey> {
+  const pemBody = pem
+    .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+    .replace(/-----END PRIVATE KEY-----/g, '')
+    .replace(/\s/g, '');
+  const binary = Uint8Array.from(atob(pemBody), c => c.charCodeAt(0));
+  return crypto.subtle.importKey(
+    'pkcs8',
+    binary,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+}
+
+async function createCustomToken(uid: string, saEmail: string, privateKeyPem: string): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const payload = base64url(JSON.stringify({
+    iss: saEmail,
+    sub: saEmail,
+    aud: 'https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit',
+    iat: now,
+    exp: now + 3600,
+    uid,
+  }));
+
+  const key = await importPrivateKey(privateKeyPem);
+  const signature = await crypto.subtle.sign(
+    'RSASSA-PKCS1-v1_5',
+    key,
+    new TextEncoder().encode(`${header}.${payload}`),
+  );
+
+  return `${header}.${payload}.${base64url(signature)}`;
+}
+
+function corsHeaders(origin: string): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+}
+
+// --- Kakao OAuth ---
+
+async function handleKakaoAuth(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders(origin) });
+  }
+
+  const body = await request.json() as { code?: string; redirectUri?: string };
+  if (!body.code || !body.redirectUri) {
+    return Response.json({ error: 'code and redirectUri are required' }, { status: 400, headers: corsHeaders(origin) });
+  }
+
+  const tokenParams = new URLSearchParams({
+    grant_type: 'authorization_code',
+    client_id: env.KAKAO_REST_API_KEY,
+    redirect_uri: body.redirectUri,
+    code: body.code,
+  });
+
+  const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: tokenParams.toString(),
+  });
+
+  if (!tokenRes.ok) {
+    return Response.json({ error: '카카오 인증에 실패했습니다.' }, { status: 401, headers: corsHeaders(origin) });
+  }
+
+  const tokenData = await tokenRes.json() as { access_token: string };
+
+  const profileRes = await fetch('https://kapi.kakao.com/v2/user/me', {
+    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+  });
+
+  if (!profileRes.ok) {
+    return Response.json({ error: '카카오 프로필 조회에 실패했습니다.' }, { status: 401, headers: corsHeaders(origin) });
+  }
+
+  const profile = await profileRes.json() as {
+    id: number;
+    kakao_account?: { profile?: { nickname?: string; profile_image_url?: string }; email?: string };
+  };
+
+  const uid = `kakao_${profile.id}`;
+  const account = profile.kakao_account || {};
+  const kakaoProfile = account.profile || {};
+
+  const customToken = await createCustomToken(uid, env.FIREBASE_SA_EMAIL, env.FIREBASE_SA_PRIVATE_KEY);
+
+  return Response.json({
+    customToken,
+    displayName: kakaoProfile.nickname || '',
+    photoURL: kakaoProfile.profile_image_url || '',
+    email: account.email || '',
+  }, { headers: corsHeaders(origin) });
+}
+
+// --- Naver OAuth ---
+
+async function handleNaverAuth(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders(origin) });
+  }
+
+  const body = await request.json() as { code?: string; state?: string };
+  if (!body.code) {
+    return Response.json({ error: 'code is required' }, { status: 400, headers: corsHeaders(origin) });
+  }
+
+  const tokenParams = new URLSearchParams({
+    grant_type: 'authorization_code',
+    client_id: env.NAVER_CLIENT_ID,
+    client_secret: env.NAVER_CLIENT_SECRET,
+    code: body.code,
+    state: body.state || '',
+  });
+
+  const tokenRes = await fetch('https://nid.naver.com/oauth2.0/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: tokenParams.toString(),
+  });
+
+  if (!tokenRes.ok) {
+    return Response.json({ error: '네이버 인증에 실패했습니다.' }, { status: 401, headers: corsHeaders(origin) });
+  }
+
+  const tokenData = await tokenRes.json() as { access_token: string };
+
+  const profileRes = await fetch('https://openapi.naver.com/v1/nid/me', {
+    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+  });
+
+  if (!profileRes.ok) {
+    return Response.json({ error: '네이버 프로필 조회에 실패했습니다.' }, { status: 401, headers: corsHeaders(origin) });
+  }
+
+  const profileData = await profileRes.json() as {
+    response?: { id?: string; name?: string; nickname?: string; email?: string; profile_image?: string };
+  };
+  const naverProfile = profileData.response || {};
+  const uid = `naver_${naverProfile.id}`;
+
+  const customToken = await createCustomToken(uid, env.FIREBASE_SA_EMAIL, env.FIREBASE_SA_PRIVATE_KEY);
+
+  return Response.json({
+    customToken,
+    displayName: naverProfile.name || naverProfile.nickname || '',
+    photoURL: naverProfile.profile_image || '',
+    email: naverProfile.email || '',
+  }, { headers: corsHeaders(origin) });
+}
+
+// --- Main Router ---
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const pathname = url.pathname;
+
+    // API routes
+    if (pathname === '/api/auth/kakao') {
+      try {
+        return await handleKakaoAuth(request, env);
+      } catch {
+        const origin = request.headers.get('Origin') || '*';
+        return Response.json({ error: '로그인 처리 중 오류가 발생했습니다.' }, { status: 500, headers: corsHeaders(origin) });
+      }
+    }
+    if (pathname === '/api/auth/naver') {
+      try {
+        return await handleNaverAuth(request, env);
+      } catch {
+        const origin = request.headers.get('Origin') || '*';
+        return Response.json({ error: '로그인 처리 중 오류가 발생했습니다.' }, { status: 500, headers: corsHeaders(origin) });
+      }
+    }
 
     // /og/{slug} → heroPhoto를 이미지로 반환 (OG 이미지용)
     const ogMatch = pathname.match(/^\/og\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
