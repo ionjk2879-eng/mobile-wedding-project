@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { exchangeCodeForToken, signInWithSocialToken } from '../services/auth';
+import { exchangeCodeForToken, signInWithSocialToken, decodeState } from '../services/auth';
 
 const AuthCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +18,7 @@ const AuthCallbackPage: React.FC = () => {
 
     let parsed: { provider: 'kakao' | 'naver'; returnUrl: string; nonce: string };
     try {
-      parsed = JSON.parse(stateStr);
+      parsed = decodeState(stateStr);
     } catch {
       setError('로그인 상태 정보가 올바르지 않습니다.');
       return;

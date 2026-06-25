@@ -193,7 +193,7 @@ async function handleNaverAuth(request: Request, env: Env): Promise<Response> {
 
   return Response.json({
     customToken,
-    displayName: naverProfile.name || naverProfile.nickname || '',
+    displayName: naverProfile.nickname || naverProfile.name || '',
     photoURL: naverProfile.profile_image || '',
     email: naverProfile.email || '',
   }, { headers: corsHeaders(origin) });

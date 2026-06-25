@@ -26,16 +26,23 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const signInWithGoogle = () => signInWithPopup(getAuthInstance(), googleProvider);
 
+function encodeState(data: object): string {
+  return btoa(JSON.stringify(data));
+}
+
+export function decodeState(encoded: string): { provider: 'kakao' | 'naver'; returnUrl: string; nonce: string } {
+  return JSON.parse(atob(encoded));
+}
+
 export const initiateKakaoLogin = (returnUrl: string = '/manage') => {
   const nonce = crypto.randomUUID();
-  const state = JSON.stringify({ provider: 'kakao', returnUrl, nonce });
   sessionStorage.setItem('oauth_nonce', nonce);
 
   const params = new URLSearchParams({
     client_id: '7edc2c74f346bfad9c9006cd26d04e3c',
     redirect_uri: `${window.location.origin}/auth/callback`,
     response_type: 'code',
-    state,
+    state: encodeState({ provider: 'kakao', returnUrl, nonce }),
   });
 
   window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`;
@@ -43,14 +50,13 @@ export const initiateKakaoLogin = (returnUrl: string = '/manage') => {
 
 export const initiateNaverLogin = (returnUrl: string = '/manage') => {
   const nonce = crypto.randomUUID();
-  const state = JSON.stringify({ provider: 'naver', returnUrl, nonce });
   sessionStorage.setItem('oauth_nonce', nonce);
 
   const params = new URLSearchParams({
     client_id: 'IIdKMJXjUkWkNqPv92KX',
     redirect_uri: `${window.location.origin}/auth/callback`,
     response_type: 'code',
-    state,
+    state: encodeState({ provider: 'naver', returnUrl, nonce }),
   });
 
   window.location.href = `https://nid.naver.com/oauth2.0/authorize?${params}`;
