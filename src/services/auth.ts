@@ -94,12 +94,10 @@ export const exchangeCodeForToken = async (
 
 export const signInWithSocialToken = async (result: SocialAuthResult) => {
   const credential = await firebaseSignInWithCustomToken(getAuthInstance(), result.customToken);
-  if (result.displayName || result.photoURL) {
-    await updateProfile(credential.user, {
-      displayName: result.displayName || null,
-      photoURL: result.photoURL || null,
-    });
-  }
+  await updateProfile(credential.user, {
+    displayName: result.displayName || null,
+    photoURL: result.photoURL || null,
+  });
   return credential;
 };
 
