@@ -36,8 +36,8 @@ const AuthCallbackPage: React.FC = () => {
         const result = await exchangeCodeForToken(parsed.provider, code, stateStr);
         await signInWithSocialToken(result);
         navigate(parsed.returnUrl || '/manage', { replace: true });
-      } catch {
-        setError('로그인 처리에 실패했습니다. 다시 시도해주세요.');
+      } catch (e: any) {
+        setError(e?.message || '로그인 처리에 실패했습니다. 다시 시도해주세요.');
       }
     })();
   }, [searchParams, navigate]);

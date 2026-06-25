@@ -3,6 +3,7 @@ interface Env {
   FIREBASE_SA_EMAIL: string;
   FIREBASE_SA_PRIVATE_KEY: string;
   KAKAO_REST_API_KEY: string;
+  KAKAO_CLIENT_SECRET: string;
   NAVER_CLIENT_ID: string;
   NAVER_CLIENT_SECRET: string;
 }
@@ -30,6 +31,7 @@ function base64url(data: string | ArrayBuffer): string {
 
 async function importPrivateKey(pem: string): Promise<CryptoKey> {
   const pemBody = pem
+    .replace(/\\n/g, '\n')
     .replace(/-----BEGIN PRIVATE KEY-----/g, '')
     .replace(/-----END PRIVATE KEY-----/g, '')
     .replace(/\s/g, '');
@@ -88,7 +90,8 @@ async function handleKakaoAuth(request: Request, env: Env): Promise<Response> {
 
   const tokenParams = new URLSearchParams({
     grant_type: 'authorization_code',
-    client_id: env.KAKAO_REST_API_KEY,
+    client_id: '7edc2c74f346bfad9c9006cd26d04e3c',
+    client_secret: env.KAKAO_CLIENT_SECRET,
     redirect_uri: body.redirectUri,
     code: body.code,
   });
@@ -100,7 +103,14 @@ async function handleKakaoAuth(request: Request, env: Env): Promise<Response> {
   });
 
   if (!tokenRes.ok) {
-    return Response.json({ error: '카카오 인증에 실패했습니다.' }, { status: 401, headers: corsHeaders(origin) });
+    const errText = await tokenRes.text();
+    const usedKey = tokenParams.get('client_id') || '';
+    return Response.json({
+      error: '카카오 인증에 실패했습니다.',
+      detail: errText,
+      debug_key: usedKey.slice(0, 6) + '...' + usedKey.slice(-4),
+      debug_redirect: body.redirectUri,
+    }, { status: 401, headers: corsHeaders(origin) });
   }
 
   const tokenData = await tokenRes.json() as { access_token: string };
@@ -200,9 +210,9 @@ export default {
     if (pathname === '/api/auth/kakao') {
       try {
         return await handleKakaoAuth(request, env);
-      } catch {
+      } catch (e: any) {
         const origin = request.headers.get('Origin') || '*';
-        return Response.json({ error: '로그인 처리 중 오류가 발생했습니다.' }, { status: 500, headers: corsHeaders(origin) });
+        return Response.json({ error: '로그인 처리 중 오류가 발생했습니다.', detail: e?.message || String(e) }, { status: 500, headers: corsHeaders(origin) });
       }
     }
     if (pathname === '/api/auth/naver') {

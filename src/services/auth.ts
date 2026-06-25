@@ -79,7 +79,10 @@ export const exchangeCodeForToken = async (
     }),
   });
 
-  if (!res.ok) throw new Error('로그인 처리에 실패했습니다.');
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error(errBody.detail || errBody.error || '로그인 처리에 실패했습니다.');
+  }
   return await res.json();
 };
 
