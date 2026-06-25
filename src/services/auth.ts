@@ -32,7 +32,7 @@ export const initiateKakaoLogin = (returnUrl: string = '/manage') => {
   sessionStorage.setItem('oauth_nonce', nonce);
 
   const params = new URLSearchParams({
-    client_id: import.meta.env.VITE_KAKAO_REST_API_KEY || '',
+    client_id: '7edc2c74f346bfad9c9006cd26d04e3c',
     redirect_uri: `${window.location.origin}/auth/callback`,
     response_type: 'code',
     state,
