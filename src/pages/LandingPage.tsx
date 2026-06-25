@@ -131,6 +131,11 @@ const LandingPage: React.FC = () => {
 
       {/* Footer */}
       <footer className="land-footer">
+        <div className="land-footer-links">
+          <Link to="/terms">이용약관</Link>
+          <span>|</span>
+          <Link to="/privacy" className="land-footer-privacy">개인정보처리방침</Link>
+        </div>
         <p>© 2026 Sonett. All rights reserved.</p>
       </footer>
 
@@ -377,6 +382,21 @@ const LandingPage: React.FC = () => {
           color: #9CA3AF;
           font-size: 0.8rem;
         }
+        .land-footer-links {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-bottom: 10px;
+          font-size: 0.78rem;
+        }
+        .land-footer-links a {
+          color: #9CA3AF;
+          text-decoration: none;
+          transition: color 0.15s;
+        }
+        .land-footer-links a:hover { color: #6B7280; }
+        .land-footer-links span { color: #D1D5DB; }
+        .land-footer-privacy { font-weight: 700; }
 
         /* Mobile */
         @media (max-width: 768px) {

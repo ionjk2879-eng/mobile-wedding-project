@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import useAuthStore from '../stores/useAuthStore';
 import { signInWithGoogle, initiateKakaoLogin, initiateNaverLogin } from '../services/auth';
 
@@ -42,6 +43,9 @@ const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             Google로 로그인
           </button>
         </div>
+        <p style={{ fontSize: '0.72rem', color: '#9CA3AF', marginTop: '20px', lineHeight: 1.6 }}>
+          로그인 시 <Link to="/terms" style={{ color: '#6B7280', textDecoration: 'underline' }}>이용약관</Link> 및 <Link to="/privacy" style={{ color: '#6B7280', textDecoration: 'underline', fontWeight: 700 }}>개인정보처리방침</Link>에 동의하게 됩니다.
+        </p>
       </div>
     );
   }
