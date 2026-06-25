@@ -121,6 +121,7 @@ export interface SharingConfig {
   shareTitle: string;
   shareDescription: string;
   kakaoAppKey: string;
+  isPaid?: boolean;
 }
 
 export type InvitationData = BasicInfo & DesignConfig & ContentData & FeatureConfig & SharingConfig;
