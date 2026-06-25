@@ -122,21 +122,30 @@ const ManagePage: React.FC = () => {
           <div className="manage-list">
             {invitations.map(({ slug, data }) => (
               <div key={slug} className="manage-card">
-                <div className="manage-card-info">
-                  <h3 className="manage-card-title">
-                    {data.groomName && data.brideName
-                      ? `${data.groomName} & ${data.brideName}`
-                      : slug}
-                  </h3>
-                  <p className="manage-card-slug">/w/{slug}</p>
-                  {data.date && <p className="manage-card-date">{data.date}</p>}
+                <div className="manage-card-thumb">
+                  {data.heroPhoto ? (
+                    <img src={data.heroPhoto} alt="" className="manage-card-img" />
+                  ) : (
+                    <div className="manage-card-img-empty">No Photo</div>
+                  )}
                 </div>
-                <div className="manage-card-actions">
-                  <button className="manage-action share" onClick={() => setShareSlug(slug)}><Share2 size={16} /> 공유</button>
-                  <Link to={`/edit/${slug}`} className="manage-action"><Edit3 size={16} /> 편집</Link>
-                  <a href={`/w/${slug}`} target="_blank" rel="noopener noreferrer" className="manage-action"><Eye size={16} /> 보기</a>
-                  <a href={`/admin/${slug}`} target="_blank" rel="noopener noreferrer" className="manage-action"><ClipboardList size={16} /> 응답</a>
-                  <button className="manage-action delete" onClick={() => handleDelete(slug)}><Trash2 size={16} /> 삭제</button>
+                <div className="manage-card-body">
+                  <div className="manage-card-info">
+                    <h3 className="manage-card-title">
+                      {data.groomName && data.brideName
+                        ? `${data.groomName} & ${data.brideName}`
+                        : slug}
+                    </h3>
+                    <p className="manage-card-slug">/w/{slug}</p>
+                    {data.date && <p className="manage-card-date">{data.date}</p>}
+                  </div>
+                  <div className="manage-card-actions">
+                    <button className="manage-action share" onClick={() => setShareSlug(slug)}><Share2 size={16} /> 공유</button>
+                    <Link to={`/edit/${slug}`} className="manage-action"><Edit3 size={16} /> 편집</Link>
+                    <a href={`/w/${slug}`} target="_blank" rel="noopener noreferrer" className="manage-action"><Eye size={16} /> 보기</a>
+                    <a href={`/admin/${slug}`} target="_blank" rel="noopener noreferrer" className="manage-action"><ClipboardList size={16} /> 응답</a>
+                    <button className="manage-action delete" onClick={() => handleDelete(slug)}><Trash2 size={16} /> 삭제</button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -189,11 +198,41 @@ const ManagePage: React.FC = () => {
         .manage-card {
           background: white;
           border-radius: 12px;
-          padding: 20px;
+          padding: 16px;
           display: flex;
-          justify-content: space-between;
-          align-items: center;
+          gap: 16px;
+          align-items: stretch;
           box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .manage-card-thumb {
+          width: 90px;
+          flex-shrink: 0;
+          border-radius: 8px;
+          overflow: hidden;
+          background: #F3F4F6;
+        }
+        .manage-card-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .manage-card-img-empty {
+          width: 100%;
+          height: 100%;
+          min-height: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.7rem;
+          color: #9CA3AF;
+        }
+        .manage-card-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 10px;
         }
         .manage-card-info { flex: 1; }
         .manage-card-title {
@@ -340,13 +379,10 @@ const ManagePage: React.FC = () => {
         .share-modal-btn.kakao:hover { filter: brightness(0.95); }
 
         @media (max-width: 600px) {
-          .manage-card {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
+          .manage-card-thumb {
+            width: 70px;
           }
           .manage-card-actions {
-            width: 100%;
             flex-wrap: wrap;
           }
           .share-modal { padding: 20px; max-width: 100%; }
