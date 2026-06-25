@@ -3,6 +3,34 @@ import { db } from './index';
 import { InvitationData } from '../types';
 import { getCurrentUser } from './auth';
 
+export const changeSlug = async (oldSlug: string, newSlug: string): Promise<void> => {
+  const uid = getCurrentUser()?.uid;
+  if (!uid) throw new Error('로그인이 필요합니다.');
+
+  const newSnap = await getDoc(doc(db, 'invitations', newSlug));
+  if (newSnap.exists()) throw new Error('이미 사용 중인 주소입니다.');
+
+  const oldSnap = await getDoc(doc(db, 'invitations', oldSlug));
+  if (!oldSnap.exists()) throw new Error('청첩장을 찾을 수 없습니다.');
+
+  const data = oldSnap.data();
+  await setDoc(doc(db, 'invitations', newSlug), { ...data, slug: newSlug, updatedAt: serverTimestamp() });
+
+  const gbSnap = await getDocs(collection(db, `invitations/${oldSlug}/guestbook`));
+  for (const d of gbSnap.docs) {
+    await setDoc(doc(db, `invitations/${newSlug}/guestbook`, d.id), d.data());
+    await deleteDoc(doc(db, `invitations/${oldSlug}/guestbook`, d.id));
+  }
+
+  const rsvpSnap = await getDocs(collection(db, `invitations/${oldSlug}/rsvp`));
+  for (const d of rsvpSnap.docs) {
+    await setDoc(doc(db, `invitations/${newSlug}/rsvp`, d.id), d.data());
+    await deleteDoc(doc(db, `invitations/${oldSlug}/rsvp`, d.id));
+  }
+
+  await deleteDoc(doc(db, 'invitations', oldSlug));
+};
+
 export const saveInvitation = async (slug: string, data: InvitationData) => {
   const uid = getCurrentUser()?.uid;
   if (!uid) throw new Error('로그인이 필요합니다.');
