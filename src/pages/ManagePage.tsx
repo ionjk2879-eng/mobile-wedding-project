@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../firebase';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, PenLine } from 'lucide-react';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
+
 const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 
@@ -72,93 +73,91 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
   );
 };
 
-const SlugChangeModal: React.FC<{ slug: string; onClose: () => void; onChanged: () => void }> = ({ slug, onClose, onChanged }) => {
+const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () => void }> = ({ slug, onDone, onClose }) => {
   const [newSlug, setNewSlug] = useState(slug);
   const [saving, setSaving] = useState(false);
   const valid = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(newSlug) && newSlug !== slug;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!valid || saving) return;
     setSaving(true);
     try {
       await changeSlug(slug, newSlug);
-      toast.success(`주소가 /w/${newSlug} 으로 변경되었습니다.`);
-      onChanged();
-      onClose();
+      toast.success(`주소가 /w/${newSlug} 로 변경되었습니다.`);
+      onDone();
     } catch (err: any) {
-      toast.error(err.message || '주소 변경에 실패했습니다.');
-    } finally {
-      setSaving(false);
+      toast.error(err?.message || '주소 변경에 실패했습니다.');
     }
+    setSaving(false);
   };
 
   return (
     <div className="share-modal-overlay" onClick={onClose}>
-      <div className="share-modal slug-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="slug-modal" onClick={(e) => e.stopPropagation()}>
         <div className="share-modal-header">
           <h3>도메인 변경</h3>
           <button className="share-modal-close" onClick={onClose}><X size={20} /></button>
         </div>
-        <form onSubmit={handleSubmit}>
-          <p className="slug-modal-hint">청첩장 주소를 변경합니다. 기존 주소로는 더 이상 접근할 수 없습니다.</p>
-          <div className="slug-modal-preview">
-            <span className="slug-modal-prefix">{SITE_ORIGIN}/w/</span>
+        <p className="slug-modal-desc">청첩장 주소를 변경합니다. 기존 주소로는 더 이상 접속할 수 없습니다.</p>
+        <div className="slug-modal-current">
+          <span className="slug-modal-label">현재 주소</span>
+          <span className="slug-modal-value">/w/{slug}</span>
+        </div>
+        <div className="slug-modal-field">
+          <span className="slug-modal-label">새 주소</span>
+          <div className="slug-modal-input-wrap">
+            <span className="slug-modal-prefix">/w/</span>
             <input
               type="text"
               className="slug-modal-input"
               value={newSlug}
               onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
               placeholder="new-slug"
-              autoFocus
             />
           </div>
           {newSlug && !(/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(newSlug)) && (
-            <p className="slug-modal-error">영문 소문자, 숫자, 하이픈만 사용 가능합니다.</p>
+            <p className="slug-modal-hint error">영문 소문자, 숫자, 하이픈만 사용 가능합니다.</p>
           )}
-          <div className="slug-modal-actions">
-            <button type="button" className="slug-modal-btn cancel" onClick={onClose}>취소</button>
-            <button type="submit" className="slug-modal-btn confirm" disabled={!valid || saving}>
-              {saving ? '변경 중...' : '변경하기'}
-            </button>
-          </div>
-        </form>
+        </div>
+        <div className="slug-modal-actions">
+          <button className="slug-modal-btn cancel" onClick={onClose}>취소</button>
+          <button className="slug-modal-btn confirm" disabled={!valid || saving} onClick={handleSubmit}>
+            {saving ? '변경 중...' : '변경하기'}
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-const DropdownMenu: React.FC<{
-  slug: string;
-  onResponse: () => void;
-  onChangeSlug: () => void;
-  onDelete: () => void;
-}> = ({ slug, onResponse, onChangeSlug, onDelete }) => {
+const CardDropdown: React.FC<{ slug: string; onDelete: () => void; onChangeSlug: () => void }> = ({ slug, onDelete, onChangeSlug }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const close = (e: MouseEvent) => {
+    const handleClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
   return (
     <div className="mc-dropdown" ref={ref}>
-      <button className="mc-more-btn" onClick={() => setOpen(!open)} aria-label="더보기"><MoreVertical size={18} /></button>
+      <button className="mc-action-btn mc-more-btn" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
+        <MoreVertical size={16} />
+      </button>
       {open && (
-        <div className="mc-dropdown-menu">
-          <button className="mc-dropdown-item" onClick={() => { onResponse(); setOpen(false); }}>
-            <ClipboardList size={15} /> 응답 확인
+        <div className="mc-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+          <button className="mc-dropdown-item" onClick={() => { setOpen(false); onChangeSlug(); }}>
+            <Globe size={14} /> 도메인 변경
           </button>
-          <button className="mc-dropdown-item" onClick={() => { onChangeSlug(); setOpen(false); }}>
-            <PenLine size={15} /> 도메인 변경
-          </button>
-          <button className="mc-dropdown-item delete" onClick={() => { onDelete(); setOpen(false); }}>
-            <Trash2 size={15} /> 삭제
+          <a href={`/admin/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-dropdown-item" onClick={() => setOpen(false)}>
+            <ClipboardList size={14} /> 응답 확인
+          </a>
+          <button className="mc-dropdown-item danger" onClick={() => { setOpen(false); onDelete(); }}>
+            <Trash2 size={14} /> 삭제
           </button>
         </div>
       )}
@@ -170,7 +169,7 @@ const ManagePage: React.FC = () => {
   const [invitations, setInvitations] = useState<{ slug: string; data: InvitationData }[]>([]);
   const [loading, setLoading] = useState(true);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
-  const [slugChangeTarget, setSlugChangeTarget] = useState<string | null>(null);
+  const [changeSlugTarget, setChangeSlugTarget] = useState<string | null>(null);
 
   const load = () => {
     fetchMyInvitations().then(setInvitations).catch(() => {}).finally(() => setLoading(false));
@@ -205,35 +204,46 @@ const ManagePage: React.FC = () => {
             <Link to="/editor" className="manage-cta">청첩장 만들기</Link>
           </div>
         ) : (
-          <div className="manage-grid">
+          <div className="mc-grid">
             {invitations.map(({ slug, data }) => (
-              <div key={slug} className="mc">
-                <a href={`/w/${slug}`} className="mc-thumb">
-                  {data.heroPhoto ? (
-                    <img src={data.heroPhoto} alt="" className="mc-thumb-img" />
-                  ) : (
-                    <div className="mc-thumb-empty">No Photo</div>
-                  )}
+              <div key={slug} className="mc-card">
+                <a href={`/w/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-thumb-link">
+                  <div className="mc-thumb">
+                    {data.heroPhoto ? (
+                      <img
+                        src={data.heroPhoto}
+                        alt=""
+                        className="mc-thumb-img"
+                        style={{ objectPosition: `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%` }}
+                      />
+                    ) : (
+                      <div className="mc-thumb-empty">
+                        <span>사진 없음</span>
+                      </div>
+                    )}
+                    <div className="mc-thumb-overlay">
+                      <span>청첩장 보기</span>
+                    </div>
+                  </div>
                 </a>
                 <div className="mc-body">
                   <div className="mc-info">
-                    <h3 className="mc-title">
+                    <h3 className="mc-name">
                       {data.groomName && data.brideName
                         ? `${data.groomName} & ${data.brideName}`
                         : slug}
                     </h3>
-                    <p className="mc-slug">/w/{slug}</p>
                     {data.date && <p className="mc-date">{data.date}</p>}
+                    <p className="mc-slug">/w/{slug}</p>
                   </div>
                   <div className="mc-actions">
-                    <button className="mc-btn share" onClick={() => setShareSlug(slug)}><Share2 size={15} /> 공유</button>
-                    <Link to={`/edit/${slug}`} className="mc-btn edit"><Edit3 size={15} /> 편집</Link>
-                    <DropdownMenu
-                      slug={slug}
-                      onResponse={() => window.open(`/admin/${slug}`, '_blank')}
-                      onChangeSlug={() => setSlugChangeTarget(slug)}
-                      onDelete={() => handleDelete(slug)}
-                    />
+                    <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
+                      <Share2 size={14} /> 공유
+                    </button>
+                    <Link to={`/edit/${slug}`} className="mc-action-btn mc-edit-btn">
+                      <Edit3 size={14} /> 편집
+                    </Link>
+                    <CardDropdown slug={slug} onDelete={() => handleDelete(slug)} onChangeSlug={() => setChangeSlugTarget(slug)} />
                   </div>
                 </div>
               </div>
@@ -245,89 +255,350 @@ const ManagePage: React.FC = () => {
       {shareTarget && (
         <ShareModal slug={shareTarget.slug} data={shareTarget.data} onClose={() => setShareSlug(null)} />
       )}
-      {slugChangeTarget && (
-        <SlugChangeModal slug={slugChangeTarget} onClose={() => setSlugChangeTarget(null)} onChanged={load} />
+
+      {changeSlugTarget && (
+        <SlugChangeModal
+          slug={changeSlugTarget}
+          onClose={() => setChangeSlugTarget(null)}
+          onDone={() => { setChangeSlugTarget(null); load(); }}
+        />
       )}
 
       <style>{`
-        .manage { min-height: 100vh; background: #F9FAFB; font-family: 'Pretendard', sans-serif; }
-        .manage-main { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
-        .manage-title { font-size: 1.4rem; font-weight: 700; color: #1F2937; margin: 0 0 24px; }
-        .manage-empty { text-align: center; color: #9CA3AF; padding: 60px 0; }
-        .manage-cta { display: inline-block; margin-top: 16px; background: #B07A8E; color: white; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; }
+        .manage {
+          min-height: 100vh;
+          background: #F9FAFB;
+          font-family: 'Pretendard', sans-serif;
+        }
+        .manage-main {
+          max-width: 900px;
+          margin: 0 auto;
+          padding: 40px 24px;
+        }
+        .manage-title {
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: #1F2937;
+          margin: 0 0 28px;
+        }
+        .manage-empty {
+          text-align: center;
+          color: #9CA3AF;
+          padding: 60px 0;
+        }
+        .manage-cta {
+          display: inline-block;
+          margin-top: 16px;
+          background: #B07A8E;
+          color: white;
+          text-decoration: none;
+          padding: 12px 28px;
+          border-radius: 10px;
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
 
-        .manage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        /* Card grid */
+        .mc-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          gap: 20px;
+        }
+        .mc-card {
+          background: white;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+          transition: box-shadow 0.25s, transform 0.25s;
+        }
+        .mc-card:hover {
+          box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+          transform: translateY(-2px);
+        }
 
-        .mc { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
-        .mc:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+        /* Thumbnail */
+        .mc-thumb-link {
+          display: block;
+          text-decoration: none;
+        }
+        .mc-thumb {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 3 / 4;
+          overflow: hidden;
+          background: #F3F4F6;
+        }
+        .mc-thumb-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .mc-thumb-empty {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #D1D5DB;
+          font-size: 0.85rem;
+          background: linear-gradient(135deg, #F9FAFB, #F3F4F6);
+        }
+        .mc-thumb-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0,0,0,0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.25s;
+        }
+        .mc-thumb-overlay span {
+          color: white;
+          font-size: 0.9rem;
+          font-weight: 600;
+          padding: 10px 24px;
+          border: 1.5px solid rgba(255,255,255,0.8);
+          border-radius: 30px;
+        }
+        .mc-thumb-link:hover .mc-thumb-overlay {
+          opacity: 1;
+        }
 
-        .mc-thumb { display: block; aspect-ratio: 3/4; overflow: hidden; background: #F3F4F6; cursor: pointer; text-decoration: none; }
-        .mc-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
-        .mc-thumb:hover .mc-thumb-img { transform: scale(1.03); }
-        .mc-thumb-empty { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #9CA3AF; }
+        /* Body */
+        .mc-body {
+          padding: 16px;
+        }
+        .mc-info {
+          margin-bottom: 14px;
+        }
+        .mc-name {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #1F2937;
+          margin: 0 0 4px;
+        }
+        .mc-date {
+          font-size: 0.82rem;
+          color: #6B7280;
+          margin: 0 0 2px;
+        }
+        .mc-slug {
+          font-size: 0.75rem;
+          color: #9CA3AF;
+          margin: 0;
+        }
 
-        .mc-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
-        .mc-info {}
-        .mc-title { font-size: 0.95rem; font-weight: 600; color: #1F2937; margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mc-slug { font-size: 0.75rem; color: #9CA3AF; margin: 0; }
-        .mc-date { font-size: 0.75rem; color: #6B7280; margin: 3px 0 0; }
+        /* Actions */
+        .mc-actions {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .mc-action-btn {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 7px 14px;
+          border-radius: 8px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          text-decoration: none;
+          font-family: inherit;
+          transition: all 0.15s;
+        }
+        .mc-share-btn {
+          background: #B07A8E;
+          color: white;
+        }
+        .mc-share-btn:hover {
+          background: #9B6A7E;
+        }
+        .mc-edit-btn {
+          background: #F3F4F6;
+          color: #4B5563;
+        }
+        .mc-edit-btn:hover {
+          background: #E5E7EB;
+          color: #1F2937;
+        }
+        .mc-more-btn {
+          background: #F3F4F6;
+          color: #9CA3AF;
+          padding: 7px 8px;
+          margin-left: auto;
+        }
+        .mc-more-btn:hover {
+          background: #E5E7EB;
+          color: #4B5563;
+        }
 
-        .mc-actions { display: flex; align-items: center; gap: 6px; }
-        .mc-btn { display: flex; align-items: center; gap: 4px; padding: 7px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; }
-        .mc-btn.share { background: #B07A8E; color: white; flex: 1; justify-content: center; }
-        .mc-btn.share:hover { background: #9B6A7E; }
-        .mc-btn.edit { background: #F3F4F6; color: #374151; flex: 1; justify-content: center; }
-        .mc-btn.edit:hover { background: #E5E7EB; }
-
-        .mc-dropdown { position: relative; }
-        .mc-more-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; border: none; background: #F3F4F6; color: #6B7280; cursor: pointer; transition: all 0.15s; }
-        .mc-more-btn:hover { background: #E5E7EB; color: #374151; }
-        .mc-dropdown-menu { position: absolute; right: 0; bottom: 100%; margin-bottom: 6px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); border: 1px solid #E5E7EB; min-width: 150px; z-index: 100; overflow: hidden; }
-        .mc-dropdown-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 11px 16px; border: none; background: none; font-size: 0.82rem; color: #374151; cursor: pointer; font-family: inherit; transition: background 0.1s; text-align: left; }
-        .mc-dropdown-item:hover { background: #F3F4F6; }
-        .mc-dropdown-item.delete { color: #DC2626; }
-        .mc-dropdown-item.delete:hover { background: #FEF2F2; }
+        /* Dropdown */
+        .mc-dropdown {
+          position: relative;
+          margin-left: auto;
+        }
+        .mc-dropdown-menu {
+          position: absolute;
+          bottom: calc(100% + 6px);
+          right: 0;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+          border: 1px solid #F0F0F0;
+          min-width: 140px;
+          padding: 4px;
+          z-index: 50;
+          animation: mc-menu-in 0.12s ease;
+        }
+        @keyframes mc-menu-in {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .mc-dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+          padding: 10px 14px;
+          border: none;
+          border-radius: 8px;
+          background: none;
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #4B5563;
+          cursor: pointer;
+          text-decoration: none;
+          font-family: inherit;
+          transition: all 0.12s;
+          box-sizing: border-box;
+        }
+        .mc-dropdown-item:hover {
+          background: #F9FAFB;
+          color: #1F2937;
+        }
+        .mc-dropdown-item.danger {
+          color: #DC2626;
+        }
+        .mc-dropdown-item.danger:hover {
+          background: #FEF2F2;
+          color: #B91C1C;
+        }
 
         /* Share Modal */
-        .share-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
-        .share-modal { background: white; border-radius: 20px; padding: 36px; max-width: 440px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
-        .share-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-        .share-modal-header h3 { font-size: 1.3rem; font-weight: 700; color: #1F2937; margin: 0; }
-        .share-modal-close { background: none; border: none; cursor: pointer; color: #9CA3AF; padding: 4px; }
-        .share-modal-qr { display: flex; flex-direction: column; align-items: center; padding: 28px; background: #FAFAFA; border-radius: 16px; margin-bottom: 20px; }
+        .share-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 24px;
+        }
+        .share-modal {
+          background: white;
+          border-radius: 20px;
+          padding: 36px;
+          max-width: 440px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .share-modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 28px;
+        }
+        .share-modal-header h3 {
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: #1F2937;
+          margin: 0;
+        }
+        .share-modal-close {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #9CA3AF;
+          padding: 4px;
+        }
+        .share-modal-qr {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 28px;
+          background: #FAFAFA;
+          border-radius: 16px;
+          margin-bottom: 20px;
+        }
         .share-qr-svg { width: 180px; height: 180px; }
-        .share-modal-qr-hint { font-size: 0.85rem; color: #9CA3AF; margin: 16px 0 0; }
-        .share-modal-url { margin-bottom: 20px; }
-        .share-modal-url-input { width: 100%; padding: 12px 14px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.88rem; color: #6B7280; background: #F9FAFB; box-sizing: border-box; font-family: monospace; }
-        .share-modal-actions { display: flex; gap: 10px; }
-        .share-modal-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; border-radius: 12px; font-size: 1rem; font-weight: 600; border: none; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-        .share-modal-btn.copy { background: #F3F4F6; color: #374151; }
+        .share-modal-qr-hint {
+          font-size: 0.85rem;
+          color: #9CA3AF;
+          margin: 16px 0 0;
+        }
+        .share-modal-url {
+          margin-bottom: 20px;
+        }
+        .share-modal-url-input {
+          width: 100%;
+          padding: 12px 14px;
+          border: 1px solid #E5E7EB;
+          border-radius: 10px;
+          font-size: 0.88rem;
+          color: #6B7280;
+          background: #F9FAFB;
+          box-sizing: border-box;
+          font-family: monospace;
+        }
+        .share-modal-actions {
+          display: flex;
+          gap: 10px;
+        }
+        .share-modal-btn {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 16px;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          font-family: inherit;
+          transition: all 0.2s;
+        }
+        .share-modal-btn.copy {
+          background: #F3F4F6;
+          color: #374151;
+        }
         .share-modal-btn.copy:hover { background: #E5E7EB; }
-        .share-modal-btn.url-share { background: #B07A8E; color: white; }
+        .share-modal-btn.url-share {
+          background: #B07A8E;
+          color: white;
+        }
         .share-modal-btn.url-share:hover { background: #9B6A7E; }
-        .share-modal-btn.kakao { background: #FEE500; color: #3C1E1E; }
+        .share-modal-btn.kakao {
+          background: #FEE500;
+          color: #3C1E1E;
+        }
         .share-modal-btn.kakao:hover { filter: brightness(0.95); }
 
-        /* Slug Change Modal */
-        .slug-modal { max-width: 400px; }
-        .slug-modal-hint { font-size: 0.85rem; color: #6B7280; margin: 0 0 16px; line-height: 1.5; }
-        .slug-modal-preview { display: flex; align-items: center; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 4px 12px; margin-bottom: 8px; }
-        .slug-modal-prefix { font-size: 0.78rem; color: #9CA3AF; white-space: nowrap; font-family: monospace; }
-        .slug-modal-input { flex: 1; border: none; background: none; padding: 10px 4px; font-size: 0.9rem; color: #1F2937; font-family: monospace; outline: none; min-width: 0; }
-        .slug-modal-error { font-size: 0.78rem; color: #DC2626; margin: 0 0 8px; }
-        .slug-modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .slug-modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; }
-        .slug-modal-btn.cancel { background: #F3F4F6; color: #6B7280; }
-        .slug-modal-btn.cancel:hover { background: #E5E7EB; }
-        .slug-modal-btn.confirm { background: #B07A8E; color: white; }
-        .slug-modal-btn.confirm:hover { background: #9B6A7E; }
-        .slug-modal-btn.confirm:disabled { opacity: 0.5; cursor: not-allowed; }
-
         @media (max-width: 600px) {
-          .manage-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-          .mc-body { padding: 10px 12px 12px; }
-          .mc-title { font-size: 0.85rem; }
-          .mc-btn { padding: 6px 8px; font-size: 0.72rem; }
+          .mc-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+          .mc-body { padding: 12px; }
+          .mc-name { font-size: 0.88rem; }
+          .mc-action-btn { padding: 6px 10px; font-size: 0.72rem; }
+          .mc-more-btn { padding: 6px; }
           .share-modal { padding: 20px; max-width: 100%; }
           .share-modal-header { margin-bottom: 16px; }
           .share-modal-header h3 { font-size: 1rem; }
@@ -339,8 +610,124 @@ const ManagePage: React.FC = () => {
           .share-modal-actions { gap: 8px; }
           .share-modal-btn { padding: 12px 8px; font-size: 0.8rem; gap: 5px; }
         }
-        @media (max-width: 380px) {
-          .manage-grid { grid-template-columns: 1fr; max-width: 280px; margin: 0 auto; }
+        @media (max-width: 400px) {
+          .mc-grid {
+            grid-template-columns: 1fr;
+            max-width: 300px;
+            margin: 0 auto;
+          }
+        }
+
+        /* Slug Change Modal */
+        .slug-modal {
+          background: white;
+          border-radius: 20px;
+          padding: 32px;
+          max-width: 420px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+          font-family: 'Pretendard', sans-serif;
+        }
+        .slug-modal-desc {
+          font-size: 0.85rem;
+          color: #6B7280;
+          margin: 0 0 20px;
+          line-height: 1.5;
+        }
+        .slug-modal-current {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 16px;
+          background: #F9FAFB;
+          border-radius: 10px;
+          margin-bottom: 16px;
+        }
+        .slug-modal-label {
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: #9CA3AF;
+          flex-shrink: 0;
+        }
+        .slug-modal-value {
+          font-size: 0.88rem;
+          color: #374151;
+          font-family: monospace;
+        }
+        .slug-modal-field {
+          margin-bottom: 24px;
+        }
+        .slug-modal-input-wrap {
+          display: flex;
+          align-items: center;
+          border: 1px solid #E5E7EB;
+          border-radius: 10px;
+          overflow: hidden;
+          margin-top: 8px;
+          transition: border-color 0.2s;
+        }
+        .slug-modal-input-wrap:focus-within {
+          border-color: #B07A8E;
+        }
+        .slug-modal-prefix {
+          padding: 12px 0 12px 14px;
+          font-size: 0.88rem;
+          color: #9CA3AF;
+          font-family: monospace;
+          flex-shrink: 0;
+        }
+        .slug-modal-input {
+          flex: 1;
+          padding: 12px 14px 12px 0;
+          border: none;
+          outline: none;
+          font-size: 0.88rem;
+          color: #1F2937;
+          font-family: monospace;
+          background: transparent;
+        }
+        .slug-modal-hint {
+          font-size: 0.75rem;
+          margin: 6px 0 0;
+        }
+        .slug-modal-hint.error {
+          color: #DC2626;
+        }
+        .slug-modal-actions {
+          display: flex;
+          gap: 10px;
+        }
+        .slug-modal-btn {
+          flex: 1;
+          padding: 14px;
+          border-radius: 12px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          border: none;
+          font-family: inherit;
+          transition: all 0.2s;
+        }
+        .slug-modal-btn.cancel {
+          background: #F3F4F6;
+          color: #374151;
+        }
+        .slug-modal-btn.cancel:hover {
+          background: #E5E7EB;
+        }
+        .slug-modal-btn.confirm {
+          background: #B07A8E;
+          color: white;
+        }
+        .slug-modal-btn.confirm:hover:not(:disabled) {
+          background: #9B6A7E;
+        }
+        .slug-modal-btn.confirm:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        @media (max-width: 480px) {
+          .slug-modal { padding: 20px; }
         }
       `}</style>
     </div>
