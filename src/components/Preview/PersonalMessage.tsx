@@ -39,68 +39,6 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
         </div>
       </div>
 
-      <style>{`
-        .personal-message {
-          background-color: transparent;
-          padding: 80px 24px;
-        }
-        .message-container {
-          display: flex;
-          flex-direction: column;
-          gap: 24px;
-        }
-        .message-box {
-          padding: 14px 16px;
-          background: var(--wedding-card-bg);
-          border-radius: 20px;
-          border: 1px solid var(--wedding-border);
-          box-shadow: 0 10px 30px rgba(74, 69, 67, 0.05);
-        }
-        .message-box.groom { border-left: 4px solid var(--wedding-accent); border-right: none; }
-        .message-box.bride { border-right: 4px solid var(--wedding-main); border-left: none; }
-        .msg-profile-row.reverse { flex-direction: row; }
-        .msg-profile-row.reverse .msg-content { text-align: center; }
-        .msg-profile-row {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-        }
-        .msg-profile-img {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          object-fit: cover;
-          flex-shrink: 0;
-          border: 2px solid var(--wedding-border);
-        }
-        .msg-profile-empty {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          flex-shrink: 0;
-          background: var(--wedding-border);
-          opacity: 0.5;
-        }
-        .msg-content {
-          flex: 1;
-          min-width: 0;
-        }
-        .message-name {
-          font-size: 0.8em;
-          font-weight: 700;
-          color: var(--wedding-main);
-          letter-spacing: 1px;
-          display: block;
-          margin-bottom: 8px;
-        }
-        .msg-content p {
-          font-size: 0.95em;
-          line-height: 1.8;
-          color: var(--wedding-text-body);
-          margin: 0;
-          word-break: keep-all;
-        }
-      `}</style>
     </section>
   );
 }, (prev, next) => {

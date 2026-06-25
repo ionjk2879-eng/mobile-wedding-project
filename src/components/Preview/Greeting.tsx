@@ -50,54 +50,6 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
         </div>
       </div>
 
-      <style>{`
-        .greeting-title {
-          font-size: 1.35em;
-          font-weight: 600;
-          color: var(--wedding-text-main);
-          margin: 8px 0 24px;
-          letter-spacing: 1px;
-          line-height: 1.5;
-        }
-        .greeting-text p {
-          line-height: 2;
-          color: var(--wedding-text-body);
-          font-size: 0.95em;
-          margin-bottom: 0;
-        }
-        .family-info {
-          margin-top: 50px;
-          display: flex;
-          flex-direction: column;
-          gap: 30px;
-        }
-        .family-block {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-        }
-        .parent-names {
-          font-size: 0.95em;
-          color: var(--wedding-text-sub);
-          letter-spacing: 1px;
-        }
-        .deceased-icon {
-          font-size: 0.85em;
-          vertical-align: middle;
-        }
-        .child-label {
-          font-size: 0.85em;
-          color: var(--wedding-text-sub);
-          margin-left: 4px;
-        }
-        .child-name {
-          font-size: 1.4em;
-          font-weight: 600;
-          color: var(--wedding-text-main);
-          letter-spacing: 3px;
-        }
-      `}</style>
     </section>
   );
 }, (prev, next) => {

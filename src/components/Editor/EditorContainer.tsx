@@ -196,7 +196,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
               onToggle={() => toggleSection(s.id)}
               sectionRef={sectionRefs[s.id as keyof typeof sectionRefs]}
             >
-              {s.content}
+              {expandedSections[s.id] ? s.content : null}
             </SectionCard>
           ))}
         </div>

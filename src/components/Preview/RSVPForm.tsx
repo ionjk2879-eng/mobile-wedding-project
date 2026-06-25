@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { InvitationData, RSVPResponse } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
-import { submitRSVP } from '../../firebase';
+const lazyFirebase = () => import('../../firebase');
 import { toast } from '../../stores/useToastStore';
 import { getFirebaseErrorMessage } from '../../utils/firebaseError';
 import { PreviewOverlay } from '../../hooks/usePreviewPopup';
@@ -23,6 +23,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
     e.preventDefault();
     if (!data.slug) return;
     try {
+      const { submitRSVP } = await lazyFirebase();
       await submitRSVP(data.slug, formData);
       setSubmitted(true);
       setFormOpen(false);
@@ -38,11 +39,6 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
           <p>{isEn ? 'Thank you.' : '소중한 응답 감사합니다.'}</p>
           <button className="rsvp-reset" onClick={() => setSubmitted(false)}>{isEn ? 'Edit' : '다시 입력하기'}</button>
         </div>
-        <style>{`
-          .rsvp-success { padding: 40px 20px; background: var(--wedding-card-bg); border-radius: 24px; border: 1px solid var(--wedding-border); display: flex; flex-direction: column; align-items: center; gap: 15px; }
-          .rsvp-success h3 { color: var(--wedding-main); margin: 0; } .rsvp-success p { color: var(--wedding-text-sub); margin: 0; }
-          .rsvp-reset { font-size: 0.8em; color: var(--wedding-text-sub); text-decoration: underline; background: none; border: none; cursor: pointer; }
-        `}</style>
       </section>
     );
   }
@@ -102,11 +98,6 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
         </form>
       </PreviewOverlay>
 
-      <style>{`
-        .rsvp-section { background-color: transparent; }
-        .pf-open-btn { width: 100%; padding: 16px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: all 0.25s; }
-        .pf-open-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
-      `}</style>
     </section>
   );
 }, (prev, next) => prev.data.isRSVPEnabled === next.data.isRSVPEnabled && prev.data.slug === next.data.slug && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily);

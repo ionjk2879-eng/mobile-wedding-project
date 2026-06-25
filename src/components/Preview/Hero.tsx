@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { InvitationData } from '../../types';
 
 interface PreviewProps {
@@ -199,11 +198,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   return (
     <section className="hero" style={{ fontFamily: data.fontFamily }} aria-label="메인">
-      <motion.div
+      <div
         key={`${groomName}-${brideName}-${style}`}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+        className="hero-entrance"
       >
         {style === 'classic' && renderClassic()}
         {style === 'overlay' && renderOverlay()}
@@ -214,139 +211,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'centercard' && renderCentercard()}
         {style === 'gradation' && renderGradation()}
         {style === 'magcover' && renderMagcover()}
-      </motion.div>
+      </div>
 
-      <style>{`
-        .hero { text-align: center; background-color: transparent; position: relative; }
-        .hero-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .hero-photo-empty { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; background: var(--wedding-card-bg); border: 2px dashed var(--wedding-border); text-align: center; }
-        .hero-photo-empty span { font-size: 0.9em; color: var(--wedding-text-sub); line-height: 1; }
-        .hero-img-wrap { overflow: hidden; line-height: 0; }
-
-        /* Classic */
-        .hero-classic { padding: 40px 20px 60px; }
-        .hero-classic .hero-img-wrap { margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .hero-info { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .hero-quote { font-size: 0.85em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 12px; opacity: 0.8; }
-        .hero-dday { display: inline-block; padding: 4px 12px; background: color-mix(in srgb, var(--wedding-accent) 10%, transparent); color: var(--wedding-accent); border: 1px solid var(--wedding-accent); border-radius: 4px; font-size: 0.75em; font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; }
-        .hero-label { font-size: 0.7em; letter-spacing: 3px; color: var(--wedding-main); opacity: 0.7; margin: 0; font-weight: 600; }
-        .hero-names { font-size: 1.8em; font-weight: 400; color: var(--wedding-text-main); margin: 10px 0; letter-spacing: 0.05em; }
-        .hero-names .amp { font-size: 0.7em; color: var(--wedding-accent); opacity: 0.6; font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; }
-        .hero-date { font-size: 1em; font-weight: 500; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; }
-        .hero-time { font-size: 0.9em; color: var(--wedding-text-sub); margin: 0; }
-        .hero-venue { font-size: 0.9em; color: var(--wedding-text-sub); margin: 5px 0 0; padding-top: 10px; border-top: 1px solid var(--wedding-border); display: inline-block; }
-
-        /* Overlay */
-        .hero-overlay { position: relative; }
-        .overlay-img { height: 85vh; min-height: 500px; }
-        .overlay-img .hero-photo-empty { height: 100%; aspect-ratio: auto; }
-        .overlay-text { position: absolute; bottom: 0; left: 0; right: 0; padding: 60px 24px 40px; background: linear-gradient(transparent, rgba(0,0,0,0.6)); color: white; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .overlay-quote { font-size: 1em; font-family: 'Dancing Script', cursive; margin: 0 0 6px; opacity: 0.9; letter-spacing: 1px; }
-        .overlay-label { font-size: 0.7em; letter-spacing: 4px; margin: 0; opacity: 0.85; }
-        .overlay-names { font-size: 2em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 3px; }
-        .overlay-names span { font-style: italic; opacity: 0.7; margin: 0 6px; }
-        .overlay-date { font-size: 0.85em; margin: 0; opacity: 0.9; letter-spacing: 1px; }
-        .overlay-venue { font-size: 0.8em; margin: 0; opacity: 0.7; }
-        .overlay-dday { display: inline-block; padding: 4px 14px; border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; margin-top: 4px; }
-
-        /* Minimal */
-        .hero-minimal { padding: 80px 24px 40px; }
-        .minimal-quote { font-size: 1em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 20px; opacity: 0.7; }
-        .minimal-label { font-size: 0.7em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0 0 30px; }
-        .minimal-names { font-size: 2.4em; font-weight: 300; color: var(--wedding-text-main); margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; }
-        .minimal-amp { font-size: 1.5em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 10px 0; opacity: 0.5; }
-        .minimal-divider { width: 30px; height: 1px; background: var(--wedding-border); margin: 25px auto; }
-        .minimal-date { font-size: 1em; color: var(--wedding-text-main); margin: 0; letter-spacing: 2px; font-weight: 500; }
-        .minimal-time { font-size: 0.85em; color: var(--wedding-text-sub); margin: 8px 0 0; }
-        .minimal-dday { display: inline-block; margin-top: 20px; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
-        .minimal-img { margin-top: 40px; border-radius: 16px; }
-
-        /* Editorial */
-        .hero-editorial { padding: 50px 24px 60px; }
-        .editorial-top { margin-bottom: 24px; }
-        .editorial-dday { display: inline-block; padding: 4px 12px; background: var(--wedding-main); color: white; border-radius: 4px; font-size: 0.7em; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; }
-        .editorial-quote { font-size: 0.9em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 8px; }
-        .editorial-label { font-size: 0.7em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0; }
-        .editorial-img { margin-bottom: 30px; border-radius: 8px; aspect-ratio: 4/5; }
-        .editorial-bottom { display: flex; flex-direction: column; align-items: center; }
-        .editorial-groom, .editorial-bride { font-size: 2em; font-weight: 300; color: var(--wedding-text-main); margin: 0; font-family: 'Playfair Display', serif; letter-spacing: 3px; }
-        .editorial-amp { font-size: 1.2em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 5px 0; opacity: 0.5; }
-        .editorial-sub { font-size: 0.8em; color: var(--wedding-text-sub); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 12px 0 0; letter-spacing: 1px; }
-        .editorial-details { display: flex; flex-direction: column; gap: 4px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--wedding-border); }
-        .editorial-details span { font-size: 0.85em; color: var(--wedding-text-sub); letter-spacing: 1px; }
-
-        /* Fullscreen */
-        .hero-fullscreen { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; max-height: 100vh; overflow: hidden; }
-        .fullscreen-bg { position: absolute; inset: 0; }
-        .fullscreen-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; }
-        .fullscreen-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
-        .fullscreen-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.35); color: white; gap: 12px; padding: 24px; box-sizing: border-box; text-align: center; }
-        .fullscreen-quote { font-size: 1.1em; font-family: 'Dancing Script', cursive; margin: 0 0 8px; opacity: 0.85; letter-spacing: 1px; }
-        .fullscreen-label { font-size: 0.75em; letter-spacing: 6px; margin: 0; opacity: 0.8; }
-        .fullscreen-names { font-size: 2.5em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; text-shadow: 0 2px 20px rgba(0,0,0,0.3); word-break: keep-all; }
-        .fullscreen-names span { font-style: italic; opacity: 0.7; margin: 0 8px; }
-        .fullscreen-info { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
-        .fullscreen-info p { font-size: 0.9em; margin: 0; opacity: 0.9; letter-spacing: 1px; }
-        .fullscreen-dday { display: inline-block; padding: 6px 16px; border: 1px solid rgba(255,255,255,0.6); border-radius: 4px; font-size: 0.8em; letter-spacing: 2px; margin-top: 8px; }
-
-        /* Split */
-        .hero-split { display: flex; flex-direction: column; }
-        .split-row { display: flex; min-height: 45vh; }
-        .split-row.reverse { flex-direction: row-reverse; }
-        .split-info { flex: 1; padding: 30px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: var(--wedding-bg); }
-        .split-photo { flex: 1; overflow: hidden; }
-        .split-photo .hero-photo { width: 100%; height: 100%; object-fit: cover; }
-        .split-photo .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; border: none; border-radius: 0; }
-        .split-quote { font-size: 0.8em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0; opacity: 0.7; line-height: 1.5; text-align: center; }
-        .split-label { font-size: 0.6em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0; }
-        .split-divider { width: 24px; height: 1px; background: var(--wedding-border); margin: 8px 0; }
-        .split-name { font-size: 1.5em; font-weight: 300; color: var(--wedding-text-main); margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 3px; }
-        .split-date { font-size: 0.85em; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; }
-        .split-time { font-size: 0.8em; color: var(--wedding-text-sub); margin: 0; }
-        .split-venue { font-size: 0.8em; color: var(--wedding-text-sub); margin: 0; }
-        .split-dday { display: inline-block; margin-top: 6px; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.7em; letter-spacing: 1px; }
-
-        /* Center Card */
-        .hero-centercard { padding: 50px 24px 60px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        .cc-label { font-size: 0.65em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0; }
-        .cc-card { width: 75%; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
-        .cc-img { aspect-ratio: 3/4; }
-        .cc-names { font-size: 1.6em; font-weight: 400; color: var(--wedding-text-main); margin: 8px 0 0; letter-spacing: 2px; }
-        .cc-names span { font-size: 0.7em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; opacity: 0.6; }
-        .cc-divider { width: 30px; height: 1px; background: var(--wedding-border); }
-        .cc-date { font-size: 0.95em; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; font-weight: 500; }
-        .cc-time { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
-        .cc-venue { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
-        .cc-dday { display: inline-block; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
-
-        /* Gradation */
-        .hero-gradation { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; max-height: 100vh; overflow: hidden; }
-        .grad-bg { position: absolute; inset: 0; }
-        .grad-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; }
-        .grad-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
-        .grad-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 30%, color-mix(in srgb, var(--wedding-main) 60%, black) 100%); display: flex; align-items: flex-end; }
-        .grad-bottom { width: 100%; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: white; text-align: center; }
-        .grad-quote { font-size: 0.9em; font-family: 'Dancing Script', cursive; margin: 0; opacity: 0.85; }
-        .grad-names { font-size: 2em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 4px; }
-        .grad-names span { font-style: italic; opacity: 0.7; margin: 0 6px; }
-        .grad-date { font-size: 0.85em; margin: 0; opacity: 0.9; letter-spacing: 1px; }
-        .grad-venue { font-size: 0.8em; margin: 0; opacity: 0.7; }
-        .grad-dday { display: inline-block; padding: 5px 14px; border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
-
-        /* Magazine Cover */
-        .hero-magcover { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; max-height: 100vh; overflow: hidden; }
-        .mag-bg { position: absolute; inset: 0; }
-        .mag-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; }
-        .mag-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
-        .mag-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 50px 24px 40px; box-sizing: border-box; color: white; text-align: center; background: rgba(0,0,0,0.2); }
-        .mag-title { font-size: 3em; font-weight: 700; margin: 0; font-family: 'Playfair Display', serif; letter-spacing: 4px; text-shadow: 0 4px 30px rgba(0,0,0,0.4); line-height: 1.1; }
-        .mag-amp { font-size: 0.5em; font-weight: 300; font-family: 'Cormorant Garamond', serif; font-style: italic; opacity: 0.7; }
-        .mag-bottom { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .mag-label { font-size: 0.7em; letter-spacing: 6px; margin: 0; opacity: 0.8; }
-        .mag-date { font-size: 0.85em; margin: 0; opacity: 0.9; letter-spacing: 1px; }
-        .mag-venue { font-size: 0.8em; margin: 0; opacity: 0.7; }
-        .mag-dday { display: inline-block; padding: 5px 14px; border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
-      `}</style>
     </section>
   );
 }, (prev, next) =>

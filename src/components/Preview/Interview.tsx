@@ -42,19 +42,6 @@ const Interview: React.FC<PreviewProps> = React.memo(({ data }) => {
         </div>
       </PreviewOverlay>
 
-      <style>{`
-        .interview-section { background-color: transparent; padding: 80px 24px; position: relative; z-index: 2; }
-        .itv-content { display: flex; flex-direction: column; gap: 24px; }
-        .interview-qa { display: flex; flex-direction: column; gap: 10px; }
-        .interview-q { display: flex; align-items: center; gap: 12px; }
-        .q-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--wedding-main); color: white; font-size: 0.75em; font-weight: 800; flex-shrink: 0; }
-        .q-text { font-size: 0.95em; font-weight: 700; color: var(--wedding-text-main); text-align: left; }
-        .interview-a-box { background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 16px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .groom-box { border-left: 3px solid var(--wedding-accent); }
-        .bride-box { border-left: 3px solid var(--wedding-main); }
-        .a-name { display: block; font-size: 0.75em; font-weight: 700; color: var(--wedding-main); margin-bottom: 6px; letter-spacing: 1px; }
-        .interview-a-box p { font-size: 0.9em; line-height: 1.7; color: var(--wedding-text-body); margin: 0; word-break: keep-all; }
-      `}</style>
     </section>
   );
 }, (prev, next) => prev.data.interview === next.data.interview && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily && prev.data.groomName === next.data.groomName && prev.data.brideName === next.data.brideName);

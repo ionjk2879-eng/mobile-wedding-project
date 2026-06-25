@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { InvitationData, GuestMessage } from '../../types';
-import { submitGuestMessage, fetchGuestMessages, deleteGuestMessage } from '../../firebase';
+const lazyFirebase = () => import('../../firebase');
 import { toast } from '../../stores/useToastStore';
 import { getFirebaseErrorMessage } from '../../utils/firebaseError';
 import { PreviewOverlay } from '../../hooks/usePreviewPopup';
@@ -80,7 +80,7 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   useEffect(() => {
     if (!data.slug || loaded) return;
-    fetchGuestMessages(data.slug).then(setMessages).catch(() => {}).finally(() => setLoaded(true));
+    lazyFirebase().then(({ fetchGuestMessages }) => fetchGuestMessages(data.slug)).then(setMessages).catch(() => {}).finally(() => setLoaded(true));
   }, [data.slug, loaded]);
 
   if (!data.isGuestbookEnabled) return null;
@@ -95,10 +95,11 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
     if (password.length !== 4 || !/^\d{4}$/.test(password)) { toast.warning(isEn ? '4-digit PIN required.' : '4자리 숫자 비밀번호를 입력해주세요.'); return; }
     setSubmitting(true);
     try {
-      await submitGuestMessage(data.slug, { name: name.trim(), content: content.trim(), password, side });
+      const fb = await lazyFirebase();
+      await fb.submitGuestMessage(data.slug, { name: name.trim(), content: content.trim(), password, side });
       setName(''); setContent(''); setPassword(''); setFormOpen(false);
       toast.success(isEn ? 'Message sent!' : '메시지가 등록되었습니다.');
-      fetchGuestMessages(data.slug).then(setMessages).catch(() => {});
+      fb.fetchGuestMessages(data.slug).then(setMessages).catch(() => {});
     } catch (err) { toast.error(getFirebaseErrorMessage(err)); }
     finally { setSubmitting(false); }
   };
@@ -108,7 +109,8 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
     const slug = data.slug;
     const isAdmin = data.guestbookPassword && deletePassword === data.guestbookPassword;
     try {
-      const ok = await deleteGuestMessage(slug, deleteTarget, deletePassword);
+      const fb = await lazyFirebase();
+      const ok = await fb.deleteGuestMessage(slug, deleteTarget, deletePassword);
       if (ok || isAdmin) {
         if (!ok && isAdmin) { const { deleteDoc: d, doc: r } = await import('firebase/firestore'); const { db } = await import('../../firebase'); await d(r(db, `invitations/${slug}/guestbook`, deleteTarget)); }
         setMessages(prev => prev.filter(m => m.id !== deleteTarget));
@@ -169,42 +171,6 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
         </form>
       </PreviewOverlay>
 
-      <style>{`
-        .guestbook-section { background-color: transparent; }
-
-        .gb-tabs { display: flex; gap: 0; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--wedding-border); }
-        .gb-tab { flex: 1; padding: 12px 8px; background: var(--wedding-card-bg); border: none; font-size: 0.85em; font-weight: 600; color: var(--wedding-text-sub); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .gb-tab.active { background: var(--wedding-main); color: white; }
-        .gb-tab-count { font-size: 0.8em; opacity: 0.7; }
-
-        .gb-slider { margin-top: 14px; }
-        .gb-slide-list { display: flex; flex-direction: column; gap: 10px; min-height: 80px; }
-        .gb-empty { text-align: center; color: var(--wedding-text-sub); font-size: 0.85em; padding: 24px 0; }
-
-        .gb-pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 14px; }
-        .gb-pager-btn { background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 10px; padding: 8px; cursor: pointer; color: var(--wedding-text-main); display: flex; align-items: center; transition: all 0.2s; }
-        .gb-pager-btn:hover:not(:disabled) { border-color: var(--wedding-main); color: var(--wedding-main); }
-        .gb-pager-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .gb-pager-info { font-size: 0.8em; color: var(--wedding-text-sub); font-weight: 600; }
-
-        .gb-item { padding: 16px; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 16px; }
-        .gb-item-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; color: var(--wedding-main); font-size: 0.85em; }
-        .gb-item-header strong { color: var(--wedding-text-main); }
-        .gb-date { margin-left: auto; color: var(--wedding-text-sub); font-size: 0.8em; }
-        .gb-delete-btn { background: none; border: none; color: var(--wedding-text-sub); cursor: pointer; padding: 4px; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; margin-left: 6px; }
-        .gb-delete-btn:hover { color: #EF4444; background: #FEF2F2; }
-        .gb-content { margin: 0; font-size: 0.9em; line-height: 1.6; color: var(--wedding-text-body); white-space: pre-wrap; word-break: keep-all; }
-        .gb-delete-form { display: flex; gap: 6px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--wedding-border); }
-        .gb-del-input { flex: 1; padding: 10px; border: 1px solid var(--wedding-border); border-radius: 10px; background: var(--wedding-bg); font-size: 0.82em; box-sizing: border-box; }
-        .gb-del-input:focus { outline: none; border-color: var(--wedding-main); }
-        .gb-del-confirm { padding: 10px 14px; background: #EF4444; color: white; border: none; border-radius: 10px; font-size: 0.8em; font-weight: 700; cursor: pointer; white-space: nowrap; }
-        .gb-del-cancel { padding: 10px 14px; background: var(--wedding-border); color: var(--wedding-text-sub); border: none; border-radius: 10px; font-size: 0.8em; font-weight: 700; cursor: pointer; white-space: nowrap; }
-
-        .gb-side-pick { display: flex; gap: 8px; }
-        .gb-side-btn { flex: 1; padding: 10px; border: 1px solid var(--wedding-border); border-radius: 10px; background: var(--wedding-card-bg); font-size: 0.85em; font-weight: 600; color: var(--wedding-text-sub); cursor: pointer; transition: all 0.2s; }
-        .gb-side-btn.active { border-color: var(--wedding-main); background: var(--wedding-main); color: white; }
-        .gb-preview-notice { font-size: 0.82em; color: var(--wedding-text-sub); text-align: center; padding: 12px; background: var(--wedding-card-bg); border: 1px dashed var(--wedding-border); border-radius: 12px; margin-top: 8px; }
-      `}</style>
     </section>
   );
 }, (prev, next) => prev.data.isGuestbookEnabled === next.data.isGuestbookEnabled && prev.data.guestbookPassword === next.data.guestbookPassword && prev.data.slug === next.data.slug && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily && prev.data.groomName === next.data.groomName && prev.data.brideName === next.data.brideName);

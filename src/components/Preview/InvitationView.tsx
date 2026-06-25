@@ -1,5 +1,6 @@
 import React from 'react';
 import { InvitationData } from '../../types';
+import '../../styles/preview.css';
 import Hero from './Hero';
 import Greeting from './Greeting';
 import Calendar from './Calendar';
