@@ -7,11 +7,12 @@ export const changeSlug = async (oldSlug: string, newSlug: string): Promise<void
   const uid = getCurrentUser()?.uid;
   if (!uid) throw new Error('로그인이 필요합니다.');
 
+  const oldSnap = await getDoc(doc(db, 'invitations', oldSlug));
+  if (!oldSnap.exists()) throw new Error('기존 청첩장을 찾을 수 없습니다.');
+  if (oldSnap.data()?.ownerUid !== uid) throw new Error('권한이 없습니다.');
+
   const newSnap = await getDoc(doc(db, 'invitations', newSlug));
   if (newSnap.exists()) throw new Error('이미 사용 중인 주소입니다.');
-
-  const oldSnap = await getDoc(doc(db, 'invitations', oldSlug));
-  if (!oldSnap.exists()) throw new Error('청첩장을 찾을 수 없습니다.');
 
   const data = oldSnap.data();
   await setDoc(doc(db, 'invitations', newSlug), { ...data, slug: newSlug, updatedAt: serverTimestamp() });
@@ -64,17 +65,4 @@ export const fetchMyInvitations = async (): Promise<{ slug: string; data: Invita
 
 export const deleteInvitation = async (slug: string): Promise<void> => {
   await deleteDoc(doc(db, 'invitations', slug));
-};
-
-export const changeSlug = async (oldSlug: string, newSlug: string): Promise<void> => {
-  const uid = getCurrentUser()?.uid;
-  if (!uid) throw new Error('로그인이 필요합니다.');
-  const oldSnap = await getDoc(doc(db, 'invitations', oldSlug));
-  if (!oldSnap.exists()) throw new Error('기존 청첩장을 찾을 수 없습니다.');
-  if (oldSnap.data()?.ownerUid !== uid) throw new Error('권한이 없습니다.');
-  const newSnap = await getDoc(doc(db, 'invitations', newSlug));
-  if (newSnap.exists()) throw new Error('이미 사용 중인 주소입니다.');
-  const data = oldSnap.data();
-  await setDoc(doc(db, 'invitations', newSlug), { ...data, slug: newSlug, updatedAt: serverTimestamp() });
-  await deleteDoc(doc(db, 'invitations', oldSlug));
 };
