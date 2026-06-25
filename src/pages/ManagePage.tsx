@@ -208,7 +208,7 @@ const ManagePage: React.FC = () => {
           <div className="manage-grid">
             {invitations.map(({ slug, data }) => (
               <div key={slug} className="mc">
-                <a href={`/w/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-thumb">
+                <a href={`/w/${slug}`} className="mc-thumb">
                   {data.heroPhoto ? (
                     <img src={data.heroPhoto} alt="" className="mc-thumb-img" />
                   ) : (
