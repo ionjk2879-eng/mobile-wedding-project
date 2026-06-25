@@ -275,6 +275,10 @@
 .share-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
 .kakao { background: #fee500; color: #3c1e1e; }
 .link { background: transparent; border: 1px solid var(--wedding-main); color: var(--wedding-main); }
+.share-locked { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 30px 20px; background: var(--wedding-card-bg); border: 1px dashed var(--wedding-border); border-radius: 20px; color: var(--wedding-text-sub); margin-bottom: 40px; }
+.share-locked svg { opacity: 0.4; }
+.share-locked-title { font-size: 0.9em; font-weight: 600; color: var(--wedding-text-main); margin: 4px 0 0; }
+.share-locked-desc { font-size: 0.78em; line-height: 1.6; text-align: center; margin: 0; color: var(--wedding-text-sub); }
 .footer { margin-top: 40px; font-size: 0.75em; color: var(--wedding-text-sub); }
 @media (max-width: 480px) {
   .share-btn { padding: 12px; font-size: 0.82em; gap: 7px; }

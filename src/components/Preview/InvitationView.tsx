@@ -23,9 +23,10 @@ interface InvitationViewProps {
   data: InvitationData;
   previewRefs?: Record<string, React.RefObject<HTMLDivElement>>;
   showOpening?: boolean;
+  shareEnabled?: boolean;
 }
 
-const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement> }> = ({ id, data, refEl }) => {
+const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean }> = ({ id, data, refEl, shareEnabled }) => {
   const wrap = (children: React.ReactNode) => refEl ? <div ref={refEl}>{children}</div> : <>{children}</>;
 
   switch (id) {
@@ -40,14 +41,14 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
     case 'accounts': return wrap(<Money data={data} />);
     case 'contacts': return wrap(<Contacts data={data} />);
     case 'guestbook': return wrap(<Guestbook data={data} />);
-    case 'share': return wrap(<Share data={data} />);
+    case 'share': return wrap(<Share data={data} shareEnabled={shareEnabled} />);
     default: return null;
   }
 };
 
 const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'share'];
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false }) => {
   const sectionOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
 
   return (
@@ -66,7 +67,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         const ref = previewRefs?.[id];
         return (
           <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={data} refEl={ref} />
+            <SectionComponent id={id} data={data} refEl={ref} shareEnabled={shareEnabled} />
           </ScrollReveal>
         );
       })}

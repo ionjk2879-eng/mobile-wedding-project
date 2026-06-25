@@ -51,7 +51,7 @@ const ViewPage: React.FC = () => {
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor, '--wedding-accent': data.customAccentColor } as React.CSSProperties : {}) }}>
         <ScrollRootContext.Provider value={scrollRef}>
-          <InvitationView data={data} showOpening />
+          <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} />
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
       </div>
