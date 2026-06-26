@@ -86,7 +86,7 @@ const AdminPage: React.FC = () => {
         </div>
         <div className="admin-actions">
           <button onClick={fetchResponses} className="admin-btn"><RefreshCw size={18} /> 새로고침</button>
-          <Link to={`/w/${slug}`} className="admin-btn"><ArrowLeft size={18} /> 청첩장 보기</Link>
+          <Link to={`/${slug}`} className="admin-btn"><ArrowLeft size={18} /> 청첩장 보기</Link>
           <button onClick={() => signOut()} className="admin-btn"><LogOut size={18} /> 로그아웃</button>
         </div>
       </header>

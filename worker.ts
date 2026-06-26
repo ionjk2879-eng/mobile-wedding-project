@@ -248,13 +248,14 @@ export default {
       return Response.redirect(`${url.origin}/og-image.png`, 302);
     }
 
-    // /w/{slug} → OG 태그 주입
-    const wMatch = pathname.match(/^\/w\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
-    if (!wMatch) {
+    // /{slug} → OG 태그 주입 (예약 경로 제외)
+    const RESERVED = new Set(['editor', 'edit', 'manage', 'admin', 'auth', 'terms', 'privacy', 'superadmin', 'api', 'og']);
+    const slugMatch = pathname.match(/^\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+    if (!slugMatch || RESERVED.has(slugMatch[1]) || pathname.includes('.')) {
       return env.ASSETS.fetch(request);
     }
 
-    const slug = wMatch[1];
+    const slug = slugMatch[1];
     // Always fetch root index.html — fetching the original /w/slug URL may return a redirect
     const indexRequest = new Request(new URL('/', url.origin).toString(), { headers: request.headers });
     const assetResponse = await env.ASSETS.fetch(indexRequest);

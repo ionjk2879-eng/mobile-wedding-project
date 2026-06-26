@@ -241,7 +241,7 @@ const App: React.FC = () => {
       await saveInvitation(d.slug, d);
       hasSavedOnceRef.current = true;
       setSaveStatus('success');
-      toast.success(`저장 완료! 청첩장 주소: /w/${d.slug}`);
+      toast.success(`저장 완료! 청첩장 주소: /${d.slug}`);
       setShowSavedPopup(true);
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (err) {
@@ -294,7 +294,7 @@ const App: React.FC = () => {
               {showStartScreen.map((slug) => (
                 <div key={slug} className="start-item">
                   <button className="start-btn load" onClick={() => handleLoadExisting(slug)}>
-                    /w/{slug}
+                    /{slug}
                   </button>
                   <button className="start-delete" onClick={() => handleDeleteSlug(slug)} title="삭제">
                     <Trash2 size={15} />

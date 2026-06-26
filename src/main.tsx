@@ -30,7 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/editor" element={<AuthGate><App /></AuthGate>} />
           <Route path="/edit/:slug" element={<AuthGate><App /></AuthGate>} />
           <Route path="/manage" element={<AuthGate><ManagePage /></AuthGate>} />
-          <Route path="/w/:slug" element={<ViewPage />} />
+          <Route path="/:slug" element={<ViewPage />} />
           <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />

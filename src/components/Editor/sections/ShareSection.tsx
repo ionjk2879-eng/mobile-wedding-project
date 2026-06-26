@@ -56,7 +56,7 @@ const ShareSection: React.FC = () => {
       <div className="input-group">
         <label>청첩장 주소</label>
         <div className="slug-input-row">
-          <span className="slug-prefix">/w/</span>
+          <span className="slug-prefix">sonett.kr/</span>
           <input type="text" value={slug || ''} onChange={handleSlugChange} className={`modern-input ${slugStatus === 'taken' || slugStatus === 'invalid' ? 'input-error' : slugStatus === 'available' ? 'input-valid' : ''}`} placeholder="jihyun-minji" />
         </div>
         {slugHint()}

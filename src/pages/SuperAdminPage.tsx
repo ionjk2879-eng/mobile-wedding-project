@@ -90,7 +90,7 @@ const SuperAdminPage: React.FC = () => {
           </label>
           <div style={{ display: 'flex', gap: 8 }}>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1.5px solid #E5E7EB', borderRadius: 10, overflow: 'hidden', transition: 'border-color 0.2s', ...(slug ? { borderColor: '#B07A8E' } : {}) }}>
-              <span style={{ padding: '11px 0 11px 12px', fontSize: '0.85rem', color: '#9CA3AF', fontFamily: 'monospace', flexShrink: 0 }}>/w/</span>
+              <span style={{ padding: '11px 0 11px 12px', fontSize: '0.85rem', color: '#9CA3AF', fontFamily: 'monospace', flexShrink: 0 }}>sonett.kr/</span>
               <input
                 type="text"
                 value={slug}

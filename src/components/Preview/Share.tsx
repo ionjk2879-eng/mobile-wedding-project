@@ -11,15 +11,18 @@ interface PreviewProps {
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 const SITE_ORIGIN = 'https://sonett.kr';
 
+function ensureKakaoInit() {
+  if (!window.Kakao) return false;
+  if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_APP_KEY);
+  return window.Kakao.isInitialized();
+}
+
 const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }) => {
   useEffect(() => {
-    if (!shareEnabled) return;
-    if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init(KAKAO_APP_KEY);
-    }
+    if (shareEnabled) ensureKakaoInit();
   }, [shareEnabled]);
 
-  const shareLink = data.slug ? `${SITE_ORIGIN}/w/${data.slug}` : window.location.href;
+  const shareLink = data.slug ? `${SITE_ORIGIN}/${data.slug}` : window.location.href;
 
   const handleCopyLink = () => {
     if (!shareEnabled) return;
@@ -29,20 +32,27 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
 
   const handleKakaoShare = () => {
     if (!shareEnabled) return;
-    if (!window.Kakao || !window.Kakao.isInitialized()) return;
+    if (!ensureKakaoInit()) {
+      toast.error('카카오 SDK가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
     const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
     const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
     const slug = data.slug || '';
-    window.Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title,
-        description,
-        imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
-        link: { mobileWebUrl: shareLink, webUrl: shareLink },
-      },
-      buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareLink, webUrl: shareLink } }],
-    });
+    try {
+      window.Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title,
+          description,
+          imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
+          link: { mobileWebUrl: shareLink, webUrl: shareLink },
+        },
+        buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareLink, webUrl: shareLink } }],
+      });
+    } catch (e: any) {
+      toast.error(`카카오 공유 오류: ${e?.message || '알 수 없는 오류'}`);
+    }
   };
 
   return (

@@ -14,7 +14,7 @@ const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 const KMONG_SERVICE_URL = 'https://kmong.com'; // TODO: 실제 크몽 서비스 URL로 변경
 
 const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
-  const shareUrl = `${SITE_ORIGIN}/w/${slug}`;
+  const shareUrl = `${SITE_ORIGIN}/${slug}`;
   const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
   const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
 
@@ -85,7 +85,7 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
     setSaving(true);
     try {
       await changeSlug(slug, newSlug);
-      toast.success(`주소가 /w/${newSlug}로 변경되었습니다.`);
+      toast.success(`주소가 /${newSlug}로 변경되었습니다.`);
       onDone();
     } catch (err: any) {
       toast.error(err?.message || '주소 변경에 실패했습니다.');
@@ -103,12 +103,12 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
         <p className="slug-modal-desc">청첩장 주소를 변경합니다. 기존 주소로는 더이상 접속할 수 없습니다.</p>
         <div className="slug-modal-current">
           <span className="slug-modal-label">현재 주소</span>
-          <span className="slug-modal-value">/w/{slug}</span>
+          <span className="slug-modal-value">sonett.kr/{slug}</span>
         </div>
         <div className="slug-modal-field">
           <span className="slug-modal-label">새 주소</span>
           <div className="slug-modal-input-wrap">
-            <span className="slug-modal-prefix">/w/</span>
+            <span className="slug-modal-prefix">sonett.kr/</span>
             <input
               type="text"
               className="slug-modal-input"
@@ -224,7 +224,7 @@ const ManagePage: React.FC = () => {
           <div className="mc-grid">
             {invitations.map(({ slug, data }) => (
               <div key={slug} className="mc-card">
-                <a href={`/w/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-thumb-link">
+                <a href={`/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-thumb-link">
                   <div className="mc-thumb">
                     {data.heroPhoto ? (
                       <img
@@ -251,7 +251,7 @@ const ManagePage: React.FC = () => {
                         : slug}
                     </h3>
                     {data.date && <p className="mc-date">{data.date}</p>}
-                    <p className="mc-slug">/w/{slug}</p>
+                    <p className="mc-slug">sonett.kr/{slug}</p>
                     {(() => {
                       const expiry = getExpiryInfo(data);
                       if (!expiry) return null;
