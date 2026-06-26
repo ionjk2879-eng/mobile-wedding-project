@@ -10,14 +10,10 @@ export function usePreviewRect(anchorRef: RefObject<HTMLElement | null>, open: b
     if (scroll) { setRect(scroll.getBoundingClientRect()); return; }
     const fullPreview = anchorRef.current.closest('.full-preview-container');
     if (fullPreview) {
+      const cr = fullPreview.getBoundingClientRect();
       const page = fullPreview.querySelector('.invitation-page');
-      if (page) {
-        const r = page.getBoundingClientRect();
-        // 뷰포트 높이로 클램프 — invitation-page는 컨텐츠 전체 높이이므로 팝업이 화면 밖으로 넘침
-        setRect(new DOMRect(r.left, 0, r.width, window.innerHeight));
-      } else {
-        setRect(fullPreview.getBoundingClientRect());
-      }
+      const pr = page ? page.getBoundingClientRect() : cr;
+      setRect({ top: cr.top, left: pr.left, right: pr.left + pr.width, bottom: cr.top + cr.height, x: pr.left, y: cr.top, width: pr.width, height: cr.height, toJSON() { return this; } } as DOMRect);
       return;
     }
     const viewContainer = anchorRef.current.closest('.view-container');
