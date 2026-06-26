@@ -40,6 +40,31 @@ const ViewPage: React.FC = () => {
   if (loading) return null;
   if (error || !data) return <div className="view-error" role="alert"><h2>청첩장을 찾을 수 없습니다</h2><p>주소를 다시 확인해주세요.</p></div>;
 
+  const isExpired = data.expiresAt && new Date(data.expiresAt) < new Date();
+  if (isExpired) return (
+    <div className="view-error" role="alert">
+      <p className="view-expired-icon">🕊️</p>
+      <h2>보관 기간이 종료되었습니다</h2>
+      <p>이 청첩장의 보관 기간이 만료되었습니다.<br />청첩장 제작자에게 문의해 주세요.</p>
+      <a href={SITE_ORIGIN} className="view-expired-link">Sonett에서 청첩장 만들기</a>
+      <style>{`
+        .view-expired-icon { font-size: 2.5rem; margin: 0 0 12px; }
+        .view-expired-link {
+          display: inline-block;
+          margin-top: 20px;
+          padding: 12px 28px;
+          background: #B07A8E;
+          color: white;
+          border-radius: 30px;
+          text-decoration: none;
+          font-size: 0.9rem;
+          font-weight: 600;
+          font-family: 'Pretendard', sans-serif;
+        }
+      `}</style>
+    </div>
+  );
+
   const getBaseFontSize = () => {
     switch (data.fontSize) { case 'small': return '13px'; case 'large': return '16px'; default: return '14.5px'; }
   };

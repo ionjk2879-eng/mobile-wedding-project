@@ -122,6 +122,8 @@ export interface SharingConfig {
   shareDescription: string;
   kakaoAppKey: string;
   isPaid?: boolean;
+  expiresAt?: string | null; // null = 영구, ISO string = 만료일, undefined = 미설정
+  isPermanent?: boolean;
 }
 
 export type InvitationData = BasicInfo & DesignConfig & ContentData & FeatureConfig & SharingConfig;

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../firebase';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe } from 'lucide-react';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
@@ -165,6 +165,16 @@ const CardDropdown: React.FC<{ slug: string; onDelete: () => void; onChangeSlug:
   );
 };
 
+function getExpiryInfo(data: InvitationData): { label: string; urgent: boolean } | null {
+  if (!data.expiresAt) return null;
+  const diff = Math.ceil((new Date(data.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  if (diff < 0) return { label: '만료됨', urgent: true };
+  if (!data.isPaid) return { label: `D-${diff} 삭제 예정`, urgent: diff <= 3 };
+  if (diff <= 30) return { label: `D-${diff} 만료`, urgent: diff <= 7 };
+  const date = new Date(data.expiresAt);
+  return { label: `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} 만료`, urgent: false };
+}
+
 const ManagePage: React.FC = () => {
   const [invitations, setInvitations] = useState<{ slug: string; data: InvitationData }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -235,7 +245,21 @@ const ManagePage: React.FC = () => {
                     </h3>
                     {data.date && <p className="mc-date">{data.date}</p>}
                     <p className="mc-slug">/w/{slug}</p>
+                    {(() => {
+                      const expiry = getExpiryInfo(data);
+                      if (!expiry) return null;
+                      return (
+                        <span className={`mc-expiry-badge ${expiry.urgent ? 'urgent' : ''}`}>
+                          {expiry.label}
+                        </span>
+                      );
+                    })()}
                   </div>
+                  {!data.isPaid && (
+                    <button className="mc-purchase-btn" onClick={() => toast.info('결제 기능 준비 중입니다.')}>
+                      <ShoppingCart size={13} /> 19,900원 · 1년 보관
+                    </button>
+                  )}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
                       <Share2 size={14} /> 공유
@@ -389,6 +413,39 @@ const ManagePage: React.FC = () => {
           color: #9CA3AF;
           margin: 0;
         }
+        .mc-expiry-badge {
+          display: inline-block;
+          margin-top: 6px;
+          padding: 3px 8px;
+          border-radius: 20px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          background: #F3F4F6;
+          color: #6B7280;
+        }
+        .mc-expiry-badge.urgent {
+          background: #FEF2F2;
+          color: #DC2626;
+        }
+        .mc-purchase-btn {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          width: 100%;
+          margin: 10px 0 4px;
+          padding: 9px 0;
+          border-radius: 10px;
+          background: linear-gradient(135deg, #B07A8E, #C994A8);
+          color: white;
+          font-size: 0.78rem;
+          font-weight: 700;
+          border: none;
+          cursor: pointer;
+          justify-content: center;
+          font-family: inherit;
+          transition: opacity 0.15s;
+        }
+        .mc-purchase-btn:hover { opacity: 0.88; }
 
         /* Actions */
         .mc-actions {

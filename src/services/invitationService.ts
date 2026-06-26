@@ -1,4 +1,4 @@
-import { getDoc, setDoc, deleteDoc, doc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { getDoc, setDoc, deleteDoc, updateDoc, doc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from './index';
 import { InvitationData } from '../types';
 import { getCurrentUser } from './auth';
@@ -32,12 +32,44 @@ export const changeSlug = async (oldSlug: string, newSlug: string): Promise<void
   await deleteDoc(doc(db, 'invitations', oldSlug));
 };
 
+function weddingPlusOneYear(weddingDateISO: string): string {
+  const d = new Date(weddingDateISO);
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString();
+}
+
 export const saveInvitation = async (slug: string, data: InvitationData) => {
   const uid = getCurrentUser()?.uid;
   if (!uid) throw new Error('로그인이 필요합니다.');
+
+  let expiresAt: string | null;
+  if (data.isPaid && data.expiresAt !== undefined) {
+    // 이미 결제된 청첩장 — 기존 만료일 유지
+    expiresAt = data.expiresAt ?? null;
+  } else if (data.isPaid && data.weddingDateISO) {
+    // 결제 완료, 결혼일 기준 +1년
+    expiresAt = weddingPlusOneYear(data.weddingDateISO);
+  } else {
+    // 미구매 — 저장일 기준 7일
+    expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  }
+
   await setDoc(doc(db, 'invitations', slug), {
     ...data,
     ownerUid: uid,
+    updatedAt: serverTimestamp(),
+    expiresAt,
+  });
+};
+
+export const activatePaidInvitation = async (slug: string, weddingDateISO: string): Promise<void> => {
+  const uid = getCurrentUser()?.uid;
+  if (!uid) throw new Error('로그인이 필요합니다.');
+  const snap = await getDoc(doc(db, 'invitations', slug));
+  if (!snap.exists() || snap.data()?.ownerUid !== uid) throw new Error('권한이 없습니다.');
+  await updateDoc(doc(db, 'invitations', slug), {
+    isPaid: true,
+    expiresAt: weddingPlusOneYear(weddingDateISO),
     updatedAt: serverTimestamp(),
   });
 };
