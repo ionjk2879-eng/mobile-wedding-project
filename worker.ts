@@ -255,7 +255,9 @@ export default {
     }
 
     const slug = wMatch[1];
-    const assetResponse = await env.ASSETS.fetch(request);
+    // Always fetch root index.html — fetching the original /w/slug URL may return a redirect
+    const indexRequest = new Request(new URL('/', url.origin).toString(), { headers: request.headers });
+    const assetResponse = await env.ASSETS.fetch(indexRequest);
 
     try {
       const f = await fetchInvitation(slug);
