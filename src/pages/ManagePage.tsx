@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+﻿import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../firebase';
 import { InvitationData } from '../types';
@@ -9,13 +9,13 @@ import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
 
-const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
+const SITE_ORIGIN = 'https://sonett.kr';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
-const KMONG_SERVICE_URL = 'https://kmong.com'; // TODO: 실제 크몽 서비스 URL로 변경
+const KMONG_SERVICE_URL = 'https://kmong.com'; // TODO: ?ㅼ젣 ?щそ ?쒕퉬??URL濡?蹂寃?
 
 const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
   const shareUrl = `${SITE_ORIGIN}/w/${slug}`;
-  const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
+  const title = data.shareTitle || `${data.groomName || '?좊옉'} ??${data.brideName || '?좊?'} 寃고샎?⑸땲??;
   const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
 
   useEffect(() => {
@@ -26,12 +26,12 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
-    toast.success('링크가 복사되었습니다.');
+    toast.success('留곹겕媛 蹂듭궗?섏뿀?듬땲??');
   };
 
   const handleKakaoShare = () => {
     if (!window.Kakao || !window.Kakao.isInitialized()) {
-      toast.error('카카오 SDK를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      toast.error('移댁뭅??SDK瑜?遺덈윭?ㅻ뒗 以묒엯?덈떎. ?좎떆 ???ㅼ떆 ?쒕룄?댁＜?몄슂.');
       return;
     }
     window.Kakao.Share.sendDefault({
@@ -42,33 +42,33 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
         imageUrl: `${SITE_ORIGIN}/og/${slug}`,
         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
       },
-      buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+      buttons: [{ title: '泥?꺽??蹂닿린', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
     });
   };
 
   const handleUrlShare = () => {
     navigator.clipboard.writeText(shareUrl);
-    toast.success('URL이 복사되었습니다. 붙여넣기로 공유하세요.');
+    toast.success('URL??蹂듭궗?섏뿀?듬땲?? 遺숈뿬?ｊ린濡?怨듭쑀?섏꽭??');
   };
 
   return (
     <div className="share-modal-overlay" onClick={onClose}>
       <div className="share-modal" onClick={(e) => e.stopPropagation()}>
         <div className="share-modal-header">
-          <h3>청첩장 공유</h3>
+          <h3>泥?꺽??怨듭쑀</h3>
           <button className="share-modal-close" onClick={onClose}><X size={20} /></button>
         </div>
         <div className="share-modal-qr">
           <QRCodeSVG value={shareUrl} size={140} level="M" bgColor="transparent" fgColor="#1F2937" className="share-qr-svg" />
-          <p className="share-modal-qr-hint">QR 코드를 스캔하면 청첩장으로 이동합니다</p>
+          <p className="share-modal-qr-hint">QR 肄붾뱶瑜??ㅼ틪?섎㈃ 泥?꺽?μ쑝濡??대룞?⑸땲??/p>
         </div>
         <div className="share-modal-url">
           <input type="text" readOnly value={shareUrl} className="share-modal-url-input" />
         </div>
         <div className="share-modal-actions">
-          <button className="share-modal-btn copy" onClick={handleCopyLink}><LinkIcon size={18} /> 링크 복사</button>
-          <button className="share-modal-btn url-share" onClick={handleUrlShare}><Share2 size={18} /> URL 공유</button>
-          <button className="share-modal-btn kakao" onClick={handleKakaoShare}><Share2 size={18} /> 카카오톡</button>
+          <button className="share-modal-btn copy" onClick={handleCopyLink}><LinkIcon size={18} /> 留곹겕 蹂듭궗</button>
+          <button className="share-modal-btn url-share" onClick={handleUrlShare}><Share2 size={18} /> URL 怨듭쑀</button>
+          <button className="share-modal-btn kakao" onClick={handleKakaoShare}><Share2 size={18} /> 移댁뭅?ㅽ넚</button>
         </div>
       </div>
     </div>
@@ -85,10 +85,10 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
     setSaving(true);
     try {
       await changeSlug(slug, newSlug);
-      toast.success(`주소가 /w/${newSlug} 로 변경되었습니다.`);
+      toast.success(`二쇱냼媛 /w/${newSlug} 濡?蹂寃쎈릺?덉뒿?덈떎.`);
       onDone();
     } catch (err: any) {
-      toast.error(err?.message || '주소 변경에 실패했습니다.');
+      toast.error(err?.message || '二쇱냼 蹂寃쎌뿉 ?ㅽ뙣?덉뒿?덈떎.');
     }
     setSaving(false);
   };
@@ -97,16 +97,16 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
     <div className="share-modal-overlay" onClick={onClose}>
       <div className="slug-modal" onClick={(e) => e.stopPropagation()}>
         <div className="share-modal-header">
-          <h3>도메인 변경</h3>
+          <h3>?꾨찓??蹂寃?/h3>
           <button className="share-modal-close" onClick={onClose}><X size={20} /></button>
         </div>
-        <p className="slug-modal-desc">청첩장 주소를 변경합니다. 기존 주소로는 더 이상 접속할 수 없습니다.</p>
+        <p className="slug-modal-desc">泥?꺽??二쇱냼瑜?蹂寃쏀빀?덈떎. 湲곗〈 二쇱냼濡쒕뒗 ???댁긽 ?묒냽?????놁뒿?덈떎.</p>
         <div className="slug-modal-current">
-          <span className="slug-modal-label">현재 주소</span>
+          <span className="slug-modal-label">?꾩옱 二쇱냼</span>
           <span className="slug-modal-value">/w/{slug}</span>
         </div>
         <div className="slug-modal-field">
-          <span className="slug-modal-label">새 주소</span>
+          <span className="slug-modal-label">??二쇱냼</span>
           <div className="slug-modal-input-wrap">
             <span className="slug-modal-prefix">/w/</span>
             <input
@@ -118,13 +118,13 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
             />
           </div>
           {newSlug && !(/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(newSlug)) && (
-            <p className="slug-modal-hint error">영문 소문자, 숫자, 하이픈만 사용 가능합니다.</p>
+            <p className="slug-modal-hint error">?곷Ц ?뚮Ц?? ?レ옄, ?섏씠?덈쭔 ?ъ슜 媛?ν빀?덈떎.</p>
           )}
         </div>
         <div className="slug-modal-actions">
-          <button className="slug-modal-btn cancel" onClick={onClose}>취소</button>
+          <button className="slug-modal-btn cancel" onClick={onClose}>痍⑥냼</button>
           <button className="slug-modal-btn confirm" disabled={!valid || saving} onClick={handleSubmit}>
-            {saving ? '변경 중...' : '변경하기'}
+            {saving ? '蹂寃?以?..' : '蹂寃쏀븯湲?}
           </button>
         </div>
       </div>
@@ -154,17 +154,17 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; onDelete: () => v
         <div className="mc-dropdown-menu" onClick={(e) => e.stopPropagation()}>
           {isPaid && (
             <button className="mc-dropdown-item highlight" onClick={() => { setOpen(false); onDownloadHtml(); }}>
-              <Download size={14} /> 영구보관 HTML
+              <Download size={14} /> ?곴뎄蹂닿? HTML
             </button>
           )}
           <button className="mc-dropdown-item" onClick={() => { setOpen(false); onChangeSlug(); }}>
-            <Globe size={14} /> 도메인 변경
+            <Globe size={14} /> ?꾨찓??蹂寃?
           </button>
           <a href={`/admin/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-dropdown-item" onClick={() => setOpen(false)}>
-            <ClipboardList size={14} /> 응답 확인
+            <ClipboardList size={14} /> ?묐떟 ?뺤씤
           </a>
           <button className="mc-dropdown-item danger" onClick={() => { setOpen(false); onDelete(); }}>
-            <Trash2 size={14} /> 삭제
+            <Trash2 size={14} /> ??젣
           </button>
         </div>
       )}
@@ -175,11 +175,11 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; onDelete: () => v
 function getExpiryInfo(data: InvitationData): { label: string; urgent: boolean } | null {
   if (!data.expiresAt) return null;
   const diff = Math.ceil((new Date(data.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return { label: '만료됨', urgent: true };
-  if (!data.isPaid) return { label: `D-${diff} 삭제 예정`, urgent: diff <= 3 };
-  if (diff <= 30) return { label: `D-${diff} 만료`, urgent: diff <= 7 };
+  if (diff < 0) return { label: '留뚮즺??, urgent: true };
+  if (!data.isPaid) return { label: `D-${diff} ??젣 ?덉젙`, urgent: diff <= 3 };
+  if (diff <= 30) return { label: `D-${diff} 留뚮즺`, urgent: diff <= 7 };
   const date = new Date(data.expiresAt);
-  return { label: `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} 만료`, urgent: false };
+  return { label: `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} 留뚮즺`, urgent: false };
 }
 
 const ManagePage: React.FC = () => {
@@ -195,13 +195,13 @@ const ManagePage: React.FC = () => {
   useEffect(load, []);
 
   const handleDelete = async (slug: string) => {
-    if (!confirm(`'${slug}' 청첩장을 삭제하시겠습니까?`)) return;
+    if (!confirm(`'${slug}' 泥?꺽?μ쓣 ??젣?섏떆寃좎뒿?덇퉴?`)) return;
     try {
       await deleteInvitation(slug);
-      toast.success(`'${slug}' 청첩장이 삭제되었습니다.`);
+      toast.success(`'${slug}' 泥?꺽?μ씠 ??젣?섏뿀?듬땲??`);
       load();
     } catch {
-      toast.error('삭제에 실패했습니다.');
+      toast.error('??젣???ㅽ뙣?덉뒿?덈떎.');
     }
   };
 
@@ -212,13 +212,13 @@ const ManagePage: React.FC = () => {
       <SiteHeader />
       <ToastContainer />
       <main className="manage-main">
-        <h2 className="manage-title">내 청첩장</h2>
+        <h2 className="manage-title">??泥?꺽??/h2>
         {loading ? (
-          <p className="manage-empty">불러오는 중...</p>
+          <p className="manage-empty">遺덈윭?ㅻ뒗 以?..</p>
         ) : invitations.length === 0 ? (
           <div className="manage-empty">
-            <p>아직 만든 청첩장이 없습니다.</p>
-            <Link to="/editor" className="manage-cta">청첩장 만들기</Link>
+            <p>?꾩쭅 留뚮뱺 泥?꺽?μ씠 ?놁뒿?덈떎.</p>
+            <Link to="/editor" className="manage-cta">泥?꺽??留뚮뱾湲?/Link>
           </div>
         ) : (
           <div className="mc-grid">
@@ -235,11 +235,11 @@ const ManagePage: React.FC = () => {
                       />
                     ) : (
                       <div className="mc-thumb-empty">
-                        <span>사진 없음</span>
+                        <span>?ъ쭊 ?놁쓬</span>
                       </div>
                     )}
                     <div className="mc-thumb-overlay">
-                      <span>청첩장 보기</span>
+                      <span>泥?꺽??蹂닿린</span>
                     </div>
                   </div>
                 </a>
@@ -264,15 +264,15 @@ const ManagePage: React.FC = () => {
                   </div>
                   {!data.isPaid && (
                     <a href={KMONG_SERVICE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
-                      <ShoppingCart size={13} /> 크몽에서 의뢰하시면 워터마크가 제거됩니다
+                      <ShoppingCart size={13} /> ?щそ?먯꽌 ?섎ː?섏떆硫??뚰꽣留덊겕媛 ?쒓굅?⑸땲??
                     </a>
                   )}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
-                      <Share2 size={14} /> 공유
+                      <Share2 size={14} /> 怨듭쑀
                     </button>
                     <Link to={`/edit/${slug}`} className="mc-action-btn mc-edit-btn">
-                      <Edit3 size={14} /> 편집
+                      <Edit3 size={14} /> ?몄쭛
                     </Link>
                     <CardDropdown
                       slug={slug}
@@ -282,9 +282,9 @@ const ManagePage: React.FC = () => {
                       onDownloadHtml={() => {
                         try {
                           downloadInvitationHtml(data);
-                          toast.success('HTML 파일이 다운로드되었습니다.');
+                          toast.success('HTML ?뚯씪???ㅼ슫濡쒕뱶?섏뿀?듬땲??');
                         } catch {
-                          toast.error('HTML 생성에 실패했습니다.');
+                          toast.error('HTML ?앹꽦???ㅽ뙣?덉뒿?덈떎.');
                         }
                       }}
                     />
@@ -821,3 +821,4 @@ const ManagePage: React.FC = () => {
 };
 
 export default ManagePage;
+

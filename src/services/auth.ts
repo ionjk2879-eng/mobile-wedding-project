@@ -1,4 +1,4 @@
-import {
+﻿import {
   getAuth,
   signInWithPopup,
   signInWithCustomToken as firebaseSignInWithCustomToken,
@@ -19,7 +19,7 @@ const getAuthInstance = (): Auth => {
 };
 
 const API_BASE = import.meta.env.VITE_FUNCTIONS_URL
-  || 'https://sonett.ionjk2879.workers.dev';
+  || 'https://sonett.kr';
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
@@ -87,7 +87,7 @@ export const exchangeCodeForToken = async (
 
   if (!res.ok) {
     const errBody = await res.json().catch(() => ({}));
-    throw new Error(errBody.detail || errBody.error || '로그인 처리에 실패했습니다.');
+    throw new Error(errBody.detail || errBody.error || '濡쒓렇??泥섎━???ㅽ뙣?덉뒿?덈떎.');
   }
   return await res.json();
 };
@@ -112,3 +112,4 @@ export const deleteAccount = async () => {
 
 export const onAuthChanged = (callback: (user: User | null) => void) =>
   onAuthStateChanged(getAuthInstance(), callback);
+
