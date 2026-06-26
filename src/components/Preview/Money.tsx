@@ -121,10 +121,12 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   if (!hasAnyAccount) return null;
 
-  const renderAccountItem = (acc: typeof data.accounts[0], index: number) => (
+  const renderAccountItem = (acc: typeof data.accounts[0], index: number) => {
+    const isGroom = acc.side.startsWith('신랑') || acc.side.toLowerCase().startsWith('groom');
+    return (
     <div key={index} className="account-item">
       <div className="account-info">
-        <span className="side-label">{acc.side}</span>
+        <span className={`side-label ${isGroom ? 'groom' : 'bride'}`}>{acc.side}</span>
         <div className="account-owner">{acc.owner}</div>
         <div className="account-number-row">
           <span className="account-number">{formatAccountNumber(acc.bank, acc.number)}</span>
@@ -138,6 +140,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
       </div>
     </div>
   );
+  };
 
   const renderAccounts = () => {
     const filled = data.accounts.filter(hasContent);

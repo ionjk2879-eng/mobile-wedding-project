@@ -213,7 +213,9 @@
 .money-desc { font-size: 0.9em; color: var(--wedding-text-sub); margin-bottom: 30px; white-space: pre-line; }
 .account-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 50px; }
 .account-item { background: var(--wedding-card-bg); padding: 20px; border-radius: 14px; text-align: left; border: 1px solid var(--wedding-border); }
-.side-label { font-size: 0.75em; color: var(--wedding-main); display: block; margin-bottom: 6px; font-weight: 600; }
+.side-label { font-size: 0.72em; display: inline-block; margin-bottom: 8px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.03em; }
+.side-label.groom { background: var(--wedding-card-bg); color: var(--wedding-main); border: 1px solid var(--wedding-border); }
+.side-label.bride { background: var(--wedding-main); color: #fff; }
 .account-owner { font-size: 1.05em; font-weight: 700; color: var(--wedding-text-main); margin-bottom: 8px; }
 .account-number-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .account-number { font-size: 0.9em; color: var(--wedding-text-body); letter-spacing: 0.3px; }
