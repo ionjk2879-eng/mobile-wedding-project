@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Navigation, Train, Bus, Car } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { loadKakaoMaps } from '../../utils/loadScript';
@@ -13,9 +13,10 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
   const venueAddress = isEn && data.en.venueAddress ? data.en.venueAddress : data.venueAddress;
 
   const mapRef = useRef<HTMLDivElement>(null);
-  const coordsRef = useRef<{ lat: number; lng: number } | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
+    setCoords(null);
     if (!data.venueAddress || !mapRef.current) return;
     const container = mapRef.current;
     let cancelled = false;
@@ -33,10 +34,10 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
         if (status === window.kakao.maps.services.Status.OK) {
           const lat = parseFloat(result[0].y);
           const lng = parseFloat(result[0].x);
-          coordsRef.current = { lat, lng };
-          const coords = new window.kakao.maps.LatLng(lat, lng);
-          new window.kakao.maps.Marker({ map, position: coords });
-          map.setCenter(coords);
+          setCoords({ lat, lng });
+          const pos = new window.kakao.maps.LatLng(lat, lng);
+          new window.kakao.maps.Marker({ map, position: pos });
+          map.setCenter(pos);
         }
       });
     }).catch(() => {});
@@ -45,28 +46,32 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
   }, [data.venueAddress]);
 
   const searchQuery = encodeURIComponent(data.venueAddress || venueName || '');
-  const nameQuery = encodeURIComponent(venueName || '');
+  const nameQuery = encodeURIComponent(venueName || data.venueAddress || '');
 
   const navLinks = [
     {
       name: '카카오맵',
       color: '#FEE500',
       textColor: '#3C1E1E',
-      url: coordsRef.current
-        ? `https://map.kakao.com/link/to/${nameQuery},${coordsRef.current.lat},${coordsRef.current.lng}`
+      url: coords
+        ? `https://map.kakao.com/link/to/${nameQuery},${coords.lat},${coords.lng}`
         : `https://map.kakao.com/link/search/${searchQuery}`,
     },
     {
       name: '네이버 지도',
       color: '#03C75A',
       textColor: '#fff',
-      url: `https://map.naver.com/v5/search/${searchQuery}`,
+      url: coords
+        ? `https://map.naver.com/v5/directions/-/-/${coords.lng},${coords.lat},${nameQuery}/car`
+        : `https://map.naver.com/v5/search/${searchQuery}`,
     },
     {
       name: 'T맵',
       color: '#EF4036',
       textColor: '#fff',
-      url: `https://tmap.life/search?query=${searchQuery}`,
+      url: coords
+        ? `https://tmap.life/route?goalname=${nameQuery}&goalx=${coords.lng}&goaly=${coords.lat}`
+        : `https://tmap.life/search?query=${searchQuery}`,
     },
   ];
 
