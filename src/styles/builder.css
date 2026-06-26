@@ -51,6 +51,7 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .autosave-toggle { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.75rem; font-weight: 700; color: #9CA3AF; background: #F9FAFB; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
 .autosave-toggle.active { color: #16A34A; border-color: #BBF7D0; background: #F0FDF4; }
+.autosave-indicator { font-size: 0.75rem; color: #9CA3AF; white-space: nowrap; }
 .header-text-btn { padding: 8px 14px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.78rem; font-weight: 700; color: #6B7280; text-decoration: none; transition: all 0.2s; background: #FFFFFF; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
 .header-text-btn:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
 .header-text-btn.reset { color: #9CA3AF; }

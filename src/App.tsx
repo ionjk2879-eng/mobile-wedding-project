@@ -106,6 +106,8 @@ const App: React.FC = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
   const hasSavedOnceRef = useRef(false);
+  const dataReadyRef = useRef(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   useEffect(() => { loadAllFonts(); }, []);
 
@@ -122,14 +124,14 @@ const App: React.FC = () => {
         } else {
           setShowStartScreen([]);
         }
-      }).catch(() => { setShowStartScreen([]); }).finally(() => setLoadingData(false));
+      }).catch(() => { setShowStartScreen([]); }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
     } else {
       fetchMyInvitations().then((items) => {
         history.replaceState({ screen: 'start' }, '', '/');
         setShowStartScreen(items.map((item) => item.slug));
       }).catch(() => {
         setShowStartScreen([]);
-      }).finally(() => setLoadingData(false));
+      }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
     }
   }, []);
 
@@ -199,6 +201,31 @@ const App: React.FC = () => {
   saveStatusRef.current = saveStatus;
   const dataRef = useRef(data);
   dataRef.current = data;
+
+  const autoSaveStatusRef = useRef(autoSaveStatus);
+  autoSaveStatusRef.current = autoSaveStatus;
+
+  const performAutoSave = useCallback(async () => {
+    const d = dataRef.current;
+    if (!d.slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(d.slug)) return;
+    if (saveStatusRef.current === 'saving' || autoSaveStatusRef.current === 'saving') return;
+    setAutoSaveStatus('saving');
+    try {
+      await saveInvitation(d.slug, d);
+      setAutoSaveStatus('saved');
+      setTimeout(() => setAutoSaveStatus('idle'), 2000);
+    } catch {
+      setAutoSaveStatus('idle');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!dataReadyRef.current) return;
+    if (!hasSavedOnceRef.current) return;
+    const timer = setTimeout(() => { performAutoSave(); }, 3000);
+    return () => clearTimeout(timer);
+  }, [data, performAutoSave]);
+
   const performSave = useCallback(async () => {
     const d = dataRef.current;
     if (!d.slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(d.slug)) return;
@@ -328,6 +355,11 @@ const App: React.FC = () => {
           <h1 className="header-logo">Sonett</h1>
         </div>
         <div className="topbar-right">
+          {hasSavedOnceRef.current && autoSaveStatus !== 'idle' && (
+            <span className="autosave-indicator">
+              {autoSaveStatus === 'saving' ? '저장 중...' : '자동 저장됨'}
+            </span>
+          )}
           <button className="save-btn" disabled={saveStatus === 'saving'} onClick={() => {
             if (!data.slug) { toast.warning('청첩장 주소를 먼저 설정해주세요.'); return; }
             if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) { toast.warning('주소는 영문 소문자, 숫자, 하이픈만 사용 가능합니다.'); return; }
