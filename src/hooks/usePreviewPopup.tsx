@@ -7,8 +7,15 @@ export function usePreviewRect(anchorRef: RefObject<HTMLElement | null>, open: b
   const update = useCallback(() => {
     if (!anchorRef.current) return;
     const scroll = anchorRef.current.closest('.preview-content-scroll');
-    const target = scroll || anchorRef.current.closest('.full-preview-container');
-    if (target) setRect(target.getBoundingClientRect());
+    if (scroll) { setRect(scroll.getBoundingClientRect()); return; }
+    const fullPreview = anchorRef.current.closest('.full-preview-container');
+    if (fullPreview) {
+      const page = fullPreview.querySelector('.invitation-page');
+      setRect((page ?? fullPreview).getBoundingClientRect());
+      return;
+    }
+    const viewContainer = anchorRef.current.closest('.view-container');
+    if (viewContainer) setRect(viewContainer.getBoundingClientRect());
   }, [anchorRef]);
 
   useEffect(() => {
