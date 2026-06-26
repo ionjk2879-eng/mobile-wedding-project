@@ -263,7 +263,7 @@ const ManagePage: React.FC = () => {
                   </div>
                   {!data.isPaid && (
                     <button className="mc-purchase-btn" onClick={() => toast.info('결제 기능 준비 중입니다.')}>
-                      <ShoppingCart size={13} /> 19,900원 · 1년 보관
+                      <ShoppingCart size={13} /> 구매하시면 워터마크가 제거됩니다
                     </button>
                   )}
                   <div className="mc-actions">
