@@ -6,18 +6,34 @@ export function usePreviewRect(anchorRef: RefObject<HTMLElement | null>, open: b
 
   const update = useCallback(() => {
     if (!anchorRef.current) return;
+
+    // 에디터 사이드바 미리보기 패널
     const scroll = anchorRef.current.closest('.preview-content-scroll');
     if (scroll) { setRect(scroll.getBoundingClientRect()); return; }
+
+    // invitation-page로 가로 위치/너비 결정
+    const invPage = anchorRef.current.closest('.invitation-page');
+    const pr = invPage?.getBoundingClientRect();
+
+    const makeRect = (top: number, height: number) => ({
+      top, left: pr?.left ?? 0,
+      right: (pr?.left ?? 0) + (pr?.width ?? window.innerWidth),
+      bottom: top + height,
+      x: pr?.left ?? 0, y: top,
+      width: pr?.width ?? window.innerWidth, height,
+      toJSON() { return this; },
+    } as DOMRect);
+
+    // 에디터 전체보기
     const fullPreview = anchorRef.current.closest('.full-preview-container');
     if (fullPreview) {
       const cr = fullPreview.getBoundingClientRect();
-      const page = fullPreview.querySelector('.invitation-page');
-      const pr = page ? page.getBoundingClientRect() : cr;
-      setRect({ top: cr.top, left: pr.left, right: pr.left + pr.width, bottom: cr.top + cr.height, x: pr.left, y: cr.top, width: pr.width, height: cr.height, toJSON() { return this; } } as DOMRect);
+      setRect(makeRect(cr.top, cr.height));
       return;
     }
-    const viewContainer = anchorRef.current.closest('.view-container');
-    if (viewContainer) setRect(viewContainer.getBoundingClientRect());
+
+    // ViewPage 등: 뷰포트 전체 높이
+    setRect(makeRect(0, window.innerHeight));
   }, [anchorRef]);
 
   useEffect(() => {

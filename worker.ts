@@ -257,8 +257,9 @@ export default {
 
     const slug = slugMatch[1];
 
-    // index.html을 /index.html로 명시적으로 요청 (/ 요청은 리다이렉트 응답을 줄 수 있음)
-    const getIndexHtml = () => env.ASSETS.fetch(new Request(`${url.origin}/index.html`));
+    // 존재하지 않는 경로로 요청해서 SPA fallback(index.html 200 OK)을 확실히 받음
+    // /index.html은 301 → / 리다이렉트를 반환할 수 있으므로 사용하지 않음
+    const getIndexHtml = () => env.ASSETS.fetch(new Request(`${url.origin}/__spa__`));
 
     try {
       const f = await fetchInvitation(slug);
