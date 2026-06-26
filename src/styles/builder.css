@@ -80,32 +80,6 @@
 }
 .preview-edit-btn:hover { background: var(--wedding-main, #D4A5C6); color: white; border-color: var(--wedding-main, #D4A5C6); opacity: 1; }
 
-/* Preview overlay (portal to body, fixed over preview area) */
-.pv-overlay-root { animation: pv-overlay-in 0.2s ease; }
-@keyframes pv-overlay-in { from { opacity: 0; } to { opacity: 1; } }
-.pv-overlay-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 18px 24px; border-bottom: 1px solid var(--wedding-border, #F0F2F5);
-  flex-shrink: 0;
-}
-.pv-overlay-header span { font-size: 1em; font-weight: 700; color: var(--wedding-text-main, #1F2937); }
-.pv-overlay-header button { background: none; border: none; color: var(--wedding-text-sub, #6B7280); cursor: pointer; padding: 4px; font-size: 1.1em; display: flex; align-items: center; transition: color 0.2s; }
-.pv-overlay-header button:hover { color: var(--wedding-main, #D4A5C6); }
-.pv-overlay-body { padding: 24px; flex: 1; overflow-y: auto; }
-.pf-group { margin-bottom: 14px; }
-.pf-label { display: flex; align-items: center; gap: 5px; font-size: 0.72em; font-weight: 700; color: var(--wedding-main); margin-bottom: 6px; }
-.pf-input { width: 100%; padding: 12px; border: 1px solid var(--wedding-border); border-radius: 10px; background: var(--wedding-card-bg, #fff); color: var(--wedding-text-body); font-size: 0.88em; box-sizing: border-box; font-family: inherit; }
-.pf-input:focus { outline: none; border-color: var(--wedding-main); }
-.pf-row { display: flex; gap: 10px; }
-.pf-row .pf-group { flex: 1; }
-.pf-tabs { display: flex; gap: 8px; }
-.pf-tab { flex: 1; padding: 11px; border-radius: 10px; border: 1px solid var(--wedding-border); background: var(--wedding-bg); font-size: 0.85em; color: var(--wedding-text-sub); cursor: pointer; transition: all 0.2s; font-weight: 600; }
-.pf-tab.active { background: var(--wedding-main); color: white; border-color: var(--wedding-main); }
-.pf-tab.refuse.active { background: #8c8581; color: white; border-color: #8c8581; }
-.pf-submit { width: 100%; padding: 14px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.9em; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
-.pf-submit:hover:not(:disabled) { filter: brightness(0.9); }
-.pf-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-
 /* Preview floating nav */
 .preview-nav-fab {
   display: none; position: fixed; bottom: 90px; right: 16px; z-index: 9998;

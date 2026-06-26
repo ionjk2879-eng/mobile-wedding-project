@@ -228,7 +228,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="account-list style3">
           {groomAccounts.length > 0 && (
             <div className="accordion-group">
-              <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={() => setGroomOpen(!groomOpen)} aria-expanded={groomOpen}>
+              <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setGroomOpen(!groomOpen); }} aria-expanded={groomOpen}>
                 <span>{isEn ? "Groom's Side" : '신랑측'}</span>
                 <ChevronDown size={16} className={`accordion-arrow ${groomOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
@@ -241,7 +241,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
           )}
           {brideAccounts.length > 0 && (
             <div className="accordion-group">
-              <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={() => setBrideOpen(!brideOpen)} aria-expanded={brideOpen}>
+              <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setBrideOpen(!brideOpen); }} aria-expanded={brideOpen}>
                 <span>{isEn ? "Bride's Side" : '신부측'}</span>
                 <ChevronDown size={16} className={`accordion-arrow ${brideOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
