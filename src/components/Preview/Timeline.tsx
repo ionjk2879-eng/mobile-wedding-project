@@ -20,7 +20,10 @@ const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
       requestAnimationFrame(() => { el.style.maxHeight = '0px'; });
     } else {
       el.style.maxHeight = el.scrollHeight + 'px';
-      const onEnd = () => { el.style.maxHeight = ''; el.removeEventListener('transitionend', onEnd); };
+      const onEnd = () => {
+        el.style.maxHeight = '';
+        el.removeEventListener('transitionend', onEnd);
+      };
       el.addEventListener('transitionend', onEnd);
     }
     setOpen(v => !v);

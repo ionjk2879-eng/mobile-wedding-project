@@ -18,6 +18,8 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isDragging = React.useRef(false);
   const trackRef = React.useRef<HTMLDivElement>(null);
   const viewportRef = React.useRef<HTMLDivElement>(null);
+  const groomBodyRef = React.useRef<HTMLDivElement>(null);
+  const brideBodyRef = React.useRef<HTMLDivElement>(null);
 
   const handleSideChange = (side: 'groom' | 'bride') => {
     setActiveSide(side);
@@ -228,11 +230,11 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="account-list style3">
           {groomAccounts.length > 0 && (
             <div className="accordion-group">
-              <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setGroomOpen(!groomOpen); }} aria-expanded={groomOpen}>
+              <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setGroomOpen(v => !v); }} aria-expanded={groomOpen}>
                 <span>{isEn ? "Groom's Side" : '신랑측'}</span>
                 <ChevronDown size={16} className={`accordion-arrow ${groomOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
-              <div className={`accordion-body ${groomOpen ? 'open' : ''}`}>
+              <div className={`accordion-body ${groomOpen ? 'open' : ''}`} ref={groomBodyRef}>
                 <div className="accordion-inner">
                   {groomAccounts.map((acc, i) => renderAccountItem(acc, i))}
                 </div>
@@ -241,11 +243,11 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
           )}
           {brideAccounts.length > 0 && (
             <div className="accordion-group">
-              <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setBrideOpen(!brideOpen); }} aria-expanded={brideOpen}>
+              <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setBrideOpen(v => !v); }} aria-expanded={brideOpen}>
                 <span>{isEn ? "Bride's Side" : '신부측'}</span>
                 <ChevronDown size={16} className={`accordion-arrow ${brideOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
-              <div className={`accordion-body ${brideOpen ? 'open' : ''}`}>
+              <div className={`accordion-body ${brideOpen ? 'open' : ''}`} ref={brideBodyRef}>
                 <div className="accordion-inner">
                   {brideAccounts.map((acc, i) => renderAccountItem(acc, i + 100))}
                 </div>
