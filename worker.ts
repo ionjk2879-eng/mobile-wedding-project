@@ -256,13 +256,13 @@ export default {
     }
 
     const slug = slugMatch[1];
-    // Always fetch root index.html — fetching the original /w/slug URL may return a redirect
-    const indexRequest = new Request(new URL('/', url.origin).toString(), { headers: request.headers });
-    const assetResponse = await env.ASSETS.fetch(indexRequest);
+
+    // index.html을 /index.html로 명시적으로 요청 (/ 요청은 리다이렉트 응답을 줄 수 있음)
+    const getIndexHtml = () => env.ASSETS.fetch(new Request(`${url.origin}/index.html`));
 
     try {
       const f = await fetchInvitation(slug);
-      if (!f) return assetResponse;
+      if (!f) return getIndexHtml();
 
       const groomName = f.groomName?.stringValue || '';
       const brideName = f.brideName?.stringValue || '';
@@ -274,7 +274,7 @@ export default {
         ? `${groomName} ♥ ${brideName} 결혼합니다`
         : '모바일 청첩장';
       const description = [date, venueName].filter(Boolean).join(' | ') || '소중한 날에 초대합니다.';
-      const pageUrl = `${url.origin}/w/${slug}`;
+      const pageUrl = `${url.origin}/${slug}`;
 
       let image: string;
       if (heroPhoto.startsWith('data:')) {
@@ -285,6 +285,7 @@ export default {
         image = `${url.origin}/og-image.png`;
       }
 
+      const assetResponse = await getIndexHtml();
       let html = await assetResponse.text();
 
       // 기존 OG/Twitter 메타 태그 + title 모두 제거
@@ -316,7 +317,7 @@ export default {
         headers: { 'Content-Type': 'text/html;charset=UTF-8' },
       });
     } catch {
-      return assetResponse;
+      return getIndexHtml();
     }
   },
 };
