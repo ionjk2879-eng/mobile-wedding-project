@@ -1,4 +1,4 @@
-﻿import { createElement } from 'react';
+import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { InvitationData } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
@@ -30,8 +30,8 @@ export function downloadInvitationHtml(data: InvitationData): void {
 
   const title =
     data.groomName && data.brideName
-      ? `${data.groomName} & ${data.brideName} 寃고샎?⑸땲??
-      : '?곕━??寃고샎??;
+      ? `${data.groomName} & ${data.brideName} 결혼합니다`
+      : '우리들의 결혼식';
 
   const fontFamily = data.fontFamily || "'Pretendard', sans-serif";
 
@@ -77,10 +77,9 @@ export function downloadInvitationHtml(data: InvitationData): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${(data.groomName || '?좊옉').replace(/\s/g, '')}-${(data.brideName || '?좊?').replace(/\s/g, '')}-泥?꺽??html`;
+  a.download = `${(data.groomName || '신랑').replace(/\s/g, '')}-${(data.brideName || '신부').replace(/\s/g, '')}-청첩장.html`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-

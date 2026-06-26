@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { InvitationData } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
@@ -13,8 +13,8 @@ const SITE_ORIGIN = 'https://sonett.kr';
 const Watermark: React.FC = () => (
   <a href={SITE_ORIGIN} target="_blank" rel="noopener noreferrer" className="wm-banner">
     <span className="wm-logo">Sonett</span>
-    <span className="wm-text">?뚮꽕?몃줈 留뚮뱺 紐⑤컮??泥?꺽??/span>
-    <span className="wm-cta">?섎룄 留뚮뱾湲?&rsaquo;</span>
+    <span className="wm-text">지금 바로 모바일 청첩장</span>
+    <span className="wm-cta">지금 만들기 &rsaquo;</span>
   </a>
 );
 
@@ -38,15 +38,15 @@ const ViewPage: React.FC = () => {
   }, [slug]);
 
   if (loading) return null;
-  if (error || !data) return <div className="view-error" role="alert"><h2>泥?꺽?μ쓣 李얠쓣 ???놁뒿?덈떎</h2><p>二쇱냼瑜??ㅼ떆 ?뺤씤?댁＜?몄슂.</p></div>;
+  if (error || !data) return <div className="view-error" role="alert"><h2>청첩장을 찾을 수 없습니다</h2><p>주소를 다시 확인해주세요.</p></div>;
 
   const isExpired = data.expiresAt && new Date(data.expiresAt) < new Date();
   if (isExpired) return (
     <div className="view-error" role="alert">
-      <p className="view-expired-icon">?븡截?/p>
-      <h2>蹂닿? 湲곌컙??醫낅즺?섏뿀?듬땲??/h2>
-      <p>??泥?꺽?μ쓽 蹂닿? 湲곌컙??留뚮즺?섏뿀?듬땲??<br />泥?꺽???쒖옉?먯뿉寃?臾몄쓽??二쇱꽭??</p>
-      <a href={SITE_ORIGIN} className="view-expired-link">Sonett?먯꽌 泥?꺽??留뚮뱾湲?/a>
+      <p className="view-expired-icon">⏰</p>
+      <h2>공유 기간이 만료되었습니다</h2>
+      <p>이 청첩장의 공유 기간이 만료되었습니다.<br />새로운 청첩장 시작에 대해 문의해주세요.</p>
+      <a href={SITE_ORIGIN} className="view-expired-link">Sonett에서 청첩장 만들기</a>
       <style>{`
         .view-expired-icon { font-size: 2.5rem; margin: 0 0 12px; }
         .view-expired-link {
@@ -131,4 +131,3 @@ const ViewPage: React.FC = () => {
 };
 
 export default ViewPage;
-

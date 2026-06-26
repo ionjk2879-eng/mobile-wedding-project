@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Share2, Link, Lock } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { toast } from '../../stores/useToastStore';
@@ -24,13 +24,13 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
   const handleCopyLink = () => {
     if (!shareEnabled) return;
     navigator.clipboard.writeText(shareLink);
-    toast.success('留곹겕媛 蹂듭궗?섏뿀?듬땲??');
+    toast.success('링크가 복사되었습니다');
   };
 
   const handleKakaoShare = () => {
     if (!shareEnabled) return;
     if (!window.Kakao || !window.Kakao.isInitialized()) return;
-    const title = data.shareTitle || `${data.groomName || '?좊옉'} ??${data.brideName || '?좊?'} 寃고샎?⑸땲??;
+    const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
     const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
     const slug = data.slug || '';
     window.Kakao.Share.sendDefault({
@@ -41,33 +41,33 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
         imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
         link: { mobileWebUrl: shareLink, webUrl: shareLink },
       },
-      buttons: [{ title: '泥?꺽??蹂닿린', link: { mobileWebUrl: shareLink, webUrl: shareLink } }],
+      buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareLink, webUrl: shareLink } }],
     });
   };
 
   return (
-    <section className="share section" style={{ fontFamily: data.fontFamily }} aria-label="怨듭쑀">
+    <section className="share section" style={{ fontFamily: data.fontFamily }} aria-label="공유">
       {shareEnabled ? (
         <div className="share-buttons">
           <button className="share-btn kakao" onClick={handleKakaoShare}>
             <Share2 size={20} />
-            <span>移댁뭅?ㅽ넚 怨듭쑀?섍린</span>
+            <span>카카오톡 공유하기</span>
           </button>
           <button className="share-btn link" onClick={handleCopyLink}>
             <Link size={20} />
-            <span>留곹겕 蹂듭궗?섍린</span>
+            <span>링크 복사하기</span>
           </button>
         </div>
       ) : (
         <div className="share-locked">
           <Lock size={20} />
-          <p className="share-locked-title">怨듭쑀 湲곕뒫? ?꾨━誘몄뾼 ?꾩슜?낅땲??/p>
-          <p className="share-locked-desc">?꾨━誘몄뾼?쇰줈 ?낃렇?덉씠?쒗븯硫?br />移댁뭅?ㅽ넚 怨듭쑀 쨌 留곹겕 蹂듭궗媛 媛?ν빀?덈떎.</p>
+          <p className="share-locked-title">공유 기능은 유료 서비스입니다</p>
+          <p className="share-locked-desc">유료로 전환하시면<br />카카오톡 공유 및 링크 복사가 가능합니다.</p>
         </div>
       )}
 
       <footer className="footer">
-        <p>Copyright 짤 2026 {data.groomName || '?좊옉'} & {data.brideName || '?좊?'}. All rights reserved.</p>
+        <p>Copyright &copy; 2026 {data.groomName || '신랑'} &amp; {data.brideName || '신부'}. All rights reserved.</p>
       </footer>
 
     </section>
@@ -88,4 +88,3 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
 );
 
 export default Share;
-
