@@ -30,7 +30,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
   const handleKakaoShare = () => {
     if (!shareEnabled) return;
     if (!window.Kakao || !window.Kakao.isInitialized()) return;
-    const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
+    const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
     const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
     const slug = data.slug || '';
     window.Kakao.Share.sendDefault({

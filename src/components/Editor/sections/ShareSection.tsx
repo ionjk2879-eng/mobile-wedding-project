@@ -65,7 +65,7 @@ const ShareSection: React.FC = () => {
       <p className="section-desc">카카오톡으로 공유할 때 표시될 정보를 설정합니다.</p>
       <div className="input-group">
         <label>공유 제목</label>
-        <input type="text" value={shareTitle} onChange={(e) => updateField('shareTitle', e.target.value)} className="modern-input" placeholder={`${groomName || '신랑'} ♡ ${brideName || '신부'} 결혼합니다`} />
+        <input type="text" value={shareTitle} onChange={(e) => updateField('shareTitle', e.target.value)} className="modern-input" placeholder={`${groomName || '신랑'} ♥ ${brideName || '신부'} 결혼합니다`} />
         <span className="input-hint">비워두면 신랑/신부 이름으로 자동 생성됩니다.</span>
       </div>
       <div className="input-group">
@@ -78,7 +78,7 @@ const ShareSection: React.FC = () => {
         <div className="share-preview-body">
           <div className="share-preview-thumb">{heroPhoto ? <img src={heroPhoto} alt="" /> : <span>사진</span>}</div>
           <div className="share-preview-info">
-            <strong>{shareTitle || `${groomName} ♡ ${brideName} 결혼합니다`}</strong>
+            <strong>{shareTitle || `${groomName} ♥ ${brideName} 결혼합니다`}</strong>
             <p>{shareDescription || `${date} ${time}\n${venueName}`}</p>
           </div>
         </div>

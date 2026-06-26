@@ -15,7 +15,7 @@ const KMONG_SERVICE_URL = 'https://kmong.com'; // TODO: 실제 크몽 서비스 
 
 const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
   const shareUrl = `${SITE_ORIGIN}/w/${slug}`;
-  const title = data.shareTitle || `${data.groomName || '신랑'} ♡ ${data.brideName || '신부'} 결혼합니다`;
+  const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
   const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
 
   useEffect(() => {
