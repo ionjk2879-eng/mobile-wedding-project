@@ -31,6 +31,7 @@ const LandingPage: React.FC = () => {
 
       {/* Hero */}
       <section className="land-hero">
+        <h2 className="land-hero-brand">Sonett</h2>
         <p className="land-hero-sub">MOBILE WEDDING INVITATION</p>
         <h1 className="land-hero-title">소중한 순간을<br />영원히 간직하세요</h1>
         <p className="land-hero-desc">세련된 모바일 청첩장을 쉽고 빠르게 만들고,<br />카카오톡으로 간편하게 공유하세요.</p>
@@ -168,6 +169,15 @@ const LandingPage: React.FC = () => {
           padding: 60px 24px;
           text-align: center;
           background: linear-gradient(180deg, #FDFBFC 0%, #FDF6F9 100%);
+        }
+        .land-hero-brand {
+          font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+          font-size: 3.2rem;
+          font-weight: 400;
+          color: #B07A8E;
+          letter-spacing: 4px;
+          margin: 0 0 8px;
+          font-style: italic;
         }
         .land-hero-sub {
           font-size: 0.75rem;
