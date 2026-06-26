@@ -4,60 +4,115 @@ const lazyFirebase = () => import('../../firebase');
 import { toast } from '../../stores/useToastStore';
 import { getFirebaseErrorMessage } from '../../utils/firebaseError';
 import { PreviewOverlay } from '../../hooks/usePreviewPopup';
-import { MessageCircle, Send, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Send, Trash2 } from 'lucide-react';
 
 interface PreviewProps { data: InvitationData; }
 
-const MessageSlider: React.FC<{
+const NOTE_COLORS = ['#FFFDF0', '#FFF8F0', '#F8F5FF', '#F0FFF8'];
+const NOTE_ROTATIONS = ['-1deg', '0.7deg', '-0.5deg', '1.2deg', '-0.8deg', '0.4deg'];
+
+const formatDate = (ts: string | { seconds: number }) => {
+  try {
+    const d = typeof ts === 'object' && 'seconds' in ts ? new Date(ts.seconds * 1000) : new Date(ts);
+    return d.toLocaleDateString('ko', { month: 'short', day: 'numeric' });
+  } catch { return ''; }
+};
+
+const NoteSlider: React.FC<{
   messages: GuestMessage[];
   isEn: boolean;
+  label: string;
   onDelete: (id: string) => void;
   deleteTarget: string | null;
   deletePassword: string;
   setDeleteTarget: (id: string | null) => void;
   setDeletePassword: (pw: string) => void;
   handleDelete: () => void;
-}> = ({ messages, isEn, onDelete, deleteTarget, deletePassword, setDeleteTarget, setDeletePassword, handleDelete }) => {
-  const [page, setPage] = useState(0);
-  const perPage = 3;
-  const totalPages = Math.max(1, Math.ceil(messages.length / perPage));
-  const paged = messages.slice(page * perPage, (page + 1) * perPage);
+}> = ({ messages, isEn, label, onDelete, deleteTarget, deletePassword, setDeleteTarget, setDeletePassword, handleDelete }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
 
-  const formatDate = (ts: string | { seconds: number }) => {
-    try { const d = typeof ts === 'object' && 'seconds' in ts ? new Date(ts.seconds * 1000) : new Date(ts); return d.toLocaleDateString('ko', { month: 'short', day: 'numeric' }); } catch { return ''; }
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el || messages.length === 0) return;
+    const cardWidth = el.scrollWidth / messages.length;
+    const idx = Math.min(Math.round(el.scrollLeft / cardWidth), messages.length - 1);
+    setActiveIdx(idx);
   };
 
-  if (messages.length === 0) {
-    return <p className="gb-empty">{isEn ? 'No messages yet.' : '아직 메시지가 없습니다.'}</p>;
-  }
+  const scrollTo = (idx: number) => {
+    const el = scrollRef.current;
+    if (!el || messages.length === 0) return;
+    const cardWidth = el.scrollWidth / messages.length;
+    el.scrollTo({ left: cardWidth * idx, behavior: 'smooth' });
+  };
 
   return (
-    <div className="gb-slider">
-      <div className="gb-slide-list">
-        {paged.map((msg) => (
-          <div key={msg.id} className="gb-item">
-            <div className="gb-item-header">
-              <MessageCircle size={14} /><strong>{msg.name}</strong>
-              {msg.createdAt && <span className="gb-date">{formatDate(msg.createdAt)}</span>}
-              <button type="button" className="gb-delete-btn" onClick={() => onDelete(msg.id)}><Trash2 size={13} /></button>
-            </div>
-            <p className="gb-content">{msg.content}</p>
-            {deleteTarget === msg.id && (
-              <div className="gb-delete-form">
-                <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} className="gb-del-input" placeholder={isEn ? 'Password' : '비밀번호'} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') handleDelete(); if (e.key === 'Escape') { setDeleteTarget(null); setDeletePassword(''); } }} />
-                <button type="button" className="gb-del-confirm" onClick={handleDelete}>{isEn ? 'Delete' : '삭제'}</button>
-                <button type="button" className="gb-del-cancel" onClick={() => { setDeleteTarget(null); setDeletePassword(''); }}>{isEn ? 'Cancel' : '취소'}</button>
+    <div className="gb-note-section">
+      <p className="gb-note-label">
+        {label}측 <span className="gb-tab-count">{messages.length}</span>
+      </p>
+      {messages.length === 0 ? (
+        <p className="gb-empty">{isEn ? 'No messages yet.' : '아직 메시지가 없습니다.'}</p>
+      ) : (
+        <>
+          <div className="gb-note-scroll" ref={scrollRef} onScroll={handleScroll}>
+            {messages.map((msg, i) => (
+              <div
+                key={msg.id}
+                className="gb-note"
+                style={{
+                  background: NOTE_COLORS[i % NOTE_COLORS.length],
+                  transform: `rotate(${NOTE_ROTATIONS[i % NOTE_ROTATIONS.length]})`,
+                }}
+              >
+                <div className="gb-note-header">
+                  <strong className="gb-note-name">{msg.name}</strong>
+                  <div className="gb-note-meta">
+                    {msg.createdAt && <span className="gb-date">{formatDate(msg.createdAt)}</span>}
+                    <button type="button" className="gb-delete-btn" onClick={() => onDelete(msg.id)}>
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                </div>
+                <p className="gb-note-content">{msg.content}</p>
+                {deleteTarget === msg.id && (
+                  <div className="gb-delete-form">
+                    <input
+                      type="password"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      className="gb-del-input"
+                      placeholder={isEn ? 'Password' : '비밀번호'}
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleDelete();
+                        if (e.key === 'Escape') { setDeleteTarget(null); setDeletePassword(''); }
+                      }}
+                    />
+                    <button type="button" className="gb-del-confirm" onClick={handleDelete}>
+                      {isEn ? 'Delete' : '삭제'}
+                    </button>
+                    <button type="button" className="gb-del-cancel" onClick={() => { setDeleteTarget(null); setDeletePassword(''); }}>
+                      {isEn ? 'Cancel' : '취소'}
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
-      {totalPages > 1 && (
-        <div className="gb-pager">
-          <button className="gb-pager-btn" disabled={page === 0} onClick={() => setPage(page - 1)}><ChevronLeft size={18} /></button>
-          <span className="gb-pager-info">{page + 1} / {totalPages}</span>
-          <button className="gb-pager-btn" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}><ChevronRight size={18} /></button>
-        </div>
+          {messages.length > 1 && (
+            <div className="gb-dots">
+              {messages.map((_, i) => (
+                <button
+                  key={i}
+                  className={`gb-dot ${i === activeIdx ? 'active' : ''}`}
+                  onClick={() => scrollTo(i)}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -75,7 +130,6 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
   const [formOpen, setFormOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deletePassword, setDeletePassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'groom' | 'bride'>('groom');
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -85,14 +139,17 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   if (!data.isGuestbookEnabled) return null;
 
-  const groomMessages = messages.filter(m => m.side === 'groom' || (!m.side && true));
+  const groomMessages = messages.filter(m => m.side === 'groom' || !m.side);
   const brideMessages = messages.filter(m => m.side === 'bride');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data.slug) return;
     if (!name.trim() || !content.trim()) return;
-    if (password.length !== 4 || !/^\d{4}$/.test(password)) { toast.warning(isEn ? '4-digit PIN required.' : '4자리 숫자 비밀번호를 입력해주세요.'); return; }
+    if (password.length !== 4 || !/^\d{4}$/.test(password)) {
+      toast.warning(isEn ? '4-digit PIN required.' : '4자리 숫자 비밀번호를 입력해주세요.');
+      return;
+    }
     setSubmitting(true);
     try {
       const fb = await lazyFirebase();
@@ -112,10 +169,17 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
       const fb = await lazyFirebase();
       const ok = await fb.deleteGuestMessage(slug, deleteTarget, deletePassword);
       if (ok || isAdmin) {
-        if (!ok && isAdmin) { const { deleteDoc: d, doc: r } = await import('firebase/firestore'); const { db } = await import('../../firebase'); await d(r(db, `invitations/${slug}/guestbook`, deleteTarget)); }
+        if (!ok && isAdmin) {
+          const { deleteDoc: d, doc: r } = await import('firebase/firestore');
+          const { db } = await import('../../firebase');
+          await d(r(db, `invitations/${slug}/guestbook`, deleteTarget));
+        }
         setMessages(prev => prev.filter(m => m.id !== deleteTarget));
         toast.success(isEn ? 'Deleted.' : '삭제되었습니다.');
-      } else { toast.error(isEn ? 'Wrong password.' : '비밀번호가 일치하지 않습니다.'); return; }
+      } else {
+        toast.error(isEn ? 'Wrong password.' : '비밀번호가 일치하지 않습니다.');
+        return;
+      }
     } catch (err) { toast.error(getFirebaseErrorMessage(err)); }
     setDeleteTarget(null); setDeletePassword('');
   };
@@ -123,35 +187,34 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
   const groomLabel = data.groomName || (isEn ? 'Groom' : '신랑');
   const brideLabel = data.brideName || (isEn ? 'Bride' : '신부');
 
+  const sliderProps = {
+    isEn,
+    onDelete: (id: string) => { setDeleteTarget(id); setDeletePassword(''); },
+    deleteTarget,
+    deletePassword,
+    setDeleteTarget,
+    setDeletePassword,
+    handleDelete,
+  };
+
   return (
     <section className="guestbook-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef} aria-label="방명록">
       <h2>GUESTBOOK</h2>
       <p className="section-sub">{isEn ? 'Leave a message for the couple' : '방명록'}</p>
+
       {data.slug ? (
-        <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>{isEn ? 'Write a Message' : '방명록 작성하기'}</button>
+        <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>
+          {isEn ? 'Write a Message' : '방명록 작성하기'}
+        </button>
       ) : (
-        <p className="gb-preview-notice">{isEn ? 'Save your invitation first to enable the guestbook.' : '청첩장을 저장하면 방명록이 활성화됩니다.'}</p>
+        <p className="gb-preview-notice">
+          {isEn ? 'Save your invitation first to enable the guestbook.' : '청첩장을 저장하면 방명록이 활성화됩니다.'}
+        </p>
       )}
 
-      <div className="gb-tabs">
-        <button className={`gb-tab ${activeTab === 'groom' ? 'active' : ''}`} onClick={() => setActiveTab('groom')}>
-          {groomLabel}측 <span className="gb-tab-count">{groomMessages.length}</span>
-        </button>
-        <button className={`gb-tab ${activeTab === 'bride' ? 'active' : ''}`} onClick={() => setActiveTab('bride')}>
-          {brideLabel}측 <span className="gb-tab-count">{brideMessages.length}</span>
-        </button>
-      </div>
-
-      <MessageSlider
-        messages={activeTab === 'groom' ? groomMessages : brideMessages}
-        isEn={isEn}
-        onDelete={(id) => { setDeleteTarget(id); setDeletePassword(''); }}
-        deleteTarget={deleteTarget}
-        deletePassword={deletePassword}
-        setDeleteTarget={setDeleteTarget}
-        setDeletePassword={setDeletePassword}
-        handleDelete={handleDelete}
-      />
+      <NoteSlider messages={groomMessages} label={groomLabel} {...sliderProps} />
+      <div className="gb-section-divider" />
+      <NoteSlider messages={brideMessages} label={brideLabel} {...sliderProps} />
 
       <PreviewOverlay open={formOpen} onClose={() => setFormOpen(false)} anchorRef={sectionRef} title={isEn ? 'Write a Message' : '축하 메시지를 남겨주세요'}>
         <form onSubmit={handleSubmit}>
@@ -163,16 +226,34 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
             </div>
           </div>
           <div className="pf-row">
-            <div className="pf-group"><label className="pf-label">{isEn ? 'Name' : '이름'}</label><input type="text" className="pf-input" required value={name} onChange={(e) => setName(e.target.value)} placeholder={isEn ? 'Name' : '이름'} /></div>
-            <div className="pf-group"><label className="pf-label">{isEn ? 'PIN' : '비밀번호'}</label><input type="password" inputMode="numeric" maxLength={4} className="pf-input" required value={password} onChange={(e) => setPassword(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder={isEn ? '4 digits' : '숫자 4자리'} /></div>
+            <div className="pf-group">
+              <label className="pf-label">{isEn ? 'Name' : '이름'}</label>
+              <input type="text" className="pf-input" required value={name} onChange={(e) => setName(e.target.value)} placeholder={isEn ? 'Name' : '이름'} />
+            </div>
+            <div className="pf-group">
+              <label className="pf-label">{isEn ? 'PIN' : '비밀번호'}</label>
+              <input type="password" inputMode="numeric" maxLength={4} className="pf-input" required value={password} onChange={(e) => setPassword(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder={isEn ? '4 digits' : '숫자 4자리'} />
+            </div>
           </div>
-          <div className="pf-group"><label className="pf-label">{isEn ? 'Message' : '메시지'}</label><textarea className="pf-input" rows={4} required value={content} onChange={(e) => setContent(e.target.value)} placeholder={isEn ? 'Write your message...' : '축하 메시지를 작성해주세요...'} /></div>
-          <button type="submit" className="pf-submit" disabled={submitting}><Send size={16} /> {submitting ? (isEn ? 'Sending...' : '전송 중...') : (isEn ? 'Send' : '등록하기')}</button>
+          <div className="pf-group">
+            <label className="pf-label">{isEn ? 'Message' : '메시지'}</label>
+            <textarea className="pf-input" rows={4} required value={content} onChange={(e) => setContent(e.target.value)} placeholder={isEn ? 'Write your message...' : '축하 메시지를 작성해주세요...'} />
+          </div>
+          <button type="submit" className="pf-submit" disabled={submitting}>
+            <Send size={16} /> {submitting ? (isEn ? 'Sending...' : '전송 중...') : (isEn ? 'Send' : '등록하기')}
+          </button>
         </form>
       </PreviewOverlay>
-
     </section>
   );
-}, (prev, next) => prev.data.isGuestbookEnabled === next.data.isGuestbookEnabled && prev.data.guestbookPassword === next.data.guestbookPassword && prev.data.slug === next.data.slug && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily && prev.data.groomName === next.data.groomName && prev.data.brideName === next.data.brideName);
+}, (prev, next) =>
+  prev.data.isGuestbookEnabled === next.data.isGuestbookEnabled
+  && prev.data.guestbookPassword === next.data.guestbookPassword
+  && prev.data.slug === next.data.slug
+  && prev.data.language === next.data.language
+  && prev.data.fontFamily === next.data.fontFamily
+  && prev.data.groomName === next.data.groomName
+  && prev.data.brideName === next.data.brideName
+);
 
 export default Guestbook;
