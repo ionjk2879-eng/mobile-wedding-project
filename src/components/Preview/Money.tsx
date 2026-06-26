@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, ChevronDown } from 'lucide-react';
 import { InvitationData } from '../../types';
 
 interface PreviewProps {
@@ -227,7 +227,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
             <div className="accordion-group">
               <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={() => setGroomOpen(!groomOpen)} aria-expanded={groomOpen}>
                 <span>{isEn ? "Groom's Side" : '신랑측'}</span>
-                <span className="accordion-arrow" aria-hidden="true">{groomOpen ? '−' : '+'}</span>
+                <ChevronDown size={16} className={`accordion-arrow ${groomOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
               <div className={`accordion-body ${groomOpen ? 'open' : ''}`}>
                 <div className="accordion-inner">
@@ -240,7 +240,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
             <div className="accordion-group">
               <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={() => setBrideOpen(!brideOpen)} aria-expanded={brideOpen}>
                 <span>{isEn ? "Bride's Side" : '신부측'}</span>
-                <span className="accordion-arrow" aria-hidden="true">{brideOpen ? '−' : '+'}</span>
+                <ChevronDown size={16} className={`accordion-arrow ${brideOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
               <div className={`accordion-body ${brideOpen ? 'open' : ''}`}>
                 <div className="accordion-inner">
