@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../firebase';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart } from 'lucide-react';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, Download } from 'lucide-react';
+import { downloadInvitationHtml } from '../utils/exportHtml';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
@@ -130,7 +131,7 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
   );
 };
 
-const CardDropdown: React.FC<{ slug: string; onDelete: () => void; onChangeSlug: () => void }> = ({ slug, onDelete, onChangeSlug }) => {
+const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; onDelete: () => void; onChangeSlug: () => void; onDownloadHtml: () => void }> = ({ slug, isPaid, onDelete, onChangeSlug, onDownloadHtml }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -150,6 +151,11 @@ const CardDropdown: React.FC<{ slug: string; onDelete: () => void; onChangeSlug:
       </button>
       {open && (
         <div className="mc-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+          {isPaid && (
+            <button className="mc-dropdown-item highlight" onClick={() => { setOpen(false); onDownloadHtml(); }}>
+              <Download size={14} /> 영구보관 HTML
+            </button>
+          )}
           <button className="mc-dropdown-item" onClick={() => { setOpen(false); onChangeSlug(); }}>
             <Globe size={14} /> 도메인 변경
           </button>
@@ -267,7 +273,20 @@ const ManagePage: React.FC = () => {
                     <Link to={`/edit/${slug}`} className="mc-action-btn mc-edit-btn">
                       <Edit3 size={14} /> 편집
                     </Link>
-                    <CardDropdown slug={slug} onDelete={() => handleDelete(slug)} onChangeSlug={() => setChangeSlugTarget(slug)} />
+                    <CardDropdown
+                      slug={slug}
+                      isPaid={!!data.isPaid}
+                      onDelete={() => handleDelete(slug)}
+                      onChangeSlug={() => setChangeSlugTarget(slug)}
+                      onDownloadHtml={() => {
+                        try {
+                          downloadInvitationHtml(data);
+                          toast.success('HTML 파일이 다운로드되었습니다.');
+                        } catch {
+                          toast.error('HTML 생성에 실패했습니다.');
+                        }
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -543,6 +562,14 @@ const ManagePage: React.FC = () => {
         .mc-dropdown-item.danger:hover {
           background: #FEF2F2;
           color: #B91C1C;
+        }
+        .mc-dropdown-item.highlight {
+          color: #B07A8E;
+          font-weight: 700;
+        }
+        .mc-dropdown-item.highlight:hover {
+          background: #FDF6F9;
+          color: #9B6A7E;
         }
 
         /* Share Modal */
