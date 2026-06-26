@@ -49,11 +49,21 @@
 @keyframes confetti-fall { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(-10px); } 75% { transform: rotate(300deg) translateX(12px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
 
 /* Music float button */
+/* 높이 0인 sticky 래퍼로 레이아웃 밀림 없이 우측 상단 고정 */
+.music-float-wrap {
+  position: sticky;
+  top: 16px;
+  height: 0;
+  overflow: visible;
+  z-index: 100;
+  pointer-events: none;
+}
 .music-float-btn {
-  position: fixed; top: 16px; right: 16px;
+  position: absolute; top: 0; right: 16px;
+  pointer-events: auto;
   width: 40px; height: 40px; border-radius: 50%;
   border: 1px solid var(--wedding-border); background: var(--wedding-card-bg);
-  color: var(--wedding-main); font-size: 1.1em; cursor: pointer; z-index: 1000;
+  color: var(--wedding-main); font-size: 1.1em; cursor: pointer;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: all 0.2s;
   display: flex; align-items: center; justify-content: center;
 }

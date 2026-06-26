@@ -66,9 +66,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
   return (
     <>
       <audio ref={audioRef} src={url} loop preload="auto" />
-      <button className="music-float-btn" onClick={toggle} ref={btnRef}>
-        {isPlaying ? <Pause size={18} /> : <Play size={18} style={{ marginLeft: 2 }} />}
-      </button>
+      <div className="music-float-wrap">
+        <button className="music-float-btn" onClick={toggle} ref={btnRef}>
+          {isPlaying ? <Pause size={18} /> : <Play size={18} style={{ marginLeft: 2 }} />}
+        </button>
+      </div>
     </>
   );
 };
