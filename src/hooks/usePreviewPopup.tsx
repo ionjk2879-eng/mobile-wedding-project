@@ -11,7 +11,13 @@ export function usePreviewRect(anchorRef: RefObject<HTMLElement | null>, open: b
     const fullPreview = anchorRef.current.closest('.full-preview-container');
     if (fullPreview) {
       const page = fullPreview.querySelector('.invitation-page');
-      setRect((page ?? fullPreview).getBoundingClientRect());
+      if (page) {
+        const r = page.getBoundingClientRect();
+        // 뷰포트 높이로 클램프 — invitation-page는 컨텐츠 전체 높이이므로 팝업이 화면 밖으로 넘침
+        setRect(new DOMRect(r.left, 0, r.width, window.innerHeight));
+      } else {
+        setRect(fullPreview.getBoundingClientRect());
+      }
       return;
     }
     const viewContainer = anchorRef.current.closest('.view-container');

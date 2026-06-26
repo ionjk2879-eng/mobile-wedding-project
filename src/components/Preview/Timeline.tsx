@@ -10,7 +10,9 @@ const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
   const [open, setOpen] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
 
-  const handleToggle = useCallback(() => {
+  const handleToggle = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    // blur 처리: 포커스로 인한 스크롤 컨테이너 자동 스크롤 방지
+    e.currentTarget.blur();
     const el = bodyRef.current;
     if (!el) { setOpen(v => !v); return; }
     if (open) {
