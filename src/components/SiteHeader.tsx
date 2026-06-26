@@ -60,8 +60,6 @@ const SiteHeader: React.FC = () => {
         <Link to="/" className="site-logo">Sonett</Link>
         <nav className="site-nav-left">
           <Link to="/" className={`site-nav-link ${pathname === '/' ? 'active' : ''}`}>모바일 청첩장</Link>
-          <Link to="/reviews" className={`site-nav-link ${pathname === '/reviews' ? 'active' : ''}`}>고객 후기</Link>
-          <Link to="/events" className={`site-nav-link ${pathname === '/events' ? 'active' : ''}`}>이벤트</Link>
         </nav>
       </div>
       <div className="site-header-right">

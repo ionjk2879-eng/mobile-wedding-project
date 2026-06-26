@@ -9,8 +9,6 @@ const App = React.lazy(() => import('./App'))
 const ViewPage = React.lazy(() => import('./pages/ViewPage'))
 const AdminPage = React.lazy(() => import('./pages/AdminPage'))
 const ManagePage = React.lazy(() => import('./pages/ManagePage'))
-const ReviewsPage = React.lazy(() => import('./pages/ReviewsPage'))
-const EventsPage = React.lazy(() => import('./pages/EventsPage'))
 const AuthCallbackPage = React.lazy(() => import('./pages/AuthCallbackPage'))
 const TermsPage = React.lazy(() => import('./pages/TermsPage'))
 const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'))
@@ -32,8 +30,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/editor" element={<AuthGate><App /></AuthGate>} />
           <Route path="/edit/:slug" element={<AuthGate><App /></AuthGate>} />
           <Route path="/manage" element={<AuthGate><ManagePage /></AuthGate>} />
-          <Route path="/reviews" element={<ReviewsPage />} />
-          <Route path="/events" element={<EventsPage />} />
           <Route path="/w/:slug" element={<ViewPage />} />
           <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
           <Route path="/terms" element={<TermsPage />} />
