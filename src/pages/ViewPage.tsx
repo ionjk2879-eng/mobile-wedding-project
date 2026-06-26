@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { InvitationData } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
@@ -18,12 +18,22 @@ const Watermark: React.FC = () => (
   </a>
 );
 
+const PromoSection: React.FC = () => (
+  <div className="promo-section">
+    <p className="promo-brand">Sonett</p>
+    <p className="promo-title">나만의 모바일 청첩장</p>
+    <p className="promo-desc">워터마크 없이, 더 아름답게.<br />지금 Sonett에서 직접 만들어보세요.</p>
+    <a href={SITE_ORIGIN} target="_blank" rel="noopener noreferrer" className="promo-cta">
+      워터마크 제거하기 &rsaquo;
+    </a>
+  </div>
+);
+
 const ViewPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [data, setData] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -72,18 +82,19 @@ const ViewPage: React.FC = () => {
   const showWatermark = !data.isPaid;
 
   return (
-    <div className="view-container" style={{ fontFamily: data.fontFamily }} ref={scrollRef}>
+    <div className="view-container" style={{ fontFamily: data.fontFamily }}>
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor, '--wedding-accent': data.customAccentColor } as React.CSSProperties : {}) }}>
-        <ScrollRootContext.Provider value={scrollRef}>
+        <ScrollRootContext.Provider value={null}>
           <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} />
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
+        <PromoSection />
       </div>
 
       <style>{`
-        .view-container { width: 100vw; height: 100vh; background: #ffffff; display: flex; justify-content: center; overflow-y: scroll; }
-        .view-container .invitation-page { width: 100%; max-width: 430px; background-color: var(--wedding-bg); min-height: 100%; }
+        .view-container { width: 100%; min-height: 100svh; background: #ffffff; display: flex; justify-content: center; }
+        .view-container .invitation-page { width: 100%; max-width: 430px; background-color: var(--wedding-bg); min-height: 100svh; }
         .view-loading, .view-error { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pretendard', sans-serif; color: #6B7280; text-align: center; padding: 20px; box-sizing: border-box; }
         .view-error h2 { color: #1F2937; margin-bottom: 8px; }
 
@@ -116,6 +127,46 @@ const ViewPage: React.FC = () => {
           color: #D4A5C6;
           margin-left: 4px;
         }
+
+        .promo-section {
+          padding: 36px 24px 40px;
+          text-align: center;
+          background: linear-gradient(180deg, #F9F3F6 0%, #FDF6F9 100%);
+          border-top: 1px solid rgba(176,122,142,0.15);
+          font-family: 'Pretendard', sans-serif;
+        }
+        .promo-brand {
+          font-size: 1.1rem;
+          font-weight: 700;
+          letter-spacing: 3px;
+          color: #B07A8E;
+          margin: 0 0 8px;
+        }
+        .promo-title {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #1F2937;
+          margin: 0 0 10px;
+        }
+        .promo-desc {
+          font-size: 0.82rem;
+          color: #6B7280;
+          line-height: 1.65;
+          margin: 0 0 20px;
+        }
+        .promo-cta {
+          display: inline-block;
+          padding: 11px 28px;
+          background: #B07A8E;
+          color: white;
+          border-radius: 30px;
+          text-decoration: none;
+          font-size: 0.85rem;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          transition: opacity 0.2s;
+        }
+        .promo-cta:hover { opacity: 0.85; }
 
         @media (max-width: 480px) {
           .view-container { background: var(--wedding-bg); }

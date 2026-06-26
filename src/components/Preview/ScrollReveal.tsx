@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, createContext, useContext, useCallback } from 'react';
+import React, { useRef, useEffect, useState, createContext, useContext } from 'react';
 
 export const ScrollRootContext = createContext<React.RefObject<HTMLDivElement | null> | null>(null);
 
@@ -13,72 +13,32 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({ effect, children, delay = 0
   const [visible, setVisible] = useState(false);
   const scrollRoot = useContext(ScrollRootContext);
 
-  const isEnabled = !!scrollRoot && !!effect && effect !== 'none';
-
-  const checkVisibility = useCallback(() => {
-    const el = ref.current;
-    const container = scrollRoot?.current;
-    if (!el || !container) return;
-
-    const containerRect = container.getBoundingClientRect();
-    const elRect = el.getBoundingClientRect();
-
-    const triggerPoint = containerRect.top + containerRect.height * 0.85;
-    if (elRect.top < triggerPoint) {
-      setTimeout(() => setVisible(true), delay);
-      return true;
-    }
-    return false;
-  }, [scrollRoot, delay]);
+  const isEnabled = !!effect && effect !== 'none';
 
   useEffect(() => {
-    if (!isEnabled) {
-      setVisible(true);
-      return;
-    }
-
+    if (!isEnabled) { setVisible(true); return; }
     setVisible(false);
 
-    const container = scrollRoot?.current;
-    if (!container) return;
+    const el = ref.current;
+    if (!el) return;
 
-    let revealed = false;
+    const root = scrollRoot?.current ?? null;
 
-    const checkAlreadyPassed = () => {
-      const el = ref.current;
-      const cont = scrollRoot?.current;
-      if (!el || !cont) return false;
-      const containerRect = cont.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      return elRect.bottom < containerRect.bottom;
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setTimeout(() => setVisible(true), delay);
+            observer.disconnect();
+          }
+        }
+      },
+      { root, threshold: 0.05, rootMargin: '0px 0px -10% 0px' },
+    );
 
-    if (checkAlreadyPassed()) {
-      setVisible(true);
-      return;
-    }
-
-    const onScroll = () => {
-      if (revealed) return;
-      if (checkVisibility()) {
-        revealed = true;
-        container.removeEventListener('scroll', onScroll);
-      }
-    };
-
-    const timer = setTimeout(() => {
-      if (checkVisibility()) {
-        revealed = true;
-      } else {
-        container.addEventListener('scroll', onScroll, { passive: true });
-      }
-    }, 400);
-
-    return () => {
-      clearTimeout(timer);
-      container.removeEventListener('scroll', onScroll);
-    };
-  }, [isEnabled, scrollRoot, checkVisibility]);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isEnabled, scrollRoot, delay]);
 
   if (!isEnabled) return <>{children}</>;
 
