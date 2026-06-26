@@ -31,6 +31,10 @@ const NoteSlider: React.FC<{
 }> = ({ messages, isEn, label, onDelete, deleteTarget, deletePassword, setDeleteTarget, setDeletePassword, handleDelete }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragScrollLeft = useRef(0);
+  const didDrag = useRef(false);
 
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -53,6 +57,32 @@ const NoteSlider: React.FC<{
     if (card) el.scrollTo({ left: card.offsetLeft, behavior: 'smooth' });
   };
 
+  const onMouseDown = (e: React.MouseEvent) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    isDragging.current = true;
+    didDrag.current = false;
+    dragStartX.current = e.clientX;
+    dragScrollLeft.current = el.scrollLeft;
+    el.style.cursor = 'grabbing';
+    el.style.userSelect = 'none';
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollRef.current) return;
+    const dx = e.clientX - dragStartX.current;
+    if (Math.abs(dx) > 4) didDrag.current = true;
+    scrollRef.current.scrollLeft = dragScrollLeft.current - dx;
+  };
+
+  const onMouseUp = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    isDragging.current = false;
+    el.style.cursor = '';
+    el.style.userSelect = '';
+  };
+
   return (
     <div className="gb-note-section">
       <p className="gb-note-label">
@@ -62,7 +92,16 @@ const NoteSlider: React.FC<{
         <p className="gb-empty">{isEn ? 'No messages yet.' : '아직 메시지가 없습니다.'}</p>
       ) : (
         <>
-          <div className="gb-note-scroll" ref={scrollRef} onScroll={handleScroll}>
+          <div
+            className="gb-note-scroll"
+            ref={scrollRef}
+            onScroll={handleScroll}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseUp}
+            style={{ cursor: 'grab' }}
+          >
             {messages.map((msg, i) => (
               <div
                 key={msg.id}
