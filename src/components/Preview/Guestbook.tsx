@@ -35,16 +35,22 @@ const NoteSlider: React.FC<{
   const handleScroll = () => {
     const el = scrollRef.current;
     if (!el || messages.length === 0) return;
-    const cardWidth = el.scrollWidth / messages.length;
-    const idx = Math.min(Math.round(el.scrollLeft / cardWidth), messages.length - 1);
-    setActiveIdx(idx);
+    const cards = Array.from(el.children) as HTMLElement[];
+    const scrollLeft = el.scrollLeft;
+    let closest = 0;
+    let minDist = Infinity;
+    cards.forEach((card, i) => {
+      const dist = Math.abs(card.offsetLeft - scrollLeft);
+      if (dist < minDist) { minDist = dist; closest = i; }
+    });
+    setActiveIdx(closest);
   };
 
   const scrollTo = (idx: number) => {
     const el = scrollRef.current;
     if (!el || messages.length === 0) return;
-    const cardWidth = el.scrollWidth / messages.length;
-    el.scrollTo({ left: cardWidth * idx, behavior: 'smooth' });
+    const card = el.children[idx] as HTMLElement | undefined;
+    if (card) el.scrollTo({ left: card.offsetLeft, behavior: 'smooth' });
   };
 
   return (
