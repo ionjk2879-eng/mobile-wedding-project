@@ -1,201 +1,150 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getDoc, doc } from 'firebase/firestore';
+import { db, activatePaidInvitation } from '../firebase';
 import useAuthStore from '../stores/useAuthStore';
-import {
-  VerificationRequest,
-  fetchAllVerificationRequests,
-  approveVerificationRequest,
-  rejectVerificationRequest,
-} from '../services/verificationService';
 import { toast } from '../stores/useToastStore';
 import ToastContainer from '../components/Toast';
 
 const ADMIN_EMAIL = 'ionjk2879@gmail.com';
 
-type Filter = 'pending' | 'all' | 'approved' | 'rejected';
+interface InvInfo {
+  groomName: string;
+  brideName: string;
+  date: string;
+  weddingDateISO: string;
+  isPaid: boolean;
+  expiresAt?: string | null;
+}
 
 const SuperAdminPage: React.FC = () => {
   const user = useAuthStore(s => s.user);
-  const [requests, setRequests] = useState<VerificationRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<Filter>('pending');
-  const [processing, setProcessing] = useState<string | null>(null);
+  const [slug, setSlug] = useState('');
+  const [invInfo, setInvInfo] = useState<InvInfo | null>(null);
+  const [looking, setLooking] = useState(false);
+  const [activating, setActivating] = useState(false);
 
-  const load = () => {
-    setLoading(true);
-    fetchAllVerificationRequests()
-      .then(setRequests)
-      .catch(() => toast.error('불러오기 실패'))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    if (user?.email === ADMIN_EMAIL) load();
-  }, [user]);
+  useEffect(() => { setInvInfo(null); }, [slug]);
 
   if (!user || user.email !== ADMIN_EMAIL) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: "'Pretendard', sans-serif", color: '#6B7280', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: "'Pretendard', sans-serif", color: '#6B7280' }}>
         <ToastContainer />
-        <p style={{ margin: 0 }}>접근 권한이 없습니다.</p>
+        <p>접근 권한이 없습니다.</p>
       </div>
     );
   }
 
-  const filtered = filter === 'all' ? requests : requests.filter(r => r.status === filter);
-  const counts = {
-    pending: requests.filter(r => r.status === 'pending').length,
-    all: requests.length,
-    approved: requests.filter(r => r.status === 'approved').length,
-    rejected: requests.filter(r => r.status === 'rejected').length,
+  const handleLookup = async () => {
+    const trimmed = slug.trim();
+    if (!trimmed) return;
+    setLooking(true);
+    setInvInfo(null);
+    try {
+      const snap = await getDoc(doc(db, 'invitations', trimmed));
+      if (!snap.exists()) { toast.error('청첩장을 찾을 수 없습니다.'); setLooking(false); return; }
+      const d = snap.data();
+      setInvInfo({
+        groomName: d.groomName || '',
+        brideName: d.brideName || '',
+        date: d.date || '',
+        weddingDateISO: d.weddingDateISO || '',
+        isPaid: !!d.isPaid,
+        expiresAt: d.expiresAt,
+      });
+    } catch { toast.error('조회 실패'); }
+    setLooking(false);
   };
 
-  const handleApprove = async (req: VerificationRequest) => {
-    if (!confirm(`'${req.orderNumber}' 주문을 승인하시겠습니까?\n/w/${req.slug} 워터마크가 제거됩니다.`)) return;
-    setProcessing(req.id);
+  const handleActivate = async () => {
+    if (!invInfo || !slug.trim()) return;
+    const name = invInfo.groomName && invInfo.brideName
+      ? `${invInfo.groomName} & ${invInfo.brideName}`
+      : slug;
+    if (!confirm(`'${name}' 청첩장을 활성화하시겠습니까?\n워터마크가 제거되고 1년 보관이 설정됩니다.`)) return;
+    setActivating(true);
     try {
-      await approveVerificationRequest(req.id, req.slug, req.weddingDateISO);
-      toast.success('승인 완료');
-      load();
+      await activatePaidInvitation(slug.trim(), invInfo.weddingDateISO);
+      toast.success('활성화 완료');
+      setSlug('');
+      setInvInfo(null);
     } catch (e: any) {
-      toast.error(e?.message || '승인 실패');
+      toast.error(e?.message || '활성화 실패');
     }
-    setProcessing(null);
+    setActivating(false);
   };
 
-  const handleReject = async (req: VerificationRequest) => {
-    if (!confirm('거절하시겠습니까?')) return;
-    setProcessing(req.id);
-    try {
-      await rejectVerificationRequest(req.id);
-      toast.success('거절 완료');
-      load();
-    } catch {
-      toast.error('처리 실패');
-    }
-    setProcessing(null);
-  };
-
-  const formatDate = (ts: any) => {
-    if (!ts) return '-';
-    const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  };
-
-  const statusColor = (s: string) =>
-    s === 'pending' ? '#F59E0B' : s === 'approved' ? '#10B981' : '#EF4444';
-  const statusBg = (s: string) =>
-    s === 'pending' ? '#FEF3C7' : s === 'approved' ? '#D1FAE5' : '#FEE2E2';
-  const statusText = (s: string) =>
-    s === 'pending' ? '대기' : s === 'approved' ? '승인' : '거절';
+  const expiryLabel = invInfo?.expiresAt
+    ? new Date(invInfo.expiresAt).toLocaleDateString('ko-KR')
+    : '-';
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F9FAFB', fontFamily: "'Pretendard', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#F9FAFB', fontFamily: "'Pretendard', sans-serif", display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '60px 24px' }}>
       <ToastContainer />
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '40px 24px' }}>
-        <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1F2937', margin: '0 0 4px' }}>주문 검증 관리</h1>
-        <p style={{ fontSize: '0.82rem', color: '#9CA3AF', margin: '0 0 28px' }}>네이버스토어 주문번호 검증 요청을 확인하고 승인합니다.</p>
+      <div style={{ width: '100%', maxWidth: 480 }}>
+        <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1F2937', margin: '0 0 4px' }}>청첩장 활성화</h1>
+        <p style={{ fontSize: '0.82rem', color: '#9CA3AF', margin: '0 0 32px' }}>크몽 주문 확인 후 청첩장의 워터마크를 제거합니다.</p>
 
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-          {(['pending', 'all', 'approved', 'rejected'] as Filter[]).map(f => (
+        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', marginBottom: 8 }}>
+            청첩장 슬러그
+          </label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1.5px solid #E5E7EB', borderRadius: 10, overflow: 'hidden', transition: 'border-color 0.2s', ...(slug ? { borderColor: '#B07A8E' } : {}) }}>
+              <span style={{ padding: '11px 0 11px 12px', fontSize: '0.85rem', color: '#9CA3AF', fontFamily: 'monospace', flexShrink: 0 }}>/w/</span>
+              <input
+                type="text"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value.trim())}
+                onKeyDown={(e) => e.key === 'Enter' && handleLookup()}
+                placeholder="slug-here"
+                style={{ flex: 1, padding: '11px 12px 11px 0', border: 'none', outline: 'none', fontSize: '0.88rem', fontFamily: 'monospace', color: '#1F2937', background: 'transparent' }}
+              />
+            </div>
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              style={{
-                padding: '8px 16px', borderRadius: 20, border: 'none',
-                cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, fontSize: '0.82rem',
-                background: filter === f ? '#1F2937' : 'white',
-                color: filter === f ? 'white' : '#6B7280',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-              }}
+              onClick={handleLookup}
+              disabled={!slug.trim() || looking}
+              style={{ padding: '11px 18px', borderRadius: 10, border: 'none', background: '#1F2937', color: 'white', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit', opacity: (!slug.trim() || looking) ? 0.4 : 1 }}
             >
-              {f === 'pending' ? '대기' : f === 'all' ? '전체' : f === 'approved' ? '승인' : '거절'}
-              <span style={{ marginLeft: 6, opacity: 0.65, fontWeight: 400 }}>{counts[f]}</span>
+              {looking ? '...' : '조회'}
             </button>
-          ))}
-          <button
-            onClick={load}
-            style={{
-              marginLeft: 'auto', padding: '8px 16px', borderRadius: 20,
-              border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer',
-              fontSize: '0.82rem', fontFamily: 'inherit', color: '#6B7280',
-            }}
-          >
-            새로고침
-          </button>
-        </div>
-
-        {loading ? (
-          <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 60 }}>불러오는 중...</p>
-        ) : filtered.length === 0 ? (
-          <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 60 }}>요청이 없습니다.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {filtered.map(req => (
-              <div
-                key={req.id}
-                style={{
-                  background: 'white', borderRadius: 14, padding: '18px 20px',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                  borderLeft: `4px solid ${statusColor(req.status)}`,
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12,
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{
-                      display: 'inline-block', padding: '2px 8px', borderRadius: 10,
-                      fontSize: '0.7rem', fontWeight: 700,
-                      background: statusBg(req.status), color: statusColor(req.status),
-                    }}>
-                      {statusText(req.status)}
-                    </span>
-                    <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#1F2937' }}>
-                      {req.groomName && req.brideName ? `${req.groomName} & ${req.brideName}` : req.slug}
-                    </span>
-                  </div>
-                  <p style={{ margin: '0 0 3px', fontSize: '0.8rem', color: '#374151' }}>
-                    주문번호: <strong style={{ fontFamily: 'monospace', letterSpacing: 0.5 }}>{req.orderNumber}</strong>
-                  </p>
-                  <p style={{ margin: '0 0 3px', fontSize: '0.77rem', color: '#6B7280' }}>
-                    /w/{req.slug} · {req.ownerEmail}
-                  </p>
-                  <p style={{ margin: 0, fontSize: '0.73rem', color: '#9CA3AF' }}>
-                    제출: {formatDate(req.submittedAt)}
-                    {req.processedAt && ` · 처리: ${formatDate(req.processedAt)}`}
-                  </p>
-                </div>
-                {req.status === 'pending' && (
-                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                    <button
-                      disabled={processing === req.id}
-                      onClick={() => handleApprove(req)}
-                      style={{
-                        padding: '8px 18px', borderRadius: 8, border: 'none',
-                        background: '#10B981', color: 'white', fontWeight: 700,
-                        fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit',
-                        opacity: processing === req.id ? 0.5 : 1,
-                      }}
-                    >
-                      승인
-                    </button>
-                    <button
-                      disabled={processing === req.id}
-                      onClick={() => handleReject(req)}
-                      style={{
-                        padding: '8px 18px', borderRadius: 8, border: 'none',
-                        background: '#FEE2E2', color: '#DC2626', fontWeight: 700,
-                        fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit',
-                        opacity: processing === req.id ? 0.5 : 1,
-                      }}
-                    >
-                      거절
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
           </div>
-        )}
+
+          {invInfo && (
+            <div style={{ marginTop: 20, padding: 18, background: '#F9FAFB', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '1rem', fontWeight: 700, color: '#1F2937' }}>
+                  {invInfo.groomName && invInfo.brideName ? `${invInfo.groomName} & ${invInfo.brideName}` : slug}
+                </span>
+                <span style={{
+                  padding: '3px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700,
+                  background: invInfo.isPaid ? '#D1FAE5' : '#FEF3C7',
+                  color: invInfo.isPaid ? '#059669' : '#D97706',
+                }}>
+                  {invInfo.isPaid ? '활성화됨' : '미구매'}
+                </span>
+              </div>
+              {invInfo.date && (
+                <p style={{ margin: 0, fontSize: '0.82rem', color: '#6B7280' }}>결혼일: {invInfo.date}</p>
+              )}
+              {invInfo.isPaid && (
+                <p style={{ margin: 0, fontSize: '0.78rem', color: '#9CA3AF' }}>만료: {expiryLabel}</p>
+              )}
+
+              {!invInfo.isPaid && (
+                <button
+                  onClick={handleActivate}
+                  disabled={activating}
+                  style={{ marginTop: 12, width: '100%', padding: '13px', borderRadius: 10, border: 'none', background: '#B07A8E', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit', opacity: activating ? 0.5 : 1, transition: 'opacity 0.15s' }}
+                >
+                  {activating ? '처리 중...' : '워터마크 제거 · 활성화'}
+                </button>
+              )}
+              {invInfo.isPaid && (
+                <p style={{ margin: '8px 0 0', fontSize: '0.78rem', color: '#9CA3AF', textAlign: 'center' }}>이미 활성화된 청첩장입니다.</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

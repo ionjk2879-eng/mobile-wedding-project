@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../firebase';
-import { submitVerificationRequest, fetchMyVerificationRequests } from '../services/verificationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
 import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, Download } from 'lucide-react';
@@ -12,7 +11,7 @@ import ToastContainer from '../components/Toast';
 
 const SITE_ORIGIN = 'https://sonett.ionjk2879.workers.dev';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
-const NAVER_STORE_URL = 'https://smartstore.naver.com/sonett'; // TODO: 실제 스마트스토어 URL로 변경
+const KMONG_SERVICE_URL = 'https://kmong.com'; // TODO: 실제 크몽 서비스 URL로 변경
 
 const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
   const shareUrl = `${SITE_ORIGIN}/w/${slug}`;
@@ -133,72 +132,6 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
   );
 };
 
-const PurchaseModal: React.FC<{
-  slug: string;
-  data: InvitationData;
-  onClose: () => void;
-  onSuccess: () => void;
-}> = ({ slug, data, onClose, onSuccess }) => {
-  const [orderNumber, setOrderNumber] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async () => {
-    if (!orderNumber.trim()) { toast.error('주문번호를 입력해주세요.'); return; }
-    setSubmitting(true);
-    try {
-      await submitVerificationRequest({
-        slug,
-        orderNumber,
-        weddingDateISO: data.weddingDateISO,
-        groomName: data.groomName,
-        brideName: data.brideName,
-      });
-      toast.success('제출되었습니다. 검토 후 워터마크가 제거됩니다.');
-      onSuccess();
-    } catch (e: any) {
-      toast.error(e?.message || '제출에 실패했습니다.');
-    }
-    setSubmitting(false);
-  };
-
-  return (
-    <div className="share-modal-overlay" onClick={onClose}>
-      <div className="purchase-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="share-modal-header">
-          <h3>워터마크 제거</h3>
-          <button className="share-modal-close" onClick={onClose}><X size={20} /></button>
-        </div>
-        <ul className="purchase-benefits">
-          <li>워터마크 제거</li>
-          <li>결혼일 기준 1년 보관</li>
-          <li>카카오톡 공유 기능</li>
-          <li>영구보관 HTML 파일 제공</li>
-        </ul>
-        <a href={NAVER_STORE_URL} target="_blank" rel="noopener noreferrer" className="purchase-naver-link">
-          네이버스토어에서 구매하기 →
-        </a>
-        <div className="purchase-divider"><span>구매 후 주문번호를 입력하세요</span></div>
-        <input
-          type="text"
-          className="purchase-order-input"
-          value={orderNumber}
-          onChange={(e) => setOrderNumber(e.target.value)}
-          placeholder="네이버 주문번호 입력"
-          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-        />
-        <button
-          className="purchase-submit-btn"
-          disabled={!orderNumber.trim() || submitting}
-          onClick={handleSubmit}
-        >
-          {submitting ? '제출 중...' : '주문번호 제출'}
-        </button>
-        <p className="purchase-note">확인 후 수 시간 이내에 처리됩니다.</p>
-      </div>
-    </div>
-  );
-};
-
 const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; onDelete: () => void; onChangeSlug: () => void; onDownloadHtml: () => void }> = ({ slug, isPaid, onDelete, onChangeSlug, onDownloadHtml }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -254,17 +187,9 @@ const ManagePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
   const [changeSlugTarget, setChangeSlugTarget] = useState<string | null>(null);
-  const [purchaseSlug, setPurchaseSlug] = useState<string | null>(null);
-  const [pendingMap, setPendingMap] = useState<Map<string, string>>(new Map());
 
   const load = () => {
-    Promise.all([fetchMyInvitations(), fetchMyVerificationRequests()])
-      .then(([invs, reqs]) => {
-        setInvitations(invs);
-        setPendingMap(new Map(reqs.map(r => [r.slug, r.status])));
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    fetchMyInvitations().then(setInvitations).catch(() => {}).finally(() => setLoading(false));
   };
 
   useEffect(load, []);
@@ -338,15 +263,9 @@ const ManagePage: React.FC = () => {
                     })()}
                   </div>
                   {!data.isPaid && (
-                    pendingMap.get(slug) === 'pending' ? (
-                      <div className="mc-pending-badge">
-                        <span className="mc-pending-dot" /> 주문 검토 중
-                      </div>
-                    ) : (
-                      <button className="mc-purchase-btn" onClick={() => setPurchaseSlug(slug)}>
-                        <ShoppingCart size={13} /> 구매하시면 워터마크가 제거됩니다
-                      </button>
-                    )
+                    <a href={KMONG_SERVICE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
+                      <ShoppingCart size={13} /> 크몽에서 의뢰하시면 워터마크가 제거됩니다
+                    </a>
                   )}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
@@ -389,18 +308,6 @@ const ManagePage: React.FC = () => {
         />
       )}
 
-      {purchaseSlug && (() => {
-        const target = invitations.find(i => i.slug === purchaseSlug);
-        if (!target) return null;
-        return (
-          <PurchaseModal
-            slug={purchaseSlug}
-            data={target.data}
-            onClose={() => setPurchaseSlug(null)}
-            onSuccess={() => { setPurchaseSlug(null); load(); }}
-          />
-        );
-      })()}
 
       <style>{`
         .manage {
@@ -560,131 +467,6 @@ const ManagePage: React.FC = () => {
           transition: opacity 0.15s;
         }
         .mc-purchase-btn:hover { opacity: 0.88; }
-        .mc-pending-badge {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          width: 100%;
-          margin: 10px 0 4px;
-          padding: 9px 14px;
-          border-radius: 10px;
-          background: #FEF9EC;
-          color: #D97706;
-          font-size: 0.78rem;
-          font-weight: 600;
-          border: 1px solid #FDE68A;
-          box-sizing: border-box;
-        }
-        .mc-pending-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #F59E0B;
-          flex-shrink: 0;
-          animation: mc-pulse 1.4s ease-in-out infinite;
-        }
-        @keyframes mc-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.35; }
-        }
-
-        /* Purchase Modal */
-        .purchase-modal {
-          background: white;
-          border-radius: 20px;
-          padding: 32px;
-          max-width: 400px;
-          width: 100%;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        }
-        .purchase-benefits {
-          list-style: none;
-          margin: 0 0 20px;
-          padding: 16px;
-          background: #F9FAFB;
-          border-radius: 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-        .purchase-benefits li {
-          font-size: 0.85rem;
-          color: #374151;
-          font-weight: 500;
-          padding-left: 4px;
-        }
-        .purchase-benefits li::before {
-          content: '✓ ';
-          color: #10B981;
-          font-weight: 700;
-        }
-        .purchase-naver-link {
-          display: block;
-          text-align: center;
-          padding: 14px;
-          border-radius: 12px;
-          background: #03C75A;
-          color: white;
-          font-size: 0.9rem;
-          font-weight: 700;
-          text-decoration: none;
-          margin-bottom: 20px;
-          transition: opacity 0.15s;
-        }
-        .purchase-naver-link:hover { opacity: 0.88; }
-        .purchase-divider {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 14px;
-          color: #9CA3AF;
-          font-size: 0.78rem;
-        }
-        .purchase-divider::before,
-        .purchase-divider::after {
-          content: '';
-          flex: 1;
-          height: 1px;
-          background: #E5E7EB;
-        }
-        .purchase-order-input {
-          width: 100%;
-          padding: 12px 14px;
-          border: 1.5px solid #E5E7EB;
-          border-radius: 10px;
-          font-size: 0.88rem;
-          color: #1F2937;
-          background: white;
-          box-sizing: border-box;
-          font-family: inherit;
-          outline: none;
-          margin-bottom: 10px;
-          transition: border-color 0.2s;
-        }
-        .purchase-order-input:focus { border-color: #B07A8E; }
-        .purchase-order-input::placeholder { color: #D1D5DB; }
-        .purchase-submit-btn {
-          width: 100%;
-          padding: 14px;
-          border-radius: 12px;
-          border: none;
-          background: #1F2937;
-          color: white;
-          font-size: 0.9rem;
-          font-weight: 700;
-          cursor: pointer;
-          font-family: inherit;
-          transition: opacity 0.15s;
-          margin-bottom: 12px;
-        }
-        .purchase-submit-btn:hover:not(:disabled) { opacity: 0.85; }
-        .purchase-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .purchase-note {
-          text-align: center;
-          font-size: 0.75rem;
-          color: #9CA3AF;
-          margin: 0;
-        }
 
         /* Actions */
         .mc-actions {
