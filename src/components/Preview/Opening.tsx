@@ -95,14 +95,16 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
 
+  const isCurtain = opening.openingStyle === 'curtain';
+  const isInsta = opening.openingStyle === 'insta';
+
   const handleDismiss = () => {
     if (phase !== 'ready') return;
     setPhase('exit');
-    const delay = isCurtain ? 1200 : opening.openingStyle === 'fade' ? 1800 : 2200;
+    const style = opening.openingStyle;
+    const delay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 600 : style === 'frame' ? 900 : 2200;
     setTimeout(() => setDismissed(true), delay);
   };
-
-  const isCurtain = opening.openingStyle === 'curtain';
 
   return (
     <div
@@ -111,6 +113,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
+      {isInsta && <div className="op-insta-progress"><div className="op-insta-bar" /></div>}
 
       <div className="op-body">
         <div className="op-line op-line-top" />

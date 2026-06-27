@@ -95,7 +95,7 @@ export interface ContentData {
 
 export interface OpeningConfig {
   openingEnabled: boolean;
-  openingStyle: 'curtain' | 'circle' | 'fade';
+  openingStyle: 'curtain' | 'circle' | 'fade' | 'frame' | 'insta';
   openingColorMode: 'theme' | 'custom';
   openingBgColor: string;
   openingBgOpacity: number;
