@@ -92,7 +92,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'midnight-gala', name: '미드나잇 갈라', category: '2026 트렌드',
     description: '딥 네이비와 별빛 골드의 우아한 이브닝 무드',
     emoji: '🌙', previewColors: ['#F0F0F5', '#2A2A5A', '#1A1A30'],
-    settings: { ...base, theme: 'midnight', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F0F0F5', customAccentColor: '#2A2A5A', bgTexture: 'silk', bgEffect: 'stars', scrollEffect: 'fade-up', heroStyle: 'gradation', galleryStyle: 'style3', accountStyle: 'style3', groomMessage: '별빛 아래 영원을 약속합니다.', brideMessage: '밤하늘처럼 깊은 사랑을 함께해요.', opening: { openingEnabled: true, openingStyle: 'circle', openingColorMode: 'custom', openingBgColor: '#0E0E20', openingBgOpacity: 0.97, openingText: 'A Night to Remember', openingSubText: '', openingFontStyle: 'elegant' } },
+    settings: { ...base, theme: 'midnight', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F0F0F5', customAccentColor: '#2A2A5A', bgTexture: 'silk', bgEffect: 'stars', scrollEffect: 'fade-up', heroStyle: 'fullscreen', galleryStyle: 'style3', accountStyle: 'style3', groomMessage: '별빛 아래 영원을 약속합니다.', brideMessage: '밤하늘처럼 깊은 사랑을 함께해요.', opening: { openingEnabled: true, openingStyle: 'circle', openingColorMode: 'custom', openingBgColor: '#0E0E20', openingBgOpacity: 0.97, openingText: 'A Night to Remember', openingSubText: '', openingFontStyle: 'elegant' } },
   },
   {
     id: 'vintage-film', name: '빈티지 필름', category: '2026 트렌드',
@@ -112,7 +112,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'march-lilac', name: '3월 라일락 블룸', category: '2026년 봄',
     description: '라일락과 벚꽃의 몽환적인 봄 시작',
     emoji: '🌷', previewColors: ['#F3EBF8', '#9B6EBF', '#4A2868'],
-    settings: { ...base, theme: 'lavender', fontFamily: "'Gowun Batang', serif", fontSize: 'medium', customBgColor: '#F3EBF8', customAccentColor: '#9B6EBF', bgTexture: 'watercolor', bgEffect: 'cherry-blossom', scrollEffect: 'fade-up', heroStyle: 'gradation', galleryStyle: 'slide', accountStyle: 'style1', greetingContent: springGreeting, opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#2A1040', openingBgOpacity: 0.95, openingText: 'Spring is Here', openingSubText: '', openingFontStyle: 'elegant' } },
+    settings: { ...base, theme: 'lavender', fontFamily: "'Gowun Batang', serif", fontSize: 'medium', customBgColor: '#F3EBF8', customAccentColor: '#9B6EBF', bgTexture: 'watercolor', bgEffect: 'cherry-blossom', scrollEffect: 'fade-up', heroStyle: 'fullscreen', galleryStyle: 'slide', accountStyle: 'style1', greetingContent: springGreeting, opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#2A1040', openingBgOpacity: 0.95, openingText: 'Spring is Here', openingSubText: '', openingFontStyle: 'elegant' } },
   },
   {
     id: 'april-coral', name: '4월 코랄 브리즈', category: '2026년 봄',
@@ -166,7 +166,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'december-crystal', name: '12월 크리스탈 윈터', category: '2026년 겨울',
     description: '순백의 눈꽃과 실버의 우아한 겨울 웨딩',
     emoji: '❄️', previewColors: ['#F5F8FA', '#7A98B0', '#1A2A3A'],
-    settings: { ...base, theme: 'cloud', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F5F8FA', customAccentColor: '#7A98B0', bgTexture: 'silk', bgEffect: 'snow', scrollEffect: 'fade-up', heroStyle: 'gradation', galleryStyle: 'style3', accountStyle: 'style1', greetingContent: winterGreeting, groomMessage: '눈처럼 순수한 마음으로 사랑하겠습니다.', brideMessage: '겨울 밤 별처럼 빛나는 사랑을 함께해요.', opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#0E1820', openingBgOpacity: 0.96, openingText: 'Winter Wonderland', openingSubText: '', openingFontStyle: 'elegant' } },
+    settings: { ...base, theme: 'cloud', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F5F8FA', customAccentColor: '#7A98B0', bgTexture: 'silk', bgEffect: 'snow', scrollEffect: 'fade-up', heroStyle: 'fullscreen', galleryStyle: 'style3', accountStyle: 'style1', greetingContent: winterGreeting, groomMessage: '눈처럼 순수한 마음으로 사랑하겠습니다.', brideMessage: '겨울 밤 별처럼 빛나는 사랑을 함께해요.', opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#0E1820', openingBgOpacity: 0.96, openingText: 'Winter Wonderland', openingSubText: '', openingFontStyle: 'elegant' } },
   },
   {
     id: 'january-ivory', name: '1월 아이보리 소네트', category: '2026년 겨울',

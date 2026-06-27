@@ -67,7 +67,7 @@ export interface DesignConfig {
   bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
-  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'gradation' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage';
+  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage';
   heroPhotoX?: number;
   heroPhotoY?: number;
   heroPhoto2?: string;

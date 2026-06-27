@@ -131,7 +131,6 @@ const HeroSection: React.FC = () => {
             { key: 'fullscreen', name: '풀스크린', desc: '사진이 전체를 채움' },
             { key: 'split', name: '스플릿', desc: '좌우 분할 레이아웃' },
             { key: 'centercard', name: '센터 카드', desc: '카드형 사진 중앙 배치' },
-            { key: 'gradation', name: '그라데이션', desc: '테마 색상 그라데이션 오버레이' },
             { key: 'magcover', name: '매거진 커버', desc: '잡지 표지 스타일 볼드' },
             { key: 'glassframe', name: '투명 액자', desc: '사진 위에 유리 액자가 떠 있는 느낌' },
             { key: 'instacard', name: '인스타그램', desc: '인스타그램 포스트 감성 레이아웃' },

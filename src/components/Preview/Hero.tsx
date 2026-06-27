@@ -166,21 +166,6 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     </div>
   );
 
-  const renderGradation = () => (
-    <div className="hero-gradation">
-      <div className="grad-bg">{photoEl}</div>
-      <div className="grad-overlay">
-        <div className="grad-bottom">
-          <p className="grad-quote">Forever starts here</p>
-          <h1 className="grad-names">{groomName} <span>&</span> {brideName}</h1>
-          <p className="grad-date">{dateStr} · {timeStr}</p>
-          <p className="grad-venue">{venueName}</p>
-          <span className="grad-dday">{calculateDDay()}</span>
-        </div>
-      </div>
-    </div>
-  );
-
   const renderMagcover = () => (
     <div className="hero-magcover">
       <div className="mag-bg">{photoEl}</div>
@@ -308,7 +293,6 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'fullscreen' && renderFullscreen()}
         {style === 'split' && renderSplit()}
         {style === 'centercard' && renderCentercard()}
-        {style === 'gradation' && renderGradation()}
         {style === 'magcover' && renderMagcover()}
         {style === 'glassframe' && renderGlassframe()}
         {style === 'instacard' && renderInstacard()}
