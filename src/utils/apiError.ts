@@ -12,9 +12,6 @@ export function getApiErrorMessage(err: unknown): string {
   return '오류가 발생했습니다. 다시 시도해주세요.';
 }
 
-// backward compat alias
-export const getFirebaseErrorMessage = getApiErrorMessage;
-
 export async function withRetry<T>(fn: () => Promise<T>, maxRetries = 2): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {

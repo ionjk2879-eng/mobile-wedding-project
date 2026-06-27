@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Image as ImageIcon, Loader2, Move } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { InvitationData } from '../../../types';
-import { uploadImage } from '../../../firebase';
+import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
-import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
+import { getApiErrorMessage } from '../../../utils/apiError';
 
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -21,7 +21,7 @@ const HeroSection: React.FC = () => {
       const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`);
       updateField('heroPhoto', url);
     } catch (err) {
-      toast.error(getFirebaseErrorMessage(err));
+      toast.error(getApiErrorMessage(err));
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -36,7 +36,7 @@ const HeroSection: React.FC = () => {
       const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`);
       updateField('heroPhoto2', url);
     } catch (err) {
-      toast.error(getFirebaseErrorMessage(err));
+      toast.error(getApiErrorMessage(err));
     } finally {
       setUploading2(false);
       e.target.value = '';

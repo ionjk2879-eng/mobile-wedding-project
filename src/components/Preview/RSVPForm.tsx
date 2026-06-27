@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { InvitationData, RSVPResponse } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
-const lazyFirebase = () => import('../../firebase');
+import { submitRSVP } from '../../services/rsvpService';
 import { toast } from '../../stores/useToastStore';
-import { getFirebaseErrorMessage } from '../../utils/firebaseError';
+import { getApiErrorMessage } from '../../utils/apiError';
 import { PreviewOverlay } from '../../hooks/usePreviewPopup';
 
 interface PreviewProps { data: InvitationData; }
@@ -23,11 +23,10 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
     e.preventDefault();
     if (!data.slug) return;
     try {
-      const { submitRSVP } = await lazyFirebase();
       await submitRSVP(data.slug, formData);
       setSubmitted(true);
       setFormOpen(false);
-    } catch (err) { toast.error(getFirebaseErrorMessage(err)); }
+    } catch (err) { toast.error(getApiErrorMessage(err)); }
   };
 
   if (submitted) {

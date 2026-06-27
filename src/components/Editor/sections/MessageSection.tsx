@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Image as ImageIcon, Loader2 } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
-import { uploadImage } from '../../../firebase';
+import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
-import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
+import { getApiErrorMessage } from '../../../utils/apiError';
 
 const MessageSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -18,7 +18,7 @@ const MessageSection: React.FC = () => {
       const url = await uploadImage(file, `images/${data.slug || 'temp'}/profile/${field}_${Date.now()}_${file.name}`);
       updateField(field, url);
     } catch (err) {
-      toast.error(getFirebaseErrorMessage(err));
+      toast.error(getApiErrorMessage(err));
     } finally {
       setUploadingField(null);
       e.target.value = '';

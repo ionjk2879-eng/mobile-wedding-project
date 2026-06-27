@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { loadInvitation, activatePaidInvitation } from '../firebase';
+import { loadInvitation, activatePaidInvitation } from '../services/invitationService';
 import useAuthStore from '../stores/useAuthStore';
 import { toast } from '../stores/useToastStore';
 import ToastContainer from '../components/Toast';

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
-import { uploadFile } from '../../../firebase';
+import { uploadFile } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
-import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
+import { getApiErrorMessage } from '../../../utils/apiError';
 
 const MUSIC_PRESETS = [
   { name: '없음', url: '' },
@@ -30,7 +30,7 @@ const MusicSection: React.FC = () => {
       const url = await uploadFile(file, `music/${slug || 'temp'}/${Date.now()}_${file.name}`);
       updateField('bgMusicUrl', url);
     } catch (err) {
-      toast.error(getFirebaseErrorMessage(err));
+      toast.error(getApiErrorMessage(err));
     } finally {
       setUploading(false);
       e.target.value = '';

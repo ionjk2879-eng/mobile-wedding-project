@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
-import { checkSlugAvailable } from '../../../firebase';
+import { checkSlugAvailable } from '../../../services/invitationService';
 
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchRSVPResponses, loadInvitation } from '../firebase';
+import { loadInvitation } from '../services/invitationService';
+import { fetchRSVPResponses } from '../services/rsvpService';
 import { signInWithGoogle, signOut } from '../services/auth';
 import { RSVPResponse } from '../types';
 import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut } from 'lucide-react';

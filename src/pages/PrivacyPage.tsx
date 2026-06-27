@@ -57,7 +57,7 @@ const PrivacyPage: React.FC = () => (
           <tr><th>수탁업체</th><th>위탁 업무</th></tr>
         </thead>
         <tbody>
-          <tr><td>Google Firebase</td><td>데이터 저장, 인증 서비스</td></tr>
+          <tr><td>Cloudflare</td><td>데이터 저장, 서비스 운영</td></tr>
           <tr><td>Kakao</td><td>소셜 로그인, 카카오톡 공유</td></tr>
           <tr><td>Naver</td><td>소셜 로그인</td></tr>
         </tbody>

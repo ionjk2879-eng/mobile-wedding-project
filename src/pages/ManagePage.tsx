@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchMyInvitations, deleteInvitation, changeSlug } from '../firebase';
+import { fetchMyInvitations, deleteInvitation, changeSlug } from '../services/invitationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
 import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, Download } from 'lucide-react';

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { InvitationData } from '../../../types';
-import { uploadImage } from '../../../firebase';
+import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
-import { getFirebaseErrorMessage } from '../../../utils/firebaseError';
+import { getApiErrorMessage } from '../../../utils/apiError';
 
 const PhotosSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -23,7 +23,7 @@ const PhotosSection: React.FC = () => {
       const urls = await Promise.all(uploads);
       addPhotos(urls);
     } catch (err) {
-      toast.error(getFirebaseErrorMessage(err));
+      toast.error(getApiErrorMessage(err));
     } finally {
       setUploading(false);
       e.target.value = '';
