@@ -538,6 +538,22 @@
 .op-insta.op-phase-exit .op-body { animation: none; }
 .op-insta .op-enter { border-radius: 30px; letter-spacing: 3px; }
 
+/* Typing (타이핑) style */
+.op-typing-body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 60px 48px; text-align: center; min-height: 100%; width: 100%; }
+.op-typing-heart { font-size: 2rem; color: rgba(255,255,255,0.75); opacity: 0; transform: scale(0.6) translateY(6px); transition: opacity 1s cubic-bezier(0.22,1,0.36,1), transform 1s cubic-bezier(0.22,1,0.36,1); }
+.op-typing-heart.visible { opacity: 0.75; transform: scale(1) translateY(0); }
+.op-typing-text { font-size: 1.55em; letter-spacing: 3px; font-family: var(--op-font); font-weight: var(--op-weight); color: rgba(255,255,255,0.92); min-height: 1.6em; display: flex; align-items: center; text-shadow: 0 1px 12px rgba(0,0,0,0.2); }
+.op-cursor { display: inline-block; color: rgba(255,255,255,0.85); animation: op-cursor-blink 0.9s step-end infinite; margin-left: 1px; font-weight: 100; }
+@keyframes op-cursor-blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.op-typing-names { margin: 0; font-size: 0.88em; letter-spacing: 7px; color: rgba(255,255,255,0.65); font-family: var(--op-font); font-weight: var(--op-weight); opacity: 0; transform: translateY(10px); transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+.op-typing-names.visible { opacity: 0.65; transform: translateY(0); }
+.op-typing-sub { margin: 0; font-size: 0.78em; letter-spacing: 4px; color: rgba(255,255,255,0.5); font-family: var(--op-font); font-weight: 300; opacity: 0; transform: translateY(8px); transition: opacity 0.9s ease 0.15s, transform 0.9s ease 0.15s; }
+.op-typing-sub.visible { opacity: 0.5; transform: translateY(0); }
+.op-typing-btn { opacity: 0; pointer-events: none; transform: translateY(12px); transition: opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s, background 0.3s, border-color 0.3s; }
+.op-typing-done .op-typing-btn { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.op-typing.op-phase-exit { transition: opacity 1s ease; opacity: 0 !important; }
+.op-typing.op-phase-exit .op-typing-body { animation: op-body-exit 0.6s ease forwards; }
+
 /* Preview overlay popup (portal to body) */
 .pv-overlay-root { animation: pv-overlay-in 0.2s ease; }
 @keyframes pv-overlay-in { from { opacity: 0; } to { opacity: 1; } }

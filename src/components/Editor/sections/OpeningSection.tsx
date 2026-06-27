@@ -48,6 +48,7 @@ const OpeningSection: React.FC = () => {
                 { key: 'fade' as const, name: '페이드', desc: '서서히 밝아지며 나타남' },
                 { key: 'frame' as const, name: '투명 액자', desc: '유리 액자 속에 담은 고급스러운 연출' },
                 { key: 'insta' as const, name: '인스타그램', desc: '스토리 형식의 감각적인 연출' },
+                { key: 'typing' as const, name: '타이핑', desc: '글자가 한 자씩 타이핑되는 감성 연출' },
               ]).map(s => (
                 <button key={s.key} type="button" className={`account-style-btn ${opening.openingStyle === s.key ? 'active' : ''}`} onClick={() => update({ openingStyle: s.key })}>
                   <strong>{s.name}</strong><span>{s.desc}</span>
@@ -63,18 +64,32 @@ const OpeningSection: React.FC = () => {
                 <strong>테마 색상</strong><span>선택한 테마에 맞춰 자동 적용</span>
               </button>
               <button type="button" className={`account-style-btn ${opening.openingColorMode === 'custom' ? 'active' : ''}`} onClick={() => update({ openingColorMode: 'custom' })}>
-                <strong>직접 선택</strong><span>원하는 색상을 직접 지정</span>
+                <strong>단색</strong><span>원하는 색상을 직접 지정</span>
+              </button>
+              <button type="button" className={`account-style-btn ${opening.openingColorMode === 'gradient' ? 'active' : ''}`} onClick={() => update({ openingColorMode: 'gradient' })}>
+                <strong>그라데이션</strong><span>두 색상이 부드럽게 전환</span>
               </button>
             </div>
           </div>
 
-          {opening.openingColorMode === 'custom' && (
+          {(opening.openingColorMode === 'custom' || opening.openingColorMode === 'gradient') && (
             <div className="input-group">
-              <label>배경색 선택</label>
+              <label>{opening.openingColorMode === 'gradient' ? '시작 색상 (위)' : '배경색 선택'}</label>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <input type="color" value={opening.openingBgColor} onChange={(e) => update({ openingBgColor: e.target.value })} style={{ width: 40, height: 40, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
                 <input type="text" value={opening.openingBgColor} onChange={(e) => update({ openingBgColor: e.target.value })} className="modern-input" style={{ flex: 1 }} />
               </div>
+            </div>
+          )}
+
+          {opening.openingColorMode === 'gradient' && (
+            <div className="input-group">
+              <label>끝 색상 (아래)</label>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input type="color" value={opening.openingBgColor2 || '#E8857A'} onChange={(e) => update({ openingBgColor2: e.target.value })} style={{ width: 40, height: 40, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
+                <input type="text" value={opening.openingBgColor2 || '#E8857A'} onChange={(e) => update({ openingBgColor2: e.target.value })} className="modern-input" style={{ flex: 1 }} />
+              </div>
+              <div style={{ marginTop: 8, height: 32, borderRadius: 8, background: `linear-gradient(to right, ${opening.openingBgColor || '#F5E6A3'}, ${opening.openingBgColor2 || '#E8857A'})` }} />
             </div>
           )}
 

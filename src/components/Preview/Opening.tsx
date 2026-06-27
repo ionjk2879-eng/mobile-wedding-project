@@ -50,10 +50,42 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
+  // Typing-specific state
+  const isTyping = opening.openingStyle === 'typing';
+  const [typedCount, setTypedCount] = useState(0);
+  const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
+
   useEffect(() => {
     const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!isTyping) return;
+    setTypedCount(0);
+    setTypingPhase('idle');
+    const t1 = setTimeout(() => setTypingPhase('heart'), 500);
+    const t2 = setTimeout(() => setTypingPhase('typing'), 1200);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [isTyping]);
+
+  const mainTextRef = useRef(opening.openingText || 'We\'re getting married');
+  mainTextRef.current = opening.openingText || 'We\'re getting married';
+
+  useEffect(() => {
+    if (typingPhase !== 'typing') return;
+    const text = mainTextRef.current;
+    let count = 0;
+    const interval = setInterval(() => {
+      count++;
+      setTypedCount(count);
+      if (count >= text.length) {
+        clearInterval(interval);
+        setTimeout(() => setTypingPhase('done'), 700);
+      }
+    }, 90);
+    return () => clearInterval(interval);
+  }, [typingPhase]);
 
   useEffect(() => {
     if (dismissed) return;
@@ -98,44 +130,69 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const isCurtain = opening.openingStyle === 'curtain';
   const isInsta = opening.openingStyle === 'insta';
 
+  // Gradient background support
+  const bgOverride: React.CSSProperties =
+    colorMode === 'gradient'
+      ? { background: `linear-gradient(180deg, ${opening.openingBgColor || '#F5E6A3'} 0%, ${opening.openingBgColor2 || '#E8857A'} 100%)` }
+      : {};
+
   const handleDismiss = () => {
-    if (phase !== 'ready') return;
+    if (isTyping) {
+      if (typingPhase !== 'done') return;
+    } else {
+      if (phase !== 'ready') return;
+    }
     setPhase('exit');
     const style = opening.openingStyle;
-    const delay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 600 : style === 'frame' ? 900 : 2200;
+    const delay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 600 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
     setTimeout(() => setDismissed(true), delay);
   };
 
   return (
     <div
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights } as React.CSSProperties}
+      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, ...bgOverride } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
       {isInsta && <div className="op-insta-progress"><div className="op-insta-bar" /></div>}
 
-      <div className="op-body">
-        <div className="op-line op-line-top" />
+      {isTyping ? (
+        <div className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}`}>
+          <div className={`op-typing-heart${typingPhase !== 'idle' ? ' visible' : ''}`}>♥</div>
+          <div className="op-typing-text">
+            <span>{mainText.slice(0, typedCount)}</span>
+            {(typingPhase === 'typing' || (typingPhase === 'heart' && typedCount === 0)) && (
+              <span className="op-cursor">|</span>
+            )}
+          </div>
+          <p className={`op-typing-names${typingPhase === 'done' ? ' visible' : ''}`}>{groom} &amp; {bride}</p>
+          <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>{subText}</p>
+          <button className="op-enter op-typing-btn" onClick={handleDismiss}>초대장 열기</button>
+        </div>
+      ) : (
+        <div className="op-body">
+          <div className="op-line op-line-top" />
 
-        <p className="op-names">
-          {groom.split('').map((ch, i) => <span key={`g${i}`} className="op-char" style={{ animationDelay: `${0.6 + i * 0.08}s` }}>{ch}</span>)}
-          <span className="op-char op-amp" style={{ animationDelay: `${0.6 + groom.length * 0.08}s` }}>&nbsp;&&nbsp;</span>
-          {bride.split('').map((ch, i) => <span key={`b${i}`} className="op-char" style={{ animationDelay: `${0.6 + (groom.length + 1 + i) * 0.08}s` }}>{ch}</span>)}
-        </p>
+          <p className="op-names">
+            {groom.split('').map((ch, i) => <span key={`g${i}`} className="op-char" style={{ animationDelay: `${0.6 + i * 0.08}s` }}>{ch}</span>)}
+            <span className="op-char op-amp" style={{ animationDelay: `${0.6 + groom.length * 0.08}s` }}>&nbsp;&&nbsp;</span>
+            {bride.split('').map((ch, i) => <span key={`b${i}`} className="op-char" style={{ animationDelay: `${0.6 + (groom.length + 1 + i) * 0.08}s` }}>{ch}</span>)}
+          </p>
 
-        <h2 className="op-main">
-          {mainText.split('').map((ch, i) => (
-            <span key={i} className="op-char" style={{ animationDelay: `${1.2 + i * 0.04}s` }}>{ch === ' ' ? ' ' : ch}</span>
-          ))}
-        </h2>
+          <h2 className="op-main">
+            {mainText.split('').map((ch, i) => (
+              <span key={i} className="op-char" style={{ animationDelay: `${1.2 + i * 0.04}s` }}>{ch === ' ' ? ' ' : ch}</span>
+            ))}
+          </h2>
 
-        <p className="op-sub">{subText}</p>
+          <p className="op-sub">{subText}</p>
 
-        <div className="op-line op-line-bottom" />
+          <div className="op-line op-line-bottom" />
 
-        <button className="op-enter" onClick={handleDismiss}>초대장 열기</button>
-      </div>
+          <button className="op-enter" onClick={handleDismiss}>초대장 열기</button>
+        </div>
+      )}
 
     </div>
   );
