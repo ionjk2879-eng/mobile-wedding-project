@@ -196,6 +196,45 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     </div>
   );
 
+  const renderGlassframe = () => (
+    <div className="hero-glassframe">
+      <div className="gf-bg">{photoEl}</div>
+      <div className="gf-card">
+        <p className="gf-label">WEDDING INVITATION</p>
+        <h1 className="gf-names">{groomName} <span>&</span> {brideName}</h1>
+        <div className="gf-divider" />
+        <p className="gf-date">{dateStr}</p>
+        <p className="gf-time">{timeStr}</p>
+        <p className="gf-venue">{venueName}</p>
+        <span className="gf-dday">{calculateDDay()}</span>
+      </div>
+    </div>
+  );
+
+  const renderInstacard = () => {
+    const initials = `${groomName[0] || ''}${brideName[0] || ''}`;
+    return (
+      <div className="hero-instacard">
+        <div className="ic-header">
+          <div className="ic-avatar-ring">
+            <div className="ic-avatar-inner">{initials}</div>
+          </div>
+          <div className="ic-handle">
+            <span className="ic-names-small">{groomName} & {brideName}</span>
+            <span className="ic-label">Wedding Invitation</span>
+          </div>
+          <span className="ic-dday">{calculateDDay()}</span>
+        </div>
+        <div className="ic-photo-wrap">{photoEl}</div>
+        <div className="ic-info">
+          <h1 className="ic-names">{groomName} <span>&</span> {brideName}</h1>
+          <p className="ic-date">{dateStr} · {timeStr}</p>
+          <p className="ic-venue">{venueName}</p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <section className="hero" style={{ fontFamily: data.fontFamily }} aria-label="메인">
       <div
@@ -211,6 +250,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'centercard' && renderCentercard()}
         {style === 'gradation' && renderGradation()}
         {style === 'magcover' && renderMagcover()}
+        {style === 'glassframe' && renderGlassframe()}
+        {style === 'instacard' && renderInstacard()}
       </div>
 
     </section>
