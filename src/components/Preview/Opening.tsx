@@ -56,9 +56,10 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
 
   useEffect(() => {
-    const timer = setTimeout(() => setPhase('ready'), 3200);
+    const delay = opening.openingStyle === 'fade' ? 2000 : 3200;
+    const timer = setTimeout(() => setPhase('ready'), delay);
     return () => clearTimeout(timer);
-  }, []);
+  }, [opening.openingStyle]);
 
   useEffect(() => {
     if (!isTyping) return;
