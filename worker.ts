@@ -9,8 +9,7 @@ interface Env {
   NAVER_CLIENT_SECRET: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
-  FIREBASE_SA_EMAIL?: string;
-  FIREBASE_SA_PRIVATE_KEY?: string;
+  RESEND_API_KEY?: string;
 }
 
 // --- JWT HS256 ---
@@ -446,7 +445,61 @@ async function handleImageGet(_request: Request, env: Env, key: string): Promise
   });
 }
 
-// --- Cron: expired invitation cleanup ---
+// --- Cron: expiry notification + cleanup ---
+
+async function sendExpiryNotificationEmail(env: Env, to: string, name: string, slug: string, expiresAt: string): Promise<void> {
+  if (!env.RESEND_API_KEY) return;
+  const expiryDate = new Date(expiresAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+  const inviteUrl = `https://sonett.kr/${slug}`;
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: 'Sonett <noreply@sonett.kr>',
+      to: [to],
+      subject: '[Sonett] 청첩장이 7일 후 만료됩니다',
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;color:#333">
+          <h2 style="font-size:20px;margin-bottom:8px">안녕하세요, ${name}님</h2>
+          <p style="line-height:1.7;color:#555">
+            Sonett에서 제작하신 청첩장이 <strong>${expiryDate}</strong>에 만료될 예정입니다.<br>
+            만료 후에는 청첩장 링크가 더 이상 작동하지 않습니다.
+          </p>
+          <div style="margin:24px 0;padding:16px;background:#f9f5f0;border-radius:8px;text-align:center">
+            <a href="${inviteUrl}" style="color:#b08d6a;font-weight:bold;text-decoration:none">${inviteUrl}</a>
+          </div>
+          <p style="line-height:1.7;color:#555">
+            청첩장을 계속 유지하려면
+            <a href="https://sonett.kr/manage" style="color:#b08d6a">sonett.kr/manage</a>에서
+            연장 문의를 해주세요.
+          </p>
+          <p style="margin-top:32px;font-size:13px;color:#aaa">Sonett · 온라인 모바일 청첩장</p>
+        </div>
+      `,
+    }),
+  });
+}
+
+async function notifyExpiringInvitations(env: Env): Promise<void> {
+  const rows = await env.DB.prepare(`
+    SELECT i.slug, i.expires_at, u.email, u.name
+    FROM invitations i
+    JOIN users u ON i.owner_uid = u.uid
+    WHERE i.expires_at IS NOT NULL
+      AND i.expires_at > datetime('now')
+      AND i.expires_at <= datetime('now', '+7 days')
+      AND i.notified = 0
+  `).all();
+
+  for (const row of rows.results) {
+    const { slug, expires_at, email, name } = row as { slug: string; expires_at: string; email: string; name: string };
+    if (!email) continue;
+    try {
+      await sendExpiryNotificationEmail(env, email, name || '회원', slug, expires_at);
+      await env.DB.prepare('UPDATE invitations SET notified = 1 WHERE slug = ?').bind(slug).run();
+    } catch { /* 알림 실패 무시 */ }
+  }
+}
 
 async function deleteExpiredInvitations(env: Env): Promise<void> {
   const now = new Date().toISOString();
@@ -601,6 +654,7 @@ export default {
   },
 
   async scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
+    await notifyExpiringInvitations(env);
     await deleteExpiredInvitations(env);
   },
 };
