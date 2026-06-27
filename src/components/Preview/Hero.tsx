@@ -198,9 +198,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const renderGlassframe = () => (
     <div className="hero-glassframe">
-      <div className="gf-bg">{photoEl}</div>
       <div className="gf-card">
         <p className="gf-label">WEDDING INVITATION</p>
+        <div className="gf-photo">{photoEl}</div>
         <h1 className="gf-names">{groomName} <span>&</span> {brideName}</h1>
         <div className="gf-divider" />
         <p className="gf-date">{dateStr}</p>
