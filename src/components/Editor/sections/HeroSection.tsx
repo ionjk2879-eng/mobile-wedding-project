@@ -135,6 +135,8 @@ const HeroSection: React.FC = () => {
             { key: 'magcover', name: '매거진 커버', desc: '잡지 표지 스타일 볼드' },
             { key: 'glassframe', name: '투명 액자', desc: '사진 위에 유리 액자가 떠 있는 느낌' },
             { key: 'instacard', name: '인스타그램', desc: '인스타그램 포스트 감성 레이아웃' },
+            { key: 'bookcover', name: '북커버', desc: '고급 양장본 표지 스타일' },
+            { key: 'bookpage', name: '책 한 페이지', desc: '아름다운 책 속 삽화 페이지 느낌' },
           ] as { key: InvitationData['heroStyle']; name: string; desc: string }[]).map(s => (
             <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
               <strong>{s.name}</strong>

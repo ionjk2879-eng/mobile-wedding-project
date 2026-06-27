@@ -147,6 +147,42 @@
 .gf-venue { font-size: 0.76em; margin: 0 0 14px; color: var(--wedding-text-sub); position: relative; z-index: 1; }
 .gf-dday { display: inline-block; padding: 4px 14px; border: 1px solid var(--wedding-border); font-size: 0.7em; letter-spacing: 2px; color: var(--wedding-text-sub); position: relative; z-index: 1; }
 
+/* Book Cover (북커버) */
+.hero-bookcover { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; max-height: 100vh; overflow: hidden; }
+.bc-bg { position: absolute; inset: 0; }
+.bc-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6) saturate(0.75); }
+.bc-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
+.bc-overlay { position: absolute; inset: 0; background: rgba(10,6,4,0.25); }
+.bc-frame { position: absolute; inset: 24px; z-index: 2; border: 1px solid rgba(255,255,255,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 28px 24px; text-align: center; color: white; }
+.bc-frame::before { content: ''; position: absolute; inset: 7px; border: 1px solid rgba(255,255,255,0.2); pointer-events: none; }
+.bc-top-label { font-size: 0.58em; letter-spacing: 6px; margin: 0; opacity: 0.72; text-transform: uppercase; position: relative; z-index: 1; }
+.bc-rule { width: 70px; height: 1px; background: rgba(255,255,255,0.4); margin: 8px 0; position: relative; z-index: 1; }
+.bc-groom { font-size: 2.6em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; line-height: 1.05; text-shadow: 0 2px 20px rgba(0,0,0,0.5); position: relative; z-index: 1; }
+.bc-amp { font-size: 1.3em; font-weight: 300; margin: 4px 0; font-family: 'Cormorant Garamond', serif; font-style: italic; opacity: 0.65; position: relative; z-index: 1; }
+.bc-bride { font-size: 2.6em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; line-height: 1.05; text-shadow: 0 2px 20px rgba(0,0,0,0.5); position: relative; z-index: 1; }
+.bc-date { font-size: 0.8em; margin: 0; opacity: 0.82; letter-spacing: 3px; position: relative; z-index: 1; }
+.bc-venue { font-size: 0.7em; margin: 2px 0 0; opacity: 0.6; position: relative; z-index: 1; }
+.bc-dday { display: inline-block; margin-top: 10px; padding: 4px 18px; border: 1px solid rgba(255,255,255,0.35); font-size: 0.68em; letter-spacing: 3px; opacity: 0.82; position: relative; z-index: 1; }
+
+/* Book Page (책 한 페이지) */
+.hero-bookpage { padding: 32px 28px 44px; display: flex; flex-direction: column; align-items: center; }
+.bp-running-head { display: flex; align-items: center; gap: 8px; font-size: 0.6em; letter-spacing: 4px; color: var(--wedding-text-sub); text-transform: uppercase; width: 100%; justify-content: center; margin-bottom: 8px; }
+.bp-rule { width: 100%; height: 1px; background: var(--wedding-border); }
+.bp-ornament { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 14px 0 16px; color: var(--wedding-main); font-size: 1em; opacity: 0.7; }
+.bp-ornament::before, .bp-ornament::after { content: ''; flex: 0 0 36px; height: 1px; background: var(--wedding-main); opacity: 0.5; }
+.bp-photo { width: 70%; aspect-ratio: 3/4; overflow: hidden; line-height: 0; margin-bottom: 22px; box-shadow: 3px 5px 20px rgba(0,0,0,0.1), -1px -1px 0 var(--wedding-border), 1px 1px 0 rgba(255,255,255,0.6); }
+.bp-photo .hero-photo { width: 100%; height: 100%; object-fit: cover; }
+.bp-photo .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
+.bp-body { text-align: center; width: 100%; }
+.bp-names { font-size: 1.75em; font-weight: 300; margin: 0 0 8px; font-family: 'Cormorant Garamond', serif; letter-spacing: 4px; color: var(--wedding-text-main); line-height: 1.2; }
+.bp-names span { font-style: italic; opacity: 0.55; margin: 0 6px; }
+.bp-divider { width: 44px; height: 1px; background: var(--wedding-main); margin: 0 auto 10px; }
+.bp-date { font-size: 0.86em; margin: 0 0 4px; color: var(--wedding-text-body); letter-spacing: 2px; }
+.bp-time { font-size: 0.78em; margin: 0 0 3px; color: var(--wedding-text-sub); }
+.bp-venue { font-size: 0.76em; margin: 0; color: var(--wedding-text-sub); }
+.bp-footer { width: 100%; text-align: center; margin-top: 18px; }
+.bp-dday { display: inline-block; margin-top: 8px; font-size: 0.68em; color: var(--wedding-text-sub); letter-spacing: 4px; text-transform: uppercase; }
+
 /* Instagram Card (인스타그램) */
 .hero-instacard { display: flex; flex-direction: column; padding-bottom: 24px; }
 .ic-header { display: flex; align-items: center; gap: 10px; padding: 10px 12px 8px; }

@@ -211,6 +211,48 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     </div>
   );
 
+  const renderBookcover = () => (
+    <div className="hero-bookcover">
+      <div className="bc-bg">{photoEl}</div>
+      <div className="bc-overlay" />
+      <div className="bc-frame">
+        <p className="bc-top-label">Wedding Invitation</p>
+        <div className="bc-rule" />
+        <h1 className="bc-groom">{groomName}</h1>
+        <p className="bc-amp">&</p>
+        <h1 className="bc-bride">{brideName}</h1>
+        <div className="bc-rule" />
+        <p className="bc-date">{dateStr}</p>
+        <p className="bc-venue">{venueName}</p>
+        <span className="bc-dday">{calculateDDay()}</span>
+      </div>
+    </div>
+  );
+
+  const renderBookpage = () => (
+    <div className="hero-bookpage">
+      <div className="bp-running-head">
+        <span>Wedding Invitation</span>
+        <span>·</span>
+        <span>{groomName} & {brideName}</span>
+      </div>
+      <div className="bp-rule" />
+      <div className="bp-ornament"><span>✦</span></div>
+      <div className="bp-photo">{photoEl}</div>
+      <div className="bp-body">
+        <h1 className="bp-names">{groomName} <span>&</span> {brideName}</h1>
+        <div className="bp-divider" />
+        <p className="bp-date">{dateStr}</p>
+        <p className="bp-time">{timeStr}</p>
+        <p className="bp-venue">{venueName}</p>
+      </div>
+      <div className="bp-footer">
+        <div className="bp-rule" />
+        <span className="bp-dday">{calculateDDay()}</span>
+      </div>
+    </div>
+  );
+
   const renderInstacard = () => {
     const initials = `${groomName[0] || ''}${brideName[0] || ''}`;
     return (
@@ -270,6 +312,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'magcover' && renderMagcover()}
         {style === 'glassframe' && renderGlassframe()}
         {style === 'instacard' && renderInstacard()}
+        {style === 'bookcover' && renderBookcover()}
+        {style === 'bookpage' && renderBookpage()}
       </div>
 
     </section>
