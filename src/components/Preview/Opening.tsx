@@ -122,8 +122,26 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const themeKey = theme || 'blush';
   const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;
   const bgColor = colorMode === 'theme' ? themeColor.bg : (opening.openingBgColor || '#1F2937');
-  const textColor = colorMode === 'theme' ? themeColor.text : 'white';
-  const accentColor = colorMode === 'theme' ? themeColor.accent : 'rgba(255,255,255,0.4)';
+
+  // 배경 밝기 계산 → 글자색 자동 결정
+  const hexLuminance = (hex: string): number => {
+    const h = hex.replace('#', '');
+    if (h.length < 6) return 0;
+    const r = parseInt(h.slice(0, 2), 16) / 255;
+    const g = parseInt(h.slice(2, 4), 16) / 255;
+    const b = parseInt(h.slice(4, 6), 16) / 255;
+    const lin = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  };
+  const isLightBg = (): boolean => {
+    if (colorMode === 'theme') return false;
+    const lum1 = hexLuminance(opening.openingBgColor || '#1F2937');
+    const lum2 = colorMode === 'gradient' ? hexLuminance(opening.openingBgColor2 || opening.openingBgColor || '#1F2937') : lum1;
+    return (lum1 + lum2) / 2 > 0.35;
+  };
+  const lightBg = isLightBg();
+  const textColor = colorMode === 'theme' ? themeColor.text : (lightBg ? 'rgba(40,30,28,0.82)' : 'rgba(255,255,255,0.92)');
+  const accentColor = colorMode === 'theme' ? themeColor.accent : (lightBg ? 'rgba(40,30,28,0.30)' : 'rgba(255,255,255,0.40)');
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
@@ -152,7 +170,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   return (
     <div
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, ...bgOverride } as React.CSSProperties}
+      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': lightBg ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': lightBg ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
