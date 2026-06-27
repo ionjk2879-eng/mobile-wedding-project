@@ -220,17 +220,35 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
             <div className="ic-avatar-inner">{initials}</div>
           </div>
           <div className="ic-handle">
-            <span className="ic-names-small">{groomName} & {brideName}</span>
-            <span className="ic-label">Wedding Invitation</span>
+            <span className="ic-username">{groomName} & {brideName}</span>
+            <span className="ic-location">📍 {venueName}</span>
           </div>
-          <span className="ic-dday">{calculateDDay()}</span>
+          <span className="ic-more">···</span>
         </div>
+
         <div className="ic-photo-wrap">{photoEl}</div>
-        <div className="ic-info">
-          <h1 className="ic-names">{groomName} <span>&</span> {brideName}</h1>
-          <p className="ic-date">{dateStr} · {timeStr}</p>
-          <p className="ic-venue">{venueName}</p>
+
+        <div className="ic-actions">
+          <div className="ic-actions-left">
+            <span className="ic-action ic-action-heart">♡</span>
+            <span className="ic-action">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            <span className="ic-action">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </span>
+          </div>
+          <span className="ic-action">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </span>
         </div>
+
+        <div className="ic-likes"><span className="ic-likes-heart">♥</span> {calculateDDay()}</div>
+        <div className="ic-caption">
+          <span className="ic-caption-user">{groomName} & {brideName}</span>
+          <span className="ic-caption-text"> {dateStr} · {timeStr}</span>
+        </div>
+        <p className="ic-timestamp">WEDDING INVITATION</p>
       </div>
     );
   };

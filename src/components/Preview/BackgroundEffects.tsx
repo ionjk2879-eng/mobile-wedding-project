@@ -99,4 +99,4 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
   }
 };
 
-export default BackgroundEffects;
+export default React.memo(BackgroundEffects);

@@ -138,8 +138,8 @@
 .saved-popup-btn.confirm:hover { background: #9B6A7E; }
 
 /* Full preview */
-.full-preview-container { width: 100vw; height: 100vh; background: #ffffff; display: flex; justify-content: center; align-items: flex-start; overflow-y: scroll; padding: 0; margin: 0; overflow-anchor: none; }
-.full-preview-container .invitation-page,
+.full-preview-container { width: 100vw; height: 100vh; background: #ffffff; overflow-y: scroll; overflow-x: hidden; padding: 0; margin: 0; overflow-anchor: none; }
+.full-preview-container .invitation-page { max-width: 430px; background-color: var(--wedding-bg); min-height: 100vh; position: relative; margin: 0 auto; }
 .view-container .invitation-page { width: 100%; max-width: 430px; background-color: var(--wedding-bg); min-height: 100%; position: relative; }
 .back-to-editor-btn { position: fixed; top: 20px; right: 20px; background: #B3A2C8; color: white; padding: 12px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 700; z-index: 9999; cursor: pointer; border: none; }
 
