@@ -1,9 +1,9 @@
 import { create } from 'zustand';
-import { User } from 'firebase/auth';
 import { onAuthChanged } from '../services/auth';
+import type { AuthUser } from '../services/api';
 
 interface AuthStore {
-  user: User | null;
+  user: AuthUser | null;
   loading: boolean;
 }
 

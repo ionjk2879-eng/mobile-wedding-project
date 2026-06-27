@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { InvitationData, GuestMessage } from '../../types';
-const lazyFirebase = () => import('../../firebase');
+import { fetchGuestMessages, submitGuestMessage, deleteGuestMessage } from '../../services/guestbookService';
 import { toast } from '../../stores/useToastStore';
-import { getFirebaseErrorMessage } from '../../utils/firebaseError';
 import { PreviewOverlay } from '../../hooks/usePreviewPopup';
 import { Send, Trash2 } from 'lucide-react';
 
@@ -179,7 +178,7 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   useEffect(() => {
     if (!data.slug || loaded) return;
-    lazyFirebase().then(({ fetchGuestMessages }) => fetchGuestMessages(data.slug)).then(setMessages).catch(() => {}).finally(() => setLoaded(true));
+    fetchGuestMessages(data.slug).then(setMessages).catch(() => {}).finally(() => setLoaded(true));
   }, [data.slug, loaded]);
 
   if (!data.isGuestbookEnabled) return null;
@@ -197,35 +196,24 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
     }
     setSubmitting(true);
     try {
-      const fb = await lazyFirebase();
-      await fb.submitGuestMessage(data.slug, { name: name.trim(), content: content.trim(), password, side });
+      await submitGuestMessage(data.slug, { name: name.trim(), content: content.trim(), password, side });
       setName(''); setContent(''); setPassword(''); setFormOpen(false);
       toast.success(isEn ? 'Message sent!' : '메시지가 등록되었습니다.');
-      fb.fetchGuestMessages(data.slug).then(setMessages).catch(() => {});
-    } catch (err) { toast.error(getFirebaseErrorMessage(err)); }
+      fetchGuestMessages(data.slug).then(setMessages).catch(() => {});
+    } catch (err) { toast.error(err instanceof Error ? err.message : '오류가 발생했습니다.'); }
     finally { setSubmitting(false); }
   };
 
   const handleDelete = async () => {
     if (!deleteTarget || !data.slug) return;
     const slug = data.slug;
-    const isAdmin = data.guestbookPassword && deletePassword === data.guestbookPassword;
-    try {
-      const fb = await lazyFirebase();
-      const ok = await fb.deleteGuestMessage(slug, deleteTarget, deletePassword);
-      if (ok || isAdmin) {
-        if (!ok && isAdmin) {
-          const { deleteDoc: d, doc: r } = await import('firebase/firestore');
-          const { db } = await import('../../firebase');
-          await d(r(db, `invitations/${slug}/guestbook`, deleteTarget));
-        }
-        setMessages(prev => prev.filter(m => m.id !== deleteTarget));
-        toast.success(isEn ? 'Deleted.' : '삭제되었습니다.');
-      } else {
-        toast.error(isEn ? 'Wrong password.' : '비밀번호가 일치하지 않습니다.');
-        return;
-      }
-    } catch (err) { toast.error(getFirebaseErrorMessage(err)); }
+    const ok = await deleteGuestMessage(slug, deleteTarget, deletePassword);
+    if (ok) {
+      setMessages(prev => prev.filter(m => m.id !== deleteTarget));
+      toast.success(isEn ? 'Deleted.' : '삭제되었습니다.');
+    } else {
+      toast.error(isEn ? 'Wrong password.' : '비밀번호가 일치하지 않습니다.');
+    }
     setDeleteTarget(null); setDeletePassword('');
   };
 

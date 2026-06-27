@@ -6,3 +6,15 @@ main = "worker.ts"
 directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sonett-db"
+database_id = "a45eb03a-036c-48ee-bf07-339a2c847fe6"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "sonett-images"
+
+[triggers]
+crons = ["0 18 * * *"]  # 매일 오전 3시 KST (만료 청첩장 삭제)

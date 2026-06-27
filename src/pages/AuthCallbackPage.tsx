@@ -16,7 +16,7 @@ const AuthCallbackPage: React.FC = () => {
       return;
     }
 
-    let parsed: { provider: 'kakao' | 'naver'; returnUrl: string; nonce: string };
+    let parsed: { provider: 'google' | 'kakao' | 'naver'; returnUrl: string; nonce: string };
     try {
       parsed = decodeState(stateStr);
     } catch {

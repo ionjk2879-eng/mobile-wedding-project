@@ -16,19 +16,27 @@ const resizeImage = (file: File, maxSize: number, quality: number): Promise<Blob
     img.src = URL.createObjectURL(file);
   });
 
-const toBase64 = (blob: Blob): Promise<string> =>
-  new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target?.result as string);
-    reader.readAsDataURL(blob);
-  });
-
 export const uploadImage = async (file: File, _path: string): Promise<string> => {
   const resized = await resizeImage(file, 800, 0.6);
-  return toBase64(resized);
+  const resizedFile = new File([resized], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+
+  const formData = new FormData();
+  formData.append('file', resizedFile);
+
+  const token = localStorage.getItem('sonett_token');
+  const res = await fetch('/api/upload', {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({})) as { error?: string };
+    throw new Error(err.error || '업로드에 실패했습니다.');
+  }
+
+  const { url } = await res.json() as { url: string };
+  return url;
 };
 
-export const uploadFile = async (file: File, _path: string): Promise<string> => {
-  const resized = await resizeImage(file, 800, 0.6);
-  return toBase64(resized);
-};
+export const uploadFile = uploadImage;

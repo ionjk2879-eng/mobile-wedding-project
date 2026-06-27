@@ -6,7 +6,7 @@ import { ScrollRootContext } from './components/Preview/ScrollReveal';
 import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, fetchMyInvitations } from './firebase';
-import { getFirebaseErrorMessage } from './utils/firebaseError';
+import { getApiErrorMessage } from './utils/firebaseError';
 import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X, Sparkles } from 'lucide-react';
@@ -180,7 +180,7 @@ const App: React.FC = () => {
   };
 
   const handleDeleteSlug = async (slug: string) => {
-    if (!confirm(`'${slug}' 청첩장을 삭제하시겠습니까?\nFirebase 데이터도 함께 삭제됩니다.`)) return;
+    if (!confirm(`'${slug}' 청첩장을 삭제하시겠습니까?`)) return;
     try {
       await deleteInvitation(slug);
       toast.success(`'${slug}' 청첩장이 삭제되었습니다.`);
@@ -246,7 +246,7 @@ const App: React.FC = () => {
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (err) {
       setSaveStatus('error');
-      toast.error(getFirebaseErrorMessage(err));
+      toast.error(getApiErrorMessage(err));
       console.error(err);
       setTimeout(() => setSaveStatus('idle'), 2000);
     }

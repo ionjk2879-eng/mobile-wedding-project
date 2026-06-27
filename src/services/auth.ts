@@ -1,115 +1,105 @@
-﻿import {
-  getAuth,
-  signInWithPopup,
-  signInWithCustomToken as firebaseSignInWithCustomToken,
-  updateProfile,
-  GoogleAuthProvider,
-  signOut as firebaseSignOut,
-  deleteUser,
-  onAuthStateChanged,
-  type Auth,
-  type User,
-} from 'firebase/auth';
-import { app } from './index';
+import { apiFetch, setSession, clearSession, getStoredUser, type AuthUser } from './api';
 
-let _auth: Auth | null = null;
-const getAuthInstance = (): Auth => {
-  if (!_auth) _auth = getAuth(app);
-  return _auth;
-};
+type AuthListener = (user: AuthUser | null) => void;
+const listeners: AuthListener[] = [];
 
-const API_BASE = import.meta.env.VITE_FUNCTIONS_URL
-  || 'https://sonett.kr';
+function notify(user: AuthUser | null): void {
+  listeners.forEach(fn => fn(user));
+}
 
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: 'select_account' });
+export function getCurrentUser(): AuthUser | null {
+  return getStoredUser();
+}
 
-export const signInWithGoogle = () => signInWithPopup(getAuthInstance(), googleProvider);
+export function onAuthChanged(callback: AuthListener): () => void {
+  listeners.push(callback);
+  // Use queueMicrotask so the callback fires after Zustand store is fully initialized
+  queueMicrotask(() => callback(getStoredUser()));
+  return () => {
+    const i = listeners.indexOf(callback);
+    if (i !== -1) listeners.splice(i, 1);
+  };
+}
 
 function encodeState(data: object): string {
   return btoa(JSON.stringify(data));
 }
 
-export function decodeState(encoded: string): { provider: 'kakao' | 'naver'; returnUrl: string; nonce: string } {
+export function decodeState(encoded: string): { provider: 'google' | 'kakao' | 'naver'; returnUrl: string; nonce: string } {
   return JSON.parse(atob(encoded));
 }
 
-export const initiateKakaoLogin = (returnUrl: string = '/manage') => {
+async function handleAuthResult(result: { token: string; uid: string; name: string; email: string; photo: string }): Promise<void> {
+  const user: AuthUser = { uid: result.uid, name: result.name, email: result.email, photo: result.photo };
+  setSession(result.token, user);
+  notify(user);
+}
+
+export const signOut = (): void => {
+  clearSession();
+  notify(null);
+};
+
+export const deleteAccount = async (): Promise<void> => {
+  clearSession();
+  notify(null);
+};
+
+// Google
+export const initiateGoogleLogin = (returnUrl = '/manage'): void => {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+  if (!clientId) { alert('Google 로그인이 설정되지 않았습니다.'); return; }
   const nonce = crypto.randomUUID();
   sessionStorage.setItem('oauth_nonce', nonce);
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: `${window.location.origin}/auth/callback`,
+    response_type: 'code',
+    scope: 'openid email profile',
+    state: encodeState({ provider: 'google', returnUrl, nonce }),
+  });
+  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+};
 
+export const signInWithGoogle = initiateGoogleLogin;
+
+// Kakao
+export const initiateKakaoLogin = (returnUrl = '/manage'): void => {
+  const nonce = crypto.randomUUID();
+  sessionStorage.setItem('oauth_nonce', nonce);
   const params = new URLSearchParams({
     client_id: '7edc2c74f346bfad9c9006cd26d04e3c',
     redirect_uri: `${window.location.origin}/auth/callback`,
     response_type: 'code',
     state: encodeState({ provider: 'kakao', returnUrl, nonce }),
   });
-
   window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`;
 };
 
-export const initiateNaverLogin = (returnUrl: string = '/manage') => {
+// Naver
+export const initiateNaverLogin = (returnUrl = '/manage'): void => {
   const nonce = crypto.randomUUID();
   sessionStorage.setItem('oauth_nonce', nonce);
-
   const params = new URLSearchParams({
     client_id: 'IIdKMJXjUkWkNqPv92KX',
     redirect_uri: `${window.location.origin}/auth/callback`,
     response_type: 'code',
     state: encodeState({ provider: 'naver', returnUrl, nonce }),
   });
-
   window.location.href = `https://nid.naver.com/oauth2.0/authorize?${params}`;
 };
 
-export interface SocialAuthResult {
-  customToken: string;
-  displayName: string;
-  photoURL: string;
-  email: string;
-}
-
 export const exchangeCodeForToken = async (
-  provider: 'kakao' | 'naver',
+  provider: 'google' | 'kakao' | 'naver',
   code: string,
   state?: string,
-): Promise<SocialAuthResult> => {
-  const endpoint = provider === 'kakao' ? 'api/auth/kakao' : 'api/auth/naver';
-  const res = await fetch(`${API_BASE}/${endpoint}`, {
+): Promise<{ token: string; uid: string; name: string; email: string; photo: string }> => {
+  return apiFetch(`/api/auth/${provider}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      code,
-      redirectUri: `${window.location.origin}/auth/callback`,
-      ...(state && { state }),
-    }),
-  });
-
-  if (!res.ok) {
-    const errBody = await res.json().catch(() => ({}));
-    throw new Error(errBody.detail || errBody.error || '濡쒓렇??泥섎━???ㅽ뙣?덉뒿?덈떎.');
-  }
-  return await res.json();
+    body: JSON.stringify({ code, redirectUri: `${window.location.origin}/auth/callback`, ...(state && { state }) }),
+  }) as Promise<{ token: string; uid: string; name: string; email: string; photo: string }>;
 };
 
-export const signInWithSocialToken = async (result: SocialAuthResult) => {
-  const credential = await firebaseSignInWithCustomToken(getAuthInstance(), result.customToken);
-  await updateProfile(credential.user, {
-    displayName: result.displayName || null,
-    photoURL: result.photoURL || null,
-  });
-  return credential;
+export const signInWithSocialToken = async (result: { token: string; uid: string; name: string; email: string; photo: string }): Promise<void> => {
+  await handleAuthResult(result);
 };
-
-export const signOut = () => firebaseSignOut(getAuthInstance());
-
-export const getCurrentUser = (): User | null => getAuthInstance().currentUser;
-
-export const deleteAccount = async () => {
-  const user = getAuthInstance().currentUser;
-  if (user) await deleteUser(user);
-};
-
-export const onAuthChanged = (callback: (user: User | null) => void) =>
-  onAuthStateChanged(getAuthInstance(), callback);
-

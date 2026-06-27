@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getDoc, doc } from 'firebase/firestore';
-import { db, activatePaidInvitation } from '../firebase';
+import { loadInvitation, activatePaidInvitation } from '../firebase';
 import useAuthStore from '../stores/useAuthStore';
 import { toast } from '../stores/useToastStore';
 import ToastContainer from '../components/Toast';
@@ -40,9 +39,8 @@ const SuperAdminPage: React.FC = () => {
     setLooking(true);
     setInvInfo(null);
     try {
-      const snap = await getDoc(doc(db, 'invitations', trimmed));
-      if (!snap.exists()) { toast.error('청첩장을 찾을 수 없습니다.'); setLooking(false); return; }
-      const d = snap.data();
+      const d = await loadInvitation(trimmed);
+      if (!d) { toast.error('청첩장을 찾을 수 없습니다.'); setLooking(false); return; }
       setInvInfo({
         groomName: d.groomName || '',
         brideName: d.brideName || '',

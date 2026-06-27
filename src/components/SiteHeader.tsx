@@ -4,11 +4,9 @@ import useAuthStore from '../stores/useAuthStore';
 import { signInWithGoogle, signOut, deleteAccount, initiateKakaoLogin, initiateNaverLogin } from '../services/auth';
 import { LogIn, LogOut, UserX } from 'lucide-react';
 
-const getProviderLabel = (uid: string, providerId?: string) => {
-  if (providerId === 'google.com') return 'Google';
+const getProviderLabel = (uid: string) => {
   if (uid.startsWith('kakao_')) return 'Kakao';
   if (uid.startsWith('naver_')) return 'Naver';
-  if (providerId) return providerId.replace('.com', '');
   return 'Google';
 };
 
@@ -39,7 +37,6 @@ const SiteHeader: React.FC = () => {
     }
   };
 
-  const provider = user?.providerData?.[0];
   const [loginMenuOpen, setLoginMenuOpen] = useState(false);
   const loginMenuRef = useRef<HTMLDivElement>(null);
 
@@ -70,24 +67,20 @@ const SiteHeader: React.FC = () => {
           ) : user ? (
             <>
               <button className="site-avatar-btn" onClick={() => setMenuOpen(!menuOpen)}>
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt="" className="site-auth-avatar" referrerPolicy="no-referrer" />
+                {user.photo ? (
+                  <img src={user.photo} alt="" className="site-auth-avatar" referrerPolicy="no-referrer" />
                 ) : (
                   <div className="site-auth-avatar-fallback">
-                    {(user.displayName || '?')[0]}
+                    {(user.name || '?')[0]}
                   </div>
                 )}
               </button>
               {menuOpen && (
                 <div className="site-auth-menu">
                   <div className="site-auth-menu-info">
-                    <span className="site-auth-provider">{getProviderLabel(user.uid, provider?.providerId)}</span>
-                    {(provider?.displayName || user.displayName) && (
-                      <span className="site-auth-menu-name">{provider?.displayName || user.displayName}</span>
-                    )}
-                    {(provider?.email || user.email) && (
-                      <span className="site-auth-menu-email">{provider?.email || user.email}</span>
-                    )}
+                    <span className="site-auth-provider">{getProviderLabel(user.uid)}</span>
+                    {user.name && <span className="site-auth-menu-name">{user.name}</span>}
+                    {user.email && <span className="site-auth-menu-email">{user.email}</span>}
                   </div>
                   <div className="site-auth-menu-divider" />
                   <button className="site-auth-menu-btn" onClick={() => { setMenuOpen(false); signOut(); }}>
