@@ -145,12 +145,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       : `linear-gradient(180deg, ${opening.openingBgColor || '#6B7FE0'} 0%, ${opening.openingBgColor2 || '#E8907A'} 100%)`
     : null;
 
-  // 커튼+그라데이션: 그라데이션을 커튼 패널에, 배경은 단색
-  // 그 외 그라데이션: 배경에 그라데이션 적용
-  const bgOverride: React.CSSProperties = gradientValue && !isCurtain
+  // 그라데이션 모드: 항상 배경(.op-root)에 그라데이션 적용
+  // 커튼 효과: 진입 시 그라데이션 배경 노출, 클릭 후 단색 패널이 쓸고 들어옴
+  const bgOverride: React.CSSProperties = gradientValue
     ? { background: gradientValue }
     : {};
-  const curtainBg = isCurtain && gradientValue ? gradientValue : null;
 
   // 미리보기 모드: ready/done 상태 진입 후 2.5초 뒤 자동 종료
   useEffect(() => {
@@ -160,7 +159,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const t = setTimeout(() => {
       setPhase('exit');
       const style = opening.openingStyle;
-      const exitDelay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+      const exitDelay = style === 'curtain' ? 1300 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
       setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
     }, 2500);
     return () => clearTimeout(t);
@@ -174,14 +173,14 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     }
     setPhase('exit');
     const style = opening.openingStyle;
-    const delay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+    const delay = style === 'curtain' ? 1300 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
     setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 
   return (
     <div
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...(curtainBg ? { '--op-curtain-bg': curtainBg } : {}), ...bgOverride } as React.CSSProperties}
+      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}

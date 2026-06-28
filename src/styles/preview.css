@@ -536,15 +536,20 @@
 
 /* === Opening === */
 .op-root { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; display: flex; align-items: center; justify-content: center; overflow: hidden; touch-action: none; overscroll-behavior: none; background: var(--op-bg); opacity: var(--op-opacity); }
-.op-curtain .op-curtain-deco { position: absolute; left: 0; width: 100%; height: 50%; background: var(--op-curtain-bg, color-mix(in srgb, var(--op-bg) 90%, white 10%)); background-size: 100% 200%; transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1); z-index: 1; }
-/* 상하 패널이 그라데이션을 각자 반씩 나눠 보여서 하나의 연속된 그라데이션처럼 보이게 */
-.op-deco-top { top: 0; transform-origin: top; background-position: top center; }
-.op-deco-bottom { bottom: 0; transform-origin: bottom; background-position: bottom center; }
-.op-curtain.op-phase-enter .op-deco-top { transform: scaleY(1); }
-.op-curtain.op-phase-enter .op-deco-bottom { transform: scaleY(1); }
-.op-curtain.op-phase-ready .op-deco-top { transform: scaleY(0); transition-delay: 0.2s; }
-.op-curtain.op-phase-ready .op-deco-bottom { transform: scaleY(0); transition-delay: 0.2s; }
-.op-curtain.op-phase-exit { transition: opacity 0.6s ease 0.6s, transform 0.8s cubic-bezier(0.76, 0, 0.24, 1) 0.4s; transform: scale(1.05); opacity: 0 !important; }
+/* 커튼 패널: 단색 (var(--op-bg)보다 약간 밝게), 기본 숨김 상태 */
+.op-curtain .op-curtain-deco { position: absolute; left: 0; width: 100%; height: 50%; background: color-mix(in srgb, var(--op-bg) 88%, white 12%); transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1); z-index: 2; }
+.op-deco-top { top: 0; transform-origin: top; transform: scaleY(0); }
+.op-deco-bottom { bottom: 0; transform-origin: bottom; transform: scaleY(0); }
+/* Enter/Ready: 패널 숨김 유지, 그라데이션 배경이 전체 화면에 노출 */
+.op-curtain.op-phase-enter .op-deco-top,
+.op-curtain.op-phase-enter .op-deco-bottom,
+.op-curtain.op-phase-ready .op-deco-top,
+.op-curtain.op-phase-ready .op-deco-bottom { transform: scaleY(0); }
+/* Exit: 단색 패널이 위아래에서 쓸고 들어와 그라데이션을 덮은 뒤 페이드아웃 */
+.op-curtain.op-phase-exit .op-deco-top { transform: scaleY(1) !important; transition-delay: 0s !important; }
+.op-curtain.op-phase-exit .op-deco-bottom { transform: scaleY(1) !important; transition-delay: 0.08s !important; }
+.op-curtain.op-phase-exit { opacity: 0 !important; transition: opacity 0.4s ease 0.9s !important; }
+.op-curtain.op-phase-exit .op-body { animation: none !important; }
 .op-circle { clip-path: circle(0% at 50% 50%); animation: op-circle-open 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards; }
 @keyframes op-circle-open { to { clip-path: circle(150% at 50% 50%); } }
 .op-circle.op-phase-exit { animation: none; clip-path: circle(150% at 50% 50%); transition: clip-path 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.2s, opacity 0.4s ease 1.2s; clip-path: circle(0% at 50% 50%) !important; opacity: 0 !important; }
