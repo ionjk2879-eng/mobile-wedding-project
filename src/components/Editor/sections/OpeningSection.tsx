@@ -84,7 +84,6 @@ const OpeningSection: React.FC = () => {
                 { key: 'circle' as const, name: '원형 확산', desc: '중앙에서 원형으로 펼쳐짐' },
                 { key: 'veil' as const, name: '베일 드롭', desc: '위에서 베일이 내려오듯 등장, 클릭 시 걷힘' },
                 { key: 'blind' as const, name: '블라인드', desc: '수평 슬라이스가 하나씩 열리며 등장' },
-                { key: 'diamond' as const, name: '다이아몬드', desc: '중앙에서 마름모꼴로 확산, 클릭 시 수축' },
                 { key: 'frame' as const, name: '투명 액자', desc: '유리 액자 속에 담은 고급스러운 연출' },
                 { key: 'insta' as const, name: '인스타그램', desc: '스토리 형식의 감각적인 연출' },
                 { key: 'typing' as const, name: '타이핑', desc: '글자가 한 자씩 타이핑되는 감성 연출' },

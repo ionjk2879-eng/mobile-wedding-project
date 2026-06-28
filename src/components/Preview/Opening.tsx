@@ -159,7 +159,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const t = setTimeout(() => {
       setPhase('exit');
       const style = opening.openingStyle;
-      const exitDelay = style === 'curtain' ? 1300 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'diamond' ? 950 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+      const exitDelay = style === 'curtain' ? 1300 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
       setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
     }, 2500);
     return () => clearTimeout(t);
@@ -173,7 +173,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     }
     setPhase('exit');
     const style = opening.openingStyle;
-    const delay = style === 'curtain' ? 1300 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'diamond' ? 950 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+    const delay = style === 'curtain' ? 1300 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
     setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 
