@@ -58,6 +58,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
 
   useEffect(() => {
+    setPhase('enter');
     const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
   }, [opening.openingStyle]);
@@ -207,7 +208,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           <button className="op-enter op-typing-btn" onClick={handleDismiss}>초대장 열기</button>
         </div>
       ) : (
-        <div className="op-body">
+        <div className="op-body" key={opening.openingStyle}>
           <div className="op-heart-deco">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 28, height: 28, display: 'block' }}>
               <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
