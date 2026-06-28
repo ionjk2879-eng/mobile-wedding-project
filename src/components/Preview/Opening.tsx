@@ -125,8 +125,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;
   const bgColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.bg : (opening.openingBgColor || '#1F2937');
 
-  const textColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.text : '#FFFFFF';
-  const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : 'rgba(255, 228, 220, 0.50)';
+  const textColorMode = (colorMode === 'theme' || isThemeGradient) ? 'white' : (opening.openingTextColor || 'white');
+  const isDark = textColorMode === 'dark';
+  const textColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.text : (isDark ? 'rgba(28, 20, 20, 0.90)' : '#FFFFFF');
+  const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : (isDark ? 'rgba(28, 20, 20, 0.30)' : 'rgba(255, 228, 220, 0.50)');
+  const heartColor = isDark ? 'rgba(100, 50, 60, 0.45)' : 'rgba(255, 218, 230, 0.82)';
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
@@ -155,7 +158,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   return (
     <div
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': 'rgba(255,255,255,0.10)', '--op-hover-bd': 'rgba(255,255,255,0.65)', ...bgOverride } as React.CSSProperties}
+      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}

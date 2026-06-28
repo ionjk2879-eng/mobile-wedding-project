@@ -542,11 +542,11 @@
 
 /* Typing (타이핑) style */
 .op-typing-body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 60px 48px; text-align: center; min-height: 100%; width: 100%; }
-.op-heart-deco { color: rgba(255, 218, 230, 0.82); display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.72) translateY(-6px); animation: op-heart-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards; }
+.op-heart-deco { color: var(--op-heart, rgba(255, 218, 230, 0.82)); display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.72) translateY(-6px); animation: op-heart-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards; }
 .op-heart-deco svg { animation: op-heart-pulse 3s ease-in-out 1.4s infinite; }
 @keyframes op-heart-in { to { opacity: 1; transform: scale(1) translateY(0); } }
 @keyframes op-heart-pulse { 0%,100% { transform: scale(1); } 45% { transform: scale(1.12); } 60% { transform: scale(1.06); } }
-.op-typing-heart { display: flex; align-items: center; justify-content: center; color: rgba(255, 218, 230, 0.82); opacity: 0; transform: scale(0.6) translateY(6px); transition: opacity 1s cubic-bezier(0.22,1,0.36,1), transform 1s cubic-bezier(0.22,1,0.36,1); }
+.op-typing-heart { display: flex; align-items: center; justify-content: center; color: var(--op-heart, rgba(255, 218, 230, 0.82)); opacity: 0; transform: scale(0.6) translateY(6px); transition: opacity 1s cubic-bezier(0.22,1,0.36,1), transform 1s cubic-bezier(0.22,1,0.36,1); }
 .op-typing-heart.visible { opacity: 1; transform: scale(1) translateY(0); }
 .op-typing-heart.visible svg { animation: op-heart-pulse 3s ease-in-out 0.8s infinite; }
 .op-typing-text { font-size: 1.55em; letter-spacing: 3px; font-family: var(--op-font); font-weight: var(--op-weight); color: var(--op-text); min-height: 1.6em; display: flex; align-items: center; }

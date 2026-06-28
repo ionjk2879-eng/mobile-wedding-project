@@ -143,6 +143,34 @@ const OpeningSection: React.FC = () => {
                   })}
                 </div>
               )}
+
+              {(opening.openingGradientMode === 'preset' || opening.openingGradientMode === 'custom') && (
+                <div style={{ marginTop: 10 }}>
+                  <label style={{ fontSize: '0.78rem', color: '#6B7280', display: 'block', marginBottom: 6 }}>글자 색상</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="button"
+                      className={`account-style-btn ${(!opening.openingTextColor || opening.openingTextColor === 'white') ? 'active' : ''}`}
+                      style={{ flex: 1 }}
+                      onClick={() => update({ openingTextColor: 'white' })}
+                    >
+                      <strong style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+                        <span style={{ width: 14, height: 14, borderRadius: '50%', background: '#fff', border: '1px solid #E5E7EB', display: 'inline-block', flexShrink: 0 }} />
+                        흰색
+                      </strong>
+                    </button>
+                    <button type="button"
+                      className={`account-style-btn ${opening.openingTextColor === 'dark' ? 'active' : ''}`}
+                      style={{ flex: 1 }}
+                      onClick={() => update({ openingTextColor: 'dark' })}
+                    >
+                      <strong style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+                        <span style={{ width: 14, height: 14, borderRadius: '50%', background: '#1C1414', border: '1px solid #E5E7EB', display: 'inline-block', flexShrink: 0 }} />
+                        검정
+                      </strong>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
