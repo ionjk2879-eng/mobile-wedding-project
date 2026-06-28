@@ -2,6 +2,21 @@ import React from 'react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { OpeningConfig } from '../../../types';
 
+const GRADIENT_PRESETS = [
+  { id: 'rose-mist',   from: '#FFF0F2', to: '#D4918E' },
+  { id: 'dark-rose',   from: '#3C2B2B', to: '#C8716E' },
+  { id: 'champagne',   from: '#FBF8F3', to: '#C8A97E' },
+  { id: 'dark-mocha',  from: '#1A0E08', to: '#A68B78' },
+  { id: 'sage-light',  from: '#EDF3EB', to: '#6B9868' },
+  { id: 'sage-dark',   from: '#1A2418', to: '#7BAA78' },
+  { id: 'sky',         from: '#EEF4F9', to: '#5B93B8' },
+  { id: 'midnight',    from: '#08081A', to: '#5A5A9A' },
+  { id: 'lavender',    from: '#F7F5FA', to: '#9B8BB8' },
+  { id: 'terracotta',  from: '#FAF0E6', to: '#B86842' },
+  { id: 'emerald',     from: '#EDF5F0', to: '#2E7D5B' },
+  { id: 'dark-navy',   from: '#0E1828', to: '#4A5E7A' },
+];
+
 const OPENING_PRESETS = [
   { label: "We're getting married", value: "We're getting married" },
   { label: '결혼합니다', value: '결혼합니다' },
@@ -74,43 +89,49 @@ const OpeningSection: React.FC = () => {
 
           {opening.openingColorMode === 'gradient' && (
             <div className="input-group" style={{ marginTop: -8 }}>
-              <label>그라데이션 색상 설정</label>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button type="button"
-                  className={`account-style-btn ${(!opening.openingGradientMode || opening.openingGradientMode === 'theme') ? 'active' : ''}`}
-                  style={{ flex: 1 }}
-                  onClick={() => update({ openingGradientMode: 'theme' })}
-                >
-                  <strong>테마 자동</strong><span>선택한 테마 색상으로 자동 생성</span>
-                </button>
-                <button type="button"
+              <label>그라데이션 프리셋</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                {GRADIENT_PRESETS.map(preset => {
+                  const isActive = opening.openingGradientMode !== 'custom'
+                    && opening.openingBgColor === preset.from
+                    && opening.openingBgColor2 === preset.to;
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => update({ openingGradientMode: 'preset', openingBgColor: preset.from, openingBgColor2: preset.to })}
+                      style={{
+                        border: isActive ? '2px solid #B07A8E' : '2px solid #E5E7EB',
+                        borderRadius: 8,
+                        padding: '5px 5px 7px',
+                        background: isActive ? '#FDF2F4' : 'white',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div style={{
+                        width: '100%',
+                        height: 60,
+                        borderRadius: 4,
+                        background: `linear-gradient(180deg, ${preset.from} 0%, ${preset.to} 100%)`,
+                        marginBottom: 5,
+                      }} />
+                      <div style={{ fontSize: '0.6rem', color: '#888', lineHeight: 1.5, fontFamily: 'monospace', letterSpacing: 0 }}>
+                        <div>{preset.from}</div>
+                        <div>{preset.to}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <button
+                  type="button"
                   className={`account-style-btn ${opening.openingGradientMode === 'custom' ? 'active' : ''}`}
-                  style={{ flex: 1 }}
+                  style={{ width: '100%' }}
                   onClick={() => update({ openingGradientMode: 'custom' })}
                 >
                   <strong>직접 지정</strong><span>시작·끝 색상을 직접 선택</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {opening.openingColorMode === 'gradient' && (!opening.openingGradientMode || opening.openingGradientMode === 'theme') && (
-            <div className="input-group" style={{ marginTop: -8 }}>
-              <label>밝기</label>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button type="button"
-                  className={`account-style-btn ${opening.openingGradientBrightness === 'light' ? 'active' : ''}`}
-                  style={{ flex: 1 }}
-                  onClick={() => update({ openingGradientBrightness: 'light' })}
-                >
-                  <strong>밝게</strong><span>밝은 계열의 테마 색상</span>
-                </button>
-                <button type="button"
-                  className={`account-style-btn ${(!opening.openingGradientBrightness || opening.openingGradientBrightness === 'dark') ? 'active' : ''}`}
-                  style={{ flex: 1 }}
-                  onClick={() => update({ openingGradientBrightness: 'dark' })}
-                >
-                  <strong>어둡게</strong><span>어두운 계열의 테마 색상</span>
                 </button>
               </div>
             </div>

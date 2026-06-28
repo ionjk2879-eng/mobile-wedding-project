@@ -19,23 +19,23 @@ const OPENING_FONTS: Record<string, { family: string; url: string; weights: stri
   },
 };
 
-const THEME_COLORS: Record<string, { bg: string; lightBg: string; text: string; accent: string }> = {
-  blush:      { bg: '#3C2B2B', lightBg: '#FFF5F6', text: '#F3CDCC', accent: '#D4918E' },
-  champagne:  { bg: '#3B3228', lightBg: '#FBF8F3', text: '#E8DFD2', accent: '#C8A97E' },
-  sage:       { bg: '#2B3328', lightBg: '#F5F7F4', text: '#D6DED0', accent: '#8BA888' },
-  navy:       { bg: '#1E2638', lightBg: '#F3F5F9', text: '#D0D8E8', accent: '#6A80A0' },
-  burgundy:   { bg: '#2E1A1E', lightBg: '#FBF5F5', text: '#E8D4D4', accent: '#A8626E' },
-  lavender:   { bg: '#2C2038', lightBg: '#F7F5FA', text: '#E3DFEE', accent: '#B5A4CC' },
-  dusty:      { bg: '#38282A', lightBg: '#FAF5F3', text: '#E8D8D4', accent: '#C99498' },
-  modern:     { bg: '#1A1A1A', lightBg: '#FAFAFA', text: '#E8E8E8', accent: '#AAAAAA' },
-  mocha:      { bg: '#2C1E16', lightBg: '#F5EDE4', text: '#E8DDD4', accent: '#A68B78' },
-  cloud:      { bg: '#1A2A34', lightBg: '#F8FAFB', text: '#D8E8F0', accent: '#7BA3B8' },
-  emerald:    { bg: '#0E2218', lightBg: '#EDF5F0', text: '#D0E8D8', accent: '#4A9E78' },
-  butter:     { bg: '#3A3010', lightBg: '#FFFCE8', text: '#F0E8C8', accent: '#D4B050' },
-  cobalt:     { bg: '#0A0E20', lightBg: '#EEF0F8', text: '#D0D8F0', accent: '#5070B0' },
-  terracotta: { bg: '#2E1A10', lightBg: '#FAF0E6', text: '#E8D8C8', accent: '#D08860' },
-  rosegold:   { bg: '#3A2020', lightBg: '#FDF5F3', text: '#F0D8D0', accent: '#D4A090' },
-  midnight:   { bg: '#0E0E20', lightBg: '#F0F0F5', text: '#D0D0E8', accent: '#6A6AA0' },
+const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
+  blush:      { bg: '#3C2B2B', text: '#F3CDCC', accent: '#D4918E' },
+  champagne:  { bg: '#3B3228', text: '#E8DFD2', accent: '#C8A97E' },
+  sage:       { bg: '#2B3328', text: '#D6DED0', accent: '#8BA888' },
+  navy:       { bg: '#1E2638', text: '#D0D8E8', accent: '#6A80A0' },
+  burgundy:   { bg: '#2E1A1E', text: '#E8D4D4', accent: '#A8626E' },
+  lavender:   { bg: '#2C2038', text: '#E3DFEE', accent: '#B5A4CC' },
+  dusty:      { bg: '#38282A', text: '#E8D8D4', accent: '#C99498' },
+  modern:     { bg: '#1A1A1A', text: '#E8E8E8', accent: '#AAAAAA' },
+  mocha:      { bg: '#2C1E16', text: '#E8DDD4', accent: '#A68B78' },
+  cloud:      { bg: '#1A2A34', text: '#D8E8F0', accent: '#7BA3B8' },
+  emerald:    { bg: '#0E2218', text: '#D0E8D8', accent: '#4A9E78' },
+  butter:     { bg: '#3A3010', text: '#F0E8C8', accent: '#D4B050' },
+  cobalt:     { bg: '#0A0E20', text: '#D0D8F0', accent: '#5070B0' },
+  terracotta: { bg: '#2E1A10', text: '#E8D8C8', accent: '#D08860' },
+  rosegold:   { bg: '#3A2020', text: '#F0D8D0', accent: '#D4A090' },
+  midnight:   { bg: '#0E0E20', text: '#D0D0E8', accent: '#6A6AA0' },
 };
 
 interface OpeningProps {
@@ -119,20 +119,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const mainText = opening.openingText || 'We\'re getting married';
   const subText = opening.openingSubText || date;
   const colorMode = opening.openingColorMode || 'theme';
-  const gradientMode = opening.openingGradientMode || 'theme';
-  const gradientBrightness = opening.openingGradientBrightness || 'dark';
   const themeKey = theme || 'blush';
   const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;
+  const bgColor = colorMode === 'theme' ? themeColor.bg : (opening.openingBgColor || '#1F2937');
 
-  const isThemeGradient = colorMode === 'gradient' && gradientMode === 'theme';
-  const isLightVariant = isThemeGradient && gradientBrightness === 'light';
-
-  // 기본 배경색 (CSS var fallback용)
-  const bgColor = isLightVariant
-    ? themeColor.lightBg
-    : (colorMode === 'theme' || isThemeGradient) ? themeColor.bg : (opening.openingBgColor || '#1F2937');
-
-  // 배경 밝기 계산 → 글자색 자동 결정 (custom 모드용)
+  // 배경 밝기 계산 → 글자색 자동 결정
   const hexLuminance = (hex: string): number => {
     const h = hex.replace('#', '');
     if (h.length < 6) return 0;
@@ -144,23 +135,13 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   };
   const isLightBg = (): boolean => {
     if (colorMode === 'theme') return false;
-    if (isThemeGradient) return isLightVariant;
     const lum1 = hexLuminance(opening.openingBgColor || '#1F2937');
     const lum2 = colorMode === 'gradient' ? hexLuminance(opening.openingBgColor2 || opening.openingBgColor || '#1F2937') : lum1;
     return (lum1 + lum2) / 2 > 0.35;
   };
   const lightBg = isLightBg();
-
-  // 글자색: 테마 밝게 → 어두운(bg) 색, 테마 어둡게 → 밝은(text) 색, custom → 밝기 계산
-  const textColor = colorMode === 'theme' ? themeColor.text
-    : isLightVariant ? themeColor.bg
-    : isThemeGradient ? themeColor.text
-    : (lightBg ? 'rgba(40,30,28,0.82)' : 'rgba(255,255,255,0.92)');
-  const accentColor = colorMode === 'theme' ? themeColor.accent
-    : isLightVariant ? `${themeColor.bg}60`
-    : isThemeGradient ? themeColor.accent
-    : (lightBg ? 'rgba(40,30,28,0.30)' : 'rgba(255,255,255,0.40)');
-
+  const textColor = colorMode === 'theme' ? themeColor.text : (lightBg ? 'rgba(40,30,28,0.82)' : 'rgba(255,255,255,0.92)');
+  const accentColor = colorMode === 'theme' ? themeColor.accent : (lightBg ? 'rgba(40,30,28,0.30)' : 'rgba(255,255,255,0.40)');
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
@@ -168,15 +149,9 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const isCurtain = opening.openingStyle === 'curtain';
   const isInsta = opening.openingStyle === 'insta';
 
-  // Gradient background support
-  const bgOverride: React.CSSProperties =
-    isLightVariant
-      ? { background: `linear-gradient(180deg, ${themeColor.lightBg} 0%, ${themeColor.accent} 100%)` }
-      : isThemeGradient
-        ? { background: `linear-gradient(180deg, ${themeColor.bg} 0%, ${themeColor.accent} 100%)` }
-        : colorMode === 'gradient'
-          ? { background: `linear-gradient(180deg, ${opening.openingBgColor || '#F5E6A3'} 0%, ${opening.openingBgColor2 || '#E8857A'} 100%)` }
-          : {};
+  const bgOverride: React.CSSProperties = colorMode === 'gradient'
+    ? { background: `linear-gradient(180deg, ${opening.openingBgColor || '#F5E6A3'} 0%, ${opening.openingBgColor2 || '#E8857A'} 100%)` }
+    : {};
 
   const handleDismiss = () => {
     if (isTyping) {
