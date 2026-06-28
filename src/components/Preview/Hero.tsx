@@ -13,6 +13,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const dateStr = isEn && data.en.date ? data.en.date : data.date;
   const timeStr = isEn && data.en.time ? data.en.time : data.time;
   const style = data.heroStyle || 'classic';
+  const yearStr = data.weddingDateISO ? data.weddingDateISO.slice(0, 4) : String(new Date().getFullYear());
 
   const calculateDDay = () => {
     const today = new Date();
@@ -238,6 +239,49 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     </div>
   );
 
+  const renderFilmstrip = () => (
+    <div className="hero-filmstrip">
+      <div className="fs-bar-top">
+        <span className="fs-label">Wedding</span>
+        <span className="fs-sep">·</span>
+        <span className="fs-datesmall">{yearStr}</span>
+      </div>
+      <div className="fs-photo">{photoEl}</div>
+      <div className="fs-bar-bottom">
+        <div className="fs-rule" />
+        <h1 className="fs-names">
+          <span>{groomName}</span>
+          <span className="fs-amp">&</span>
+          <span>{brideName}</span>
+        </h1>
+        <p className="fs-meta">{venueName || 'Venue'}&nbsp;·&nbsp;{calculateDDay()}</p>
+      </div>
+    </div>
+  );
+
+  const renderVerttype = () => (
+    <div className="hero-verttype">
+      <div className="vt-spine">
+        <span className="vt-spine-text">Wedding Invitation</span>
+        <span className="vt-year">{yearStr}</span>
+      </div>
+      <div className="vt-main">
+        <div className="vt-photo">{photoEl}</div>
+        <div className="vt-info">
+          <div className="vt-rule" />
+          <h1 className="vt-names">
+            {groomName}
+            <span className="vt-amp">&</span>
+            {brideName}
+          </h1>
+          <p className="vt-date">{dateStr}</p>
+          {venueName && <p className="vt-venue">{venueName}</p>}
+          <span className="vt-dday">{calculateDDay()}</span>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderInstacard = () => {
     const initials = `${groomName[0] || ''}${brideName[0] || ''}`;
     return (
@@ -298,6 +342,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'instacard' && renderInstacard()}
         {style === 'bookcover' && renderBookcover()}
         {style === 'bookpage' && renderBookpage()}
+        {style === 'filmstrip' && renderFilmstrip()}
+        {style === 'verttype' && renderVerttype()}
       </div>
 
     </section>

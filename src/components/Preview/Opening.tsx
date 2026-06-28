@@ -116,7 +116,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     }
   }, [fontConfig.url]);
 
-  if (!opening.openingEnabled || dismissed) return null;
+  if ((!opening.openingEnabled && !autoClose) || dismissed) return null;
 
   const mainText = opening.openingText || 'We\'re getting married';
   const subText = opening.openingSubText || date;

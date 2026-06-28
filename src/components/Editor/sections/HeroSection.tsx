@@ -136,6 +136,8 @@ const HeroSection: React.FC = () => {
             { key: 'instacard', name: '인스타그램', desc: '인스타그램 포스트 감성 레이아웃' },
             { key: 'bookcover', name: '북커버', desc: '고급 양장본 표지 스타일' },
             { key: 'bookpage', name: '책 한 페이지', desc: '아름다운 책 속 삽화 페이지 느낌' },
+            { key: 'filmstrip', name: '필름 스틸', desc: '필름 상하 바에 정보, 사진 중앙' },
+            { key: 'verttype', name: '세로 타이포', desc: '왼쪽 세로 타이틀 + 오른쪽 사진' },
           ] as { key: InvitationData['heroStyle']; name: string; desc: string }[]).map(s => (
             <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
               <strong>{s.name}</strong>
