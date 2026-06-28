@@ -4,13 +4,13 @@ import { OpeningConfig } from '../../types';
 const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
   elegant: {
     family: "'Noto Serif KR', serif",
-    url: 'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300&display=swap',
-    weights: '200',
+    url: 'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400&display=swap',
+    weights: '300',
   },
   simple: {
     family: "'Noto Sans KR', sans-serif",
-    url: 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300&display=swap',
-    weights: '100',
+    url: 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300&display=swap',
+    weights: '200',
   },
   clean: {
     family: "'Gowun Batang', serif",
@@ -129,9 +129,9 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   const textColorMode = (colorMode === 'theme' || isThemeGradient) ? 'white' : (opening.openingTextColor || 'white');
   const isDark = textColorMode === 'dark';
-  const textColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.text : (isDark ? 'rgba(28, 20, 20, 0.90)' : '#FFFFFF');
+  const textColor = (colorMode === 'theme' || isThemeGradient) ? 'rgba(255, 255, 255, 0.95)' : (isDark ? 'rgba(28, 20, 20, 0.90)' : '#FFFFFF');
   const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : (isDark ? 'rgba(28, 20, 20, 0.30)' : 'rgba(255, 228, 220, 0.50)');
-  const heartColor = isDark ? 'rgba(100, 50, 60, 0.45)' : 'rgba(255, 218, 230, 0.82)';
+  const heartColor = isDark ? 'rgba(40, 20, 20, 0.55)' : 'rgba(255, 255, 255, 0.88)';
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';

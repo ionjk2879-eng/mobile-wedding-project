@@ -584,7 +584,7 @@
 @keyframes op-amp-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 0.85; transform: translateY(0); } }
 .op-amp { letter-spacing: 4px; }
 .op-main { margin: 8px 0; font-size: 1.4em; font-weight: var(--op-weight); letter-spacing: 2px; line-height: 1.5; font-family: var(--op-font); color: var(--op-text); text-shadow: 0 1px 10px rgba(0,0,0,0.15); }
-.op-sub { margin: 0; font-size: 0.82em; opacity: 0; letter-spacing: 4px; font-weight: 300; color: var(--op-text); font-family: var(--op-font); animation: op-fade-up 0.6s ease 2s both; }
+.op-sub { margin: 0; font-size: 0.82em; opacity: 0; letter-spacing: 4px; font-weight: 400; color: var(--op-text); font-family: var(--op-font); animation: op-fade-up 0.6s ease 2s both; }
 @keyframes op-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .op-enter { margin-top: 20px; padding: 13px 48px; background: transparent; border: 1px solid var(--op-accent); border-radius: 0; color: var(--op-text); font-size: 0.78em; font-weight: 300; letter-spacing: 4px; cursor: pointer; font-family: var(--op-font); text-transform: uppercase; opacity: 0; animation: op-fade-up 0.6s ease 2.4s both; transition: all 0.3s; }
 .op-enter:hover { background: var(--op-hover-bg, rgba(255,255,255,0.1)); border-color: var(--op-hover-bd, rgba(255,255,255,0.7)); }
