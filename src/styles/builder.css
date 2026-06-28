@@ -64,7 +64,7 @@
 .preview-label { font-size: 0.75rem; font-weight: 800; color: #B2A4B0; text-transform: uppercase; letter-spacing: 1.5px; }
 .full-preview-btn-mini { background: #F3F4F6; border: none; color: #4B5563; padding: 8px 18px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
 .full-preview-btn-mini:hover { background: #E5E7EB; color: #111827; }
-.preview-content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; overflow-anchor: none; }
+.preview-content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; overflow-anchor: none; transform: translateZ(0); }
 .preview-content-scroll::-webkit-scrollbar { display: none; }
 
 /* Preview section edit button */
