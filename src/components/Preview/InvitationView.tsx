@@ -53,13 +53,34 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   const sectionOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
   const [previewActive, setPreviewActive] = useState(false);
+  // openingDone: 한 번 dismiss 되면 true → shouldShowOpening = false → 완전히 언마운트
+  const [openingDone, setOpeningDone] = useState(false);
 
+  // 전체화면 진입 시마다 Opening 상태 초기화
   useEffect(() => {
-    if (openingPreviewKey > 0) setPreviewActive(true);
+    if (showOpening) setOpeningDone(false);
+  }, [showOpening]);
+
+  // 미리보기 버튼 클릭: previewActive + openingDone 초기화
+  useEffect(() => {
+    if (openingPreviewKey > 0) {
+      setPreviewActive(true);
+      setOpeningDone(false);
+    }
   }, [openingPreviewKey]);
 
   const isPreviewOnly = previewActive && !data.opening?.openingEnabled;
-  const shouldShowOpening = showOpening && (data.opening?.openingEnabled || previewActive);
+
+  // 에디터 패널(showOpening 없음): previewActive일 때만 표시
+  // 전체화면(showOpening=true): openingEnabled이면 자동 표시, 또는 previewActive일 때
+  const shouldShowOpening = !openingDone && (
+    (showOpening && !!data.opening?.openingEnabled) || previewActive
+  );
+
+  const handleOpeningDismissed = () => {
+    setPreviewActive(false);
+    setOpeningDone(true);
+  };
 
   return (
     <article className={`preview-wrapper texture-${data.bgTexture || 'none'}`} aria-label="청첩장">
@@ -72,7 +93,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           date={data.date}
           theme={data.theme}
           autoClose={isPreviewOnly}
-          onDismissed={() => setPreviewActive(false)}
+          onDismissed={handleOpeningDismissed}
         />
       )}
       <BackgroundEffects effect={data.bgEffect} />
