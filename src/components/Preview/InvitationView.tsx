@@ -55,16 +55,19 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   const [previewActive, setPreviewActive] = useState(false);
   // openingDone: 한 번 dismiss 되면 true → shouldShowOpening = false → 완전히 언마운트
   const [openingDone, setOpeningDone] = useState(false);
+  // 마운트 시점의 key를 기준으로 삼아, 리마운트 시 이전 key로 재트리거 방지
+  const lastProcessedKeyRef = useRef(openingPreviewKey);
 
   // 전체화면 진입 시마다 Opening 상태 초기화
   useEffect(() => {
     if (showOpening) setOpeningDone(false);
   }, [showOpening]);
 
-  // 미리보기 버튼 클릭: 에디터 프리뷰 패널(showOpening 없음)에서만 동작
+  // 미리보기 버튼 클릭: 에디터 프리뷰 패널에서만, key가 실제로 증가했을 때만 1회 트리거
   useEffect(() => {
     if (showOpening) return;
-    if (openingPreviewKey > 0) {
+    if (openingPreviewKey > lastProcessedKeyRef.current) {
+      lastProcessedKeyRef.current = openingPreviewKey;
       setPreviewActive(true);
       setOpeningDone(false);
     }
