@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { OpeningConfig } from '../../types';
 
 const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
@@ -54,20 +54,24 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [editorBounds, setEditorBounds] = useState<React.CSSProperties>({});
-  useLayoutEffect(() => {
+  useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
-    const box = el.closest('.preview-container-box') as HTMLElement | null;
-    if (!box) return;
+    const scrollEl = el.closest('.preview-content-scroll') as HTMLElement | null;
+    if (!scrollEl) return;
     const update = () => {
-      const r = box.getBoundingClientRect();
-      setEditorBounds({ top: r.top, left: r.left, width: r.width, height: r.height });
+      setEditorBounds({
+        top: scrollEl.scrollTop,
+        left: 0,
+        width: scrollEl.clientWidth,
+        height: scrollEl.clientHeight,
+      });
     };
     update();
+    scrollEl.addEventListener('scroll', update, { passive: true });
     const ro = new ResizeObserver(update);
-    ro.observe(box);
-    window.addEventListener('resize', update);
-    return () => { ro.disconnect(); window.removeEventListener('resize', update); };
+    ro.observe(scrollEl);
+    return () => { scrollEl.removeEventListener('scroll', update); ro.disconnect(); };
   }, []);
 
   // Typing-specific state
