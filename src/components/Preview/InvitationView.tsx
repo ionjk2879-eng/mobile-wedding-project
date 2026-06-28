@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { InvitationData } from '../../types';
 import useInvitationStore from '../../stores/useInvitationStore';
 import '../../styles/preview.css';
