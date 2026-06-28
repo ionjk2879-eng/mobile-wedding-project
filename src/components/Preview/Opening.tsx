@@ -58,8 +58,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
 
   useEffect(() => {
-    const delay = opening.openingStyle === 'fade' ? 2000 : 3200;
-    const timer = setTimeout(() => setPhase('ready'), delay);
+    const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
   }, [opening.openingStyle]);
 
@@ -138,6 +137,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   const isCurtain = opening.openingStyle === 'curtain';
   const isInsta = opening.openingStyle === 'insta';
+  const isBlind = opening.openingStyle === 'blind';
 
   const gradientValue = colorMode === 'gradient'
     ? isThemeGradient
@@ -159,7 +159,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const t = setTimeout(() => {
       setPhase('exit');
       const style = opening.openingStyle;
-      const exitDelay = style === 'curtain' ? 1300 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+      const exitDelay = style === 'curtain' ? 1300 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'diamond' ? 950 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
       setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
     }, 2500);
     return () => clearTimeout(t);
@@ -173,7 +173,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     }
     setPhase('exit');
     const style = opening.openingStyle;
-    const delay = style === 'curtain' ? 1300 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+    const delay = style === 'curtain' ? 1300 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'diamond' ? 950 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
     setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 
@@ -184,6 +184,9 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
+      {isBlind && Array.from({ length: 8 }, (_, i) => (
+        <div key={i} className="op-blind-slice" style={{ '--slice-i': i } as React.CSSProperties} />
+      ))}
       {isInsta && <div className="op-insta-progress"><div className="op-insta-bar" /></div>}
 
       {isTyping ? (

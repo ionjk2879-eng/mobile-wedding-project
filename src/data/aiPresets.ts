@@ -54,7 +54,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'natural-garden', name: '내추럴 가든', category: '2025 트렌드',
     description: '싱그러운 초록빛과 나뭇잎이 흩날리는 자연 느낌',
     emoji: '🌿', previewColors: ['#E8F5E9', '#5D8A5E', '#1B3A1C'],
-    settings: { ...base, theme: 'sage', fontFamily: "'Gowun Dodum', sans-serif", fontSize: 'medium', customBgColor: '#E8F5E9', customAccentColor: '#5D8A5E', bgTexture: 'paper', bgEffect: 'leaves', scrollEffect: 'slide-in', heroStyle: 'minimal', galleryStyle: 'style3', accountStyle: 'style1', groomMessage: '자연처럼 변함없이 곁에 있겠습니다.', brideMessage: '함께라면 어디든 편안한 쉼터가 돼요.', opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#1B3A1C', openingBgOpacity: 0.93, openingText: 'Together forever', openingSubText: '', openingFontStyle: 'clean' } },
+    settings: { ...base, theme: 'sage', fontFamily: "'Gowun Dodum', sans-serif", fontSize: 'medium', customBgColor: '#E8F5E9', customAccentColor: '#5D8A5E', bgTexture: 'paper', bgEffect: 'leaves', scrollEffect: 'slide-in', heroStyle: 'minimal', galleryStyle: 'style3', accountStyle: 'style1', groomMessage: '자연처럼 변함없이 곁에 있겠습니다.', brideMessage: '함께라면 어디든 편안한 쉼터가 돼요.', opening: { openingEnabled: true, openingStyle: 'veil', openingColorMode: 'custom', openingBgColor: '#1B3A1C', openingBgOpacity: 0.93, openingText: 'Together forever', openingSubText: '', openingFontStyle: 'clean' } },
   },
   {
     id: 'mocha-warmth', name: '모카 무스', category: '2025 트렌드',
@@ -74,7 +74,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'cloud-dancer', name: '클라우드 댄서', category: '2026 트렌드',
     description: 'Pantone 2026 순백 세레니티와 파우더 블루의 청량함',
     emoji: '☁️', previewColors: ['#F8FAFB', '#A8C4D6', '#4A6A7A'],
-    settings: { ...base, theme: 'cloud', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F8FAFB', customAccentColor: '#7BA3B8', bgTexture: 'silk', bgEffect: 'snow', scrollEffect: 'fade-in', heroStyle: 'minimal', galleryStyle: 'slide', accountStyle: 'style3', opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#1A2A34', openingBgOpacity: 0.95, openingText: 'Forever & Always', openingSubText: '', openingFontStyle: 'elegant' } },
+    settings: { ...base, theme: 'cloud', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F8FAFB', customAccentColor: '#7BA3B8', bgTexture: 'silk', bgEffect: 'snow', scrollEffect: 'fade-in', heroStyle: 'minimal', galleryStyle: 'slide', accountStyle: 'style3', opening: { openingEnabled: true, openingStyle: 'veil', openingColorMode: 'custom', openingBgColor: '#1A2A34', openingBgOpacity: 0.95, openingText: 'Forever & Always', openingSubText: '', openingFontStyle: 'elegant' } },
   },
   {
     id: 'emerald-luxe', name: '에메랄드 럭스', category: '2026 트렌드',
@@ -98,13 +98,13 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'vintage-film', name: '빈티지 필름', category: '2026 트렌드',
     description: '필름 카메라 감성의 따뜻한 빈티지 톤',
     emoji: '📷', previewColors: ['#F5F0E8', '#8A7A6A', '#3A3028'],
-    settings: { ...base, theme: 'champagne', fontFamily: "'Gowun Batang', serif", fontSize: 'small', customBgColor: '#F5F0E8', customAccentColor: '#8A7A6A', bgTexture: 'paper', bgEffect: 'none', scrollEffect: 'fade-in', heroStyle: 'fullscreen', galleryStyle: 'style3', accountStyle: 'style1', groomMessage: '오래된 필름처럼, 시간이 지날수록 빛나는 사랑을 하겠습니다.', brideMessage: '우리의 모든 순간을 소중히 기록하며 살아갈게요.', sectionOrder: ['greeting', 'message', 'photos', 'calendar', 'interview', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'share'], opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#2A2420', openingBgOpacity: 0.95, openingText: 'Our Film', openingSubText: '', openingFontStyle: 'clean' } },
+    settings: { ...base, theme: 'champagne', fontFamily: "'Gowun Batang', serif", fontSize: 'small', customBgColor: '#F5F0E8', customAccentColor: '#8A7A6A', bgTexture: 'paper', bgEffect: 'none', scrollEffect: 'fade-in', heroStyle: 'fullscreen', galleryStyle: 'style3', accountStyle: 'style1', groomMessage: '오래된 필름처럼, 시간이 지날수록 빛나는 사랑을 하겠습니다.', brideMessage: '우리의 모든 순간을 소중히 기록하며 살아갈게요.', sectionOrder: ['greeting', 'message', 'photos', 'calendar', 'interview', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'share'], opening: { openingEnabled: true, openingStyle: 'veil', openingColorMode: 'custom', openingBgColor: '#2A2420', openingBgOpacity: 0.95, openingText: 'Our Film', openingSubText: '', openingFontStyle: 'clean' } },
   },
   {
     id: 'soft-lavender', name: '소프트 라벤더', category: '2026 트렌드',
     description: '몽환적인 라벤더와 실크 텍스처의 드리미한 감성',
     emoji: '💜', previewColors: ['#F0EBF5', '#8A6AAE', '#3A2858'],
-    settings: { ...base, theme: 'lavender', fontFamily: "'Cormorant Garamond', serif", fontSize: 'large', customBgColor: '#F0EBF5', customAccentColor: '#8A6AAE', bgTexture: 'silk', bgEffect: 'hearts', scrollEffect: 'fade-up', heroStyle: 'centercard', galleryStyle: 'slide', accountStyle: 'style2', groomMessage: '꿈같은 사랑이 현실이 된 오늘, 감사합니다.', brideMessage: '동화 속 주인공이 된 기분이에요.', opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#1E1030', openingBgOpacity: 0.95, openingText: 'A Dream Come True', openingSubText: '', openingFontStyle: 'elegant' } },
+    settings: { ...base, theme: 'lavender', fontFamily: "'Cormorant Garamond', serif", fontSize: 'large', customBgColor: '#F0EBF5', customAccentColor: '#8A6AAE', bgTexture: 'silk', bgEffect: 'hearts', scrollEffect: 'fade-up', heroStyle: 'centercard', galleryStyle: 'slide', accountStyle: 'style2', groomMessage: '꿈같은 사랑이 현실이 된 오늘, 감사합니다.', brideMessage: '동화 속 주인공이 된 기분이에요.', opening: { openingEnabled: true, openingStyle: 'veil', openingColorMode: 'custom', openingBgColor: '#1E1030', openingBgOpacity: 0.95, openingText: 'A Dream Come True', openingSubText: '', openingFontStyle: 'elegant' } },
   },
 
   // === 2026 월별 ===
@@ -112,7 +112,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'march-lilac', name: '3월 라일락 블룸', category: '2026년 봄',
     description: '라일락과 벚꽃의 몽환적인 봄 시작',
     emoji: '🌷', previewColors: ['#F3EBF8', '#9B6EBF', '#4A2868'],
-    settings: { ...base, theme: 'lavender', fontFamily: "'Gowun Batang', serif", fontSize: 'medium', customBgColor: '#F3EBF8', customAccentColor: '#9B6EBF', bgTexture: 'watercolor', bgEffect: 'cherry-blossom', scrollEffect: 'fade-up', heroStyle: 'fullscreen', galleryStyle: 'slide', accountStyle: 'style1', greetingContent: springGreeting, opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#2A1040', openingBgOpacity: 0.95, openingText: 'Spring is Here', openingSubText: '', openingFontStyle: 'elegant' } },
+    settings: { ...base, theme: 'lavender', fontFamily: "'Gowun Batang', serif", fontSize: 'medium', customBgColor: '#F3EBF8', customAccentColor: '#9B6EBF', bgTexture: 'watercolor', bgEffect: 'cherry-blossom', scrollEffect: 'fade-up', heroStyle: 'fullscreen', galleryStyle: 'slide', accountStyle: 'style1', greetingContent: springGreeting, opening: { openingEnabled: true, openingStyle: 'veil', openingColorMode: 'custom', openingBgColor: '#2A1040', openingBgOpacity: 0.95, openingText: 'Spring is Here', openingSubText: '', openingFontStyle: 'elegant' } },
   },
   {
     id: 'april-coral', name: '4월 코랄 브리즈', category: '2026년 봄',
@@ -142,7 +142,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'august-ocean', name: '8월 오션 블루', category: '2026년 여름',
     description: '시원한 오션 블루와 화이트의 여름 바다 감성',
     emoji: '🐚', previewColors: ['#F0F6FA', '#3A7CA5', '#1A3A50'],
-    settings: { ...base, theme: 'cloud', fontFamily: "'Gowun Dodum', sans-serif", fontSize: 'medium', customBgColor: '#F0F6FA', customAccentColor: '#3A7CA5', bgTexture: 'watercolor', bgEffect: 'snow', scrollEffect: 'fade-up', heroStyle: 'overlay', galleryStyle: 'style3', accountStyle: 'style3', greetingContent: summerGreeting, groomMessage: '바다처럼 넓은 품으로 안아줄게요.', brideMessage: '파도소리처럼 늘 곁에 있을게요.', opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#0A1E30', openingBgOpacity: 0.95, openingText: 'By the Sea', openingSubText: '', openingFontStyle: 'clean' } },
+    settings: { ...base, theme: 'cloud', fontFamily: "'Gowun Dodum', sans-serif", fontSize: 'medium', customBgColor: '#F0F6FA', customAccentColor: '#3A7CA5', bgTexture: 'watercolor', bgEffect: 'snow', scrollEffect: 'fade-up', heroStyle: 'overlay', galleryStyle: 'style3', accountStyle: 'style3', greetingContent: summerGreeting, groomMessage: '바다처럼 넓은 품으로 안아줄게요.', brideMessage: '파도소리처럼 늘 곁에 있을게요.', opening: { openingEnabled: true, openingStyle: 'veil', openingColorMode: 'custom', openingBgColor: '#0A1E30', openingBgOpacity: 0.95, openingText: 'By the Sea', openingSubText: '', openingFontStyle: 'clean' } },
   },
   {
     id: 'september-maple', name: '9월 메이플 골드', category: '2026년 가을',
@@ -166,7 +166,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'december-crystal', name: '12월 크리스탈 윈터', category: '2026년 겨울',
     description: '순백의 눈꽃과 실버의 우아한 겨울 웨딩',
     emoji: '❄️', previewColors: ['#F5F8FA', '#7A98B0', '#1A2A3A'],
-    settings: { ...base, theme: 'cloud', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F5F8FA', customAccentColor: '#7A98B0', bgTexture: 'silk', bgEffect: 'snow', scrollEffect: 'fade-up', heroStyle: 'fullscreen', galleryStyle: 'style3', accountStyle: 'style1', greetingContent: winterGreeting, groomMessage: '눈처럼 순수한 마음으로 사랑하겠습니다.', brideMessage: '겨울 밤 별처럼 빛나는 사랑을 함께해요.', opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#0E1820', openingBgOpacity: 0.96, openingText: 'Winter Wonderland', openingSubText: '', openingFontStyle: 'elegant' } },
+    settings: { ...base, theme: 'cloud', fontFamily: "'Cormorant Garamond', serif", fontSize: 'medium', customBgColor: '#F5F8FA', customAccentColor: '#7A98B0', bgTexture: 'silk', bgEffect: 'snow', scrollEffect: 'fade-up', heroStyle: 'fullscreen', galleryStyle: 'style3', accountStyle: 'style1', greetingContent: winterGreeting, groomMessage: '눈처럼 순수한 마음으로 사랑하겠습니다.', brideMessage: '겨울 밤 별처럼 빛나는 사랑을 함께해요.', opening: { openingEnabled: true, openingStyle: 'veil', openingColorMode: 'custom', openingBgColor: '#0E1820', openingBgOpacity: 0.96, openingText: 'Winter Wonderland', openingSubText: '', openingFontStyle: 'elegant' } },
   },
   {
     id: 'january-ivory', name: '1월 아이보리 소네트', category: '2026년 겨울',
@@ -186,7 +186,7 @@ export const AI_PRESETS: AIPreset[] = [
     id: 'gallery-exhibition', name: '갤러리 전시회', category: '특별 컨셉',
     description: '미술관 전시회 같은 미니멀 화이트 컨셉',
     emoji: '🖼️', previewColors: ['#FFFFFF', '#333333', '#000000'],
-    settings: { ...base, theme: 'modern', fontFamily: "'Playfair Display', serif", fontSize: 'small', customBgColor: '#FFFFFF', customAccentColor: '#333333', bgTexture: 'none', bgEffect: 'none', scrollEffect: 'fade-in', heroStyle: 'minimal', galleryStyle: 'style3', accountStyle: 'style2', groomMessage: '예술처럼 아름다운 삶을 함께 그려가겠습니다.', brideMessage: '우리만의 갤러리를 가꿔갈게요.', sectionOrder: ['photos', 'greeting', 'calendar', 'message', 'interview', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'share'], opening: { openingEnabled: true, openingStyle: 'fade', openingColorMode: 'custom', openingBgColor: '#000000', openingBgOpacity: 0.97, openingText: 'The Exhibition of Us', openingSubText: '', openingFontStyle: 'simple' } },
+    settings: { ...base, theme: 'modern', fontFamily: "'Playfair Display', serif", fontSize: 'small', customBgColor: '#FFFFFF', customAccentColor: '#333333', bgTexture: 'none', bgEffect: 'none', scrollEffect: 'fade-in', heroStyle: 'minimal', galleryStyle: 'style3', accountStyle: 'style2', groomMessage: '예술처럼 아름다운 삶을 함께 그려가겠습니다.', brideMessage: '우리만의 갤러리를 가꿔갈게요.', sectionOrder: ['photos', 'greeting', 'calendar', 'message', 'interview', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'share'], opening: { openingEnabled: true, openingStyle: 'veil', openingColorMode: 'custom', openingBgColor: '#000000', openingBgOpacity: 0.97, openingText: 'The Exhibition of Us', openingSubText: '', openingFontStyle: 'simple' } },
   },
   {
     id: 'hanok-traditional', name: '한옥 전통', category: '특별 컨셉',

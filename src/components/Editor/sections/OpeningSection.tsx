@@ -80,9 +80,11 @@ const OpeningSection: React.FC = () => {
             <label>애니메이션 스타일</label>
             <div className="account-style-grid">
               {([
-                { key: 'curtain' as const, name: '커튼', desc: '위로 걷히며 청첩장이 나타남' },
+                { key: 'curtain' as const, name: '커튼', desc: '그라데이션 배경에 단색 커튼이 닫히며 전환' },
                 { key: 'circle' as const, name: '원형 확산', desc: '중앙에서 원형으로 펼쳐짐' },
-                { key: 'fade' as const, name: '페이드', desc: '서서히 밝아지며 나타남' },
+                { key: 'veil' as const, name: '베일 드롭', desc: '위에서 베일이 내려오듯 등장, 클릭 시 걷힘' },
+                { key: 'blind' as const, name: '블라인드', desc: '수평 슬라이스가 하나씩 열리며 등장' },
+                { key: 'diamond' as const, name: '다이아몬드', desc: '중앙에서 마름모꼴로 확산, 클릭 시 수축' },
                 { key: 'frame' as const, name: '투명 액자', desc: '유리 액자 속에 담은 고급스러운 연출' },
                 { key: 'insta' as const, name: '인스타그램', desc: '스토리 형식의 감각적인 연출' },
                 { key: 'typing' as const, name: '타이핑', desc: '글자가 한 자씩 타이핑되는 감성 연출' },
