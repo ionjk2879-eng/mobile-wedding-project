@@ -3,18 +3,18 @@ import useInvitationStore from '../../../stores/useInvitationStore';
 import { OpeningConfig } from '../../../types';
 
 const GRADIENT_PRESETS = [
-  { id: 'rose-mist',   from: '#FFF0F2', to: '#D4918E' },
-  { id: 'dark-rose',   from: '#3C2B2B', to: '#C8716E' },
-  { id: 'champagne',   from: '#FBF8F3', to: '#C8A97E' },
-  { id: 'dark-mocha',  from: '#1A0E08', to: '#A68B78' },
-  { id: 'sage-light',  from: '#EDF3EB', to: '#6B9868' },
-  { id: 'sage-dark',   from: '#1A2418', to: '#7BAA78' },
-  { id: 'sky',         from: '#EEF4F9', to: '#5B93B8' },
-  { id: 'midnight',    from: '#08081A', to: '#5A5A9A' },
-  { id: 'lavender',    from: '#F7F5FA', to: '#9B8BB8' },
-  { id: 'terracotta',  from: '#FAF0E6', to: '#B86842' },
-  { id: 'emerald',     from: '#EDF5F0', to: '#2E7D5B' },
-  { id: 'dark-navy',   from: '#0E1828', to: '#4A5E7A' },
+  { id: 'indigo-coral',   from: '#6B7FE0', to: '#E8907A' },  // 인디고 → 코랄
+  { id: 'cream-blush',    from: '#F2EABF', to: '#F0A8A0' },  // 크림 → 블러쉬
+  { id: 'lavender-peach', from: '#C0AADA', to: '#F4C4A8' },  // 라벤더 → 피치
+  { id: 'slate-sage',     from: '#88A8C8', to: '#A8C4A0' },  // 슬레이트 → 세이지
+  { id: 'mocha-blush',    from: '#B08878', to: '#EDD0C8' },  // 모카 → 블러쉬
+  { id: 'peach-terra',    from: '#F5C8A0', to: '#D07858' },  // 피치 → 테라코타
+  { id: 'mint-teal',      from: '#B8D4CC', to: '#6898A0' },  // 민트 → 틸
+  { id: 'rose-mauve',     from: '#E8B0C0', to: '#A85888' },  // 로즈 → 모브
+  { id: 'blue-lilac',     from: '#7090C8', to: '#C0AADA' },  // 블루 → 라일락
+  { id: 'sand-gold',      from: '#DED0B8', to: '#C0985A' },  // 샌드 → 골드
+  { id: 'sage-olive',     from: '#B8C8A8', to: '#7A9068' },  // 세이지 → 올리브
+  { id: 'plum-rose',      from: '#8858A8', to: '#D898B8' },  // 플럼 → 로즈
 ];
 
 const OPENING_PRESETS = [
@@ -89,10 +89,18 @@ const OpeningSection: React.FC = () => {
 
           {opening.openingColorMode === 'gradient' && (
             <div className="input-group" style={{ marginTop: -8 }}>
-              <label>그라데이션 프리셋</label>
+              <label>그라데이션 색상</label>
+              <button
+                type="button"
+                className={`account-style-btn ${(!opening.openingGradientMode || opening.openingGradientMode === 'theme') ? 'active' : ''}`}
+                style={{ width: '100%', marginBottom: 10 }}
+                onClick={() => update({ openingGradientMode: 'theme' })}
+              >
+                <strong>테마 자동</strong><span>선택한 청첩장 테마 색상으로 자동 생성</span>
+              </button>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                 {GRADIENT_PRESETS.map(preset => {
-                  const isActive = opening.openingGradientMode !== 'custom'
+                  const isActive = opening.openingGradientMode === 'preset'
                     && opening.openingBgColor === preset.from
                     && opening.openingBgColor2 === preset.to;
                   return (
