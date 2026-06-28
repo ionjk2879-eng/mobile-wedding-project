@@ -224,9 +224,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
               const prevLen = arr.slice(0, wIdx).reduce((s, w) => s + w.length + 1, 0);
               return (
                 <React.Fragment key={wIdx}>
-                  {wIdx > 0 && (
-                    <span className="op-char" style={{ animationDelay: `${1.2 + (prevLen - 1) * 0.04}s` }}>{' '}</span>
-                  )}
+                  {wIdx > 0 && ' '}
                   <span className="op-word">
                     {word.split('').map((ch, cIdx) => (
                       <span key={cIdx} className="op-char" style={{ animationDelay: `${1.2 + (prevLen + cIdx) * 0.04}s` }}>{ch}</span>
