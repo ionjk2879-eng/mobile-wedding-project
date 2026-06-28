@@ -98,6 +98,7 @@ export interface OpeningConfig {
   openingStyle: 'curtain' | 'circle' | 'fade' | 'frame' | 'insta' | 'typing';
   openingColorMode: 'theme' | 'custom' | 'gradient';
   openingGradientMode?: 'theme' | 'custom';
+  openingGradientBrightness?: 'light' | 'dark';
   openingBgColor: string;
   openingBgColor2?: string;
   openingBgOpacity: number;

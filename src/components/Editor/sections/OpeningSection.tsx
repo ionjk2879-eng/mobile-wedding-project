@@ -94,6 +94,28 @@ const OpeningSection: React.FC = () => {
             </div>
           )}
 
+          {opening.openingColorMode === 'gradient' && (!opening.openingGradientMode || opening.openingGradientMode === 'theme') && (
+            <div className="input-group" style={{ marginTop: -8 }}>
+              <label>밝기</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type="button"
+                  className={`account-style-btn ${opening.openingGradientBrightness === 'light' ? 'active' : ''}`}
+                  style={{ flex: 1 }}
+                  onClick={() => update({ openingGradientBrightness: 'light' })}
+                >
+                  <strong>밝게</strong><span>밝은 계열의 테마 색상</span>
+                </button>
+                <button type="button"
+                  className={`account-style-btn ${(!opening.openingGradientBrightness || opening.openingGradientBrightness === 'dark') ? 'active' : ''}`}
+                  style={{ flex: 1 }}
+                  onClick={() => update({ openingGradientBrightness: 'dark' })}
+                >
+                  <strong>어둡게</strong><span>어두운 계열의 테마 색상</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {opening.openingColorMode === 'custom' && (
             <div className="input-group">
               <label>배경색 선택</label>
