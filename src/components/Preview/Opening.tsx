@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { OpeningConfig } from '../../types';
 
 const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
@@ -51,6 +51,24 @@ interface OpeningProps {
 const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
+
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [editorBounds, setEditorBounds] = useState<React.CSSProperties>({});
+  useLayoutEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const box = el.closest('.preview-container-box') as HTMLElement | null;
+    if (!box) return;
+    const update = () => {
+      const r = box.getBoundingClientRect();
+      setEditorBounds({ top: r.top, left: r.left, width: r.width, height: r.height });
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(box);
+    window.addEventListener('resize', update);
+    return () => { ro.disconnect(); window.removeEventListener('resize', update); };
+  }, []);
 
   // Typing-specific state
   const isTyping = opening.openingStyle === 'typing';
@@ -177,8 +195,9 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   return (
     <div
+      ref={rootRef}
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride } as React.CSSProperties}
+      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride, ...editorBounds } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
