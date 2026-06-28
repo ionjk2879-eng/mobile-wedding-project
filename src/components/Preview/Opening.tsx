@@ -44,9 +44,11 @@ interface OpeningProps {
   brideName: string;
   date: string;
   theme?: string;
+  autoClose?: boolean;
+  onDismissed?: () => void;
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
@@ -143,6 +145,20 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       : { background: `linear-gradient(180deg, ${opening.openingBgColor || '#6B7FE0'} 0%, ${opening.openingBgColor2 || '#E8907A'} 100%)` }
     : {};
 
+  // 미리보기 모드: ready/done 상태 진입 후 2.5초 뒤 자동 종료
+  useEffect(() => {
+    if (!autoClose) return;
+    const ready = isTyping ? typingPhase === 'done' : phase === 'ready';
+    if (!ready) return;
+    const t = setTimeout(() => {
+      setPhase('exit');
+      const style = opening.openingStyle;
+      const exitDelay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+      setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
+    }, 2500);
+    return () => clearTimeout(t);
+  }, [phase, typingPhase, autoClose, isTyping, opening.openingStyle, onDismissed]);
+
   const handleDismiss = () => {
     if (isTyping) {
       if (typingPhase !== 'done') return;
@@ -152,7 +168,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     setPhase('exit');
     const style = opening.openingStyle;
     const delay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
-    setTimeout(() => setDismissed(true), delay);
+    setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 
   return (

@@ -38,6 +38,7 @@ const defaultOpening: OpeningConfig = {
 const OpeningSection: React.FC = () => {
   const opening = useInvitationStore((s) => s.data.opening) || defaultOpening;
   const updateField = useInvitationStore((s) => s.updateField);
+  const triggerOpeningPreview = useInvitationStore((s) => s.triggerOpeningPreview);
 
   const update = (partial: Partial<OpeningConfig>) => {
     updateField('opening', { ...opening, ...partial });
@@ -46,10 +47,31 @@ const OpeningSection: React.FC = () => {
   return (
     <>
       <div className="input-group">
-        <label className="modern-checkbox">
-          <input type="checkbox" checked={opening.openingEnabled} onChange={(e) => update({ openingEnabled: e.target.checked })} />
-          <span>오프닝 애니메이션 활성화 <em style={{ fontWeight: 400, color: '#D4A5C6', fontSize: '0.85em' }}>(전체화면으로 확인해보세요!)</em></span>
-        </label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <label className="modern-checkbox" style={{ flex: 1 }}>
+            <input type="checkbox" checked={opening.openingEnabled} onChange={(e) => update({ openingEnabled: e.target.checked })} />
+            <span>오프닝 애니메이션 활성화</span>
+          </label>
+          <button
+            type="button"
+            onClick={triggerOpeningPreview}
+            style={{
+              padding: '6px 14px',
+              border: '1px solid #D4A5C6',
+              borderRadius: 8,
+              background: 'white',
+              color: '#B07A8E',
+              fontSize: '0.76rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              letterSpacing: '0.3px',
+            }}
+          >
+            ▶ 미리보기
+          </button>
+        </div>
       </div>
 
       {opening.openingEnabled && (

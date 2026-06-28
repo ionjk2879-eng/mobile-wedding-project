@@ -108,10 +108,15 @@ interface InvitationStore {
   removePhoto: (index: number) => void;
 
   moveSection: (index: number, dir: -1 | 1) => void;
+
+  openingPreviewKey: number;
+  triggerOpeningPreview: () => void;
 }
 
 const useInvitationStore = create<InvitationStore>((set) => ({
   data: initialData,
+  openingPreviewKey: 0,
+  triggerOpeningPreview: () => set((s) => ({ openingPreviewKey: s.openingPreviewKey + 1 })),
 
   setData: (data) => set({ data }),
 

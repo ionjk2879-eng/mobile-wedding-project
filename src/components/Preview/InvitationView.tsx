@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { InvitationData } from '../../types';
+import useInvitationStore from '../../stores/useInvitationStore';
 import '../../styles/preview.css';
 import Hero from './Hero';
 import Greeting from './Greeting';
@@ -50,10 +51,30 @@ const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos',
 
 const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false }) => {
   const sectionOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
+  const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
+  const [previewActive, setPreviewActive] = useState(false);
+
+  useEffect(() => {
+    if (openingPreviewKey > 0) setPreviewActive(true);
+  }, [openingPreviewKey]);
+
+  const isPreviewOnly = previewActive && !data.opening?.openingEnabled;
+  const shouldShowOpening = showOpening && (data.opening?.openingEnabled || previewActive);
 
   return (
     <article className={`preview-wrapper texture-${data.bgTexture || 'none'}`} aria-label="청첩장">
-      {showOpening && data.opening?.openingEnabled && <Opening opening={data.opening} groomName={data.groomName} brideName={data.brideName} date={data.date} theme={data.theme} />}
+      {shouldShowOpening && data.opening && (
+        <Opening
+          key={openingPreviewKey || 'static'}
+          opening={data.opening}
+          groomName={data.groomName}
+          brideName={data.brideName}
+          date={data.date}
+          theme={data.theme}
+          autoClose={isPreviewOnly}
+          onDismissed={() => setPreviewActive(false)}
+        />
+      )}
       <BackgroundEffects effect={data.bgEffect} />
       <MusicPlayer url={data.bgMusicUrl} />
       {previewRefs?.basic ? (
