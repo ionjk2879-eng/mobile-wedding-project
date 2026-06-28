@@ -148,7 +148,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     }
     setPhase('exit');
     const style = opening.openingStyle;
-    const delay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 600 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+    const delay = style === 'curtain' ? 1200 : style === 'fade' ? 1800 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
     setTimeout(() => setDismissed(true), delay);
   };
 
