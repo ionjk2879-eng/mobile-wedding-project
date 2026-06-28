@@ -90,58 +90,59 @@ const OpeningSection: React.FC = () => {
           {opening.openingColorMode === 'gradient' && (
             <div className="input-group" style={{ marginTop: -8 }}>
               <label>그라데이션 색상</label>
-              <button
-                type="button"
-                className={`account-style-btn ${(!opening.openingGradientMode || opening.openingGradientMode === 'theme') ? 'active' : ''}`}
-                style={{ width: '100%', marginBottom: 10 }}
-                onClick={() => update({ openingGradientMode: 'theme' })}
-              >
-                <strong>테마 자동</strong><span>선택한 청첩장 테마 색상으로 자동 생성</span>
-              </button>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                {GRADIENT_PRESETS.map(preset => {
-                  const isActive = opening.openingGradientMode === 'preset'
-                    && opening.openingBgColor === preset.from
-                    && opening.openingBgColor2 === preset.to;
-                  return (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => update({ openingGradientMode: 'preset', openingBgColor: preset.from, openingBgColor2: preset.to })}
-                      style={{
-                        border: isActive ? '2px solid #B07A8E' : '2px solid #E5E7EB',
-                        borderRadius: 8,
-                        padding: '5px 5px 7px',
-                        background: isActive ? '#FDF2F4' : 'white',
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                      }}
-                    >
-                      <div style={{
-                        width: '100%',
-                        height: 60,
-                        borderRadius: 4,
-                        background: `linear-gradient(180deg, ${preset.from} 0%, ${preset.to} 100%)`,
-                        marginBottom: 5,
-                      }} />
-                      <div style={{ fontSize: '0.6rem', color: '#888', lineHeight: 1.5, fontFamily: 'monospace', letterSpacing: 0 }}>
-                        <div>{preset.from}</div>
-                        <div>{preset.to}</div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-              <div style={{ marginTop: 8 }}>
-                <button
-                  type="button"
+              <div className="account-style-grid">
+                <button type="button"
+                  className={`account-style-btn ${(!opening.openingGradientMode || opening.openingGradientMode === 'theme') ? 'active' : ''}`}
+                  onClick={() => update({ openingGradientMode: 'theme' })}
+                >
+                  <strong>테마 자동</strong><span>청첩장 테마 색상으로 자동 생성</span>
+                </button>
+                <button type="button"
+                  className={`account-style-btn ${opening.openingGradientMode === 'preset' ? 'active' : ''}`}
+                  onClick={() => update({ openingGradientMode: 'preset' })}
+                >
+                  <strong>프리셋</strong><span>감성 컬러 조합에서 선택</span>
+                </button>
+                <button type="button"
                   className={`account-style-btn ${opening.openingGradientMode === 'custom' ? 'active' : ''}`}
-                  style={{ width: '100%' }}
                   onClick={() => update({ openingGradientMode: 'custom' })}
                 >
                   <strong>직접 지정</strong><span>시작·끝 색상을 직접 선택</span>
                 </button>
               </div>
+
+              {opening.openingGradientMode === 'preset' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 10 }}>
+                  {GRADIENT_PRESETS.map(preset => {
+                    const isActive = opening.openingBgColor === preset.from && opening.openingBgColor2 === preset.to;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => update({ openingBgColor: preset.from, openingBgColor2: preset.to })}
+                        style={{
+                          border: isActive ? '2px solid #B07A8E' : '2px solid #E5E7EB',
+                          borderRadius: 8,
+                          padding: '5px 5px 7px',
+                          background: isActive ? '#FDF2F4' : 'white',
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <div style={{
+                          width: '100%', height: 60, borderRadius: 4,
+                          background: `linear-gradient(180deg, ${preset.from} 0%, ${preset.to} 100%)`,
+                          marginBottom: 5,
+                        }} />
+                        <div style={{ fontSize: '0.6rem', color: '#888', lineHeight: 1.5, fontFamily: 'monospace', letterSpacing: 0 }}>
+                          <div>{preset.from}</div>
+                          <div>{preset.to}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
