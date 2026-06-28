@@ -119,9 +119,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const mainText = opening.openingText || 'We\'re getting married';
   const subText = opening.openingSubText || date;
   const colorMode = opening.openingColorMode || 'theme';
+  const gradientMode = opening.openingGradientMode || 'theme';
   const themeKey = theme || 'blush';
   const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;
-  const bgColor = colorMode === 'theme' ? themeColor.bg : (opening.openingBgColor || '#1F2937');
+
+  const isThemeGradient = colorMode === 'gradient' && gradientMode === 'theme';
+  const bgColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.bg : (opening.openingBgColor || '#1F2937');
 
   // 배경 밝기 계산 → 글자색 자동 결정
   const hexLuminance = (hex: string): number => {
@@ -134,14 +137,14 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
   };
   const isLightBg = (): boolean => {
-    if (colorMode === 'theme') return false;
+    if (colorMode === 'theme' || isThemeGradient) return false;
     const lum1 = hexLuminance(opening.openingBgColor || '#1F2937');
     const lum2 = colorMode === 'gradient' ? hexLuminance(opening.openingBgColor2 || opening.openingBgColor || '#1F2937') : lum1;
     return (lum1 + lum2) / 2 > 0.35;
   };
   const lightBg = isLightBg();
-  const textColor = colorMode === 'theme' ? themeColor.text : (lightBg ? 'rgba(40,30,28,0.82)' : 'rgba(255,255,255,0.92)');
-  const accentColor = colorMode === 'theme' ? themeColor.accent : (lightBg ? 'rgba(40,30,28,0.30)' : 'rgba(255,255,255,0.40)');
+  const textColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.text : (lightBg ? 'rgba(40,30,28,0.82)' : 'rgba(255,255,255,0.92)');
+  const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : (lightBg ? 'rgba(40,30,28,0.30)' : 'rgba(255,255,255,0.40)');
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
@@ -151,9 +154,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   // Gradient background support
   const bgOverride: React.CSSProperties =
-    colorMode === 'gradient'
-      ? { background: `linear-gradient(180deg, ${opening.openingBgColor || '#F5E6A3'} 0%, ${opening.openingBgColor2 || '#E8857A'} 100%)` }
-      : {};
+    isThemeGradient
+      ? { background: `linear-gradient(180deg, ${themeColor.bg} 0%, ${themeColor.accent} 100%)` }
+      : colorMode === 'gradient'
+        ? { background: `linear-gradient(180deg, ${opening.openingBgColor || '#F5E6A3'} 0%, ${opening.openingBgColor2 || '#E8857A'} 100%)` }
+        : {};
 
   const handleDismiss = () => {
     if (isTyping) {

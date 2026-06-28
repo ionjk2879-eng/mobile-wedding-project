@@ -72,9 +72,31 @@ const OpeningSection: React.FC = () => {
             </div>
           </div>
 
-          {(opening.openingColorMode === 'custom' || opening.openingColorMode === 'gradient') && (
+          {opening.openingColorMode === 'gradient' && (
+            <div className="input-group" style={{ marginTop: -8 }}>
+              <label>그라데이션 색상 설정</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type="button"
+                  className={`account-style-btn ${(!opening.openingGradientMode || opening.openingGradientMode === 'theme') ? 'active' : ''}`}
+                  style={{ flex: 1 }}
+                  onClick={() => update({ openingGradientMode: 'theme' })}
+                >
+                  <strong>테마 자동</strong><span>선택한 테마 색상으로 자동 생성</span>
+                </button>
+                <button type="button"
+                  className={`account-style-btn ${opening.openingGradientMode === 'custom' ? 'active' : ''}`}
+                  style={{ flex: 1 }}
+                  onClick={() => update({ openingGradientMode: 'custom' })}
+                >
+                  <strong>직접 지정</strong><span>시작·끝 색상을 직접 선택</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {opening.openingColorMode === 'custom' && (
             <div className="input-group">
-              <label>{opening.openingColorMode === 'gradient' ? '시작 색상 (위)' : '배경색 선택'}</label>
+              <label>배경색 선택</label>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <input type="color" value={opening.openingBgColor} onChange={(e) => update({ openingBgColor: e.target.value })} style={{ width: 40, height: 40, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
                 <input type="text" value={opening.openingBgColor} onChange={(e) => update({ openingBgColor: e.target.value })} className="modern-input" style={{ flex: 1 }} />
@@ -82,15 +104,24 @@ const OpeningSection: React.FC = () => {
             </div>
           )}
 
-          {opening.openingColorMode === 'gradient' && (
-            <div className="input-group">
-              <label>끝 색상 (아래)</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input type="color" value={opening.openingBgColor2 || '#E8857A'} onChange={(e) => update({ openingBgColor2: e.target.value })} style={{ width: 40, height: 40, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
-                <input type="text" value={opening.openingBgColor2 || '#E8857A'} onChange={(e) => update({ openingBgColor2: e.target.value })} className="modern-input" style={{ flex: 1 }} />
+          {opening.openingColorMode === 'gradient' && opening.openingGradientMode === 'custom' && (
+            <>
+              <div className="input-group">
+                <label>시작 색상 (위)</label>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input type="color" value={opening.openingBgColor} onChange={(e) => update({ openingBgColor: e.target.value })} style={{ width: 40, height: 40, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
+                  <input type="text" value={opening.openingBgColor} onChange={(e) => update({ openingBgColor: e.target.value })} className="modern-input" style={{ flex: 1 }} />
+                </div>
               </div>
-              <div style={{ marginTop: 8, height: 32, borderRadius: 8, background: `linear-gradient(to right, ${opening.openingBgColor || '#F5E6A3'}, ${opening.openingBgColor2 || '#E8857A'})` }} />
-            </div>
+              <div className="input-group">
+                <label>끝 색상 (아래)</label>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input type="color" value={opening.openingBgColor2 || '#E8857A'} onChange={(e) => update({ openingBgColor2: e.target.value })} style={{ width: 40, height: 40, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
+                  <input type="text" value={opening.openingBgColor2 || '#E8857A'} onChange={(e) => update({ openingBgColor2: e.target.value })} className="modern-input" style={{ flex: 1 }} />
+                </div>
+                <div style={{ marginTop: 8, height: 32, borderRadius: 8, background: `linear-gradient(to right, ${opening.openingBgColor || '#F5E6A3'}, ${opening.openingBgColor2 || '#E8857A'})` }} />
+              </div>
+            </>
           )}
 
           <div className="input-group">
