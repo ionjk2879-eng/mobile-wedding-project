@@ -146,13 +146,10 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       : `linear-gradient(180deg, ${opening.openingBgColor || '#6B7FE0'} 0%, ${opening.openingBgColor2 || '#E8907A'} 100%)`
     : null;
 
-  // 그라데이션 모드: 항상 배경(.op-root)에 그라데이션 적용
-  // 커튼 효과: 진입 시 그라데이션 배경 노출, 클릭 후 단색 패널이 쓸고 들어옴
   const bgOverride: React.CSSProperties = gradientValue
     ? { background: gradientValue }
     : {};
 
-  // 미리보기 모드: ready/done 상태 진입 후 2.5초 뒤 자동 종료
   useEffect(() => {
     if (!autoClose) return;
     const ready = isTyping ? typingPhase === 'done' : phase === 'ready';
@@ -223,9 +220,21 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           </p>
 
           <h2 className="op-main">
-            {mainText.split('').map((ch, i) => (
-              <span key={i} className="op-char" style={{ animationDelay: `${1.2 + i * 0.04}s` }}>{ch === ' ' ? ' ' : ch}</span>
-            ))}
+            {mainText.split(' ').map((word, wIdx, arr) => {
+              const prevLen = arr.slice(0, wIdx).reduce((s, w) => s + w.length + 1, 0);
+              return (
+                <React.Fragment key={wIdx}>
+                  {wIdx > 0 && (
+                    <span className="op-char" style={{ animationDelay: `${1.2 + (prevLen - 1) * 0.04}s` }}>{' '}</span>
+                  )}
+                  <span className="op-word">
+                    {word.split('').map((ch, cIdx) => (
+                      <span key={cIdx} className="op-char" style={{ animationDelay: `${1.2 + (prevLen + cIdx) * 0.04}s` }}>{ch}</span>
+                    ))}
+                  </span>
+                </React.Fragment>
+              );
+            })}
           </h2>
 
           <p className="op-sub">{subText}</p>
