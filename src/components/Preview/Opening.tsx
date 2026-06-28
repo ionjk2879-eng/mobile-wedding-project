@@ -139,11 +139,18 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const isCurtain = opening.openingStyle === 'curtain';
   const isInsta = opening.openingStyle === 'insta';
 
-  const bgOverride: React.CSSProperties = colorMode === 'gradient'
+  const gradientValue = colorMode === 'gradient'
     ? isThemeGradient
-      ? { background: `linear-gradient(180deg, ${themeColor.bg} 0%, ${themeColor.accent} 100%)` }
-      : { background: `linear-gradient(180deg, ${opening.openingBgColor || '#6B7FE0'} 0%, ${opening.openingBgColor2 || '#E8907A'} 100%)` }
+      ? `linear-gradient(180deg, ${themeColor.bg} 0%, ${themeColor.accent} 100%)`
+      : `linear-gradient(180deg, ${opening.openingBgColor || '#6B7FE0'} 0%, ${opening.openingBgColor2 || '#E8907A'} 100%)`
+    : null;
+
+  // 커튼+그라데이션: 그라데이션을 커튼 패널에, 배경은 단색
+  // 그 외 그라데이션: 배경에 그라데이션 적용
+  const bgOverride: React.CSSProperties = gradientValue && !isCurtain
+    ? { background: gradientValue }
     : {};
+  const curtainBg = isCurtain && gradientValue ? gradientValue : null;
 
   // 미리보기 모드: ready/done 상태 진입 후 2.5초 뒤 자동 종료
   useEffect(() => {
@@ -174,7 +181,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   return (
     <div
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride } as React.CSSProperties}
+      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...(curtainBg ? { '--op-curtain-bg': curtainBg } : {}), ...bgOverride } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}

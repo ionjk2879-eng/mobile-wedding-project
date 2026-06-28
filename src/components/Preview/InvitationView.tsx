@@ -61,13 +61,14 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     if (showOpening) setOpeningDone(false);
   }, [showOpening]);
 
-  // 미리보기 버튼 클릭: previewActive + openingDone 초기화
+  // 미리보기 버튼 클릭: 에디터 프리뷰 패널(showOpening 없음)에서만 동작
   useEffect(() => {
+    if (showOpening) return;
     if (openingPreviewKey > 0) {
       setPreviewActive(true);
       setOpeningDone(false);
     }
-  }, [openingPreviewKey]);
+  }, [openingPreviewKey, showOpening]);
 
   const isPreviewOnly = previewActive && !data.opening?.openingEnabled;
 

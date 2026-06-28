@@ -536,7 +536,7 @@
 
 /* === Opening === */
 .op-root { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; display: flex; align-items: center; justify-content: center; overflow: hidden; touch-action: none; overscroll-behavior: none; background: var(--op-bg); opacity: var(--op-opacity); }
-.op-curtain .op-curtain-deco { position: absolute; left: 0; width: 100%; height: 50%; background: color-mix(in srgb, var(--op-bg) 90%, white 10%); transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1); z-index: 1; }
+.op-curtain .op-curtain-deco { position: absolute; left: 0; width: 100%; height: 50%; background: var(--op-curtain-bg, color-mix(in srgb, var(--op-bg) 90%, white 10%)); transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1); z-index: 1; }
 .op-deco-top { top: 0; transform-origin: top; }
 .op-deco-bottom { bottom: 0; transform-origin: bottom; }
 .op-curtain.op-phase-enter .op-deco-top { transform: scaleY(1); }
