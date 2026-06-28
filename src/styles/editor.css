@@ -186,6 +186,9 @@
 .hero-style-btn strong { font-size: 0.85rem; color: #1F2937; }
 .hero-style-btn.active strong { color: #D4A5C6; }
 .hero-style-btn span { font-size: 0.7rem; color: #9CA3AF; }
+.hero-style-subgroup { margin-top: 12px; padding-top: 12px; border-top: 1px solid #F0F0F0; }
+.hero-style-subgroup-label { display: block; font-size: 0.68rem; font-weight: 600; color: #B0BAC8; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+.hero-style-subgroup .hero-style-grid { grid-template-columns: repeat(2, 1fr); }
 
 /* Account style */
 .account-style-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
