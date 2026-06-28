@@ -160,7 +160,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const t = setTimeout(() => {
       setPhase('exit');
       const style = opening.openingStyle;
-      const exitDelay = style === 'curtain' ? 1300 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+      const exitDelay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 900;
       setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
     }, 2500);
     return () => clearTimeout(t);
@@ -174,7 +174,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     }
     setPhase('exit');
     const style = opening.openingStyle;
-    const delay = style === 'curtain' ? 1300 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 2200;
+    const delay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 900;
     setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 
@@ -194,7 +194,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         <div className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}`}>
           <div className={`op-typing-heart${typingPhase !== 'idle' ? ' visible' : ''}`}>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34, display: 'block' }}>
-              <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>
             </svg>
           </div>
           <div className="op-typing-text">
@@ -211,7 +211,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         <div className="op-body" key={opening.openingStyle}>
           <div className="op-heart-deco">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 28, height: 28, display: 'block' }}>
-              <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>
             </svg>
           </div>
           <div className="op-line op-line-top" />

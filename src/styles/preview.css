@@ -550,9 +550,12 @@
 .op-curtain.op-phase-exit .op-deco-bottom { transform: scaleY(1) !important; transition-delay: 0.08s !important; }
 .op-curtain.op-phase-exit { opacity: 0 !important; transition: opacity 0.4s ease 0.9s !important; }
 .op-curtain.op-phase-exit .op-body { animation: none !important; }
-.op-circle { clip-path: circle(0% at 50% 50%); animation: op-circle-open 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards; }
-@keyframes op-circle-open { to { clip-path: circle(150% at 50% 50%); } }
-.op-circle.op-phase-exit { animation: none; clip-path: circle(150% at 50% 50%); transition: clip-path 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.2s, opacity 0.4s ease 1.2s; clip-path: circle(0% at 50% 50%) !important; opacity: 0 !important; }
+.op-circle { clip-path: circle(0% at 50% 50%); animation: op-circle-open 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+@keyframes op-circle-open { from { clip-path: circle(0% at 50% 50%); } to { clip-path: circle(150% at 50% 50%); } }
+/* exit: @keyframes로 명시적 from/to → animation:none의 forwards fill 소실 문제 해결 */
+.op-circle.op-phase-exit { animation: op-circle-close 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.2s both !important; }
+@keyframes op-circle-close { from { clip-path: circle(150% at 50% 50%); } to { clip-path: circle(0% at 50% 50%); } }
+.op-circle.op-phase-exit .op-body { animation: none !important; }
 /* Veil Drop - body가 슬라이드 중 자연스럽게 등장하므로 별도 reveal 불필요 */
 .op-veil { animation: op-veil-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
 @keyframes op-veil-in { from { transform: translateY(-100%); } to { transform: translateY(0); } }
@@ -571,20 +574,23 @@
 .op-body { position: relative; z-index: 2; text-align: center; color: var(--op-text); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 40px; max-width: 360px; }
 .op-phase-exit .op-body { animation: op-body-exit 0.5s ease forwards; }
 @keyframes op-body-exit { to { opacity: 0; transform: translateY(-30px); } }
-.op-char { display: inline-block; opacity: 0; transform: translateY(12px); animation: op-char-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-@keyframes op-char-in { to { opacity: 1; transform: translateY(0); } }
-.op-line { width: 0; height: 1px; background: var(--op-accent); animation: op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards; }
-@keyframes op-line-grow { to { width: 60px; } }
+.op-char { display: inline-block; opacity: 0; transform: translateY(12px); animation: op-char-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes op-char-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.op-line { width: 0; height: 1px; background: var(--op-accent); animation: op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both; }
+@keyframes op-line-grow { from { width: 0; } to { width: 60px; } }
 .op-names { margin: 0; font-size: 1.1em; letter-spacing: 8px; font-weight: var(--op-weight); color: var(--op-text); font-family: var(--op-font); text-shadow: 0 1px 10px rgba(0,0,0,0.15); }
-.op-amp { opacity: 0.85; letter-spacing: 4px; }
+/* & 글자: opacity 0.85를 CSS로 두면 op-char의 opacity:0보다 나중에 선언돼 덮어씌워짐 → op-amp-in 키프레임으로 to 상태에서만 0.85 적용 */
+.op-char.op-amp { animation: op-amp-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes op-amp-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 0.85; transform: translateY(0); } }
+.op-amp { letter-spacing: 4px; }
 .op-main { margin: 8px 0; font-size: 1.4em; font-weight: var(--op-weight); letter-spacing: 2px; line-height: 1.5; font-family: var(--op-font); color: var(--op-text); text-shadow: 0 1px 10px rgba(0,0,0,0.15); }
-.op-sub { margin: 0; font-size: 0.82em; opacity: 0; letter-spacing: 4px; font-weight: 300; color: var(--op-text); font-family: var(--op-font); animation: op-fade-up 0.6s ease 2s forwards; }
+.op-sub { margin: 0; font-size: 0.82em; opacity: 0; letter-spacing: 4px; font-weight: 300; color: var(--op-text); font-family: var(--op-font); animation: op-fade-up 0.6s ease 2s both; }
 @keyframes op-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.op-enter { margin-top: 20px; padding: 13px 48px; background: transparent; border: 1px solid var(--op-accent); border-radius: 0; color: var(--op-text); font-size: 0.78em; font-weight: 300; letter-spacing: 4px; cursor: pointer; font-family: var(--op-font); text-transform: uppercase; opacity: 0; animation: op-fade-up 0.6s ease 2.4s forwards; transition: all 0.3s; }
+.op-enter { margin-top: 20px; padding: 13px 48px; background: transparent; border: 1px solid var(--op-accent); border-radius: 0; color: var(--op-text); font-size: 0.78em; font-weight: 300; letter-spacing: 4px; cursor: pointer; font-family: var(--op-font); text-transform: uppercase; opacity: 0; animation: op-fade-up 0.6s ease 2.4s both; transition: all 0.3s; }
 .op-enter:hover { background: var(--op-hover-bg, rgba(255,255,255,0.1)); border-color: var(--op-hover-bd, rgba(255,255,255,0.7)); }
 
 /* Frame (투명 액자) style */
-.op-frame .op-body { background: rgba(255,255,255,0.07); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 0 0 8px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.1); padding: 48px 36px; animation: op-frame-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both; }
+.op-frame .op-body { background: rgba(255,255,255,0.07); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 0 0 8px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.1); padding: 48px 36px; animation: op-frame-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
 .op-frame .op-body::before { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid rgba(255,255,255,0.12); pointer-events: none; }
 @keyframes op-frame-in { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
 .op-frame.op-phase-exit { transition: opacity 0.9s ease; opacity: 0 !important; }
@@ -604,9 +610,9 @@
 
 /* Typing (타이핑) style */
 .op-typing-body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 60px 48px; text-align: center; min-height: 100%; width: 100%; }
-.op-heart-deco { color: var(--op-heart, rgba(255, 218, 230, 0.82)); display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.72) translateY(-6px); animation: op-heart-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards; }
+.op-heart-deco { color: var(--op-heart, rgba(255, 218, 230, 0.82)); display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.72) translateY(-6px); animation: op-heart-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
 .op-heart-deco svg { animation: op-heart-pulse 3s ease-in-out 1.4s infinite; }
-@keyframes op-heart-in { to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes op-heart-in { from { opacity: 0; transform: scale(0.72) translateY(-6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 @keyframes op-heart-pulse { 0%,100% { transform: scale(1); } 45% { transform: scale(1.12); } 60% { transform: scale(1.06); } }
 .op-typing-heart { display: flex; align-items: center; justify-content: center; color: var(--op-heart, rgba(255, 218, 230, 0.82)); opacity: 0; transform: scale(0.6) translateY(6px); transition: opacity 1s cubic-bezier(0.22,1,0.36,1), transform 1s cubic-bezier(0.22,1,0.36,1); }
 .op-typing-heart.visible { opacity: 1; transform: scale(1) translateY(0); }
