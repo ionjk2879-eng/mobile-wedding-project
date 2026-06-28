@@ -150,19 +150,31 @@
 /* Book Cover (북커버) */
 .hero-bookcover { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; overflow: hidden; }
 .bc-bg { position: absolute; inset: 0; }
-.bc-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6) saturate(0.75); }
+.bc-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85) saturate(0.82) contrast(1.04); }
 .bc-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
-.bc-overlay { position: absolute; inset: 0; background: rgba(10,6,4,0.25); }
-.bc-frame { position: absolute; inset: 24px; z-index: 2; border: 1px solid rgba(255,255,255,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 28px 24px; text-align: center; color: white; }
-.bc-frame::before { content: ''; position: absolute; inset: 7px; border: 1px solid rgba(255,255,255,0.2); pointer-events: none; }
-.bc-top-label { font-size: 0.58em; letter-spacing: 6px; margin: 0; opacity: 0.72; text-transform: uppercase; position: relative; z-index: 1; }
-.bc-rule { width: 70px; height: 1px; background: rgba(255,255,255,0.4); margin: 8px 0; position: relative; z-index: 1; }
-.bc-groom { font-size: 2.6em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; line-height: 1.05; text-shadow: 0 2px 20px rgba(0,0,0,0.5); position: relative; z-index: 1; }
-.bc-amp { font-size: 1.3em; font-weight: 300; margin: 4px 0; font-family: 'Cormorant Garamond', serif; font-style: italic; opacity: 0.65; position: relative; z-index: 1; }
-.bc-bride { font-size: 2.6em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; line-height: 1.05; text-shadow: 0 2px 20px rgba(0,0,0,0.5); position: relative; z-index: 1; }
-.bc-date { font-size: 0.8em; margin: 0; opacity: 0.82; letter-spacing: 3px; position: relative; z-index: 1; }
-.bc-venue { font-size: 0.7em; margin: 2px 0 0; opacity: 0.6; position: relative; z-index: 1; }
-.bc-dday { display: inline-block; margin-top: 10px; padding: 4px 18px; border: 1px solid rgba(255,255,255,0.35); font-size: 0.68em; letter-spacing: 3px; opacity: 0.82; position: relative; z-index: 1; }
+/* 그라데이션 오버레이: 상단 투명 → 하단 짙은 어둠 */
+.bc-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,4,2,0.08) 0%, rgba(8,4,2,0.04) 30%, rgba(8,4,2,0.48) 60%, rgba(8,4,2,0.82) 85%, rgba(8,4,2,0.90) 100%); }
+/* 이중 테두리 제거 → 코너 마크만 */
+.bc-frame { position: absolute; inset: 24px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; padding: 18px 28px 38px; text-align: center; color: white;
+  background:
+    linear-gradient(rgba(255,255,255,0.48),rgba(255,255,255,0.48)) top left/26px 1px no-repeat,
+    linear-gradient(rgba(255,255,255,0.48),rgba(255,255,255,0.48)) top left/1px 26px no-repeat,
+    linear-gradient(rgba(255,255,255,0.48),rgba(255,255,255,0.48)) top right/26px 1px no-repeat,
+    linear-gradient(rgba(255,255,255,0.48),rgba(255,255,255,0.48)) top right/1px 26px no-repeat,
+    linear-gradient(rgba(255,255,255,0.48),rgba(255,255,255,0.48)) bottom left/26px 1px no-repeat,
+    linear-gradient(rgba(255,255,255,0.48),rgba(255,255,255,0.48)) bottom left/1px 26px no-repeat,
+    linear-gradient(rgba(255,255,255,0.48),rgba(255,255,255,0.48)) bottom right/26px 1px no-repeat,
+    linear-gradient(rgba(255,255,255,0.48),rgba(255,255,255,0.48)) bottom right/1px 26px no-repeat; }
+.bc-frame::before { display: none; }
+/* "Wedding Invitation" 레이블: 상단 중앙에 절대 배치 */
+.bc-top-label { position: absolute; top: 18px; left: 0; right: 0; text-align: center; font-size: 0.56em; letter-spacing: 6px; margin: 0; opacity: 0.68; text-transform: uppercase; }
+.bc-rule { width: 56px; height: 1px; background: rgba(255,255,255,0.38); margin: 7px 0; }
+.bc-groom { font-size: 2.7em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; line-height: 1.05; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
+.bc-amp { font-size: 1.5em; font-weight: 300; margin: 2px 0; font-family: 'Cormorant Garamond', serif; font-style: italic; opacity: 0.50; }
+.bc-bride { font-size: 2.7em; font-weight: 300; margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; line-height: 1.05; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
+.bc-date { font-size: 0.75em; margin: 0; opacity: 0.85; letter-spacing: 3px; }
+.bc-venue { font-size: 0.66em; margin: 2px 0 0; opacity: 0.58; }
+.bc-dday { display: inline-block; margin-top: 12px; padding: 4px 18px; border: 1px solid rgba(255,255,255,0.32); font-size: 0.65em; letter-spacing: 3px; opacity: 0.78; }
 
 /* Book Page (책 한 페이지) */
 .hero-bookpage { padding: 32px 28px 44px; display: flex; flex-direction: column; align-items: center; }
