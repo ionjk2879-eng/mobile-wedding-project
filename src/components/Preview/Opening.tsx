@@ -125,7 +125,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;
   const bgColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.bg : (opening.openingBgColor || '#1F2937');
 
-  const textColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.text : 'rgba(255, 248, 244, 0.93)';
+  const textColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.text : '#FFFFFF';
   const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : 'rgba(255, 228, 220, 0.50)';
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
