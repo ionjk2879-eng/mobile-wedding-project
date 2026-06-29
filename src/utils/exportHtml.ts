@@ -99,36 +99,30 @@ export async function downloadInvitationHtml(data: InvitationData): Promise<void
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: ${bgColor}; }
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      font-family: 'Pretendard', -apple-system, sans-serif;
+    html, body { margin: 0; padding: 0; background: ${bgColor}; font-family: 'Pretendard', -apple-system, sans-serif; }
+    #page-wrap {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
     }
     .invitation-page {
       width: 100%;
-      max-width: 430px;
       min-height: 100vh;
-      margin: 0 auto;
       background-color: var(--wedding-bg, #fff);
       font-size: ${fontSize};
       font-family: ${fontFamily};
-    }
-    @media (max-width: 430px) {
-      body { background: var(--wedding-bg, #fff); }
-      .invitation-page { max-width: 100%; margin: 0; }
     }
     ${previewCss}
     ${effectsCss}
   </style>
 </head>
 <body>
-  ${bodyHtml}
-  <footer style="text-align:center;padding:24px 16px;font-size:0.75rem;color:#9CA3AF;font-family:'Pretendard',sans-serif;border-top:1px solid #F3F4F6;margin-top:20px;">
-    Made with <a href="https://sonett.kr" style="color:#B07A8E;text-decoration:none;font-weight:600;">Sonett</a>
-  </footer>
+  <div id="page-wrap">
+    ${bodyHtml}
+    <footer style="text-align:center;padding:24px 16px;font-size:0.75rem;color:#9CA3AF;font-family:'Pretendard',sans-serif;border-top:1px solid #F3F4F6;margin-top:20px;">
+      Made with <a href="https://sonett.kr" style="color:#B07A8E;text-decoration:none;font-weight:600;">Sonett</a>
+    </footer>
+  </div>
 </body>
 </html>`;
 
