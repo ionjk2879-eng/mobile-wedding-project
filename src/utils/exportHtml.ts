@@ -5,16 +5,68 @@ import InvitationView from '../components/Preview/InvitationView';
 import previewCss from '../styles/preview.css?raw';
 import effectsCss from '../styles/effects.css?raw';
 
-export function downloadInvitationHtml(data: InvitationData): void {
-  const theme = data.theme || 'blush';
+async function urlToBase64(url: string): Promise<string> {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return url;
+  }
+}
+
+async function resolveUrl(url: string | undefined): Promise<string> {
+  if (!url) return '';
+  if (url.startsWith('/images/')) return urlToBase64(url);
+  return url;
+}
+
+async function embedImages(data: InvitationData): Promise<InvitationData> {
+  const [heroPhoto, heroPhoto2, groomPhoto, bridePhoto, photos, timeline] = await Promise.all([
+    resolveUrl(data.heroPhoto),
+    resolveUrl(data.heroPhoto2),
+    resolveUrl(data.groomPhoto),
+    resolveUrl(data.bridePhoto),
+    Promise.all((data.photos || []).map(resolveUrl)),
+    Promise.all((data.timeline || []).map(async (t) => ({ ...t, photo: await resolveUrl(t.photo) }))),
+  ]);
+  return { ...data, heroPhoto, heroPhoto2, groomPhoto, bridePhoto, photos, timeline };
+}
+
+function getThemeBgColor(theme: string, customBgColor?: string): string {
+  if (customBgColor) return customBgColor;
+  const map: Record<string, string> = {
+    blush: '#FDF6F9', champagne: '#FBF7F0', sage: '#F4F7F4', navy: '#F0F2F7',
+    burgundy: '#F7F0F2', lavender: '#F5F3FB', dusty: '#F6F3F7', modern: '#F8F8F8',
+    mocha: '#F7F3EF', cloud: '#F5F7FA', emerald: '#F0F6F3', butter: '#FBF9EE',
+    cobalt: '#EEF2FA', terracotta: '#FAF2EE', rosegold: '#FAF0F2', midnight: '#1A1A2E',
+  };
+  return map[theme] || '#FFFFFF';
+}
+
+export async function downloadInvitationHtml(data: InvitationData): Promise<void> {
+  const resolved = await embedImages(data);
+
+  const exportData: InvitationData = {
+    ...resolved,
+    sectionOrder: (resolved.sectionOrder || []).filter(s => s !== 'share'),
+  };
+
+  const theme = exportData.theme || 'blush';
   const fontSize =
-    data.fontSize === 'small' ? '13px' : data.fontSize === 'large' ? '16px' : '14.5px';
+    exportData.fontSize === 'small' ? '13px' : exportData.fontSize === 'large' ? '16px' : '14.5px';
+  const bgColor = getThemeBgColor(theme, exportData.customBgColor);
 
   const customVars: Record<string, string> = {};
-  if (data.customBgColor) customVars['--wedding-bg'] = data.customBgColor;
-  if (data.customAccentColor) {
-    customVars['--wedding-main'] = data.customAccentColor;
-    customVars['--wedding-accent'] = data.customAccentColor;
+  if (exportData.customBgColor) customVars['--wedding-bg'] = exportData.customBgColor;
+  if (exportData.customAccentColor) {
+    customVars['--wedding-main'] = exportData.customAccentColor;
+    customVars['--wedding-accent'] = exportData.customAccentColor;
   }
 
   const bodyHtml = renderToStaticMarkup(
@@ -24,16 +76,16 @@ export function downloadInvitationHtml(data: InvitationData): void {
         className: `invitation-page theme-${theme}`,
         style: Object.keys(customVars).length ? customVars : undefined,
       },
-      createElement(InvitationView, { data, showOpening: false, shareEnabled: false }),
+      createElement(InvitationView, { data: exportData, showOpening: false, shareEnabled: false }),
     ),
   );
 
   const title =
-    data.groomName && data.brideName
-      ? `${data.groomName} & ${data.brideName} 결혼합니다`
+    exportData.groomName && exportData.brideName
+      ? `${exportData.groomName} & ${exportData.brideName} 결혼합니다`
       : '우리들의 결혼식';
 
-  const fontFamily = data.fontFamily || "'Pretendard', sans-serif";
+  const fontFamily = exportData.fontFamily || "'Pretendard', sans-serif";
 
   const html = `<!DOCTYPE html>
 <html lang="ko">
@@ -47,7 +99,7 @@ export function downloadInvitationHtml(data: InvitationData): void {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: #fff; }
+    html, body { margin: 0; padding: 0; background: ${bgColor}; }
     body { display: flex; justify-content: center; min-height: 100vh; font-family: 'Pretendard', -apple-system, sans-serif; }
     .invitation-page {
       width: 100%;
@@ -77,7 +129,7 @@ export function downloadInvitationHtml(data: InvitationData): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${(data.groomName || '신랑').replace(/\s/g, '')}-${(data.brideName || '신부').replace(/\s/g, '')}-청첩장.html`;
+  a.download = `${(exportData.groomName || '신랑').replace(/\s/g, '')}-${(exportData.brideName || '신부').replace(/\s/g, '')}-청첩장.html`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

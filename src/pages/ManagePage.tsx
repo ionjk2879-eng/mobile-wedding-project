@@ -294,12 +294,9 @@ const ManagePage: React.FC = () => {
                       onDelete={() => handleDelete(slug)}
                       onChangeSlug={() => setChangeSlugTarget(slug)}
                       onDownloadHtml={() => {
-                        try {
-                          downloadInvitationHtml(data);
-                          toast.success('HTML 파일을 다운로드했습니다');
-                        } catch {
-                          toast.error('HTML 생성에 실패했습니다.');
-                        }
+                        downloadInvitationHtml(data)
+                          .then(() => toast.success('HTML 파일을 다운로드했습니다'))
+                          .catch(() => toast.error('HTML 생성에 실패했습니다.'));
                       }}
                     />
                   </div>
