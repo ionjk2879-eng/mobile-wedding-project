@@ -546,6 +546,7 @@ async function notifyExpiringInvitations(env: Env): Promise<void> {
     FROM invitations i
     JOIN users u ON i.owner_uid = u.uid
     WHERE i.expires_at IS NOT NULL
+      AND i.is_paid = 1
       AND i.expires_at > datetime('now')
       AND i.expires_at <= datetime('now', '+7 days')
       AND i.notified = 0
