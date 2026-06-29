@@ -462,10 +462,10 @@ const ManagePage: React.FC = () => {
         .mc-expiry-badge {
           display: inline-flex;
           align-items: center;
-          padding: 4px 8px;
-          border-radius: 20px;
-          font-size: 0.7rem;
-          font-weight: 700;
+          padding: 7px 14px;
+          border-radius: 8px;
+          font-size: 0.78rem;
+          font-weight: 600;
           background: #F3F4F6;
           color: #6B7280;
           white-space: nowrap;
