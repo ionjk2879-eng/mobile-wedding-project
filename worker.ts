@@ -410,6 +410,7 @@ async function handleGuestbook(request: Request, env: Env, slug: string): Promis
     await env.DB.prepare(
       'INSERT INTO guestbook (id, invitation_slug, name, content, password, side) VALUES (?, ?, ?, ?, ?, ?)'
     ).bind(id, slug, body.name, body.content, body.password, body.side).run();
+    sendGuestbookNotification(env, slug, body.name, body.content, body.side).catch(() => {});
     return json({ ok: true, id }, 200, origin);
   }
 
@@ -467,6 +468,7 @@ async function handleRSVP(request: Request, env: Env, slug: string): Promise<Res
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET is_attending = excluded.is_attending, total_guests = excluded.total_guests, wants_meal = excluded.wants_meal, message = excluded.message`
     ).bind(id, slug, body.guestName, body.isAttending ? 1 : 0, body.totalGuests ?? 1, body.wantsMeal ? 1 : 0, body.relation, body.message || '').run();
+    sendRsvpNotification(env, slug, body.guestName, body.isAttending ?? false, body.totalGuests ?? 1, body.relation, body.message || '').catch(() => {});
     return json({ ok: true }, 200, origin);
   }
 
@@ -578,6 +580,83 @@ async function deleteExpiredInvitations(env: Env): Promise<void> {
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// --- Notification emails (유료 청첩장 전용) ---
+
+async function sendGuestbookNotification(env: Env, slug: string, guestName: string, content: string, side: string): Promise<void> {
+  if (!env.RESEND_API_KEY) return;
+  const row = await env.DB.prepare(
+    `SELECT u.email, i.data, i.is_paid FROM invitations i JOIN users u ON i.owner_uid = u.uid WHERE i.slug = ?`
+  ).bind(slug).first();
+  if (!row || !row.is_paid || !row.email) return;
+
+  const d = JSON.parse(row.data as string);
+  const coupleName = d.groomName && d.brideName ? `${d.groomName} & ${d.brideName}` : slug;
+  const sideLabel = side === 'groom' ? '신랑 측' : '신부 측';
+
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: 'Sonett <noreply@sonett.kr>',
+      to: [row.email as string],
+      subject: `[Sonett] ${coupleName} 청첩장에 방명록이 작성되었습니다`,
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;color:#333">
+          <h2 style="font-size:18px;margin-bottom:8px">새 방명록 메시지</h2>
+          <p style="color:#555;line-height:1.6">
+            <strong>${escapeHtml(guestName)}</strong>님(${sideLabel})이 방명록에 메시지를 남겼습니다.
+          </p>
+          <div style="margin:20px 0;padding:16px 20px;background:#f9f5f0;border-radius:10px;border-left:3px solid #B07A8E">
+            <p style="margin:0;color:#333;line-height:1.7">${escapeHtml(content)}</p>
+          </div>
+          <a href="https://sonett.kr/admin/${slug}" style="display:inline-block;margin-top:8px;padding:12px 24px;background:#B07A8E;color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px">방명록 확인하기</a>
+          <p style="margin-top:32px;font-size:12px;color:#aaa">Sonett · 온라인 모바일 청첩장</p>
+        </div>
+      `,
+    }),
+  });
+}
+
+async function sendRsvpNotification(env: Env, slug: string, guestName: string, isAttending: boolean, totalGuests: number, relation: string, message: string): Promise<void> {
+  if (!env.RESEND_API_KEY) return;
+  const row = await env.DB.prepare(
+    `SELECT u.email, i.data, i.is_paid FROM invitations i JOIN users u ON i.owner_uid = u.uid WHERE i.slug = ?`
+  ).bind(slug).first();
+  if (!row || !row.is_paid || !row.email) return;
+
+  const d = JSON.parse(row.data as string);
+  const coupleName = d.groomName && d.brideName ? `${d.groomName} & ${d.brideName}` : slug;
+  const relationLabel = relation === 'groom' ? '신랑 측' : '신부 측';
+  const attendLabel = isAttending ? '✅ 참석' : '❌ 불참';
+
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: 'Sonett <noreply@sonett.kr>',
+      to: [row.email as string],
+      subject: `[Sonett] ${coupleName} 청첩장에 RSVP 응답이 도착했습니다`,
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;color:#333">
+          <h2 style="font-size:18px;margin-bottom:8px">새 RSVP 응답</h2>
+          <p style="color:#555;line-height:1.6">
+            <strong>${escapeHtml(guestName)}</strong>님(${relationLabel})이 참석 여부를 응답했습니다.
+          </p>
+          <div style="margin:20px 0;padding:16px 20px;background:#f9f5f0;border-radius:10px">
+            <table style="width:100%;border-collapse:collapse;font-size:14px">
+              <tr><td style="padding:6px 0;color:#888;width:80px">참석 여부</td><td style="padding:6px 0;font-weight:bold">${attendLabel}</td></tr>
+              ${isAttending ? `<tr><td style="padding:6px 0;color:#888">인원</td><td style="padding:6px 0">${totalGuests}명</td></tr>` : ''}
+              ${message ? `<tr><td style="padding:6px 0;color:#888">메시지</td><td style="padding:6px 0">${escapeHtml(message)}</td></tr>` : ''}
+            </table>
+          </div>
+          <a href="https://sonett.kr/admin/${slug}" style="display:inline-block;margin-top:8px;padding:12px 24px;background:#B07A8E;color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px">전체 응답 보기</a>
+          <p style="margin-top:32px;font-size:12px;color:#aaa">Sonett · 온라인 모바일 청첩장</p>
+        </div>
+      `,
+    }),
+  });
 }
 
 // --- Main Router ---
