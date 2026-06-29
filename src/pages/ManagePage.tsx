@@ -213,6 +213,9 @@ const ManagePage: React.FC = () => {
       <ToastContainer />
       <main className="manage-main">
         <h2 className="manage-title">내 청첩장</h2>
+        {!loading && invitations.some(i => !i.data.isPaid) && (
+          <p className="manage-notice">결제하지 않은 청첩장은 1주일이 지나면 자동으로 삭제됩니다.</p>
+        )}
         {loading ? (
           <p className="manage-empty">불러오는 중..</p>
         ) : invitations.length === 0 ? (
@@ -341,6 +344,14 @@ const ManagePage: React.FC = () => {
           font-weight: 700;
           color: #1F2937;
           margin: 0 0 28px;
+        }
+        .manage-notice {
+          margin: -12px 0 20px;
+          padding: 10px 14px;
+          background: #FEF3C7;
+          border-radius: 8px;
+          font-size: 0.82rem;
+          color: #92400E;
         }
         .manage-empty {
           text-align: center;
