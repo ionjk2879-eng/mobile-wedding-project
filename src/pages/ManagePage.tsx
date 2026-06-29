@@ -252,15 +252,6 @@ const ManagePage: React.FC = () => {
                     </h3>
                     {data.date && <p className="mc-date">{data.date}</p>}
                     <p className="mc-slug">sonett.kr/{slug}</p>
-                    {(() => {
-                      const expiry = getExpiryInfo(data);
-                      if (!expiry) return null;
-                      return (
-                        <span className={`mc-expiry-badge ${expiry.urgent ? 'urgent' : ''}`}>
-                          {expiry.label}
-                        </span>
-                      );
-                    })()}
                   </div>
                   {!data.isPaid && (
                     <div className="mc-purchase-section">
@@ -290,6 +281,15 @@ const ManagePage: React.FC = () => {
                     <Link to={`/edit/${slug}`} className="mc-action-btn mc-edit-btn">
                       <Edit3 size={14} /> 편집
                     </Link>
+                    {(() => {
+                      const expiry = getExpiryInfo(data);
+                      if (!expiry) return null;
+                      return (
+                        <span className={`mc-expiry-badge ${expiry.urgent ? 'urgent' : ''}`}>
+                          {expiry.label}
+                        </span>
+                      );
+                    })()}
                     <CardDropdown
                       slug={slug}
                       isPaid={!!data.isPaid}
