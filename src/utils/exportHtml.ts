@@ -52,9 +52,10 @@ function getThemeBgColor(theme: string, customBgColor?: string): string {
 export async function downloadInvitationHtml(data: InvitationData): Promise<void> {
   const resolved = await embedImages(data);
 
+  const EXCLUDE_SECTIONS = new Set(['share', 'rsvp', 'guestbook']);
   const exportData: InvitationData = {
     ...resolved,
-    sectionOrder: (resolved.sectionOrder || []).filter(s => s !== 'share'),
+    sectionOrder: (resolved.sectionOrder || []).filter(s => !EXCLUDE_SECTIONS.has(s)),
   };
 
   const theme = exportData.theme || 'blush';
@@ -112,11 +113,71 @@ export async function downloadInvitationHtml(data: InvitationData): Promise<void
       font-size: ${fontSize};
       font-family: ${fontFamily};
     }
+
+    /* PDF 저장 버튼 */
+    #pdf-toolbar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    #pdf-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: #B07A8E;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: 'Pretendard', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(176,122,142,0.4);
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s;
+    }
+    #pdf-btn:hover { opacity: 0.85; }
+    #pdf-hint {
+      font-size: 0.72rem;
+      color: rgba(0,0,0,0.4);
+      font-family: 'Pretendard', sans-serif;
+      background: rgba(255,255,255,0.85);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* 인쇄 최적화 */
+    @media print {
+      @page { size: 430px auto; margin: 0; }
+      html, body { background: var(--wedding-bg, ${bgColor}); }
+      #pdf-toolbar { display: none !important; }
+      #page-wrap { max-width: 100%; }
+      .invitation-page { min-height: auto; }
+      .section { page-break-inside: avoid; }
+      /* 애니메이션 제거 */
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
     ${previewCss}
     ${effectsCss}
   </style>
 </head>
 <body>
+  <div id="pdf-toolbar">
+    <button id="pdf-btn" onclick="window.print()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      PDF로 저장
+    </button>
+    <span id="pdf-hint">Chrome에서 '대상: PDF로 저장' 선택</span>
+  </div>
+
   <div id="page-wrap">
     ${bodyHtml}
     <footer style="text-align:center;padding:24px 16px;font-size:0.75rem;color:#9CA3AF;font-family:'Pretendard',sans-serif;border-top:1px solid #F3F4F6;margin-top:20px;">
