@@ -277,10 +277,10 @@ const ManagePage: React.FC = () => {
                   )}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
-                      <Share2 size={14} /> 공유
+                      <Share2 size={12} /> 공유
                     </button>
                     <Link to={`/edit/${slug}`} className="mc-action-btn mc-edit-btn">
-                      <Edit3 size={14} /> 편집
+                      <Edit3 size={12} /> 편집
                     </Link>
                     {(() => {
                       const expiry = getExpiryInfo(data);
@@ -461,9 +461,9 @@ const ManagePage: React.FC = () => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 7px 14px;
+          padding: 7px 4px;
           border-radius: 8px;
-          font-size: 0.78rem;
+          font-size: 0.72rem;
           font-weight: 600;
           background: #F3F4F6;
           color: #6B7280;
@@ -554,16 +554,17 @@ const ManagePage: React.FC = () => {
         .mc-action-btn {
           display: flex;
           align-items: center;
-          gap: 5px;
-          padding: 7px 14px;
+          gap: 3px;
+          padding: 7px 4px;
           border-radius: 8px;
-          font-size: 0.78rem;
+          font-size: 0.72rem;
           font-weight: 600;
           border: none;
           cursor: pointer;
           text-decoration: none;
           font-family: inherit;
           transition: all 0.15s;
+          white-space: nowrap;
         }
         .mc-share-btn {
           flex: 1;
