@@ -284,12 +284,9 @@ const ManagePage: React.FC = () => {
                     </Link>
                     {(() => {
                       const expiry = getExpiryInfo(data);
-                      if (!expiry) return null;
-                      return (
-                        <span className={`mc-expiry-badge ${expiry.urgent ? 'urgent' : ''}`}>
-                          {expiry.label}
-                        </span>
-                      );
+                      return expiry
+                        ? <span className={`mc-expiry-badge ${expiry.urgent ? 'urgent' : ''}`}>{expiry.label}</span>
+                        : <span className="mc-expiry-badge mc-expiry-empty" />;
                     })()}
                     <CardDropdown
                       slug={slug}
@@ -460,8 +457,10 @@ const ManagePage: React.FC = () => {
           margin: 0;
         }
         .mc-expiry-badge {
+          flex: 1;
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           padding: 7px 14px;
           border-radius: 8px;
           font-size: 0.78rem;
@@ -469,11 +468,13 @@ const ManagePage: React.FC = () => {
           background: #F3F4F6;
           color: #6B7280;
           white-space: nowrap;
-          flex-shrink: 0;
         }
         .mc-expiry-badge.urgent {
           background: #FEF2F2;
           color: #DC2626;
+        }
+        .mc-expiry-empty {
+          background: transparent;
         }
         .mc-purchase-section {
           margin: 10px 0 4px;
@@ -565,6 +566,8 @@ const ManagePage: React.FC = () => {
           transition: all 0.15s;
         }
         .mc-share-btn {
+          flex: 1;
+          justify-content: center;
           background: #B07A8E;
           color: white;
         }
@@ -572,6 +575,8 @@ const ManagePage: React.FC = () => {
           background: #9B6A7E;
         }
         .mc-edit-btn {
+          flex: 1;
+          justify-content: center;
           background: #F3F4F6;
           color: #4B5563;
         }
@@ -583,7 +588,7 @@ const ManagePage: React.FC = () => {
           background: #F3F4F6;
           color: #9CA3AF;
           padding: 7px 8px;
-          margin-left: auto;
+          flex-shrink: 0;
         }
         .mc-more-btn:hover {
           background: #E5E7EB;
