@@ -175,11 +175,9 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; onDelete: () => v
 function getExpiryInfo(data: InvitationData): { label: string; urgent: boolean } | null {
   if (!data.expiresAt) return null;
   const diff = Math.ceil((new Date(data.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return { label: '만료됨', urgent: true };
-  if (!data.isPaid) return { label: `D-${diff} 삭제 예정`, urgent: diff <= 3 };
-  if (diff <= 30) return { label: `D-${diff} 만료`, urgent: diff <= 7 };
-  const date = new Date(data.expiresAt);
-  return { label: `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} 만료`, urgent: false };
+  if (diff < 0) return { label: '만료', urgent: true };
+  if (diff <= 30) return { label: `D-${diff}`, urgent: diff <= 3 };
+  return null;
 }
 
 const ManagePage: React.FC = () => {
@@ -462,14 +460,16 @@ const ManagePage: React.FC = () => {
           margin: 0;
         }
         .mc-expiry-badge {
-          display: inline-block;
-          margin-top: 6px;
-          padding: 3px 8px;
+          display: inline-flex;
+          align-items: center;
+          padding: 4px 8px;
           border-radius: 20px;
           font-size: 0.7rem;
           font-weight: 700;
           background: #F3F4F6;
           color: #6B7280;
+          white-space: nowrap;
+          flex-shrink: 0;
         }
         .mc-expiry-badge.urgent {
           background: #FEF2F2;
@@ -548,6 +548,7 @@ const ManagePage: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 6px;
+          flex-wrap: nowrap;
         }
         .mc-action-btn {
           display: flex;
