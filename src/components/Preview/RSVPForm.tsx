@@ -46,7 +46,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
     <section className="rsvp-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef} aria-label="참석 의사">
       <h2>RSVP</h2>
       <p className="section-sub">{isEn ? 'Please let us know' : '참석 여부를 알려주세요'}</p>
-      <p style={{ fontSize: '0.9em', color: 'var(--wedding-text-sub)', lineHeight: 1.6, marginBottom: 24, whiteSpace: 'pre-line' }}>
+      <p style={{ fontSize: '0.9em', color: 'var(--wedding-text-sub)', lineHeight: 1.6, marginBottom: 24, whiteSpace: 'pre-line', textAlign: 'center' }}>
         {isEn ? 'Please let us know if you can join us\nby providing your name below.' : '축하의 마음으로 참석해주시는\n모든 분들의 성함을 남겨주세요.'}
       </p>
       {data.slug ? (
