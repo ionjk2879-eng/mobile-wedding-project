@@ -100,18 +100,25 @@ export async function downloadInvitationHtml(data: InvitationData): Promise<void
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; background: ${bgColor}; }
-    body { display: flex; justify-content: center; min-height: 100vh; font-family: 'Pretendard', -apple-system, sans-serif; }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Pretendard', -apple-system, sans-serif;
+    }
     .invitation-page {
       width: 100%;
       max-width: 430px;
       min-height: 100vh;
+      margin: 0 auto;
       background-color: var(--wedding-bg, #fff);
       font-size: ${fontSize};
       font-family: ${fontFamily};
     }
     @media (max-width: 430px) {
       body { background: var(--wedding-bg, #fff); }
-      .invitation-page { max-width: 100%; }
+      .invitation-page { max-width: 100%; margin: 0; }
     }
     ${previewCss}
     ${effectsCss}
