@@ -213,7 +213,7 @@ async function handleInvitations(request: Request, env: Env): Promise<Response> 
 
   return json(rows.results.map((r: Record<string, unknown>) => ({
     slug: r.slug,
-    data: { ...JSON.parse(r.data as string), slug: r.slug, ownerUid: r.owner_uid },
+    data: { ...JSON.parse(r.data as string), slug: r.slug, ownerUid: r.owner_uid, expiresAt: r.expires_at ?? null, isPaid: !!r.is_paid },
   })), 200, origin);
 }
 
