@@ -47,8 +47,7 @@ export const deleteAccount = async (): Promise<void> => {
 
 // Google
 export const initiateGoogleLogin = (returnUrl = '/manage'): void => {
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
-  if (!clientId) { alert('Google 로그인이 설정되지 않았습니다.'); return; }
+  const clientId = '584343413565-h8ukuqrrnravndmocei20kr9t3inkkjn.apps.googleusercontent.com';
   const nonce = crypto.randomUUID();
   sessionStorage.setItem('oauth_nonce', nonce);
   const params = new URLSearchParams({
