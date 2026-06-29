@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../services/invitationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, Download } from 'lucide-react';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, Download, BookOpen } from 'lucide-react';
 import { downloadInvitationHtml } from '../utils/exportHtml';
+import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
@@ -132,7 +133,7 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
   );
 };
 
-const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; onDelete: () => void; onChangeSlug: () => void; onDownloadHtml: () => void }> = ({ slug, isPaid, onDelete, onChangeSlug, onDownloadHtml }) => {
+const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void; onDownloadHtml: () => void }> = ({ slug, isPaid, data, onDelete, onChangeSlug, onDownloadHtml }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -155,6 +156,16 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; onDelete: () => v
           {isPaid && (
             <button className="mc-dropdown-item highlight" onClick={() => { setOpen(false); onDownloadHtml(); }}>
               <Download size={14} /> 다운로드 HTML
+            </button>
+          )}
+          {isPaid && (
+            <button className="mc-dropdown-item highlight" onClick={() => {
+              setOpen(false);
+              downloadGuestbookPdf(data)
+                .then(() => {})
+                .catch((e: Error) => toast.error(e.message || '방명록 PDF 생성에 실패했습니다.'));
+            }}>
+              <BookOpen size={14} /> 방명록 PDF
             </button>
           )}
           <button className="mc-dropdown-item" onClick={() => { setOpen(false); onChangeSlug(); }}>
@@ -291,6 +302,7 @@ const ManagePage: React.FC = () => {
                     <CardDropdown
                       slug={slug}
                       isPaid={!!data.isPaid}
+                      data={data}
                       onDelete={() => handleDelete(slug)}
                       onChangeSlug={() => setChangeSlugTarget(slug)}
                       onDownloadHtml={() => {
