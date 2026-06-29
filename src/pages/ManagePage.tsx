@@ -263,9 +263,25 @@ const ManagePage: React.FC = () => {
                     })()}
                   </div>
                   {!data.isPaid && (
-                    <a href={KMONG_SERVICE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
-                      <ShoppingCart size={13} /> 크몽에서 의뢰하시면 워터마크가 제거됩니다
-                    </a>
+                    <div className="mc-purchase-section">
+                      <a href={KMONG_SERVICE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
+                        <ShoppingCart size={13} /> 크몽에서 구매하기
+                      </a>
+                      <div className="mc-slug-guide">
+                        <span className="mc-slug-guide-text">구매 후 채팅에서 아래 주소를 알려주세요</span>
+                        <button
+                          className="mc-slug-copy-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(slug);
+                            toast.success('주소가 복사되었습니다');
+                          }}
+                        >
+                          <span className="mc-slug-copy-code">sonett.kr/{slug}</span>
+                          <span className="mc-slug-copy-label">복사</span>
+                        </button>
+                      </div>
+                    </div>
                   )}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
@@ -448,12 +464,17 @@ const ManagePage: React.FC = () => {
           background: #FEF2F2;
           color: #DC2626;
         }
+        .mc-purchase-section {
+          margin: 10px 0 4px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
         .mc-purchase-btn {
           display: flex;
           align-items: center;
           gap: 5px;
           width: 100%;
-          margin: 10px 0 4px;
           padding: 9px 0;
           border-radius: 10px;
           background: linear-gradient(135deg, #B07A8E, #C994A8);
@@ -468,6 +489,48 @@ const ManagePage: React.FC = () => {
           text-decoration: none;
         }
         .mc-purchase-btn:hover { opacity: 0.88; }
+        .mc-slug-guide {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          padding: 8px 10px;
+          background: #FDF6F9;
+          border-radius: 8px;
+          border: 1px solid #F3E0E6;
+        }
+        .mc-slug-guide-text {
+          font-size: 0.68rem;
+          color: #9CA3AF;
+        }
+        .mc-slug-copy-btn {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          background: white;
+          border: 1px solid #E5E7EB;
+          border-radius: 6px;
+          padding: 5px 8px;
+          cursor: pointer;
+          font-family: inherit;
+          transition: border-color 0.15s;
+          gap: 6px;
+        }
+        .mc-slug-copy-btn:hover { border-color: #B07A8E; }
+        .mc-slug-copy-code {
+          font-size: 0.7rem;
+          color: #4B5563;
+          font-family: monospace;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .mc-slug-copy-label {
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #B07A8E;
+          flex-shrink: 0;
+        }
 
         /* Actions */
         .mc-actions {

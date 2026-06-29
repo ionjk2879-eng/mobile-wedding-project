@@ -239,10 +239,16 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
     const isPaid = !!body.isPaid;
     const weddingDateISO = body.weddingDateISO as string;
     if (existing && existing.is_paid && isPaid && existing.expires_at) {
+      // 기존 유료 → 유료 유지: 만료일 보존
       expiresAt = existing.expires_at as string;
     } else if (isPaid && weddingDateISO) {
+      // 유료 전환: 결혼식 날짜 기준 +1년
       expiresAt = weddingPlusOneYear(weddingDateISO);
+    } else if (existing && !isPaid && existing.expires_at) {
+      // 기존 미결제 수정: 최초 생성 시점 기준 만료일 유지 (편집할 때마다 리셋 방지)
+      expiresAt = existing.expires_at as string;
     } else {
+      // 최초 생성(미결제): 지금부터 7일
       expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     }
 
@@ -328,6 +334,58 @@ async function handleActivate(request: Request, env: Env, slug: string): Promise
   ).bind(expiresAt, JSON.stringify(data), slug).run();
 
   return json({ ok: true, expiresAt }, 200, origin);
+}
+
+// --- Admin API ---
+
+async function handleAdminInvitations(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== 'ionjk2879@gmail.com')
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+
+  const url = new URL(request.url);
+  const filter = url.searchParams.get('filter') || 'all';
+  const q = url.searchParams.get('q') || '';
+
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+
+  if (filter === 'unpaid') conditions.push('i.is_paid = 0');
+  else if (filter === 'paid') conditions.push('i.is_paid = 1');
+
+  if (q) {
+    conditions.push('(i.slug LIKE ? OR u.email LIKE ? OR u.name LIKE ?)');
+    const like = `%${q}%`;
+    params.push(like, like, like);
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const rows = await env.DB.prepare(
+    `SELECT i.slug, i.is_paid, i.expires_at, i.created_at, i.data,
+            u.email AS owner_email, u.name AS owner_name
+     FROM invitations i
+     LEFT JOIN users u ON i.owner_uid = u.uid
+     ${where}
+     ORDER BY i.created_at DESC
+     LIMIT 200`
+  ).bind(...params).all();
+
+  return json(rows.results.map((r: Record<string, unknown>) => {
+    const d = JSON.parse(r.data as string);
+    return {
+      slug: r.slug,
+      ownerEmail: r.owner_email,
+      ownerName: r.owner_name,
+      isPaid: !!r.is_paid,
+      expiresAt: r.expires_at,
+      createdAt: r.created_at,
+      groomName: d.groomName || '',
+      brideName: d.brideName || '',
+      date: d.date || '',
+      weddingDateISO: d.weddingDateISO || '',
+    };
+  }), 200, origin);
 }
 
 // --- Guestbook API ---
@@ -554,6 +612,10 @@ export default {
 
       const activateMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/activate$/);
       if (activateMatch) return await handleActivate(request, env, activateMatch[1]);
+
+      // Admin
+      if (pathname === '/api/admin/invitations' && request.method === 'GET')
+        return await handleAdminInvitations(request, env);
 
       // Upload
       if (pathname === '/api/upload') return await handleUpload(request, env);
