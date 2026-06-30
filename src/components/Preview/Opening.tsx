@@ -111,37 +111,37 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [typedCount, setTypedCount] = useState(0);
   const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
 
+  // 전환 스타일이 바뀔 때만 phase와 CSS 애니메이션 재시작
+  // 내용 연출(openingContentStyle) 변경 시에는 phase를 건드리지 않음
   useLayoutEffect(() => {
     const el = rootRef.current;
     if (el) {
-      // 스타일 클래스를 잠깐 제거해 reflow를 유도하여 CSS 애니메이션 강제 재시작
       const styleClass = `op-${effectiveStyle}`;
       el.classList.remove(styleClass);
       void el.offsetWidth;
       el.classList.add(styleClass);
     }
     setPhase('enter');
-  }, [opening.openingStyle, opening.openingContentStyle]);
+  }, [opening.openingStyle]);
 
   useEffect(() => {
     const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
-  }, [opening.openingStyle, opening.openingContentStyle]);
+  }, [opening.openingStyle]);
 
-  // paint 이전에 동기적으로 리셋 (전환 시 잔상 방지)
+  // 타이핑 모드 전환 시 리셋
   useLayoutEffect(() => {
     if (!isTyping) return;
     setTypedCount(0);
     setTypingPhase('idle');
-  }, [isTyping, opening.openingStyle, opening.openingContentStyle]);
+  }, [isTyping, opening.openingStyle]);
 
-  // 타이머는 비동기로 (paint 이후)
   useEffect(() => {
     if (!isTyping) return;
     const t1 = setTimeout(() => setTypingPhase('heart'), 500);
     const t2 = setTimeout(() => setTypingPhase('typing'), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isTyping, opening.openingStyle, opening.openingContentStyle]);
+  }, [isTyping, opening.openingStyle]);
 
   const mainTextRef = useRef(opening.openingText || 'We\'re getting married');
   mainTextRef.current = opening.openingText || 'We\'re getting married';

@@ -621,6 +621,8 @@
 @keyframes op-insta-in { from { opacity: 0; transform: scale(1.06); } to { opacity: var(--op-opacity); transform: scale(1); } }
 .op-insta-progress { position: absolute; top: 14px; left: 14px; right: 14px; height: 2px; background: rgba(255,255,255,0.28); border-radius: 2px; z-index: 3; }
 .op-insta-bar { height: 100%; width: 0; background: rgba(255,255,255,0.88); border-radius: 2px; animation: op-insta-fill 3s linear 0.5s forwards; }
+/* 인스타 모드가 아닐 때 바가 남지 않도록 안전망 */
+.op-root:not(.op-insta) .op-insta-progress { display: none !important; }
 @keyframes op-insta-fill { from { width: 0%; } to { width: 100%; } }
 .op-insta.op-phase-exit { animation: op-insta-exit 1.4s ease forwards !important; }
 .op-insta.op-phase-exit .op-body { animation: none !important; }
