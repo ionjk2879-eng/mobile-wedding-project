@@ -305,26 +305,26 @@ html, body {
   --wedding-text-sub: #8A6A38;
 }
 
-.theme-ivory {
-  --wedding-bg: #FDFDF8;
+.theme-sky {
+  --wedding-bg: #EDF2FA;
   --wedding-card-bg: #FFFFFF;
-  --wedding-border: #ECEADA;
-  --wedding-main: #A89C70;
-  --wedding-accent: #C0B488;
-  --wedding-text-main: #2C2A1E;
-  --wedding-text-body: #4A4836;
-  --wedding-text-sub: #8A8670;
+  --wedding-border: #C8D6EC;
+  --wedding-main: #6070A8;
+  --wedding-accent: #8090C0;
+  --wedding-text-main: #1A2240;
+  --wedding-text-body: #38405E;
+  --wedding-text-sub: #6878A0;
 }
 
-.theme-plum {
-  --wedding-bg: #F5F1F7;
-  --wedding-card-bg: #FFFFFF;
-  --wedding-border: #DDD0EC;
-  --wedding-main: #7C4E80;
-  --wedding-accent: #9C6EA0;
-  --wedding-text-main: #281630;
-  --wedding-text-body: #4A3852;
-  --wedding-text-sub: #8A7090;
+.theme-linen {
+  --wedding-bg: #F5EFE6;
+  --wedding-card-bg: #FFFCF8;
+  --wedding-border: #E2D5C2;
+  --wedding-main: #9A8468;
+  --wedding-accent: #B49E80;
+  --wedding-text-main: #2C2218;
+  --wedding-text-body: #4A3C2E;
+  --wedding-text-sub: #8A7860;
 }
 
 .theme-olive {
