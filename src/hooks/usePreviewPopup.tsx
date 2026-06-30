@@ -70,6 +70,19 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ open, onClose, a
   const themeEl = anchorRef.current?.closest('[class*="theme-"]');
   const themeClass = themeEl ? Array.from(themeEl.classList).find(c => c.startsWith('theme-')) || '' : '';
 
+  // .invitation-page의 인라인 커스텀 색상 변수를 포털에 직접 전달
+  const invPage = anchorRef.current?.closest('.invitation-page') as HTMLElement | null;
+  const customVars: Record<string, string> = {};
+  if (invPage) {
+    const s = invPage.style;
+    const main = s.getPropertyValue('--wedding-main');
+    const accent = s.getPropertyValue('--wedding-accent');
+    const bg = s.getPropertyValue('--wedding-bg');
+    if (main) customVars['--wedding-main'] = main;
+    if (accent) customVars['--wedding-accent'] = accent;
+    if (bg) customVars['--wedding-bg'] = bg;
+  }
+
   const style: React.CSSProperties = {
     position: 'fixed',
     top: rect.top,
@@ -82,6 +95,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ open, onClose, a
     background: 'var(--wedding-bg, #fff)',
     borderRadius: 'inherit',
     overflow: 'hidden',
+    ...customVars as React.CSSProperties,
   };
 
   return ReactDOM.createPortal(
