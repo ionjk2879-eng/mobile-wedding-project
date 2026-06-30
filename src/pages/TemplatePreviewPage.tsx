@@ -126,8 +126,24 @@ const TemplatePreviewPage: React.FC = () => {
             }}
           >
             <ScrollRootContext.Provider value={null}>
-              <InvitationView data={previewData} showOpening={true} shareEnabled={false} />
+              <InvitationView data={previewData} showOpening={true} shareEnabled={false} openingTopOffset={88} />
             </ScrollRootContext.Provider>
+            <a
+              href="https://sonett.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '14px 20px',
+                background: 'linear-gradient(135deg, #1F2937 0%, #374151 100%)',
+                color: 'white', textDecoration: 'none',
+                fontFamily: "'Pretendard', sans-serif",
+              }}
+            >
+              <span style={{ fontSize: '0.9em', fontWeight: 700, letterSpacing: 1, color: '#D4A5C6' }}>Sonett</span>
+              <span style={{ fontSize: '0.75em', color: 'rgba(255,255,255,0.7)' }}>지금 바로 모바일 청첩장</span>
+              <span style={{ fontSize: '0.75em', fontWeight: 600, color: '#D4A5C6', marginLeft: 4 }}>지금 만들기 ›</span>
+            </a>
           </div>
         )}
       </div>

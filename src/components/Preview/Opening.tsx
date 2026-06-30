@@ -73,9 +73,10 @@ interface OpeningProps {
   theme?: string;
   autoClose?: boolean;
   onDismissed?: () => void;
+  topOffset?: number;
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
@@ -229,7 +230,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     <div
       ref={rootRef}
       className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
-      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride, ...editorBounds } as React.CSSProperties}
+      style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride, ...editorBounds, ...(topOffset != null && !Object.keys(editorBounds).length ? { top: topOffset, height: `calc(100% - ${topOffset}px)` } : {}) } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}

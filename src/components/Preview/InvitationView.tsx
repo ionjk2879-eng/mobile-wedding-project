@@ -25,6 +25,7 @@ interface InvitationViewProps {
   previewRefs?: Record<string, React.RefObject<HTMLDivElement>>;
   showOpening?: boolean;
   shareEnabled?: boolean;
+  openingTopOffset?: number;
 }
 
 const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean }> = ({ id, data, refEl, shareEnabled }) => {
@@ -49,7 +50,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 
 const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'share'];
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset }) => {
   const sectionOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
   const [previewActive, setPreviewActive] = useState(false);
@@ -98,6 +99,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           theme={data.theme}
           autoClose={isPreviewOnly}
           onDismissed={handleOpeningDismissed}
+          topOffset={openingTopOffset}
         />
       )}
       <BackgroundEffects effect={data.bgEffect} />
