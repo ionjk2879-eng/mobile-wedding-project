@@ -111,11 +111,14 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [typedCount, setTypedCount] = useState(0);
   const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setPhase('enter');
+  }, [opening.openingStyle]);
+
+  useEffect(() => {
     const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
-  }, [opening.openingStyle, opening.openingContentStyle]);
+  }, [opening.openingStyle]);
 
   // paint 이전에 동기적으로 리셋 (전환 시 잔상 방지)
   useLayoutEffect(() => {
