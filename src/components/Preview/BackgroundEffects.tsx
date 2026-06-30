@@ -8,11 +8,14 @@ interface BackgroundEffectsProps {
 const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir }) => {
   if (!effect || effect === 'none') return null;
 
-  const anim = (base: string): string => {
+  const animName = (base: string) => {
     if (effectDir === 'diagonal') return `${base}-diag`;
     if (effectDir === 'gentle') return `${base}-gentle`;
     return base;
   };
+
+  const fa = (base: string, dur: number, delay: number) =>
+    `${animName(base)} ${dur.toFixed(1)}s linear ${delay.toFixed(1)}s infinite`;
 
   switch (effect) {
     case 'cherry-blossom':
@@ -21,9 +24,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
           {[...Array(35)].map((_, i) => (
             <div key={i} className="particle blossom" style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 14}s`,
-              animationDuration: `${16 + Math.random() * 14}s`,
-              animationName: anim('fall'),
+              animation: fa('fall', 16 + Math.random() * 14, Math.random() * 14),
             }} />
           ))}
         </div>
@@ -34,9 +35,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
           {[...Array(60)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 12}s`,
-              animationDuration: `${10 + Math.random() * 8}s`,
-              animationName: anim('fall'),
+              animation: fa('fall', 10 + Math.random() * 8, Math.random() * 12),
             }} />
           ))}
         </div>
@@ -48,7 +47,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
             <div key={i} className="particle star" style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`
+              animationDelay: `${Math.random() * 5}s`,
             }} />
           ))}
         </div>
@@ -59,9 +58,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
           {[...Array(25)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 14}s`,
-              animationDuration: `${14 + Math.random() * 12}s`,
-              animationName: anim('fall-sway'),
+              animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
             }} />
           ))}
         </div>
@@ -74,7 +71,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
               left: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 12}s`,
               animationDuration: `${12 + Math.random() * 10}s`,
-              fontSize: `${8 + Math.random() * 10}px`
+              fontSize: `${8 + Math.random() * 10}px`,
             }}>♥</div>
           ))}
         </div>
@@ -87,7 +84,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 6}s`,
-              animationDuration: `${5 + Math.random() * 5}s`
+              animationDuration: `${5 + Math.random() * 5}s`,
             }} />
           ))}
         </div>
@@ -98,9 +95,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
           {[...Array(50)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 12}s`,
-              animationDuration: `${10 + Math.random() * 8}s`,
-              animationName: anim('confetti-fall'),
+              animation: fa('confetti-fall', 10 + Math.random() * 8, Math.random() * 12),
             }} />
           ))}
         </div>
@@ -111,9 +106,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
           {[...Array(30)].map((_, i) => (
             <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 14}s`,
-              animationDuration: `${15 + Math.random() * 12}s`,
-              animationName: anim('fall'),
+              animation: fa('fall', 15 + Math.random() * 12, Math.random() * 14),
             }} />
           ))}
         </div>
@@ -124,9 +117,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
           {[...Array(22)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 14}s`,
-              animationDuration: `${14 + Math.random() * 12}s`,
-              animationName: anim('fall-sway'),
+              animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
             }} />
           ))}
         </div>
