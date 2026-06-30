@@ -192,7 +192,12 @@ const ManagePage: React.FC = () => {
   const [changeSlugTarget, setChangeSlugTarget] = useState<string | null>(null);
 
   const load = () => {
-    fetchMyInvitations().then(setInvitations).catch(() => {}).finally(() => setLoading(false));
+    fetchMyInvitations()
+      .then(list => setInvitations(
+        [...list].sort((a, b) => (b.data.isPaid ? 1 : 0) - (a.data.isPaid ? 1 : 0))
+      ))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   };
 
   useEffect(load, []);
