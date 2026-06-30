@@ -34,6 +34,8 @@ const App: React.FC = () => {
   const [loadingSample, setLoadingSample] = useState(false);
   const hasSavedOnceRef = useRef(false);
   const dataReadyRef = useRef(false);
+  const showStartScreenRef = useRef(showStartScreen);
+  showStartScreenRef.current = showStartScreen;
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   useEffect(() => { loadAllFonts(); }, []);
@@ -61,6 +63,26 @@ const App: React.FC = () => {
     }
   }, []);
 
+
+  // 브라우저 뒤로/앞으로 이동 시 URL ↔ 화면 동기화
+  useEffect(() => {
+    if (!dataReadyRef.current) return; // 초기 마운트는 위 loadedRef 효과가 처리
+    const currentShowStartScreen = showStartScreenRef.current;
+    if (!urlSlug && currentShowStartScreen === null) {
+      // /edit/:slug → /editor 로 뒤로가기: 시작 화면 표시
+      setLoadingData(true);
+      fetchMyInvitations().then((items) => {
+        setShowStartScreen(items.map((item) => item.slug));
+      }).catch(() => setShowStartScreen([])).finally(() => setLoadingData(false));
+    } else if (urlSlug && currentShowStartScreen !== null) {
+      // 시작 화면에서 /edit/:slug 로 앞으로가기: 해당 청첩장 로드
+      setShowStartScreen(null);
+      setLoadingData(true);
+      loadInvitation(urlSlug).then((saved) => {
+        if (saved) { setData(saved); hasSavedOnceRef.current = true; }
+      }).catch(() => {}).finally(() => setLoadingData(false));
+    }
+  }, [urlSlug]);
 
   const handleLoadExisting = async (slug: string) => {
     setShowStartScreen(null);
