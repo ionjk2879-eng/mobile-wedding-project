@@ -9,89 +9,9 @@ import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, f
 import { getApiErrorMessage } from './utils/apiError';
 import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X, Sparkles } from 'lucide-react';
-import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
+import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
 import './styles/effects.css';
 import './styles/builder.css';
-
-const ITEMS_PER_PAGE = 6;
-
-const PresetSlider: React.FC<{ onSelect: (preset: AIPreset) => void }> = ({ onSelect }) => {
-  const totalPages = Math.ceil(AI_PRESETS.length / ITEMS_PER_PAGE);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [page, setPage] = useState(0);
-  const startX = useRef(0);
-  const dragging = useRef(false);
-  const didDrag = useRef(false);
-  const [dragOffset, setDragOffset] = useState(0);
-
-  const finishDrag = (offset: number) => {
-    dragging.current = false;
-    didDrag.current = Math.abs(offset) > 10;
-    if (offset < -50 && page < totalPages - 1) setPage(page + 1);
-    else if (offset > 50 && page > 0) setPage(page - 1);
-    setDragOffset(0);
-  };
-
-  const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; dragging.current = true; didDrag.current = false; };
-  const onTouchMove = (e: React.TouchEvent) => { if (dragging.current) setDragOffset(e.touches[0].clientX - startX.current); };
-  const onTouchEnd = () => finishDrag(dragOffset);
-  const onMouseDown = (e: React.MouseEvent) => { startX.current = e.clientX; dragging.current = true; didDrag.current = false; };
-  const onMouseMove = (e: React.MouseEvent) => { if (dragging.current) { e.preventDefault(); setDragOffset(e.clientX - startX.current); } };
-  const onMouseUp = () => { if (dragging.current) finishDrag(dragOffset); };
-  const onMouseLeave = () => { if (dragging.current) finishDrag(dragOffset); };
-
-  const handleCardClick = (preset: AIPreset) => {
-    if (didDrag.current) return;
-    onSelect(preset);
-  };
-
-  const pages = Array.from({ length: totalPages }, (_, i) =>
-    AI_PRESETS.slice(i * ITEMS_PER_PAGE, (i + 1) * ITEMS_PER_PAGE)
-  );
-
-  const translateX = -(page * 100) + (dragOffset / (containerRef.current?.offsetWidth || 320)) * 100;
-
-  return (
-    <div className="ai-preset-section">
-      <div className="ai-preset-label"><Sparkles size={16} /> AI 추천 샘플 청첩장</div>
-      <div className="ai-preset-viewport" ref={containerRef}
-        onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-        onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}
-      >
-        <div className="ai-preset-track" style={{
-          transform: `translateX(${translateX}%)`,
-          transition: dragOffset ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
-        }}>
-          {pages.map((group, pi) => (
-            <div key={pi} className="ai-preset-page">
-              {group.map((preset) => (
-                <button key={preset.id} className="ai-preset-card" onClick={() => handleCardClick(preset)}>
-                  <span className="ai-preset-category">{preset.category}</span>
-                  <span className="ai-preset-emoji">{preset.emoji}</span>
-                  <span className="ai-preset-name">{preset.name}</span>
-                  <span className="ai-preset-desc">{preset.description}</span>
-                  <div className="ai-preset-swatches">
-                    {preset.previewColors.map((color, ci) => (
-                      <span key={ci} className="ai-preset-swatch" style={{ background: color }} />
-                    ))}
-                  </div>
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      {totalPages > 1 && (
-        <div className="ai-preset-dots">
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button key={i} className={`ai-preset-dot ${page === i ? 'active' : ''}`} onClick={() => setPage(i)} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
 
 const App: React.FC = () => {
   const { slug: urlSlug } = useParams<{ slug: string }>();
@@ -153,12 +73,6 @@ const App: React.FC = () => {
   const handleStartNew = () => {
     setShowStartScreen(null);
     setData(initialData);
-    hasSavedOnceRef.current = false;
-  };
-
-  const handleStartWithPreset = (preset: AIPreset) => {
-    setShowStartScreen(null);
-    setData(applyPreset(preset));
     hasSavedOnceRef.current = false;
   };
 
@@ -268,8 +182,6 @@ const App: React.FC = () => {
         <h1>Sonett</h1>
         <p className="start-desc">소네트 모바일 청첩장</p>
         <div className="start-options">
-          <PresetSlider onSelect={handleStartWithPreset} />
-          <div className="start-divider">또는 직접 설정하기</div>
           <button className="start-btn new" onClick={handleStartNew}>새로 만들기</button>
           {showStartScreen.length > 0 && (
             <>
