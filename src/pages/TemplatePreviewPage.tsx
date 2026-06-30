@@ -109,15 +109,17 @@ const TemplatePreviewPage: React.FC = () => {
       }}>
         샘플 사진과 정보로 미리 보는 화면입니다. 제작하기를 누르면 빈 청첩장으로 시작합니다.
       </div>
-      <div style={{ paddingTop: 88 }}>
+      <div style={{ paddingTop: 88, width: '100%', minHeight: 'calc(100vh - 88px)', background: '#ffffff', display: 'flex', justifyContent: 'center' }}>
         {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 88px)', fontFamily: "'Pretendard', sans-serif" }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', fontFamily: "'Pretendard', sans-serif" }}>
             <span style={{ color: '#9CA3AF' }}>샘플 불러오는 중...</span>
           </div>
         ) : (
           <div
             className={`invitation-page ${themeClass}${preset.accentOnText ? ' tmpl-accent-text' : ''}`}
             style={{
+              width: '100%',
+              maxWidth: 430,
               ...(previewData.customBgColor ? { '--wedding-bg': previewData.customBgColor } as React.CSSProperties : {}),
               ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor, '--wedding-accent': previewData.customAccentColor } as React.CSSProperties : {}),
               fontFamily: previewData.fontFamily || undefined,
