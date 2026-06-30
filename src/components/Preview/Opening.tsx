@@ -248,7 +248,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       )}
       {decoEffect === 'ripple' && (
         <div className="op-deco-ripple" aria-hidden="true">
-          {[0, 1.2, 2.4].map((delay, i) => (
+          {[0, 2, 4].map((delay, i) => (
             <span key={i} className="op-ripple-ring" style={{ animationDelay: `${delay}s` }} />
           ))}
         </div>
