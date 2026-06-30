@@ -78,19 +78,32 @@ export async function downloadHeroPng(data: InvitationData): Promise<void> {
       status.style.display = 'block';
       btn.style.display = 'none';
       var el = document.querySelector('.invitation-page');
-      html2canvas(el, { scale: 3, useCORS: true, allowTaint: false, backgroundColor: null, logging: false })
-        .then(function(canvas) {
-          var link = document.createElement('a');
-          link.download = '${fileName}';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-          status.textContent = '✓ 저장 완료';
-          setTimeout(function() { btn.style.display='flex'; status.style.display='none'; }, 2000);
-        })
-        .catch(function(e) {
-          status.textContent = '오류: ' + e.message;
-          btn.style.display = 'flex';
-        });
+
+      // 애니메이션 제거 후 최종 렌더링 상태로 캡처
+      var freezeStyle = document.createElement('style');
+      freezeStyle.textContent = '* { animation: none !important; transition: none !important; }';
+      document.head.appendChild(freezeStyle);
+
+      requestAnimationFrame(function() {
+        var bg = window.getComputedStyle(el).backgroundColor;
+        if (!bg || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') bg = '#ffffff';
+
+        html2canvas(el, { scale: 3, useCORS: true, allowTaint: false, backgroundColor: bg, logging: false })
+          .then(function(canvas) {
+            document.head.removeChild(freezeStyle);
+            var link = document.createElement('a');
+            link.download = '${fileName}';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            status.textContent = '✓ 저장 완료';
+            setTimeout(function() { btn.style.display='flex'; status.style.display='none'; }, 2000);
+          })
+          .catch(function(e) {
+            document.head.removeChild(freezeStyle);
+            status.textContent = '오류: ' + e.message;
+            btn.style.display = 'flex';
+          });
+      });
     }
   </script>
 </body>

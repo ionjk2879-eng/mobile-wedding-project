@@ -89,7 +89,7 @@ const ViewPage: React.FC = () => {
           <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} />
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
-        <PromoSection />
+        {showWatermark && <PromoSection />}
       </div>
 
       <style>{`
