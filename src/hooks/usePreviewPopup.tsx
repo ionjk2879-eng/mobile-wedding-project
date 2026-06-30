@@ -66,15 +66,19 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ open, onClose, a
   const rect = usePreviewRect(anchorRef, open);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // 렌더 후(커밋 완료 후) .invitation-page의 최신 CSS 변수를 포털 div에 동기화
-  // 렌더 중 읽으면 React가 DOM을 아직 커밋하기 전이라 구버전 값이 읽히므로 useEffect로 처리
+  // 렌더 후(커밋 완료 후) CSS 변수를 포털 div에 동기화
+  // ViewPage/.invitation-page에는 vars가 거기 있고,
+  // 에디터 사이드바에서는 .preview-content-scroll에 vars가 있으므로 둘 다 탐색
   useEffect(() => {
     if (!open || !overlayRef.current || !anchorRef.current) return;
-    const invPage = anchorRef.current.closest('.invitation-page') as HTMLElement | null;
-    if (!invPage) return;
+    const varsSource = (
+      anchorRef.current.closest('.invitation-page') ??
+      anchorRef.current.closest('.preview-content-scroll')
+    ) as HTMLElement | null;
+    if (!varsSource) return;
     const div = overlayRef.current;
     ['--wedding-main', '--wedding-accent', '--wedding-bg'].forEach(v => {
-      const val = invPage.style.getPropertyValue(v);
+      const val = varsSource.style.getPropertyValue(v);
       if (val) div.style.setProperty(v, val);
       else div.style.removeProperty(v);
     });
