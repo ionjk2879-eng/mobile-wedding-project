@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { OpeningConfig } from '../../types';
 
 const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
@@ -117,10 +117,16 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     return () => clearTimeout(timer);
   }, [opening.openingStyle, opening.openingContentStyle]);
 
-  useEffect(() => {
+  // paint 이전에 동기적으로 리셋 (전환 시 잔상 방지)
+  useLayoutEffect(() => {
     if (!isTyping) return;
     setTypedCount(0);
     setTypingPhase('idle');
+  }, [isTyping, opening.openingStyle, opening.openingContentStyle]);
+
+  // 타이머는 비동기로 (paint 이후)
+  useEffect(() => {
+    if (!isTyping) return;
     const t1 = setTimeout(() => setTypingPhase('heart'), 500);
     const t2 = setTimeout(() => setTypingPhase('typing'), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
@@ -252,7 +258,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       {isBlind && Array.from({ length: 8 }, (_, i) => (
         <div key={i} className="op-blind-slice" style={{ '--slice-i': i } as React.CSSProperties} />
       ))}
-      {isInsta && <div className="op-insta-progress"><div className="op-insta-bar" /></div>}
+      {isInsta && <div key={`insta-${opening.openingContentStyle || 'seq'}`} className="op-insta-progress"><div className="op-insta-bar" /></div>}
 
       {decoEffect === 'dots' && (
         <div className="op-deco-dots" aria-hidden="true">
@@ -277,7 +283,10 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       )}
 
       {isTyping ? (
-        <div className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}`}>
+        <div
+          key={`typing-${opening.openingStyle}-${opening.openingContentStyle || 'seq'}`}
+          className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}`}
+        >
           <div className="op-typing-inner">
             {decoEffect === 'trace' && (
               <div className="op-deco-trace" aria-hidden="true">
@@ -307,7 +316,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         <div
           className="op-body"
           key={`${opening.openingStyle}-${opening.openingContentStyle || 'seq'}`}
-          style={{ '--op-sub-delay': seqSubDelay, '--op-line-b-delay': seqLineBottomDelay, '--op-enter-delay': seqEnterDelay } as React.CSSProperties}
         >
           {decoEffect === 'trace' && (
             <div className="op-deco-trace" aria-hidden="true">
@@ -346,11 +354,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
             })}
           </h2>
 
-          <p className="op-sub">{subText}</p>
+          <p className="op-sub" style={{ animation: `op-fade-up 0.6s ease ${seqSubDelay} both` }}>{subText}</p>
 
-          <div className="op-line op-line-bottom" />
+          <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />
 
-          <button className="op-enter" onClick={handleDismiss}>초대장 열기</button>
+          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both` }} onClick={handleDismiss}>초대장 열기</button>
         </div>
       )}
 
