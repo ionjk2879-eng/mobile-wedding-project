@@ -11,6 +11,7 @@ export interface AIPreset {
   tags?: string[];
   sampleSlug?: string;
   sampleHeroFromGallery?: number;
+  accentOnText?: boolean;
   settings: Partial<InvitationData>;
 }
 
@@ -24,6 +25,7 @@ export const AI_PRESETS: AIPreset[] = [
     previewColors: ['#F2F6EE', '#5F8E5A', '#1A2E18'],
     tags: ['나뭇잎 이펙트', '워터컬러 텍스처', '베일 오프닝', 'Gowun Batang'],
     sampleSlug: 'junho-seoyeon',
+    accentOnText: false,
     settings: {
       theme: 'sage',
       fontFamily: "'Gowun Batang', serif",
@@ -75,6 +77,7 @@ export const AI_PRESETS: AIPreset[] = [
     tags: ['인스타 스타일 히어로', '코랄 그라데이션 오프닝', '스파클 효과'],
     sampleSlug: 'junho-seoyeon',
     sampleHeroFromGallery: 1,
+    accentOnText: true,
     settings: {
       theme: 'rosegold',
       fontFamily: "'Pretendard', sans-serif",
