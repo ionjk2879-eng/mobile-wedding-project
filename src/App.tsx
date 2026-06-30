@@ -8,7 +8,7 @@ import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, fetchMyInvitations } from './services/invitationService';
 import { getApiErrorMessage } from './utils/apiError';
 import { loadAllFonts } from './utils/loadFont';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
 import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import { loadInvitationPublic } from './services/publicLoad';
@@ -19,6 +19,7 @@ import './styles/builder.css';
 const App: React.FC = () => {
   const { slug: urlSlug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const data = useInvitationStore((s) => s.data);
   const setData = useInvitationStore((s) => s.setData);
   const [isFullPreview, setIsFullPreview] = useState(false);
@@ -55,8 +56,18 @@ const App: React.FC = () => {
         }
       }).catch(() => { setShowStartScreen([]); }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
     } else {
+      const templateParam = searchParams.get('template');
       fetchMyInvitations().then((items) => {
-        setShowStartScreen(items.map((item) => item.slug));
+        if (templateParam) {
+          const preset = AI_PRESETS.find(p => p.id === templateParam);
+          if (preset) {
+            setData(applyPreset(preset));
+            hasSavedOnceRef.current = false;
+          }
+          setShowStartScreen(null);
+        } else {
+          setShowStartScreen(items.map((item) => item.slug));
+        }
       }).catch(() => {
         setShowStartScreen([]);
       }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
@@ -267,7 +278,17 @@ const App: React.FC = () => {
                     <div className="tmpl-section-label">템플릿 선택</div>
                     <div className="tmpl-cards">
                       {AI_PRESETS.map((preset) => (
-                        <button key={preset.id} className="tmpl-card" onClick={() => handlePreviewPreset(preset)}>
+                        <a
+                          key={preset.id}
+                          href={`/template-preview/${preset.id}`}
+                          className="tmpl-card"
+                          onClick={(e) => {
+                            if (!e.ctrlKey && !e.metaKey) {
+                              e.preventDefault();
+                              handlePreviewPreset(preset);
+                            }
+                          }}
+                        >
                           <div className="tmpl-card-bar" style={{
                             background: `linear-gradient(to right, ${preset.previewColors[0]} 0%, ${preset.previewColors[1]} 55%, ${preset.previewColors[2]} 100%)`,
                           }} />
@@ -283,7 +304,7 @@ const App: React.FC = () => {
                             )}
                           </div>
                           <span className="tmpl-card-arrow">미리보기 →</span>
-                        </button>
+                        </a>
                       ))}
                     </div>
                   </>

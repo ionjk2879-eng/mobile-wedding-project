@@ -13,6 +13,7 @@ const AuthCallbackPage = React.lazy(() => import('./pages/AuthCallbackPage'))
 const TermsPage = React.lazy(() => import('./pages/TermsPage'))
 const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'))
 const SuperAdminPage = React.lazy(() => import('./pages/SuperAdminPage'))
+const TemplatePreviewPage = React.lazy(() => import('./pages/TemplatePreviewPage'))
 
 const Loading = () => (
   <div style={{ width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", color: '#9CA3AF' }}>
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/editor" element={<AuthGate><App /></AuthGate>} />
           <Route path="/edit/:slug" element={<AuthGate><App /></AuthGate>} />
           <Route path="/manage" element={<AuthGate><ManagePage /></AuthGate>} />
+          <Route path="/template-preview/:presetId" element={<TemplatePreviewPage />} />
           <Route path="/:slug" element={<ViewPage />} />
           <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
           <Route path="/terms" element={<TermsPage />} />

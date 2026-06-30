@@ -36,7 +36,7 @@
 .tmpl-blank-btn:hover .tmpl-blank-title { color: #B07A8E; }
 .tmpl-section-label { font-size: 0.72rem; font-weight: 700; color: #B0B8C1; letter-spacing: 0.8px; text-transform: uppercase; padding: 6px 2px 0; }
 .tmpl-cards { display: flex; flex-direction: column; gap: 10px; }
-.tmpl-card { display: flex; flex-direction: column; border: 1px solid #E5E7EB; border-radius: 16px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; background: white; text-align: left; }
+.tmpl-card { display: flex; flex-direction: column; border: 1px solid #E5E7EB; border-radius: 16px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; background: white; text-align: left; text-decoration: none; color: inherit; }
 .tmpl-card:hover { border-color: #B07A8E; box-shadow: 0 6px 20px rgba(176,122,142,0.14); transform: translateY(-2px); }
 .tmpl-card:active { transform: scale(0.98); }
 .tmpl-card-bar { height: 52px; width: 100%; flex-shrink: 0; }
