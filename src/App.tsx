@@ -239,8 +239,10 @@ const App: React.FC = () => {
   if (showStartScreen !== null) {
     return (
       <div className="start-screen">
-        <h1>Sonett</h1>
-        <p className="start-desc">소네트 모바일 청첩장</p>
+        <div className="start-logo-wrap" onClick={() => navigate('/')} style={{ cursor: 'pointer', textAlign: 'center' }}>
+          <h1>Sonett</h1>
+          <p className="start-desc">소네트 모바일 청첩장</p>
+        </div>
         <div className="start-options">
           <button className="start-btn new" onClick={() => setShowTemplateModal(true)}>새로 만들기</button>
           {showStartScreen.length > 0 && (
