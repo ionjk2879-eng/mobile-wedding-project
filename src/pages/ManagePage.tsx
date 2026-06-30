@@ -332,7 +332,7 @@ const ManagePage: React.FC = () => {
       <style>{`
         .manage {
           min-height: 100vh;
-          background: #F9FAFB;
+          background: #EBEBEB;
           font-family: 'Pretendard', sans-serif;
         }
         .manage-main {
