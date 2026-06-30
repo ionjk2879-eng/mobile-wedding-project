@@ -10,14 +10,19 @@ function formatDate(iso: string): string {
   }
 }
 
-function renderCard(msg: GuestMessage, accentColor: string, mainColor: string): string {
-  const sideLabel = msg.side === 'groom' ? '신랑측' : '신부측';
-  const sideDot = msg.side === 'groom' ? accentColor : mainColor;
-  return `<div class="gb-card">
-    <div class="gb-card-header">
-      <span class="gb-dot" style="background:${sideDot}"></span>
+const GROOM_COLOR = '#6E9FC8';
+const GROOM_BG    = '#EDF4FA';
+
+function renderCard(msg: GuestMessage, brideColor: string, bgColor: string): string {
+  const isGroom  = msg.side === 'groom';
+  const sideLabel = isGroom ? '신랑측' : '신부측';
+  const color     = isGroom ? GROOM_COLOR : brideColor;
+  const cardBg    = isGroom ? GROOM_BG    : bgColor;
+  return `<div class="gb-card" style="border-color:${color}33;background:${cardBg};">
+    <div class="gb-card-header" style="border-bottom-color:${color}22;">
+      <span class="gb-dot" style="background:${color};"></span>
       <span class="gb-name">${msg.name}</span>
-      <span class="gb-side">${sideLabel}</span>
+      <span class="gb-side" style="color:${color};border-color:${color}55;">${sideLabel}</span>
       <span class="gb-date">${formatDate(msg.createdAt)}</span>
     </div>
     <p class="gb-content">${msg.content.replace(/\n/g, '<br>')}</p>
@@ -31,14 +36,13 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
   if (messages.length === 0) throw new Error('등록된 방명록이 없습니다');
 
   const accentColor = data.customAccentColor || '#B07A8E';
-  const mainColor   = data.customAccentColor || '#9E7BA0';
   const bgColor     = data.customBgColor     || '#FDF6F9';
   const fontFamily  = data.fontFamily        || "'Pretendard', sans-serif";
   const groomName   = data.groomName         || '신랑';
   const brideName   = data.brideName         || '신부';
   const weddingDate = data.date              || '';
 
-  const cards = messages.map(m => renderCard(m, accentColor, mainColor)).join('\n');
+  const cards = messages.map(m => renderCard(m, accentColor, bgColor)).join('\n');
 
   const html = `<!DOCTYPE html>
 <html lang="ko">
@@ -111,7 +115,9 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       align-items: center;
       justify-content: center;
       text-align: center;
-      border-bottom: 1px solid ${accentColor}22;
+      background: ${bgColor};
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     .cover-deco {
       width: 40px;
@@ -166,10 +172,9 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       gap: 6mm;
     }
     .gb-card {
-      border: 1px solid ${accentColor}33;
+      border: 1px solid;
       border-radius: 6px;
       padding: 5mm 5mm 6mm;
-      background: ${bgColor};
       break-inside: avoid;
       page-break-inside: avoid;
     }
@@ -179,7 +184,7 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       gap: 5px;
       margin-bottom: 4mm;
       padding-bottom: 3mm;
-      border-bottom: 1px solid ${accentColor}22;
+      border-bottom: 1px solid;
     }
     .gb-dot {
       width: 7px;
@@ -195,8 +200,7 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
     }
     .gb-side {
       font-size: 0.62rem;
-      color: ${accentColor};
-      border: 1px solid ${accentColor}55;
+      border: 1px solid;
       border-radius: 10px;
       padding: 1px 6px;
       font-weight: 600;
