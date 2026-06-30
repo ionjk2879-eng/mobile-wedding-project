@@ -32,6 +32,14 @@ export function usePreviewRect(anchorRef: RefObject<HTMLElement | null>, open: b
       return;
     }
 
+    // 템플릿 미리보기 스크롤 영역
+    const tmplScroll = anchorRef.current.closest('.tmpl-preview-scroll');
+    if (tmplScroll) {
+      const cr = tmplScroll.getBoundingClientRect();
+      setRect(makeRect(cr.top, cr.height));
+      return;
+    }
+
     // ViewPage 등: 뷰포트 전체 높이
     setRect(makeRect(0, window.innerHeight));
   }, [anchorRef]);
