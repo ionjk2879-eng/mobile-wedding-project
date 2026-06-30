@@ -220,7 +220,10 @@ const ManagePage: React.FC = () => {
       <SiteHeader />
       <ToastContainer />
       <main className="manage-main">
-        <h2 className="manage-title">내 청첩장</h2>
+        <div className="manage-title-row">
+          <h2 className="manage-title">내 청첩장</h2>
+          <Link to="/editor" className="manage-new-btn">+ 청첩장 만들기</Link>
+        </div>
         {!loading && invitations.some(i => !i.data.isPaid) && (
           <p className="manage-notice">결제하지 않은 청첩장은 1주일이 지나면 자동으로 삭제됩니다.</p>
         )}
@@ -337,12 +340,32 @@ const ManagePage: React.FC = () => {
           margin: 0 auto;
           padding: 40px 24px;
         }
+        .manage-title-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 0 28px;
+        }
         .manage-title {
           font-size: 1.4rem;
           font-weight: 700;
           color: #1F2937;
-          margin: 0 0 28px;
+          margin: 0;
         }
+        .manage-new-btn {
+          display: inline-flex;
+          align-items: center;
+          padding: 8px 18px;
+          background: #B07A8E;
+          color: white;
+          border-radius: 20px;
+          font-size: 0.82rem;
+          font-weight: 600;
+          text-decoration: none;
+          letter-spacing: 0.01em;
+          transition: opacity 0.2s;
+        }
+        .manage-new-btn:hover { opacity: 0.85; }
         .manage-notice {
           margin: -12px 0 20px;
           padding: 10px 14px;
