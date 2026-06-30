@@ -10,6 +10,7 @@ import { getApiErrorMessage } from './utils/apiError';
 import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
+import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
 import './styles/effects.css';
 import './styles/builder.css';
 
@@ -25,6 +26,7 @@ const App: React.FC = () => {
   const [showSavedPopup, setShowSavedPopup] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
   const hasSavedOnceRef = useRef(false);
   const dataReadyRef = useRef(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -73,6 +75,13 @@ const App: React.FC = () => {
   const handleStartNew = () => {
     setShowStartScreen(null);
     setData(initialData);
+    hasSavedOnceRef.current = false;
+  };
+
+  const handleStartWithPreset = (preset: AIPreset) => {
+    setShowTemplateModal(false);
+    setShowStartScreen(null);
+    setData(applyPreset(preset));
     hasSavedOnceRef.current = false;
   };
 
@@ -182,7 +191,7 @@ const App: React.FC = () => {
         <h1>Sonett</h1>
         <p className="start-desc">소네트 모바일 청첩장</p>
         <div className="start-options">
-          <button className="start-btn new" onClick={handleStartNew}>새로 만들기</button>
+          <button className="start-btn new" onClick={() => setShowTemplateModal(true)}>새로 만들기</button>
           {showStartScreen.length > 0 && (
             <>
               <div className="start-divider">이전 청첩장 이어서 편집</div>
@@ -199,6 +208,49 @@ const App: React.FC = () => {
             </>
           )}
         </div>
+
+        {showTemplateModal && (
+          <div className="tmpl-overlay" onClick={() => setShowTemplateModal(false)}>
+            <div className="tmpl-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="tmpl-handle" />
+              <div className="tmpl-header">
+                <span className="tmpl-title">어떻게 시작할까요?</span>
+                <button className="tmpl-close" onClick={() => setShowTemplateModal(false)}>✕</button>
+              </div>
+              <div className="tmpl-body">
+                <button className="tmpl-blank-btn" onClick={handleStartNew}>
+                  <span className="tmpl-blank-title">+ 빈 청첩장으로 시작</span>
+                  <span className="tmpl-blank-sub">처음부터 직접 꾸미기</span>
+                </button>
+                {AI_PRESETS.length > 0 && (
+                  <>
+                    <div className="tmpl-section-label">템플릿 선택</div>
+                    <div className="tmpl-cards">
+                      {AI_PRESETS.map((preset) => (
+                        <button key={preset.id} className="tmpl-card" onClick={() => handleStartWithPreset(preset)}>
+                          <div className="tmpl-card-bar" style={{
+                            background: `linear-gradient(to right, ${preset.previewColors[0]} 0%, ${preset.previewColors[1]} 55%, ${preset.previewColors[2]} 100%)`,
+                          }} />
+                          <div className="tmpl-card-info">
+                            <span className="tmpl-card-name">{preset.emoji} {preset.name}</span>
+                            <span className="tmpl-card-desc">{preset.description}</span>
+                            {preset.tags && (
+                              <div className="tmpl-card-tags">
+                                {preset.tags.map((tag, i) => (
+                                  <span key={i} className="tmpl-card-tag">{tag}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
