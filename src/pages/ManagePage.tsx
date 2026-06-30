@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../services/invitationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, Download, BookOpen } from 'lucide-react';
-import { downloadInvitationHtml } from '../utils/exportHtml';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen } from 'lucide-react';
 import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
@@ -133,7 +132,7 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
   );
 };
 
-const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void; onDownloadHtml: () => void }> = ({ slug, isPaid, data, onDelete, onChangeSlug, onDownloadHtml }) => {
+const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void }> = ({ slug, isPaid, data, onDelete, onChangeSlug }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -153,11 +152,6 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
       </button>
       {open && (
         <div className="mc-dropdown-menu" onClick={(e) => e.stopPropagation()}>
-          {isPaid && (
-            <button className="mc-dropdown-item highlight" onClick={() => { setOpen(false); onDownloadHtml(); }}>
-              <Download size={14} /> 다운로드 HTML
-            </button>
-          )}
           {isPaid && (
             <button className="mc-dropdown-item highlight" onClick={() => {
               setOpen(false);
@@ -305,11 +299,6 @@ const ManagePage: React.FC = () => {
                       data={data}
                       onDelete={() => handleDelete(slug)}
                       onChangeSlug={() => setChangeSlugTarget(slug)}
-                      onDownloadHtml={() => {
-                        downloadInvitationHtml(data)
-                          .then(() => toast.success('HTML 파일을 다운로드했습니다'))
-                          .catch(() => toast.error('HTML 생성에 실패했습니다.'));
-                      }}
                     />
                   </div>
                 </div>
