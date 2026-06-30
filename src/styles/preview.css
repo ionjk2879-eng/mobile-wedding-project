@@ -469,12 +469,14 @@
 .itv-content { display: flex; flex-direction: column; gap: 24px; }
 .interview-qa { display: flex; flex-direction: column; gap: 10px; }
 .interview-q { display: flex; align-items: center; gap: 12px; }
-.q-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--wedding-main); color: white; font-size: 0.75em; font-weight: 800; flex-shrink: 0; }
+.q-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--wedding-accent); color: white; font-size: 0.75em; font-weight: 800; flex-shrink: 0; }
 .q-text { font-size: 0.95em; font-weight: 700; color: var(--wedding-text-main); text-align: left; }
-.interview-a-box { background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 16px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-.groom-box { border-left: 3px solid var(--wedding-accent); }
-.bride-box { border-left: 3px solid var(--wedding-main); }
-.a-name { display: block; font-size: 0.75em; font-weight: 700; color: var(--wedding-main); margin-bottom: 6px; letter-spacing: 1px; }
+.interview-a-box { border: 1px solid var(--wedding-border); border-radius: 16px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+.groom-box { background: color-mix(in srgb, var(--wedding-main) 7%, var(--wedding-card-bg)); border-left: 3px solid var(--wedding-main); }
+.bride-box { background: color-mix(in srgb, var(--wedding-accent) 7%, var(--wedding-card-bg)); border-left: 3px solid var(--wedding-accent); }
+.a-name { display: block; font-size: 0.75em; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
+.groom-box .a-name { color: var(--wedding-main); }
+.bride-box .a-name { color: var(--wedding-accent); }
 .interview-a-box p { font-size: 0.9em; line-height: 1.7; color: var(--wedding-text-body); margin: 0; word-break: keep-all; }
 
 /* === Timeline === */
