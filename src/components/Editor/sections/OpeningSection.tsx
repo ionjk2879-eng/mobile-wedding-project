@@ -253,21 +253,6 @@ const OpeningSection: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label>멘트 폰트 스타일</label>
-            <div className="account-style-grid">
-              {([
-                { key: 'elegant' as const, name: '세련됨', desc: 'Noto Serif KR · 고급스러운 세리프' },
-                { key: 'simple' as const, name: '심플함', desc: 'Noto Sans KR · 모던 미니멀' },
-                { key: 'clean' as const, name: '깔끔함', desc: 'Gowun Batang · 단정한 바탕체' },
-              ]).map(s => (
-                <button key={s.key} type="button" className={`account-style-btn ${(opening.openingFontStyle || 'elegant') === s.key ? 'active' : ''}`} onClick={() => update({ openingFontStyle: s.key })}>
-                  <strong>{s.name}</strong><span>{s.desc}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="input-group">
             <label>장식 효과</label>
             <div className="account-style-grid">
               {([
@@ -281,6 +266,21 @@ const OpeningSection: React.FC = () => {
                   className={`account-style-btn ${(opening.openingDecoEffect || 'none') === e.key ? 'active' : ''}`}
                   onClick={() => update({ openingDecoEffect: e.key })}>
                   <strong>{e.name}</strong><span>{e.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label>멘트 폰트 스타일</label>
+            <div className="account-style-grid">
+              {([
+                { key: 'elegant' as const, name: '세련됨', desc: 'Noto Serif KR · 고급스러운 세리프' },
+                { key: 'simple' as const, name: '심플함', desc: 'Noto Sans KR · 모던 미니멀' },
+                { key: 'clean' as const, name: '깔끔함', desc: 'Gowun Batang · 단정한 바탕체' },
+              ]).map(s => (
+                <button key={s.key} type="button" className={`account-style-btn ${(opening.openingFontStyle || 'elegant') === s.key ? 'active' : ''}`} onClick={() => update({ openingFontStyle: s.key })}>
+                  <strong>{s.name}</strong><span>{s.desc}</span>
                 </button>
               ))}
             </div>
