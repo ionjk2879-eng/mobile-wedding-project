@@ -19,6 +19,18 @@ const OPENING_FONTS: Record<string, { family: string; url: string; weights: stri
   },
 };
 
+const DECO_DOTS = [
+  { left: '7%',  top: '14%', s: 3 }, { left: '16%', top: '72%', s: 2 },
+  { left: '26%', top: '24%', s: 4 }, { left: '70%', top: '16%', s: 2 },
+  { left: '84%', top: '63%', s: 3 }, { left: '90%', top: '32%', s: 2 },
+  { left: '62%', top: '86%', s: 4 }, { left: '44%', top: '9%',  s: 2 },
+  { left: '35%', top: '90%', s: 3 }, { left: '76%', top: '44%', s: 2 },
+  { left: '11%', top: '50%', s: 3 }, { left: '52%', top: '76%', s: 2 },
+  { left: '87%', top: '80%', s: 4 }, { left: '22%', top: '56%', s: 2 },
+  { left: '66%', top: '52%', s: 3 }, { left: '4%',  top: '84%', s: 2 },
+  { left: '50%', top: '5%',  s: 2 }, { left: '93%', top: '12%', s: 3 },
+];
+
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
   blush:      { bg: '#3C2B2B', text: '#F3CDCC', accent: '#D4918E' },
   champagne:  { bg: '#3B3228', text: '#E8DFD2', accent: '#C8A97E' },
@@ -161,6 +173,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const isCurtain = opening.openingStyle === 'curtain';
   const isInsta = opening.openingStyle === 'insta';
   const isBlind = opening.openingStyle === 'blind';
+  const decoEffect = opening.openingDecoEffect || 'none';
 
   const gradientValue = colorMode === 'gradient'
     ? isThemeGradient
@@ -209,6 +222,29 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         <div key={i} className="op-blind-slice" style={{ '--slice-i': i } as React.CSSProperties} />
       ))}
       {isInsta && <div className="op-insta-progress"><div className="op-insta-bar" /></div>}
+
+      {decoEffect === 'trace' && (
+        <div className="op-deco-trace" aria-hidden="true">
+          <span className="op-trace-top" />
+          <span className="op-trace-right" />
+          <span className="op-trace-bottom" />
+          <span className="op-trace-left" />
+        </div>
+      )}
+      {decoEffect === 'dots' && (
+        <div className="op-deco-dots" aria-hidden="true">
+          {DECO_DOTS.map((d, i) => (
+            <span key={i} className="op-dot" style={{ left: d.left, top: d.top, width: d.s, height: d.s, animationDelay: `${(i * 0.28).toFixed(2)}s` } as React.CSSProperties} />
+          ))}
+        </div>
+      )}
+      {decoEffect === 'ripple' && (
+        <div className="op-deco-ripple" aria-hidden="true">
+          {[0, 1.2, 2.4].map((delay, i) => (
+            <span key={i} className="op-ripple-ring" style={{ animationDelay: `${delay}s` }} />
+          ))}
+        </div>
+      )}
 
       {isTyping ? (
         <div className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}`}>

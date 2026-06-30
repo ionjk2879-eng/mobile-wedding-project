@@ -105,6 +105,7 @@ export interface OpeningConfig {
   openingText: string;
   openingSubText: string;
   openingFontStyle?: 'elegant' | 'simple' | 'clean';
+  openingDecoEffect?: 'none' | 'trace' | 'dots' | 'ripple';
 }
 
 export interface FeatureConfig {

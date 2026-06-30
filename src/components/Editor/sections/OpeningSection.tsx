@@ -248,6 +248,24 @@ const OpeningSection: React.FC = () => {
           </div>
 
           <div className="input-group">
+            <label>장식 효과</label>
+            <div className="account-style-grid">
+              {([
+                { key: 'none'   as const, name: '없음',       desc: '추가 장식 없이 깔끔하게' },
+                { key: 'trace'  as const, name: '선 연결',     desc: '흰 선이 사각형을 그리며 연결' },
+                { key: 'dots'   as const, name: '떠다니는 점', desc: '작은 점들이 은은하게 부유' },
+                { key: 'ripple' as const, name: '원형 파동',   desc: '중앙에서 원형 파동이 퍼져나감' },
+              ]).map(e => (
+                <button key={e.key} type="button"
+                  className={`account-style-btn ${(opening.openingDecoEffect || 'none') === e.key ? 'active' : ''}`}
+                  onClick={() => update({ openingDecoEffect: e.key })}>
+                  <strong>{e.name}</strong><span>{e.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="input-group">
             <label>메인 멘트</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
               {OPENING_PRESETS.map((p) => (
