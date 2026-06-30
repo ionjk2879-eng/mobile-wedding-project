@@ -7,6 +7,7 @@ import InvitationView from '../components/Preview/InvitationView';
 import { ScrollRootContext } from '../components/Preview/ScrollReveal';
 import { loadAllFonts } from '../utils/loadFont';
 import '../styles/effects.css';
+import '../styles/builder.css';
 
 const TemplatePreviewPage: React.FC = () => {
   const { presetId } = useParams<{ presetId: string }>();
@@ -70,56 +71,25 @@ const TemplatePreviewPage: React.FC = () => {
   const themeClass = previewData.theme ? `theme-${previewData.theme}` : '';
 
   return (
-    <>
-      <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 16px', height: 52,
-        background: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(8px)',
-        borderBottom: '1px solid #F3F4F6',
-        fontFamily: "'Pretendard', sans-serif",
-        gap: 8,
-      }}>
-        <button
-          onClick={() => window.close()}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', fontSize: '0.85rem', padding: '4px 8px', whiteSpace: 'nowrap', flexShrink: 0 }}
-        >
-          ← 닫기
-        </button>
-        <span style={{ fontWeight: 700, color: '#1F2937', fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {preset.emoji} {preset.name}
-        </span>
-        <a
-          href={`/editor?template=${preset.id}`}
-          style={{
-            background: '#B07A8E', color: 'white',
-            padding: '8px 14px', borderRadius: 20,
-            fontSize: '0.8rem', fontWeight: 700,
-            textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0,
-          }}
-        >
-          이 템플릿으로 제작하기
-        </a>
+    <div className="tmpl-preview-root">
+      <div className="tmpl-preview-bar">
+        <button className="tmpl-preview-back" onClick={() => window.close()}>← 닫기</button>
+        <span className="tmpl-preview-name">{preset.emoji} {preset.name}</span>
+        <a href={`/editor?template=${preset.id}`} className="tmpl-preview-apply">이 템플릿으로 제작하기</a>
       </div>
-      <div style={{
-        position: 'fixed', top: 52, left: 0, right: 0, zIndex: 999,
-        textAlign: 'center', padding: '7px 16px', fontSize: '0.75rem', color: '#9CA3AF',
-        background: '#FAFAFA', borderBottom: '1px solid #F3F4F6',
-        fontFamily: "'Pretendard', sans-serif",
-      }}>
+      <div className="tmpl-preview-notice">
         샘플 사진과 정보로 미리 보는 화면입니다. 제작하기를 누르면 빈 청첩장으로 시작합니다.
       </div>
-      <div style={{ paddingTop: 88, width: '100%', minHeight: 'calc(100vh - 88px)', background: '#ffffff', display: 'flex', justifyContent: 'center' }}>
+      <div className="tmpl-preview-scroll">
         {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', fontFamily: "'Pretendard', sans-serif" }}>
-            <span style={{ color: '#9CA3AF' }}>샘플 불러오는 중...</span>
+          <div className="tmpl-preview-loading">
+            <div className="tmpl-spinner" />
+            <span>샘플 불러오는 중...</span>
           </div>
         ) : (
           <div
-            className={`invitation-page ${themeClass}${preset.accentOnText ? ' tmpl-accent-text' : ''}`}
+            className={`invitation-page ${themeClass} tmpl-preview-invitation${preset.accentOnText ? ' tmpl-accent-text' : ''}`}
             style={{
-              width: '100%',
-              maxWidth: 430,
               ...(previewData.customBgColor ? { '--wedding-bg': previewData.customBgColor } as React.CSSProperties : {}),
               ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor, '--wedding-accent': previewData.customAccentColor } as React.CSSProperties : {}),
               fontFamily: previewData.fontFamily || undefined,
@@ -147,7 +117,7 @@ const TemplatePreviewPage: React.FC = () => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
