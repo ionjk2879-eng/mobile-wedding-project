@@ -3,10 +3,9 @@ import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../services/invitationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, Download, BookOpen, Image } from 'lucide-react';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, Download, BookOpen } from 'lucide-react';
 import { downloadInvitationHtml } from '../utils/exportHtml';
 import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
-import { downloadHeroPng } from '../utils/exportHeroPng';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
@@ -167,16 +166,6 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
                 .catch((e: Error) => toast.error(e.message || '방명록 PDF 생성에 실패했습니다.'));
             }}>
               <BookOpen size={14} /> 방명록 PDF
-            </button>
-          )}
-          {isPaid && (
-            <button className="mc-dropdown-item highlight" onClick={() => {
-              setOpen(false);
-              downloadHeroPng(data)
-                .then(() => {})
-                .catch((e: Error) => toast.error(e.message || '이미지 생성에 실패했습니다.'));
-            }}>
-              <Image size={14} /> 대표 이미지 PNG
             </button>
           )}
           <button className="mc-dropdown-item" onClick={() => { setOpen(false); onChangeSlug(); }}>
