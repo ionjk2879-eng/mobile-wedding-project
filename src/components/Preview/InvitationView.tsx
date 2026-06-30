@@ -102,7 +102,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           topOffset={openingTopOffset}
         />
       )}
-      <BackgroundEffects effect={data.bgEffect} />
+      <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />
       <MusicPlayer url={data.bgMusicUrl} />
       {previewRefs?.basic ? (
         <div ref={previewRefs.basic}><Hero data={data} /></div>

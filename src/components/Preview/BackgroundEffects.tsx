@@ -2,32 +2,35 @@ import React from 'react';
 
 interface BackgroundEffectsProps {
   effect?: string;
+  effectDir?: string;
 }
 
-const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
+const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir }) => {
   if (!effect || effect === 'none') return null;
+
+  const dir = effectDir && effectDir !== 'down' ? `dir-${effectDir}` : '';
 
   switch (effect) {
     case 'cherry-blossom':
       return (
-        <div className="effect-layer cherry-blossoms">
+        <div className={`effect-layer cherry-blossoms ${dir}`}>
           {[...Array(35)].map((_, i) => (
             <div key={i} className="particle blossom" style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 10}s`,
-              animationDuration: `${10 + Math.random() * 10}s`
+              animationDelay: `${Math.random() * 14}s`,
+              animationDuration: `${16 + Math.random() * 14}s`
             }} />
           ))}
         </div>
       );
     case 'snow':
       return (
-        <div className="effect-layer snow">
+        <div className={`effect-layer snow ${dir}`}>
           {[...Array(60)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 10}s`,
-              animationDuration: `${5 + Math.random() * 5}s`
+              animationDelay: `${Math.random() * 12}s`,
+              animationDuration: `${10 + Math.random() * 8}s`
             }} />
           ))}
         </div>
@@ -46,12 +49,12 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
       );
     case 'leaves':
       return (
-        <div className="effect-layer leaves">
+        <div className={`effect-layer leaves ${dir}`}>
           {[...Array(25)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 12}s`,
-              animationDuration: `${8 + Math.random() * 8}s`
+              animationDelay: `${Math.random() * 14}s`,
+              animationDuration: `${14 + Math.random() * 12}s`
             }} />
           ))}
         </div>
@@ -62,8 +65,8 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(25)].map((_, i) => (
             <div key={i} className="particle heart" style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 10}s`,
-              animationDuration: `${8 + Math.random() * 8}s`,
+              animationDelay: `${Math.random() * 12}s`,
+              animationDuration: `${12 + Math.random() * 10}s`,
               fontSize: `${8 + Math.random() * 10}px`
             }}>♥</div>
           ))}
@@ -77,19 +80,43 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 6}s`,
-              animationDuration: `${3 + Math.random() * 4}s`
+              animationDuration: `${5 + Math.random() * 5}s`
             }} />
           ))}
         </div>
       );
     case 'confetti':
       return (
-        <div className="effect-layer confetti-layer">
+        <div className={`effect-layer confetti-layer ${dir}`}>
           {[...Array(50)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 10}s`,
-              animationDuration: `${6 + Math.random() * 6}s`
+              animationDelay: `${Math.random() * 12}s`,
+              animationDuration: `${10 + Math.random() * 8}s`
+            }} />
+          ))}
+        </div>
+      );
+    case 'petals':
+      return (
+        <div className={`effect-layer petals-layer ${dir}`}>
+          {[...Array(30)].map((_, i) => (
+            <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 14}s`,
+              animationDuration: `${15 + Math.random() * 12}s`
+            }} />
+          ))}
+        </div>
+      );
+    case 'autumn':
+      return (
+        <div className={`effect-layer autumn-layer ${dir}`}>
+          {[...Array(22)].map((_, i) => (
+            <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 14}s`,
+              animationDuration: `${14 + Math.random() * 12}s`
             }} />
           ))}
         </div>

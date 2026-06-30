@@ -29,16 +29,46 @@
 /* Particle effects */
 .effect-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; }
 .particle { position: absolute; top: -20px; }
-@keyframes fall { 0% { top: -20px; } 100% { top: 100%; } }
+
+/* === 기본 (아래로) 키프레임 === */
+@keyframes fall { 0% { top: -20px; transform: translateX(0); } 100% { top: 100%; transform: translateX(0); } }
+@keyframes fall-sway { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(90deg) translateX(20px); } 50% { transform: rotate(180deg) translateX(-20px); } 75% { transform: rotate(270deg) translateX(15px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
+@keyframes confetti-fall { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(-10px); } 75% { transform: rotate(300deg) translateX(12px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
+
+/* === 대각선 (왼쪽 위→오른쪽 아래) 키프레임 === */
+@keyframes fall-diag { 0% { top: -20px; transform: translateX(-80px); } 100% { top: 100%; transform: translateX(120px); } }
+@keyframes fall-sway-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-60px); } 25% { transform: rotate(90deg) translateX(0px); } 50% { transform: rotate(180deg) translateX(40px); } 75% { transform: rotate(270deg) translateX(80px); } 100% { top: 100%; transform: rotate(360deg) translateX(130px); } }
+@keyframes confetti-fall-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-70px); } 25% { transform: rotate(120deg) translateX(-20px); } 50% { transform: rotate(240deg) translateX(30px); } 75% { transform: rotate(300deg) translateX(80px); } 100% { top: 100%; transform: rotate(360deg) translateX(120px); } }
+
+/* === 완만한 대각선 키프레임 === */
+@keyframes fall-gentle { 0% { top: -20px; transform: translateX(-30px); } 100% { top: 100%; transform: translateX(50px); } }
+@keyframes fall-sway-gentle { 0% { top: -20px; transform: rotate(0deg) translateX(-20px); } 25% { transform: rotate(90deg) translateX(10px); } 50% { transform: rotate(180deg) translateX(0px); } 75% { transform: rotate(270deg) translateX(30px); } 100% { top: 100%; transform: rotate(360deg) translateX(50px); } }
+@keyframes confetti-fall-gentle { 0% { top: -20px; transform: rotate(0deg) translateX(-25px); } 25% { transform: rotate(120deg) translateX(0px); } 50% { transform: rotate(240deg) translateX(10px); } 75% { transform: rotate(300deg) translateX(30px); } 100% { top: 100%; transform: rotate(360deg) translateX(50px); } }
+
+/* === 방향 오버라이드 === */
+.dir-diagonal .particle.blossom,
+.dir-diagonal .particle.snowflake,
+.dir-diagonal .particle.petal { animation-name: fall-diag; }
+.dir-diagonal .particle.leaf,
+.dir-diagonal .particle.autumn-leaf { animation-name: fall-sway-diag; }
+.dir-diagonal .particle.confetti { animation-name: confetti-fall-diag; }
+
+.dir-gentle .particle.blossom,
+.dir-gentle .particle.snowflake,
+.dir-gentle .particle.petal { animation-name: fall-gentle; }
+.dir-gentle .particle.leaf,
+.dir-gentle .particle.autumn-leaf { animation-name: fall-sway-gentle; }
+.dir-gentle .particle.confetti { animation-name: confetti-fall-gentle; }
+
+/* === 파티클 스타일 === */
 .particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: 0.7; animation: fall linear infinite; }
 .particle.snowflake { width: 6px; height: 6px; background: #C8D8E8; border-radius: 50%; opacity: 0.7; box-shadow: 0 0 4px rgba(200,216,232,0.5); animation: fall linear infinite; }
 .particle.star { width: 4px; height: 4px; background: #D4B896; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(212,184,150,0.5); animation: twinkle 2s infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 .particle.leaf { width: 12px; height: 16px; background: #A8C686; border-radius: 2px 50% 50% 50%; opacity: 0.6; animation: fall-sway linear infinite; transform-origin: center; }
-@keyframes fall-sway { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(90deg) translateX(20px); } 50% { transform: rotate(180deg) translateX(-20px); } 75% { transform: rotate(270deg) translateX(15px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
 .particle.heart { color: #F4A0B0; opacity: 0.5; animation: float-up linear infinite; line-height: 1; }
 @keyframes float-up { 0% { top: 100%; opacity: 0; transform: scale(0.5) translateX(0); } 10% { opacity: 0.5; } 50% { transform: scale(1) translateX(15px); } 90% { opacity: 0.5; } 100% { top: -20px; opacity: 0; transform: scale(0.8) translateX(-10px); } }
-.particle.firefly { width: 5px; height: 5px; background: #F5E6A3; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(245, 230, 163, 0.6); animation: firefly-glow ease-in-out infinite; }
+.particle.firefly { width: 5px; height: 5px; background: #F5E6A3; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(245,230,163,0.6); animation: firefly-glow ease-in-out infinite; }
 @keyframes firefly-glow { 0%, 100% { opacity: 0.1; transform: translate(0, 0); } 25% { opacity: 0.8; transform: translate(10px, -15px); } 50% { opacity: 0.3; transform: translate(-8px, 10px); } 75% { opacity: 0.9; transform: translate(12px, 5px); } }
 .particle.confetti { width: 6px; height: 10px; opacity: 0.7; animation: confetti-fall linear infinite; }
 .confetti.c1 { background: #FFB3BA; border-radius: 1px; }
@@ -46,7 +76,19 @@
 .confetti.c3 { background: #BAE1FF; border-radius: 1px; transform: rotate(45deg); }
 .confetti.c4 { background: #FFFFBA; border-radius: 50%; width: 5px; height: 5px; }
 .confetti.c5 { background: #E8BAFF; border-radius: 1px; }
-@keyframes confetti-fall { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(-10px); } 75% { transform: rotate(300deg) translateX(12px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
+
+/* 꽃잎 - 크림/아이보리 계열 부드러운 꽃잎 */
+.particle.petal { opacity: 0.65; animation: fall linear infinite; transform-origin: center; }
+.petal.p1 { width: 10px; height: 14px; background: #F5E8DC; border-radius: 50% 0 50% 50%; }
+.petal.p2 { width: 12px; height: 10px; background: #F0DDE8; border-radius: 50%; }
+.petal.p3 { width: 8px; height: 12px; background: #FAF0EA; border-radius: 0 50% 50% 50%; }
+
+/* 단풍잎 - 주황/빨강/갈색 계열 */
+.particle.autumn-leaf { opacity: 0.65; animation: fall-sway linear infinite; transform-origin: center; }
+.autumn-leaf.al1 { width: 14px; height: 14px; background: #D4724A; clip-path: polygon(50% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+.autumn-leaf.al2 { width: 12px; height: 16px; background: #C45A30; border-radius: 2px 50% 50% 50%; }
+.autumn-leaf.al3 { width: 13px; height: 13px; background: #E8904A; clip-path: polygon(50% 0%, 85% 30%, 100% 70%, 50% 100%, 0% 70%, 15% 30%); }
+.autumn-leaf.al4 { width: 11px; height: 15px; background: #A85830; border-radius: 50% 2px 50% 50%; }
 
 /* Music float button */
 /* 높이 0인 sticky 래퍼로 레이아웃 밀림 없이 우측 상단 고정 */
