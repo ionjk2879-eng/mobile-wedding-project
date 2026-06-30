@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { AI_PRESETS, applyPreset } from '../data/aiPresets';
 import { InvitationData } from '../types';
 import { loadInvitationPublic } from '../services/publicLoad';
@@ -11,7 +11,12 @@ import '../styles/builder.css';
 
 const TemplatePreviewPage: React.FC = () => {
   const { presetId } = useParams<{ presetId: string }>();
+  const navigate = useNavigate();
   const preset = AI_PRESETS.find(p => p.id === presetId);
+  const handleClose = () => {
+    if (window.history.length > 1) navigate(-1);
+    else window.close();
+  };
   const [sampleData, setSampleData] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -73,7 +78,7 @@ const TemplatePreviewPage: React.FC = () => {
   return (
     <div className="tmpl-preview-root">
       <div className="tmpl-preview-bar">
-        <button className="tmpl-preview-back" onClick={() => window.close()}>← 닫기</button>
+        <button className="tmpl-preview-back" onClick={handleClose}>← 닫기</button>
         <span className="tmpl-preview-name">{preset.emoji} {preset.name}</span>
         <a href={`/editor?template=${preset.id}`} className="tmpl-preview-apply">이 템플릿으로 제작하기</a>
       </div>

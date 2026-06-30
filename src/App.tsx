@@ -287,7 +287,7 @@ const App: React.FC = () => {
                           onClick={(e) => {
                             if (!e.ctrlKey && !e.metaKey) {
                               e.preventDefault();
-                              handlePreviewPreset(preset);
+                              navigate(`/template-preview/${preset.id}`);
                             }
                           }}
                         >
