@@ -100,27 +100,25 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       margin: 20px auto 100px;
       background: white;
       box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-      padding: 20mm 16mm 16mm;
     }
 
-    /* 표지 */
+    /* 표지 — 첫 페이지 전체 */
     .cover {
+      min-height: 257mm;
+      padding: 20mm 16mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 20mm 0 16mm;
-      border-bottom: 1px solid ${accentColor}44;
-      margin-bottom: 12mm;
-      position: relative;
+      border-bottom: 1px solid ${accentColor}22;
     }
-    .cover::before, .cover::after {
-      content: '';
-      display: block;
+    .cover-deco {
       width: 40px;
       height: 1px;
       background: ${accentColor}66;
-      margin: 0 auto;
+      margin: 10mm auto;
     }
-    .cover::before { margin-bottom: 10mm; }
-    .cover::after  { margin-top: 10mm; }
     .cover-label {
       font-size: 0.65rem;
       letter-spacing: 6px;
@@ -154,6 +152,11 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       font-size: 0.72rem;
       color: #9CA3AF;
       letter-spacing: 1px;
+    }
+
+    /* 카드 섹션 — 2페이지부터 */
+    .cards-section {
+      padding: 16mm 16mm 20mm;
     }
 
     /* 카드 그리드 — 연속 흐름 */
@@ -224,6 +227,14 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
         padding: 0;
         box-shadow: none;
       }
+      .cover {
+        min-height: calc(297mm - 28mm);
+        padding: 0;
+        border-bottom: none;
+        break-after: page;
+        page-break-after: always;
+      }
+      .cards-section { padding: 0; }
       .gb-card { break-inside: avoid; page-break-inside: avoid; }
     }
   </style>
@@ -240,15 +251,19 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
   <div id="paper">
     <div class="cover">
       <p class="cover-label">WEDDING GUEST BOOK</p>
+      <div class="cover-deco"></div>
       <div class="cover-names">
         ${groomName}<span class="cover-amp">&amp;</span>${brideName}
       </div>
+      <div class="cover-deco"></div>
       ${weddingDate ? `<p class="cover-date">${weddingDate}</p>` : ''}
       <p class="cover-count">${messages.length}개의 방명록</p>
     </div>
 
-    <div class="cards-grid">
-      ${cards}
+    <div class="cards-section">
+      <div class="cards-grid">
+        ${cards}
+      </div>
     </div>
   </div>
 </body>
