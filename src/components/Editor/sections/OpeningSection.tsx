@@ -251,10 +251,11 @@ const OpeningSection: React.FC = () => {
             <label>장식 효과</label>
             <div className="account-style-grid">
               {([
-                { key: 'none'   as const, name: '없음',       desc: '추가 장식 없이 깔끔하게' },
-                { key: 'trace'  as const, name: '선 연결',     desc: '흰 선이 사각형을 그리며 연결' },
-                { key: 'dots'   as const, name: '떠다니는 점', desc: '작은 점들이 은은하게 부유' },
-                { key: 'ripple' as const, name: '원형 파동',   desc: '중앙에서 원형 파동이 퍼져나감' },
+                { key: 'none'    as const, name: '없음',       desc: '추가 장식 없이 깔끔하게' },
+                { key: 'trace'   as const, name: '선 연결',     desc: '흰 선이 사각형을 그리며 연결' },
+                { key: 'dots'    as const, name: '떠다니는 점', desc: '작은 점들이 은은하게 부유' },
+                { key: 'ripple'  as const, name: '원형 파동',   desc: '중앙에서 원형 파동이 퍼져나감' },
+                { key: 'sparkle' as const, name: '반짝이',      desc: '✦ 별 입자가 감성적으로 반짝임' },
               ]).map(e => (
                 <button key={e.key} type="button"
                   className={`account-style-btn ${(opening.openingDecoEffect || 'none') === e.key ? 'active' : ''}`}

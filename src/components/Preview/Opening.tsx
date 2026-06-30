@@ -20,15 +20,30 @@ const OPENING_FONTS: Record<string, { family: string; url: string; weights: stri
 };
 
 const DECO_DOTS = [
-  { left: '7%',  top: '14%', s: 3 }, { left: '16%', top: '72%', s: 2 },
-  { left: '26%', top: '24%', s: 4 }, { left: '70%', top: '16%', s: 2 },
-  { left: '84%', top: '63%', s: 3 }, { left: '90%', top: '32%', s: 2 },
-  { left: '62%', top: '86%', s: 4 }, { left: '44%', top: '9%',  s: 2 },
-  { left: '35%', top: '90%', s: 3 }, { left: '76%', top: '44%', s: 2 },
-  { left: '11%', top: '50%', s: 3 }, { left: '52%', top: '76%', s: 2 },
-  { left: '87%', top: '80%', s: 4 }, { left: '22%', top: '56%', s: 2 },
-  { left: '66%', top: '52%', s: 3 }, { left: '4%',  top: '84%', s: 2 },
-  { left: '50%', top: '5%',  s: 2 }, { left: '93%', top: '12%', s: 3 },
+  { left: '7%',  top: '14%', s: 4 }, { left: '16%', top: '72%', s: 3 },
+  { left: '26%', top: '24%', s: 5 }, { left: '70%', top: '16%', s: 3 },
+  { left: '84%', top: '63%', s: 4 }, { left: '90%', top: '32%', s: 3 },
+  { left: '62%', top: '86%', s: 5 }, { left: '44%', top: '9%',  s: 3 },
+  { left: '35%', top: '90%', s: 4 }, { left: '76%', top: '44%', s: 3 },
+  { left: '11%', top: '50%', s: 4 }, { left: '52%', top: '76%', s: 3 },
+  { left: '87%', top: '80%', s: 5 }, { left: '22%', top: '56%', s: 3 },
+  { left: '66%', top: '52%', s: 4 }, { left: '4%',  top: '84%', s: 3 },
+  { left: '50%', top: '5%',  s: 3 }, { left: '93%', top: '12%', s: 4 },
+  { left: '33%', top: '40%', s: 3 }, { left: '78%', top: '28%', s: 4 },
+  { left: '58%', top: '62%', s: 3 }, { left: '14%', top: '35%', s: 5 },
+  { left: '42%', top: '78%', s: 3 }, { left: '96%', top: '55%', s: 4 },
+  { left: '20%', top: '88%', s: 3 }, { left: '72%', top: '70%', s: 4 },
+];
+
+const DECO_SPARKS = [
+  { left: '8%',  top: '18%' }, { left: '20%', top: '68%' },
+  { left: '30%', top: '12%' }, { left: '72%', top: '20%' },
+  { left: '82%', top: '58%' }, { left: '91%', top: '36%' },
+  { left: '60%', top: '82%' }, { left: '46%', top: '6%'  },
+  { left: '38%', top: '88%' }, { left: '74%', top: '48%' },
+  { left: '13%', top: '44%' }, { left: '54%', top: '74%' },
+  { left: '86%', top: '76%' }, { left: '24%', top: '52%' },
+  { left: '68%', top: '30%' }, { left: '5%',  top: '80%' },
 ];
 
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
@@ -223,14 +238,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       ))}
       {isInsta && <div className="op-insta-progress"><div className="op-insta-bar" /></div>}
 
-      {decoEffect === 'trace' && (
-        <div className="op-deco-trace" aria-hidden="true">
-          <span className="op-trace-top" />
-          <span className="op-trace-right" />
-          <span className="op-trace-bottom" />
-          <span className="op-trace-left" />
-        </div>
-      )}
       {decoEffect === 'dots' && (
         <div className="op-deco-dots" aria-hidden="true">
           {DECO_DOTS.map((d, i) => (
@@ -245,26 +252,51 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           ))}
         </div>
       )}
+      {decoEffect === 'sparkle' && (
+        <div className="op-deco-sparkle" aria-hidden="true">
+          {DECO_SPARKS.map((d, i) => (
+            <span key={i} className="op-spark" style={{ left: d.left, top: d.top, animationDelay: `${(i * 0.38).toFixed(2)}s` }} >✦</span>
+          ))}
+        </div>
+      )}
 
       {isTyping ? (
         <div className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}`}>
-          <div className={`op-typing-heart${typingPhase !== 'idle' ? ' visible' : ''}`}>
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34, display: 'block' }}>
-              <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>
-            </svg>
-          </div>
-          <div className="op-typing-text">
-            <span>{mainText.slice(0, typedCount)}</span>
-            {(typingPhase === 'typing' || (typingPhase === 'heart' && typedCount === 0)) && (
-              <span className="op-cursor">|</span>
+          <div className="op-typing-inner">
+            {decoEffect === 'trace' && (
+              <div className="op-deco-trace" aria-hidden="true">
+                <span className="op-trace-top" />
+                <span className="op-trace-right" />
+                <span className="op-trace-bottom" />
+                <span className="op-trace-left" />
+              </div>
             )}
+            <div className={`op-typing-heart${typingPhase !== 'idle' ? ' visible' : ''}`}>
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34, display: 'block' }}>
+                <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div className="op-typing-text">
+              <span>{mainText.slice(0, typedCount)}</span>
+              {(typingPhase === 'typing' || (typingPhase === 'heart' && typedCount === 0)) && (
+                <span className="op-cursor">|</span>
+              )}
+            </div>
+            <p className={`op-typing-names${typingPhase === 'done' ? ' visible' : ''}`}>{groom} &amp; {bride}</p>
+            <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>{subText}</p>
+            <button className="op-enter op-typing-btn" onClick={handleDismiss}>초대장 열기</button>
           </div>
-          <p className={`op-typing-names${typingPhase === 'done' ? ' visible' : ''}`}>{groom} &amp; {bride}</p>
-          <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>{subText}</p>
-          <button className="op-enter op-typing-btn" onClick={handleDismiss}>초대장 열기</button>
         </div>
       ) : (
         <div className="op-body" key={opening.openingStyle}>
+          {decoEffect === 'trace' && (
+            <div className="op-deco-trace" aria-hidden="true">
+              <span className="op-trace-top" />
+              <span className="op-trace-right" />
+              <span className="op-trace-bottom" />
+              <span className="op-trace-left" />
+            </div>
+          )}
           <div className="op-heart-deco">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 28, height: 28, display: 'block' }}>
               <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>
