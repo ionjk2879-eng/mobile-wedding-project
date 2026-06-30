@@ -60,7 +60,7 @@ export interface BasicInfo {
 }
 
 export interface DesignConfig {
-  theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern' | 'mocha' | 'cloud' | 'emerald' | 'butter' | 'cobalt' | 'terracotta' | 'rosegold' | 'midnight' | 'pearl' | 'mist' | 'walnut' | 'slate' | 'wisteria' | 'cedar' | 'stone' | 'copper';
+  theme?: 'blush' | 'champagne' | 'sage' | 'navy' | 'burgundy' | 'lavender' | 'dusty' | 'modern' | 'mocha' | 'cloud' | 'emerald' | 'butter' | 'cobalt' | 'terracotta' | 'rosegold' | 'midnight' | 'pearl' | 'mist' | 'walnut' | 'slate' | 'wisteria' | 'cedar' | 'stone' | 'copper' | 'ivory' | 'plum' | 'olive' | 'noir' | 'peach';
   customBgColor?: string;
   customAccentColor?: string;
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';

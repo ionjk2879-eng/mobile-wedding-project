@@ -19,6 +19,19 @@ const THEMES: { key: NonNullable<InvitationData['theme']>; name: string; colors:
   { key: 'terracotta', name: '테라코타', colors: ['#FAF0E6', '#E0CDB8', '#B86842', '#D08860', '#4A2E1E'] },
   { key: 'rosegold', name: '로즈골드', colors: ['#FDF5F3', '#F0D8D0', '#C4887A', '#D4A090', '#3E2822'] },
   { key: 'midnight', name: '미드나잇', colors: ['#F0F0F5', '#D0D0E0', '#2A2A5A', '#4A4A7A', '#1A1A30'] },
+  { key: 'pearl', name: '펄', colors: ['#FDFAF5', '#EDE6D8', '#B0946A', '#C4AB88', '#2E261A'] },
+  { key: 'mist', name: '미스트', colors: ['#F5F7F9', '#D8DFE6', '#6E8899', '#8EA0AE', '#1E2A33'] },
+  { key: 'walnut', name: '월넛', colors: ['#FAF6F0', '#E0D0C0', '#8A6248', '#A87C60', '#2C1E14'] },
+  { key: 'slate', name: '슬레이트', colors: ['#F6F7F9', '#D4D8DF', '#5E6F80', '#788694', '#1E2830'] },
+  { key: 'wisteria', name: '위스테리아', colors: ['#F8F5FC', '#E0D8F0', '#8A70B0', '#A494C4', '#281C3C'] },
+  { key: 'cedar', name: '시더', colors: ['#FAF4EF', '#E4CEC4', '#A06048', '#BA7C64', '#2E1610'] },
+  { key: 'stone', name: '스톤', colors: ['#F7F6F4', '#E0DDD8', '#8C8880', '#A0A098', '#282622'] },
+  { key: 'copper', name: '코퍼', colors: ['#FCF8F2', '#E8D8C0', '#B87A38', '#CC9454', '#2C1E0A'] },
+  { key: 'ivory', name: '아이보리', colors: ['#FDFDF8', '#ECEADA', '#A89C70', '#C0B488', '#2C2A1E'] },
+  { key: 'plum', name: '딥 플럼', colors: ['#F5F1F7', '#DDD0EC', '#7C4E80', '#9C6EA0', '#281630'] },
+  { key: 'olive', name: '다크 올리브', colors: ['#F2F4EE', '#C8D2BE', '#5A6C40', '#748C58', '#1E2814'] },
+  { key: 'noir', name: '누아르', colors: ['#F3F2F0', '#DCDAD6', '#2A2826', '#4E4C4A', '#1A1816'] },
+  { key: 'peach', name: '피치 코랄', colors: ['#FFF8F4', '#F0D8CC', '#D4785C', '#E89880', '#38201A'] },
 ];
 
 const ITEMS_PER_PAGE = 8;
