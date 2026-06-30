@@ -37,6 +37,10 @@ html, body {
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
+.invitation-page {
+  background-color: var(--wedding-bg);
+}
+
 .theme-blush {
   --wedding-bg: #FFF5F6;
   --wedding-card-bg: #FFFFFF;
