@@ -96,7 +96,8 @@ export interface ContentData {
 
 export interface OpeningConfig {
   openingEnabled: boolean;
-  openingStyle: 'curtain' | 'circle' | 'veil' | 'blind' | 'frame' | 'insta' | 'typing';
+  openingStyle: 'curtain' | 'circle' | 'veil' | 'blind' | 'frame' | 'insta' | 'typing'; // 'typing' kept for backwards compat
+  openingContentStyle?: 'sequential' | 'typing';
   openingColorMode: 'theme' | 'custom' | 'gradient';
   openingGradientMode?: 'theme' | 'preset' | 'custom';
   openingTextColor?: 'white' | 'dark';

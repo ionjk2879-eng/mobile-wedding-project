@@ -102,8 +102,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     return () => { scrollEl.removeEventListener('scroll', update); ro.disconnect(); };
   }, []);
 
-  // Typing-specific state
-  const isTyping = opening.openingStyle === 'typing';
+  // openingStyle === 'typing' 은 구버전 호환용 — 새 데이터는 openingContentStyle로 판단
+  const isTyping = opening.openingContentStyle === 'typing'
+    || (!opening.openingContentStyle && opening.openingStyle === 'typing');
+  const effectiveStyle = (opening.openingStyle === 'typing' && !opening.openingContentStyle)
+    ? 'curtain'
+    : opening.openingStyle;
   const [typedCount, setTypedCount] = useState(0);
   const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
 
@@ -186,9 +190,9 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
 
-  const isCurtain = opening.openingStyle === 'curtain';
-  const isInsta = opening.openingStyle === 'insta';
-  const isBlind = opening.openingStyle === 'blind';
+  const isCurtain = effectiveStyle === 'curtain';
+  const isInsta = effectiveStyle === 'insta';
+  const isBlind = effectiveStyle === 'blind';
   const decoEffect = opening.openingDecoEffect || 'none';
 
   const gradientValue = colorMode === 'gradient'
@@ -207,8 +211,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     if (!ready) return;
     const t = setTimeout(() => {
       setPhase('exit');
-      const style = opening.openingStyle;
-      const exitDelay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 900;
+      const style = effectiveStyle;
+      const exitDelay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : 900;
       setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
     }, 2500);
     return () => clearTimeout(t);
@@ -221,15 +225,15 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       if (phase !== 'ready') return;
     }
     setPhase('exit');
-    const style = opening.openingStyle;
-    const delay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : style === 'typing' ? 1000 : 900;
+    const style = effectiveStyle;
+    const delay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : 900;
     setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 
   return (
     <div
       ref={rootRef}
-      className={`op-root op-${opening.openingStyle} op-phase-${phase}`}
+      className={`op-root op-${effectiveStyle} op-phase-${phase}`}
       style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', ...bgOverride, ...editorBounds, ...(topOffset != null && !Object.keys(editorBounds).length ? { top: topOffset, height: `calc(100% - ${topOffset}px)` } : {}) } as React.CSSProperties}
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}

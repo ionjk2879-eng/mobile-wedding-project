@@ -80,7 +80,23 @@ const OpeningSection: React.FC = () => {
       {opening.openingEnabled && (
         <>
           <div className="input-group">
-            <label>애니메이션 스타일</label>
+            <label>내용 연출</label>
+            <div className="account-style-grid">
+              {([
+                { key: 'sequential' as const, name: '순차 등장', desc: '이름·멘트·날짜가 순서대로 서서히 나타남' },
+                { key: 'typing' as const, name: '타이핑', desc: '글자가 한 자씩 타이핑되는 감성 연출' },
+              ]).map(s => (
+                <button key={s.key} type="button"
+                  className={`account-style-btn ${(opening.openingContentStyle || 'sequential') === s.key ? 'active' : ''}`}
+                  onClick={() => update({ openingContentStyle: s.key })}>
+                  <strong>{s.name}</strong><span>{s.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label>전환 스타일</label>
             <div className="account-style-grid">
               {([
                 { key: 'curtain' as const, name: '커튼', desc: '그라데이션 배경에 단색 커튼이 닫히며 전환' },
@@ -89,9 +105,10 @@ const OpeningSection: React.FC = () => {
                 { key: 'blind' as const, name: '블라인드', desc: '수평 슬라이스가 하나씩 열리며 등장' },
                 { key: 'frame' as const, name: '투명 액자', desc: '유리 액자 속에 담은 고급스러운 연출' },
                 { key: 'insta' as const, name: '인스타그램', desc: '스토리 형식의 감각적인 연출' },
-                { key: 'typing' as const, name: '타이핑', desc: '글자가 한 자씩 타이핑되는 감성 연출' },
               ]).map(s => (
-                <button key={s.key} type="button" className={`account-style-btn ${opening.openingStyle === s.key ? 'active' : ''}`} onClick={() => update({ openingStyle: s.key })}>
+                <button key={s.key} type="button"
+                  className={`account-style-btn ${(opening.openingStyle === 'typing' ? 'curtain' : opening.openingStyle) === s.key ? 'active' : ''}`}
+                  onClick={() => update({ openingStyle: s.key })}>
                   <strong>{s.name}</strong><span>{s.desc}</span>
                 </button>
               ))}
