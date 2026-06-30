@@ -10,6 +10,7 @@ export interface AIPreset {
   previewColors: string[];
   tags?: string[];
   sampleSlug?: string;
+  sampleHeroFromGallery?: number; // 이 인덱스의 갤러리 사진을 미리보기 hero로 사용
   settings: Partial<InvitationData>;
 }
 
@@ -64,6 +65,49 @@ export const AI_PRESETS: AIPreset[] = [
         openingSubText: '',
         openingFontStyle: 'elegant',
         openingDecoEffect: 'dots',
+      },
+    },
+  },
+  {
+    id: 'insta-peach',
+    name: '화사한 인스타 무드',
+    category: '모던',
+    description: '따뜻한 코랄 그라데이션 오프닝과 인스타그램 스타일의 화사하고 세련된 연출',
+    emoji: '📸',
+    previewColors: ['#FFF9F7', '#E07A5F', '#7A2E18'],
+    tags: ['인스타 스타일 히어로', '코랄 그라데이션 오프닝', '스파클 효과'],
+    sampleSlug: 'junho-seoyeon',
+    sampleHeroFromGallery: 1,
+    settings: {
+      ...base,
+      theme: 'rosegold',
+      fontFamily: "'Pretendard', sans-serif",
+      fontSize: 'medium',
+      customBgColor: '#FFF9F7',
+      customAccentColor: '#E07A5F',
+      bgTexture: 'none',
+      bgEffect: 'none',
+      scrollEffect: 'fade-in',
+      heroStyle: 'instacard',
+      galleryStyle: 'slide',
+      accountStyle: 'style1',
+      greetingTitle: '함께 써내려가는 이야기',
+      greetingContent: '서로를 처음 만난 그 순간부터\n지금 이 순간까지,\n\n우리의 모든 날이 사진처럼\n선명하고 빛나는 기억으로 남아있습니다.\n\n앞으로 함께 만들어갈 새로운 이야기에\n여러분을 초대합니다.',
+      groomMessage: '당신과 함께라면 매일이 특별해요.',
+      brideMessage: '우리의 이야기, 이제 함께 써요.',
+      opening: {
+        openingEnabled: true,
+        openingStyle: 'insta',
+        openingColorMode: 'gradient',
+        openingGradientMode: 'custom',
+        openingBgColor: '#C05A40',
+        openingBgColor2: '#F0A080',
+        openingBgOpacity: 1,
+        openingText: '우리 결혼합니다',
+        openingSubText: '',
+        openingFontStyle: 'clean',
+        openingTextColor: 'white',
+        openingDecoEffect: 'sparkle',
       },
     },
   },

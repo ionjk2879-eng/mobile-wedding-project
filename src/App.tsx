@@ -301,9 +301,11 @@ const App: React.FC = () => {
                   date: s.date,
                   time: s.time,
                   weddingDateISO: s.weddingDateISO,
-                  heroPhoto: s.heroPhoto || '',
-                  heroPhotoX: s.heroPhotoX,
-                  heroPhotoY: s.heroPhotoY,
+                  heroPhoto: (previewPreset.sampleHeroFromGallery !== undefined && s.photos?.[previewPreset.sampleHeroFromGallery])
+                    ? s.photos[previewPreset.sampleHeroFromGallery]
+                    : s.heroPhoto || '',
+                  heroPhotoX: previewPreset.sampleHeroFromGallery !== undefined ? 50 : s.heroPhotoX,
+                  heroPhotoY: previewPreset.sampleHeroFromGallery !== undefined ? 50 : s.heroPhotoY,
                   heroPhoto2: s.heroPhoto2 || '',
                   heroPhoto2X: s.heroPhoto2X,
                   heroPhoto2Y: s.heroPhoto2Y,
