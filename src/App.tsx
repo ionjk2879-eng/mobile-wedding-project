@@ -127,7 +127,6 @@ const App: React.FC = () => {
       }).catch(() => { setShowStartScreen([]); }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
     } else {
       fetchMyInvitations().then((items) => {
-        history.replaceState({ screen: 'start' }, '', '/');
         setShowStartScreen(items.map((item) => item.slug));
       }).catch(() => {
         setShowStartScreen([]);
@@ -135,20 +134,6 @@ const App: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const onPopState = (e: PopStateEvent) => {
-      const screen = e.state?.screen;
-      if (screen === 'start') {
-        fetchMyInvitations().then((items) => {
-          if (items.length > 0) setShowStartScreen(items.map((item) => item.slug));
-        }).catch(() => {});
-      } else if (screen === 'editor') {
-        setShowStartScreen(null);
-      }
-    };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
 
   const handleLoadExisting = async (slug: string) => {
     setShowStartScreen(null);
@@ -167,14 +152,12 @@ const App: React.FC = () => {
 
   const handleStartNew = () => {
     setShowStartScreen(null);
-    history.pushState({ screen: 'editor' }, '', '/');
     setData(initialData);
     hasSavedOnceRef.current = false;
   };
 
   const handleStartWithPreset = (preset: AIPreset) => {
     setShowStartScreen(null);
-    history.pushState({ screen: 'editor' }, '', '/');
     setData(applyPreset(preset));
     hasSavedOnceRef.current = false;
   };

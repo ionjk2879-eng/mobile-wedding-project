@@ -222,9 +222,9 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
   const method = request.method;
 
   if (method === 'GET') {
-    const row = await env.DB.prepare('SELECT owner_uid, data FROM invitations WHERE slug = ?').bind(slug).first();
+    const row = await env.DB.prepare('SELECT owner_uid, data, is_paid, expires_at FROM invitations WHERE slug = ?').bind(slug).first();
     if (!row) return json(null, 404, origin);
-    return json({ ...JSON.parse(row.data as string), slug, ownerUid: row.owner_uid }, 200, origin);
+    return json({ ...JSON.parse(row.data as string), slug, ownerUid: row.owner_uid, isPaid: !!row.is_paid, expiresAt: row.expires_at ?? null }, 200, origin);
   }
 
   const user = await getAuthUser(request, env);
