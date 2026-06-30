@@ -381,7 +381,7 @@ const App: React.FC = () => {
                     }}
                   >
                     <ScrollRootContext.Provider value={null}>
-                      <InvitationView key={previewPreset.id} data={previewData} showOpening={true} shareEnabled={false} openingTopOffset={88} />
+                      <InvitationView key={previewPreset.id} data={previewData} showOpening={true} shareEnabled={false} />
                     </ScrollRootContext.Provider>
                   </div>
                 );
