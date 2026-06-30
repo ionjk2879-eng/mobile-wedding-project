@@ -326,7 +326,7 @@ const App: React.FC = () => {
                 const themeClass = previewData.theme ? `theme-${previewData.theme}` : '';
                 return (
                   <div
-                    className={`invitation-page ${themeClass}`}
+                    className={`invitation-page ${themeClass} tmpl-preview-invitation`}
                     style={{
                       ...(previewData.customBgColor ? { '--wedding-bg': previewData.customBgColor } as React.CSSProperties : {}),
                       ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor, '--wedding-accent': previewData.customAccentColor } as React.CSSProperties : {}),

@@ -58,6 +58,16 @@
 .tmpl-preview-notice { text-align: center; font-size: 0.72rem; color: #9CA3AF; padding: 8px 16px; background: #F9FAFB; border-bottom: 1px solid #F3F4F6; flex-shrink: 0; }
 .tmpl-preview-scroll { flex: 1; overflow-y: auto; display: flex; justify-content: center; }
 .tmpl-preview-scroll .invitation-page { width: 100%; max-width: 430px; }
+.tmpl-preview-invitation .minimal-names,
+.tmpl-preview-invitation .hero-names,
+.tmpl-preview-invitation .editorial-groom,
+.tmpl-preview-invitation .editorial-bride,
+.tmpl-preview-invitation .split-name,
+.tmpl-preview-invitation .cc-names,
+.tmpl-preview-invitation .gf-names,
+.tmpl-preview-invitation .fs-names,
+.tmpl-preview-invitation .vt-names,
+.tmpl-preview-invitation .bp-names { color: var(--wedding-main); }
 .tmpl-preview-loading { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #9CA3AF; font-size: 0.88rem; }
 .tmpl-spinner { width: 22px; height: 22px; border: 2.5px solid #E5E7EB; border-top-color: #B07A8E; border-radius: 50%; animation: tmpl-spin 0.75s linear infinite; }
 @keyframes tmpl-spin { to { transform: rotate(360deg); } }
