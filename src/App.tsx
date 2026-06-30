@@ -311,6 +311,10 @@ const App: React.FC = () => {
                   groomPhoto: s.groomPhoto || '',
                   bridePhoto: s.bridePhoto || '',
                   timeline: s.timeline?.length ? s.timeline : base.timeline,
+                  parents: {
+                    groomParents: (s.parents?.groomParents || []).map(p => ({ ...p, phone: '' })),
+                    brideParents: (s.parents?.brideParents || []).map(p => ({ ...p, phone: '' })),
+                  },
                   venueName: '세레나 웨딩홀 그랜드볼룸',
                   venueAddress: '서울특별시 강남구 테헤란로 123',
                   transport: {
