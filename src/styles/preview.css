@@ -1,6 +1,6 @@
 /* === Section common === */
 .section { padding: 60px 24px; }
-.section h2 { font-size: 0.78em; letter-spacing: 6px; color: var(--wedding-text-sub); margin: 0 0 8px; font-weight: 400; text-align: center; text-transform: uppercase; }
+.section h2 { font-size: 0.78em; letter-spacing: 6px; color: var(--wedding-main); opacity: 0.8; margin: 0 0 8px; font-weight: 400; text-align: center; text-transform: uppercase; }
 .section-sub { font-size: 0.82em; color: var(--wedding-text-sub); text-align: center; margin: 0 0 32px; line-height: 1.6; }
 
 /* === Hero === */
@@ -298,7 +298,7 @@
 /* === Greeting === */
 .greeting { padding: 60px 24px; text-align: center; }
 .greeting-text { text-align: center; }
-.greeting-text h2 { font-size: 0.8em; letter-spacing: 6px; color: var(--wedding-text-sub); margin: 0 0 20px; font-weight: 400; }
+.greeting-text h2 { font-size: 0.8em; letter-spacing: 6px; color: var(--wedding-main); opacity: 0.8; margin: 0 0 20px; font-weight: 400; }
 .greeting-title { font-size: 1.35em; font-weight: 600; color: var(--wedding-text-main); margin: 8px 0 24px; letter-spacing: 1px; line-height: 1.5; }
 .greeting-text p { line-height: 2; color: var(--wedding-text-body); font-size: 0.95em; margin-bottom: 0; }
 .family-info { margin-top: 50px; display: flex; flex-direction: column; gap: 30px; }
