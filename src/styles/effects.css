@@ -45,21 +45,6 @@
 @keyframes fall-sway-gentle { 0% { top: -20px; transform: rotate(0deg) translateX(-20px); } 25% { transform: rotate(90deg) translateX(10px); } 50% { transform: rotate(180deg) translateX(0px); } 75% { transform: rotate(270deg) translateX(30px); } 100% { top: 100%; transform: rotate(360deg) translateX(50px); } }
 @keyframes confetti-fall-gentle { 0% { top: -20px; transform: rotate(0deg) translateX(-25px); } 25% { transform: rotate(120deg) translateX(0px); } 50% { transform: rotate(240deg) translateX(10px); } 75% { transform: rotate(300deg) translateX(30px); } 100% { top: 100%; transform: rotate(360deg) translateX(50px); } }
 
-/* === 방향 오버라이드 === */
-.dir-diagonal .particle.blossom,
-.dir-diagonal .particle.snowflake,
-.dir-diagonal .particle.petal { animation-name: fall-diag; }
-.dir-diagonal .particle.leaf,
-.dir-diagonal .particle.autumn-leaf { animation-name: fall-sway-diag; }
-.dir-diagonal .particle.confetti { animation-name: confetti-fall-diag; }
-
-.dir-gentle .particle.blossom,
-.dir-gentle .particle.snowflake,
-.dir-gentle .particle.petal { animation-name: fall-gentle; }
-.dir-gentle .particle.leaf,
-.dir-gentle .particle.autumn-leaf { animation-name: fall-sway-gentle; }
-.dir-gentle .particle.confetti { animation-name: confetti-fall-gentle; }
-
 /* === 파티클 스타일 === */
 .particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: 0.7; animation: fall linear infinite; }
 .particle.snowflake { width: 6px; height: 6px; background: #C8D8E8; border-radius: 50%; opacity: 0.7; box-shadow: 0 0 4px rgba(200,216,232,0.5); animation: fall linear infinite; }
