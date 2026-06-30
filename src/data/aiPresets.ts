@@ -55,6 +55,7 @@ export const AI_PRESETS: AIPreset[] = [
       greetingContent: '자연처럼 변함없이\n서로의 곁에서 함께 걷겠습니다.\n\n싱그러운 바람처럼 늘 상쾌하고\n깊은 숲처럼 든든한 사람이 되어\n소중한 분들과 함께 새 출발을 합니다.',
       groomMessage: '자연처럼 변함없이 곁에 있겠습니다.',
       brideMessage: '함께라면 어디든 편안한 쉼터가 돼요.',
+      bgMusicUrl: '/music/the_mountain-life-story-149913.mp3',
       opening: {
         openingEnabled: true,
         openingStyle: 'veil',
@@ -95,6 +96,7 @@ export const AI_PRESETS: AIPreset[] = [
       greetingContent: '서로를 처음 만난 그 순간부터\n지금 이 순간까지,\n\n우리의 모든 날이 사진처럼\n선명하고 빛나는 기억으로 남아있습니다.\n\n앞으로 함께 만들어갈 새로운 이야기에\n여러분을 초대합니다.',
       groomMessage: '당신과 함께라면 매일이 특별해요.',
       brideMessage: '우리의 이야기, 이제 함께 써요.',
+      bgMusicUrl: '/music/paulyudin-romantic-romantic-music-493488.mp3',
       opening: {
         openingEnabled: true,
         openingStyle: 'insta',
