@@ -310,6 +310,7 @@ const App: React.FC = () => {
                   photos: s.photos || [],
                   groomPhoto: s.groomPhoto || '',
                   bridePhoto: s.bridePhoto || '',
+                  timeline: s.timeline?.length ? s.timeline : base.timeline,
                   venueName: '세레나 웨딩홀 그랜드볼룸',
                   venueAddress: '서울특별시 강남구 테헤란로 123',
                   transport: {
