@@ -114,9 +114,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   useLayoutEffect(() => {
     const el = rootRef.current;
     if (el) {
-      el.style.animation = 'none';
+      // 스타일 클래스를 잠깐 제거해 reflow를 유도하여 CSS 애니메이션 강제 재시작
+      const styleClass = `op-${effectiveStyle}`;
+      el.classList.remove(styleClass);
       void el.offsetWidth;
-      el.style.animation = '';
+      el.classList.add(styleClass);
     }
     setPhase('enter');
   }, [opening.openingStyle, opening.openingContentStyle]);
