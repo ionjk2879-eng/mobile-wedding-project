@@ -115,7 +115,7 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       align-items: center;
       justify-content: center;
       text-align: center;
-      background: ${bgColor};
+      background: #FAE8EF;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
