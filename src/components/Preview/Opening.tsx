@@ -115,7 +115,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     setPhase('enter');
     const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
-  }, [opening.openingStyle]);
+  }, [opening.openingStyle, opening.openingContentStyle]);
 
   useEffect(() => {
     if (!isTyping) return;
@@ -124,7 +124,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const t1 = setTimeout(() => setTypingPhase('heart'), 500);
     const t2 = setTimeout(() => setTypingPhase('typing'), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isTyping]);
+  }, [isTyping, opening.openingStyle, opening.openingContentStyle]);
 
   const mainTextRef = useRef(opening.openingText || 'We\'re getting married');
   mainTextRef.current = opening.openingText || 'We\'re getting married';
@@ -189,6 +189,17 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
+
+  // 동적 타이밍: 이름과 본문 마지막 글자 애니메이션 종료 시간 계산
+  const namesLastDelay = 0.6 + (groom.length + bride.length) * 0.08;
+  const mainWords = mainText.split(' ');
+  const mainNonSpaceLen = mainText.replace(/ /g, '').length;
+  const mainLastCharIdx = Math.max(0, mainNonSpaceLen + mainWords.length - 2);
+  const mainLastDelay = 1.2 + mainLastCharIdx * 0.04;
+  const contentEndTime = Math.max(namesLastDelay, mainLastDelay) + 0.5;
+  const seqSubDelay = `${(contentEndTime + 0.15).toFixed(2)}s`;
+  const seqLineBottomDelay = `${contentEndTime.toFixed(2)}s`;
+  const seqEnterDelay = `${(contentEndTime + 0.5).toFixed(2)}s`;
 
   const isCurtain = effectiveStyle === 'curtain';
   const isInsta = effectiveStyle === 'insta';
@@ -293,7 +304,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           </div>
         </div>
       ) : (
-        <div className="op-body" key={opening.openingStyle}>
+        <div
+          className="op-body"
+          key={`${opening.openingStyle}-${opening.openingContentStyle || 'seq'}`}
+          style={{ '--op-sub-delay': seqSubDelay, '--op-line-b-delay': seqLineBottomDelay, '--op-enter-delay': seqEnterDelay } as React.CSSProperties}
+        >
           {decoEffect === 'trace' && (
             <div className="op-deco-trace" aria-hidden="true">
               <span className="op-trace-top" />
