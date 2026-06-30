@@ -11,6 +11,8 @@ import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
 import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
+import { loadInvitationPublic } from './services/publicLoad';
+import { InvitationData } from './types';
 import './styles/effects.css';
 import './styles/builder.css';
 
@@ -27,6 +29,9 @@ const App: React.FC = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [previewPreset, setPreviewPreset] = useState<AIPreset | null>(null);
+  const [sampleData, setSampleData] = useState<InvitationData | null>(null);
+  const [loadingSample, setLoadingSample] = useState(false);
   const hasSavedOnceRef = useRef(false);
   const dataReadyRef = useRef(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -78,10 +83,23 @@ const App: React.FC = () => {
     hasSavedOnceRef.current = false;
   };
 
-  const handleStartWithPreset = (preset: AIPreset) => {
+  const handlePreviewPreset = async (preset: AIPreset) => {
     setShowTemplateModal(false);
+    setPreviewPreset(preset);
+    if (preset.sampleSlug && !sampleData) {
+      setLoadingSample(true);
+      try {
+        const d = await loadInvitationPublic(preset.sampleSlug);
+        if (d) setSampleData(d);
+      } catch { /* 샘플 로드 실패 시 디자인만 미리보기 */ }
+      setLoadingSample(false);
+    }
+  };
+
+  const handleApplyTemplate = (preset: AIPreset) => {
+    setPreviewPreset(null);
     setShowStartScreen(null);
-    setData(applyPreset(preset));
+    setData(applyPreset(preset)); // 디자인 설정만, 개인 정보 없음
     hasSavedOnceRef.current = false;
   };
 
@@ -227,7 +245,7 @@ const App: React.FC = () => {
                     <div className="tmpl-section-label">템플릿 선택</div>
                     <div className="tmpl-cards">
                       {AI_PRESETS.map((preset) => (
-                        <button key={preset.id} className="tmpl-card" onClick={() => handleStartWithPreset(preset)}>
+                        <button key={preset.id} className="tmpl-card" onClick={() => handlePreviewPreset(preset)}>
                           <div className="tmpl-card-bar" style={{
                             background: `linear-gradient(to right, ${preset.previewColors[0]} 0%, ${preset.previewColors[1]} 55%, ${preset.previewColors[2]} 100%)`,
                           }} />
@@ -242,12 +260,80 @@ const App: React.FC = () => {
                               </div>
                             )}
                           </div>
+                          <span className="tmpl-card-arrow">미리보기 →</span>
                         </button>
                       ))}
                     </div>
                   </>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {previewPreset && (
+          <div className="tmpl-preview-root">
+            <div className="tmpl-preview-bar">
+              <button className="tmpl-preview-back" onClick={() => { setPreviewPreset(null); setShowTemplateModal(true); }}>
+                ← 목록
+              </button>
+              <span className="tmpl-preview-name">{previewPreset.emoji} {previewPreset.name}</span>
+              <button className="tmpl-preview-apply" onClick={() => handleApplyTemplate(previewPreset)}>
+                이 템플릿으로 제작하기
+              </button>
+            </div>
+            <div className="tmpl-preview-notice">
+              샘플 사진과 정보로 미리 보는 화면입니다. 제작하기를 누르면 빈 청첩장으로 시작합니다.
+            </div>
+            <div className="tmpl-preview-scroll">
+              {loadingSample ? (
+                <div className="tmpl-preview-loading">
+                  <div className="tmpl-spinner" />
+                  <span>샘플 불러오는 중...</span>
+                </div>
+              ) : (() => {
+                const s = sampleData;
+                const base = applyPreset(previewPreset);
+                const previewData: InvitationData = s ? {
+                  ...base,
+                  groomName: s.groomName,
+                  brideName: s.brideName,
+                  date: s.date,
+                  time: s.time,
+                  weddingDateISO: s.weddingDateISO,
+                  heroPhoto: s.heroPhoto || '',
+                  heroPhotoX: s.heroPhotoX,
+                  heroPhotoY: s.heroPhotoY,
+                  heroPhoto2: s.heroPhoto2 || '',
+                  heroPhoto2X: s.heroPhoto2X,
+                  heroPhoto2Y: s.heroPhoto2Y,
+                  photos: s.photos || [],
+                  groomPhoto: s.groomPhoto || '',
+                  bridePhoto: s.bridePhoto || '',
+                  venueName: '세레나 웨딩홀 그랜드볼룸',
+                  venueAddress: '서울특별시 강남구 테헤란로 123',
+                  transport: {
+                    subway: '2호선 강남역 3번 출구 도보 5분',
+                    bus: '간선 140, 402번 강남역 하차',
+                    parking: '건물 지하 1~3층 (3시간 무료)',
+                  },
+                } : base;
+                const themeClass = previewData.theme ? `theme-${previewData.theme}` : '';
+                return (
+                  <div
+                    className={`invitation-page ${themeClass}`}
+                    style={{
+                      ...(previewData.customBgColor ? { '--wedding-bg': previewData.customBgColor } as React.CSSProperties : {}),
+                      ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor, '--wedding-accent': previewData.customAccentColor } as React.CSSProperties : {}),
+                      fontFamily: previewData.fontFamily || undefined,
+                    }}
+                  >
+                    <ScrollRootContext.Provider value={null}>
+                      <InvitationView data={previewData} showOpening={false} shareEnabled={false} />
+                    </ScrollRootContext.Provider>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}

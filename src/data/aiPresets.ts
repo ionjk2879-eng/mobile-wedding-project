@@ -9,6 +9,7 @@ export interface AIPreset {
   category: string;
   previewColors: string[];
   tags?: string[];
+  sampleSlug?: string;
   settings: Partial<InvitationData>;
 }
 
@@ -35,6 +36,7 @@ export const AI_PRESETS: AIPreset[] = [
     emoji: '🌿',
     previewColors: ['#F2F6EE', '#5F8E5A', '#1A2E18'],
     tags: ['나뭇잎 이펙트', '워터컬러 텍스처', '베일 오프닝', 'Gowun Batang'],
+    sampleSlug: 'junho-seoyeon',
     settings: {
       ...base,
       theme: 'sage',
