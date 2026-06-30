@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, RefObject } from 'react';
+import React, { useEffect, useRef, useState, useCallback, RefObject } from 'react';
 import ReactDOM from 'react-dom';
 
 export function usePreviewRect(anchorRef: RefObject<HTMLElement | null>, open: boolean) {
@@ -64,24 +64,26 @@ interface PreviewOverlayProps {
 
 export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ open, onClose, anchorRef, title, children }) => {
   const rect = usePreviewRect(anchorRef, open);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  // 렌더 후(커밋 완료 후) .invitation-page의 최신 CSS 변수를 포털 div에 동기화
+  // 렌더 중 읽으면 React가 DOM을 아직 커밋하기 전이라 구버전 값이 읽히므로 useEffect로 처리
+  useEffect(() => {
+    if (!open || !overlayRef.current || !anchorRef.current) return;
+    const invPage = anchorRef.current.closest('.invitation-page') as HTMLElement | null;
+    if (!invPage) return;
+    const div = overlayRef.current;
+    ['--wedding-main', '--wedding-accent', '--wedding-bg'].forEach(v => {
+      const val = invPage.style.getPropertyValue(v);
+      if (val) div.style.setProperty(v, val);
+      else div.style.removeProperty(v);
+    });
+  });
 
   if (!open || !rect) return null;
 
   const themeEl = anchorRef.current?.closest('[class*="theme-"]');
   const themeClass = themeEl ? Array.from(themeEl.classList).find(c => c.startsWith('theme-')) || '' : '';
-
-  // .invitation-page의 인라인 커스텀 색상 변수를 포털에 직접 전달
-  const invPage = anchorRef.current?.closest('.invitation-page') as HTMLElement | null;
-  const customVars: Record<string, string> = {};
-  if (invPage) {
-    const s = invPage.style;
-    const main = s.getPropertyValue('--wedding-main');
-    const accent = s.getPropertyValue('--wedding-accent');
-    const bg = s.getPropertyValue('--wedding-bg');
-    if (main) customVars['--wedding-main'] = main;
-    if (accent) customVars['--wedding-accent'] = accent;
-    if (bg) customVars['--wedding-bg'] = bg;
-  }
 
   const style: React.CSSProperties = {
     position: 'fixed',
@@ -95,11 +97,10 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ open, onClose, a
     background: 'var(--wedding-bg, #fff)',
     borderRadius: 'inherit',
     overflow: 'hidden',
-    ...customVars as React.CSSProperties,
   };
 
   return ReactDOM.createPortal(
-    <div className={`pv-overlay-root ${themeClass}`} style={style}>
+    <div className={`pv-overlay-root ${themeClass}`} style={style} ref={overlayRef}>
       <div className="pv-overlay-header">
         <span>{title}</span>
         <button type="button" onClick={onClose} aria-label="닫기">✕</button>
