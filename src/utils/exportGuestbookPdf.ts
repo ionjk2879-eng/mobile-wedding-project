@@ -115,22 +115,54 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       align-items: center;
       justify-content: center;
       text-align: center;
-      background: #FAE8EF;
+      background-color: #FAE8EF;
+      background-image: radial-gradient(circle, rgba(176,122,142,0.2) 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-    .cover-deco {
-      width: 40px;
-      height: 1px;
-      background: ${accentColor}66;
-      margin: 10mm auto;
+    .cover-inner {
+      position: relative;
+      border: 1px solid rgba(176,122,142,0.4);
+      padding: 14mm 18mm 12mm;
+      width: 100%;
+      max-width: 148mm;
+      background: rgba(255,255,255,0.28);
     }
+    .corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-color: ${accentColor};
+      border-style: solid;
+    }
+    .corner.tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .corner.tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+    .corner.bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+    .corner.br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+    .cover-ornament {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8mm 0;
+    }
+    .orn-line-l {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, ${accentColor}77);
+    }
+    .orn-line-r {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to left, transparent, ${accentColor}77);
+    }
+    .orn-diamond { font-size: 0.6rem; color: ${accentColor}; }
     .cover-label {
-      font-size: 0.65rem;
-      letter-spacing: 6px;
+      font-size: 0.6rem;
+      letter-spacing: 7px;
       color: ${accentColor};
       font-weight: 600;
-      margin-bottom: 8mm;
+      opacity: 0.85;
     }
     .cover-names {
       font-family: 'Cormorant Garamond', serif;
@@ -148,14 +180,14 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       margin: 4mm 0;
     }
     .cover-date {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       letter-spacing: 3px;
       color: #6B7280;
-      margin-top: 6mm;
+      margin-top: 5mm;
     }
     .cover-count {
-      margin-top: 3mm;
-      font-size: 0.72rem;
+      margin-top: 2mm;
+      font-size: 0.68rem;
       color: #9CA3AF;
       letter-spacing: 1px;
     }
@@ -233,11 +265,12 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
       }
       .cover {
         min-height: calc(297mm - 28mm);
-        padding: 0;
+        padding: 16mm 14mm;
         border-bottom: none;
         break-after: page;
         page-break-after: always;
       }
+      .cover-inner { background: rgba(255,255,255,0.25); }
       .cards-section { padding: 0; }
       .gb-card { break-inside: avoid; page-break-inside: avoid; }
     }
@@ -254,14 +287,28 @@ export async function downloadGuestbookPdf(data: InvitationData): Promise<void> 
 
   <div id="paper">
     <div class="cover">
-      <p class="cover-label">WEDDING GUEST BOOK</p>
-      <div class="cover-deco"></div>
-      <div class="cover-names">
-        ${groomName}<span class="cover-amp">&amp;</span>${brideName}
+      <div class="cover-inner">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+        <p class="cover-label">WEDDING GUEST BOOK</p>
+        <div class="cover-ornament">
+          <span class="orn-line-l"></span>
+          <span class="orn-diamond">✦</span>
+          <span class="orn-line-r"></span>
+        </div>
+        <div class="cover-names">
+          ${groomName}<span class="cover-amp">&amp;</span>${brideName}
+        </div>
+        <div class="cover-ornament">
+          <span class="orn-line-l"></span>
+          <span class="orn-diamond">✦</span>
+          <span class="orn-line-r"></span>
+        </div>
+        ${weddingDate ? `<p class="cover-date">${weddingDate}</p>` : ''}
+        <p class="cover-count">${messages.length}개의 방명록</p>
       </div>
-      <div class="cover-deco"></div>
-      ${weddingDate ? `<p class="cover-date">${weddingDate}</p>` : ''}
-      <p class="cover-count">${messages.length}개의 방명록</p>
     </div>
 
     <div class="cards-section">
