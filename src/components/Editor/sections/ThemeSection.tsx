@@ -17,6 +17,8 @@ const THEMES: { key: NonNullable<InvitationData['theme']>; name: string; colors:
   { key: 'olive', name: '다크 올리브', colors: ['#F2F4EE', '#C8D2BE', '#5A6C40', '#748C58', '#1E2814'] },
   { key: 'noir', name: '누아르', colors: ['#F3F2F0', '#DCDAD6', '#2A2826', '#4E4C4A', '#1A1816'] },
   { key: 'peach', name: '피치 코랄', colors: ['#FFF8F4', '#F0D8CC', '#D4785C', '#E89880', '#38201A'] },
+  { key: 'white', name: '화이트 미니멀', colors: ['#FFFFFF', '#E5E5E5', '#2A2A2A', '#595959', '#1A1A1A'] },
+  { key: 'whitegold', name: '화이트 골드', colors: ['#FFFFFF', '#EDE0C8', '#C9A227', '#D4B94E', '#3A2E10'] },
 ];
 
 const ITEMS_PER_PAGE = 8;

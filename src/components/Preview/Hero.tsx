@@ -324,6 +324,60 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     );
   };
 
+  const renderMagframe = () => (
+    <div className="hero-magframe">
+      <span className="mf-vtext mf-vtext-left">Wedding</span>
+      <span className="mf-vtext mf-vtext-right">Invitation</span>
+      <span className="mf-dots">•••</span>
+      <div className="mf-frame">
+        <div className="hero-img-wrap mf-photo">{photoEl}</div>
+      </div>
+      <div className="mf-info">
+        <h1 className="mf-names">{groomName}<span className="mf-amp">and</span>{brideName}</h1>
+        <div className="mf-divider" />
+        <p className="mf-date">{dateStr}</p>
+        <p className="mf-venue">{venueName}</p>
+      </div>
+    </div>
+  );
+
+  const renderBoldtype = () => (
+    <div className="hero-boldtype">
+      <div className="bt-bg">{photoEl}</div>
+      <div className="bt-overlay">
+        <span className="bt-dots">•••</span>
+        <h1 className="bt-statement"><span>Our</span><span>Wedding.</span></h1>
+        <div className="bt-bottom">
+          <span className="bt-name">{groomName}</span>
+          <span className="bt-name">{brideName}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const dateParts = data.weddingDateISO ? data.weddingDateISO.split('-') : [];
+  const dsYear = dateParts[0] ? dateParts[0].slice(2) : '';
+  const dsMonth = dateParts[1] || '';
+  const dsDay = dateParts[2] || '';
+
+  const renderDatesplit = () => (
+    <div className="hero-datesplit">
+      <div className="ds-photo">{photoEl}</div>
+      <div className="ds-panel">
+        <div className="ds-date">
+          <span>{dsDay}</span>
+          <span>{dsMonth}</span>
+          <span>{dsYear}</span>
+        </div>
+        <div className="ds-names">
+          <p><em>groom.</em> {groomName}</p>
+          <p><em>bride.</em> {brideName}</p>
+        </div>
+        <p className="ds-venue">{venueName}</p>
+      </div>
+    </div>
+  );
+
   return (
     <section className="hero" style={{ fontFamily: data.fontFamily }} aria-label="메인">
       <div
@@ -344,6 +398,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'bookpage' && renderBookpage()}
         {style === 'filmstrip' && renderFilmstrip()}
         {style === 'verttype' && renderVerttype()}
+        {style === 'magframe' && renderMagframe()}
+        {style === 'boldtype' && renderBoldtype()}
+        {style === 'datesplit' && renderDatesplit()}
       </div>
 
     </section>

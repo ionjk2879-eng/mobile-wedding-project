@@ -60,7 +60,7 @@ export interface BasicInfo {
 }
 
 export interface DesignConfig {
-  theme?: 'sage' | 'mist' | 'pearl' | 'walnut' | 'slate' | 'wisteria' | 'cedar' | 'stone' | 'copper' | 'sky' | 'linen' | 'olive' | 'noir' | 'peach';
+  theme?: 'sage' | 'mist' | 'pearl' | 'walnut' | 'slate' | 'wisteria' | 'cedar' | 'stone' | 'copper' | 'sky' | 'linen' | 'olive' | 'noir' | 'peach' | 'white' | 'whitegold';
   customBgColor?: string;
   customAccentColor?: string;
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';
@@ -68,7 +68,7 @@ export interface DesignConfig {
   bgEffectDir?: 'down' | 'diagonal' | 'gentle';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
-  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype';
+  heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype' | 'magframe' | 'boldtype' | 'datesplit';
   heroPhotoX?: number;
   heroPhotoY?: number;
   heroPhoto2?: string;

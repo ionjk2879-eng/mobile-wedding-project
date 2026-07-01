@@ -156,6 +156,21 @@ const HeroSection: React.FC = () => {
             ))}
           </div>
         </div>
+        <div className="hero-style-subgroup">
+          <span className="hero-style-subgroup-label">포토그래피</span>
+          <div className="hero-style-grid">
+            {([
+              { key: 'magframe' as InvitationData['heroStyle'], name: '매거진 프레임', desc: '세로 타이틀 + 액자 사진 + 시그니처 이름' },
+              { key: 'boldtype' as InvitationData['heroStyle'], name: '볼드 타이포', desc: '사진 위 굵은 타이포 강조' },
+              { key: 'datesplit' as InvitationData['heroStyle'], name: '데이트 스플릿', desc: '사진 + 큰 날짜 숫자 컬럼' },
+            ]).map(s => (
+              <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
+                <strong>{s.name}</strong>
+                <span>{s.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );

@@ -195,6 +195,28 @@ html, body {
   --wedding-text-sub: #8A7068;
 }
 
+.theme-white {
+  --wedding-bg: #FFFFFF;
+  --wedding-card-bg: #FFFFFF;
+  --wedding-border: #E5E5E5;
+  --wedding-main: #2A2A2A;
+  --wedding-accent: #595959;
+  --wedding-text-main: #1A1A1A;
+  --wedding-text-body: #3A3A3A;
+  --wedding-text-sub: #7A7A7A;
+}
+
+.theme-whitegold {
+  --wedding-bg: #FFFFFF;
+  --wedding-card-bg: #FFFFFF;
+  --wedding-border: #EDE0C8;
+  --wedding-main: #C9A227;
+  --wedding-accent: #D4B94E;
+  --wedding-text-main: #3A2E10;
+  --wedding-text-body: #5A4A24;
+  --wedding-text-sub: #9A8858;
+}
+
 body {
   margin: 0;
   padding: 0;
