@@ -39,8 +39,10 @@ function SortableSectionItem({ id, index }: { id: string; index: number }) {
 
 const OrderSection: React.FC = () => {
   const sectionOrder = useInvitationStore((s) => s.data.sectionOrder);
+  const templateSectionOrder = useInvitationStore((s) => s.data.templateSectionOrder);
   const updateField = useInvitationStore((s) => s.updateField);
   const order = sectionOrder?.length ? sectionOrder : DEFAULT_ORDER;
+  const resetTarget = templateSectionOrder ?? DEFAULT_ORDER;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -57,13 +59,15 @@ const OrderSection: React.FC = () => {
     }
   };
 
-  const isDefault = order.join(',') === DEFAULT_ORDER.join(',');
+  const isReset = order.join(',') === resetTarget.join(',');
 
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <p className="section-desc" style={{ margin: 0 }}>드래그하여 섹션 순서를 변경하세요.</p>
-        <button type="button" className="order-reset-btn" disabled={isDefault} onClick={() => updateField('sectionOrder', [...DEFAULT_ORDER])}>초기화</button>
+        <button type="button" className="order-reset-btn" disabled={isReset} onClick={() => updateField('sectionOrder', [...resetTarget])}>
+          {templateSectionOrder ? '템플릿 기본값' : '초기화'}
+        </button>
       </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>

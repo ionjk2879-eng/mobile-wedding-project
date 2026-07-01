@@ -126,7 +126,7 @@ export const AI_PRESETS: AIPreset[] = [
 
 export function applyPreset(preset: AIPreset): InvitationData {
   const { settings } = preset;
-  return {
+  const merged: InvitationData = {
     ...initialData,
     ...settings,
     opening: {
@@ -134,4 +134,8 @@ export function applyPreset(preset: AIPreset): InvitationData {
       ...(settings.opening || {}),
     },
   };
+  if (settings.sectionOrder) {
+    merged.templateSectionOrder = [...settings.sectionOrder];
+  }
+  return merged;
 }

@@ -117,6 +117,7 @@ export interface FeatureConfig {
   opening: OpeningConfig;
   bgMusicUrl: string;
   sectionOrder: string[];
+  templateSectionOrder?: string[];
   language: 'ko' | 'en';
   en: Partial<InvitationData>;
 }
