@@ -35,6 +35,14 @@ const DECO_DOTS = [
   { left: '20%', top: '88%', s: 3 }, { left: '72%', top: '70%', s: 4 },
 ];
 
+const RIPPLE_SOURCES = [
+  { cx: '50%', cy: '50%', delays: [0,   4.5, 9  ] },
+  { cx: '22%', cy: '26%', delays: [1.8, 6.8      ] },
+  { cx: '78%', cy: '72%', delays: [3.2, 8.2      ] },
+  { cx: '80%', cy: '20%', delays: [5.5, 10.5     ] },
+  { cx: '20%', cy: '74%', delays: [2.6, 7.6      ] },
+];
+
 const DECO_SPARKS = [
   { left: '8%',  top: '18%' }, { left: '20%', top: '68%' },
   { left: '30%', top: '12%' }, { left: '72%', top: '20%' },
@@ -376,9 +384,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       )}
       {decoEffect === 'ripple' && (
         <div className="op-deco-ripple" aria-hidden="true">
-          {[0, 2, 4].map((delay, i) => (
-            <span key={i} className="op-ripple-ring" style={{ animationDelay: `${delay}s` }} />
-          ))}
+          {RIPPLE_SOURCES.map((src, si) =>
+            src.delays.map((delay, ri) => (
+              <span key={`${si}-${ri}`} className="op-ripple-ring" style={{ left: src.cx, top: src.cy, animationDelay: `${delay}s` } as React.CSSProperties} />
+            ))
+          )}
         </div>
       )}
       {decoEffect === 'sparkle' && (
