@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import EditorContainer from './components/Editor/EditorContainer';
 import InvitationView from './components/Preview/InvitationView';
@@ -6,13 +5,12 @@ import ToastContainer from './components/Toast';
 import { ScrollRootContext } from './components/Preview/ScrollReveal';
 import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
-import { saveInvitation, checkSlugAvailable, loadInvitation, deleteInvitation, fetchMyInvitations } from './services/invitationService';
+import { saveInvitation, checkSlugAvailable, loadInvitation } from './services/invitationService';
 import { getApiErrorMessage } from './utils/apiError';
 import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
+import { Edit3, Eye, Save, ClipboardList, RotateCcw, Menu, X } from 'lucide-react';
 import { AI_PRESETS, applyPreset } from './data/aiPresets';
-import { InvitationData } from './types';
 import './styles/effects.css';
 import './styles/builder.css';
 
@@ -28,7 +26,7 @@ const App: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [showSavedPopup, setShowSavedPopup] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [showStartScreen, setShowStartScreen] = useState<{ slug: string; data: InvitationData }[] | null>(null);
+  const [showStartScreen, setShowStartScreen] = useState(false);
   const hasSavedOnceRef = useRef(false);
   const dataReadyRef = useRef(false);
   const showStartScreenRef = useRef(showStartScreen);
@@ -46,44 +44,38 @@ const App: React.FC = () => {
         if (saved) {
           setData(saved);
           hasSavedOnceRef.current = true;
-          setShowStartScreen(null);
+          setShowStartScreen(false);
         } else {
-          setShowStartScreen([]);
+          setShowStartScreen(true);
         }
-      }).catch(() => { setShowStartScreen([]); }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
+      }).catch(() => { setShowStartScreen(true); }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
     } else {
       const templateParam = searchParams.get('template');
-      fetchMyInvitations().then((items) => {
-        if (templateParam) {
-          const preset = AI_PRESETS.find(p => p.id === templateParam);
-          if (preset) {
-            setData(applyPreset(preset));
-            hasSavedOnceRef.current = false;
-          }
-          setShowStartScreen(null);
-        } else {
-          setShowStartScreen(items);
+      if (templateParam) {
+        const preset = AI_PRESETS.find(p => p.id === templateParam);
+        if (preset) {
+          setData(applyPreset(preset));
+          hasSavedOnceRef.current = false;
         }
-      }).catch(() => {
-        setShowStartScreen([]);
-      }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
+        setShowStartScreen(false);
+      } else {
+        setShowStartScreen(true);
+      }
+      setLoadingData(false);
+      dataReadyRef.current = true;
     }
   }, []);
 
-
   // 브라우저 뒤로/앞으로 이동 시 URL ↔ 화면 동기화
   useEffect(() => {
-    if (!dataReadyRef.current) return; // 초기 마운트는 위 loadedRef 효과가 처리
+    if (!dataReadyRef.current) return;
     const currentShowStartScreen = showStartScreenRef.current;
-    if (!urlSlug && currentShowStartScreen === null) {
+    if (!urlSlug && !currentShowStartScreen) {
       // /edit/:slug → /editor 로 뒤로가기: 시작 화면 표시
-      setLoadingData(true);
-      fetchMyInvitations().then((items) => {
-        setShowStartScreen(items);
-      }).catch(() => setShowStartScreen([])).finally(() => setLoadingData(false));
-    } else if (urlSlug && currentShowStartScreen !== null) {
+      setShowStartScreen(true);
+    } else if (urlSlug && currentShowStartScreen) {
       // 시작 화면에서 /edit/:slug 로 앞으로가기: 해당 청첩장 로드
-      setShowStartScreen(null);
+      setShowStartScreen(false);
       setLoadingData(true);
       loadInvitation(urlSlug).then((saved) => {
         if (saved) { setData(saved); hasSavedOnceRef.current = true; }
@@ -91,35 +83,10 @@ const App: React.FC = () => {
     }
   }, [urlSlug]);
 
-  const handleLoadExisting = async (slug: string) => {
-    setShowStartScreen(null);
-    navigate(`/edit/${slug}`, { state: { screen: 'editor' } });
-    setLoadingData(true);
-    try {
-      const saved = await loadInvitation(slug);
-      if (saved) {
-        setData(saved);
-        hasSavedOnceRef.current = true;
-        toast.info(`'${slug}' 청첩장을 불러왔습니다.`);
-      }
-    } catch { /* ignore */ }
-    setLoadingData(false);
-  };
-
   const handleStartNew = () => {
-    setShowStartScreen(null);
+    setShowStartScreen(false);
     setData(initialData);
     hasSavedOnceRef.current = false;
-  };
-
-  const handleDeleteSlug = async (slug: string) => {
-    if (!confirm(`'${slug}' 청첩장을 삭제하시겠습니까?`)) return;
-    try {
-      await deleteInvitation(slug);
-      toast.success(`'${slug}' 청첩장이 삭제되었습니다.`);
-      const items = await fetchMyInvitations();
-      setShowStartScreen(items);
-    } catch { toast.error('삭제에 실패했습니다.'); }
   };
 
   const handleReset = () => {
@@ -211,7 +178,7 @@ const App: React.FC = () => {
     );
   }
 
-  if (showStartScreen !== null) {
+  if (showStartScreen) {
     return (
       <div className="start-screen-v2">
         <div className="ss-logo-area" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
@@ -219,55 +186,6 @@ const App: React.FC = () => {
           <p className="ss-logo-sub">소네트 모바일 청첩장</p>
         </div>
 
-        {/* 나의 청첩장 */}
-        <section className="ss-section">
-          <h2 className="ss-section-title">나의 청첩장</h2>
-          <div className="ss-inv-row">
-            <button className="ss-inv-card ss-inv-new" onClick={handleStartNew}>
-              <div className="ss-inv-visual ss-inv-visual-new">
-                <span className="ss-inv-plus">+</span>
-              </div>
-              <div className="ss-inv-body">
-                <span className="ss-inv-new-text">새 청첩장</span>
-              </div>
-            </button>
-            {showStartScreen.map(({ slug, data: inv }) => (
-              <div key={slug} className="ss-inv-card" onClick={() => handleLoadExisting(slug)} style={{ cursor: 'pointer' }}>
-                <div className="ss-inv-visual">
-                  {inv.heroPhoto ? (
-                    <img
-                      src={inv.heroPhoto}
-                      className="ss-inv-photo"
-                      style={{ objectPosition: `${inv.heroPhotoX ?? 50}% ${inv.heroPhotoY ?? 50}%` }}
-                      alt=""
-                    />
-                  ) : (
-                    <div className="ss-inv-visual-empty"><span>사진 없음</span></div>
-                  )}
-                </div>
-                <div className="ss-inv-body">
-                  <span className="ss-inv-names">
-                    {inv.groomName && inv.brideName ? `${inv.groomName} & ${inv.brideName}` : slug}
-                  </span>
-                  {inv.date && <span className="ss-inv-date">{inv.date}</span>}
-                  <span className="ss-inv-slug">/{slug}</span>
-                </div>
-                <button
-                  className="ss-inv-del"
-                  onClick={(e) => { e.stopPropagation(); handleDeleteSlug(slug); }}
-                  title="삭제"
-                >
-                  <Trash2 size={11} />
-                </button>
-              </div>
-            ))}
-          </div>
-          {showStartScreen.some(({ data: inv }) => !inv.isPaid) && showStartScreen.length > 0 && (
-            <p className="ss-notice">결제하지 않은 청첩장은 1주일이 지나면 자동으로 삭제됩니다.</p>
-          )}
-        </section>
-
-        {/* 템플릿 선택 */}
         <section className="ss-section">
           <h2 className="ss-section-title">템플릿 선택</h2>
           <p className="ss-section-sub">마음에 드는 디자인을 미리 보고 시작하세요</p>
