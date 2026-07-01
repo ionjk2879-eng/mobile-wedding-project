@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
@@ -14,6 +15,29 @@ const TimelineSection: React.FC = () => {
   const setData = useInvitationStore((s) => s.setData);
   const data = useInvitationStore((s) => s.data);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const orderListRef = useRef<HTMLDivElement>(null);
+  const pendingFocusRef = useRef<number | null>(null);
+  const list = timeline || [];
+
+  useEffect(() => {
+    if (pendingFocusRef.current !== null && orderListRef.current) {
+      const items = orderListRef.current.querySelectorAll<HTMLElement>('[role="listitem"]');
+      items[pendingFocusRef.current]?.focus();
+      pendingFocusRef.current = null;
+    }
+  }, [timeline]);
+
+  const handleOrderKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'ArrowUp' && index > 0) {
+      e.preventDefault();
+      pendingFocusRef.current = index - 1;
+      moveTimelineEvent(list[index].id, -1);
+    } else if (e.key === 'ArrowDown' && index < list.length - 1) {
+      e.preventDefault();
+      pendingFocusRef.current = index + 1;
+      moveTimelineEvent(list[index].id, 1);
+    }
+  };
 
   const toggleShowDate = (id: string) => {
     setData({ ...data, timeline: (data.timeline || []).map(e => e.id === id ? { ...e, showDate: !(e.showDate !== false) } : e) });
@@ -37,16 +61,42 @@ const TimelineSection: React.FC = () => {
   return (
     <>
       <p className="section-desc">연애 시작부터 결혼까지의 과정을 입력해 보세요.</p>
+
+      {list.length >= 2 && (
+        <div className="timeline-order-panel">
+          <p className="timeline-order-title">순서 관리</p>
+          <div className="order-list" role="list" ref={orderListRef}>
+            {list.map((event, index) => {
+              const label = [event.date, event.title].filter(Boolean).join(' · ') || `이벤트 ${index + 1}`;
+              return (
+                <div
+                  key={event.id}
+                  className="order-item"
+                  role="listitem"
+                  tabIndex={0}
+                  onKeyDown={(e) => handleOrderKeyDown(e, index)}
+                  aria-label={`${index + 1}. ${label}`}
+                  aria-roledescription="이동 가능한 항목"
+                >
+                  <span className="order-num">{index + 1}</span>
+                  <span className="order-label">{label}</span>
+                  <div className="order-btns">
+                    <button type="button" className="order-btn" disabled={index === 0} onClick={() => moveTimelineEvent(event.id, -1)} aria-label="위로 이동"><ChevronUp size={16} /></button>
+                    <button type="button" className="order-btn" disabled={index === list.length - 1} onClick={() => moveTimelineEvent(event.id, 1)} aria-label="아래로 이동"><ChevronDown size={16} /></button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="timeline-editor-list">
-        {(timeline || []).map((event, index) => (
+        {list.map((event, index) => (
           <div key={event.id} className="timeline-editor-item">
             <div className="timeline-editor-header">
               <span className="timeline-index">{index + 1}</span>
-              <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                <button type="button" className="timeline-move-btn" disabled={index === 0} onClick={() => moveTimelineEvent(event.id, -1)}>▲</button>
-                <button type="button" className="timeline-move-btn" disabled={index === (timeline || []).length - 1} onClick={() => moveTimelineEvent(event.id, 1)}>▼</button>
-                <button type="button" className="timeline-remove-btn" onClick={() => removeTimelineEvent(event.id)}>×</button>
-              </div>
+              <button type="button" className="timeline-remove-btn" onClick={() => removeTimelineEvent(event.id)}>×</button>
             </div>
             <div className="timeline-editor-fields">
               <div className="input-group">
