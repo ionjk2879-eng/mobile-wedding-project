@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen, Clock, Clapperboard, Menu, X } from 'lucide-react';
+import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen, Clock, Clapperboard, Menu, X, Camera } from 'lucide-react';
 import '../../styles/editor.css';
 import SectionCard from './SectionCard';
 import ShareSection from './sections/ShareSection';
@@ -20,6 +20,7 @@ import OrderSection from './sections/OrderSection';
 import GuestbookSection from './sections/GuestbookSection';
 import DateTimeSection from './sections/DateTimeSection';
 import OpeningSection from './sections/OpeningSection';
+import EndingSection from './sections/EndingSection';
 
 interface EditorProps {
   onSectionClick?: (id: string) => void;
@@ -43,6 +44,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     interview: React.useRef<HTMLDivElement>(null),
     rsvp: React.useRef<HTMLDivElement>(null),
     guestbook: React.useRef<HTMLDivElement>(null),
+    ending: React.useRef<HTMLDivElement>(null),
     share: React.useRef<HTMLDivElement>(null),
     order: React.useRef<HTMLDivElement>(null),
     music: React.useRef<HTMLDivElement>(null),
@@ -55,7 +57,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     hero: true, opening: false, theme: true, design: false, basic: true, datetime: true,
     greeting: false, message: false, location: true, contacts: false,
     accounts: false, photos: false, timeline: false, interview: false,
-    rsvp: false, guestbook: false, share: false, order: false, music: false,
+    rsvp: false, guestbook: false, ending: false, share: false, order: false, music: false,
   });
 
   const isScrollingRef = React.useRef(false);
@@ -116,6 +118,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     { id: 'rsvp', name: '참석의사', icon: <CalendarCheck size={18} />, ref: sectionRefs.rsvp },
     { id: 'guestbook', name: '방명록', icon: <BookOpen size={18} />, ref: sectionRefs.guestbook },
     { id: 'accounts', name: '계좌', icon: <CreditCard size={18} />, ref: sectionRefs.accounts },
+    { id: 'ending', name: '엔딩', icon: <Camera size={18} />, ref: sectionRefs.ending },
     { id: 'music', name: '배경음악', icon: <Music size={18} />, ref: sectionRefs.music },
     { id: 'order', name: '순서관리', icon: <ListOrdered size={18} />, ref: sectionRefs.order },
   ];
@@ -137,6 +140,7 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     { id: 'rsvp', title: '참석의사 (RSVP)', icon: <CalendarCheck size={20} />, content: <RSVPSection /> },
     { id: 'guestbook', title: '방명록', icon: <BookOpen size={20} />, content: <GuestbookSection /> },
     { id: 'accounts', title: '계좌 정보', icon: <CreditCard size={20} />, content: <AccountsSection /> },
+    { id: 'ending', title: '엔딩', icon: <Camera size={20} />, content: <EndingSection /> },
     { id: 'music', title: '배경음악', icon: <Music size={20} />, content: <MusicSection /> },
     { id: 'order', title: '순서 관리', icon: <ListOrdered size={20} />, content: <OrderSection /> },
   ];

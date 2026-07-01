@@ -13,6 +13,7 @@ import Location from './Location';
 import RSVPForm from './RSVPForm';
 import Money from './Money';
 import Contacts from './Contacts';
+import Ending from './Ending';
 import Share from './Share';
 import Guestbook from './Guestbook';
 import ScrollReveal from './ScrollReveal';
@@ -43,15 +44,17 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
     case 'accounts': return wrap(<Money data={data} />);
     case 'contacts': return wrap(<Contacts data={data} />);
     case 'guestbook': return wrap(<Guestbook data={data} />);
+    case 'ending': return wrap(<Ending data={data} />);
     case 'share': return wrap(<Share data={data} shareEnabled={shareEnabled} />);
     default: return null;
   }
 };
 
-const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'share'];
+const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
 
 const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset }) => {
-  const sectionOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
+  const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
+  const sectionOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
   const [previewActive, setPreviewActive] = useState(false);
   // openingDone: 한 번 dismiss 되면 true → shouldShowOpening = false → 완전히 언마운트

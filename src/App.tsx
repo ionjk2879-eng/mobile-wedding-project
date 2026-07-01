@@ -166,6 +166,7 @@ const App: React.FC = () => {
     guestbook: React.useRef<HTMLDivElement>(null),
     contacts: React.useRef<HTMLDivElement>(null),
     accounts: React.useRef<HTMLDivElement>(null),
+    ending: React.useRef<HTMLDivElement>(null),
     share: React.useRef<HTMLDivElement>(null),
     music: React.useRef<HTMLDivElement>(null),
   };

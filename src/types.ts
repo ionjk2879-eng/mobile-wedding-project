@@ -92,6 +92,10 @@ export interface ContentData {
   accounts: Account[];
   accountStyle: 'style1' | 'style2' | 'style3';
   videoUrl: string;
+  endingPhoto: string;
+  endingPhotoX?: number;
+  endingPhotoY?: number;
+  endingMessage: string;
 }
 
 export interface OpeningConfig {

@@ -14,10 +14,10 @@ import useInvitationStore from '../../../stores/useInvitationStore';
 const SECTION_LABELS: Record<string, string> = {
   greeting: '인사말', calendar: '예식일시', message: '신랑/신부 한마디', interview: '인터뷰',
   photos: '갤러리', timeline: '타임라인', location: '장소', rsvp: '참석의사',
-  guestbook: '방명록', accounts: '계좌정보', contacts: '연락처', share: '공유',
+  guestbook: '방명록', accounts: '계좌정보', contacts: '연락처', ending: '엔딩', share: '공유',
 };
 
-const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'accounts', 'contacts', 'share'];
+const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
 
 function SortableSectionItem({ id, index }: { id: string; index: number }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -41,7 +41,8 @@ const OrderSection: React.FC = () => {
   const sectionOrder = useInvitationStore((s) => s.data.sectionOrder);
   const templateSectionOrder = useInvitationStore((s) => s.data.templateSectionOrder);
   const updateField = useInvitationStore((s) => s.updateField);
-  const order = sectionOrder?.length ? sectionOrder : DEFAULT_ORDER;
+  const savedOrder = sectionOrder?.length ? sectionOrder : DEFAULT_ORDER;
+  const order = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
   const resetTarget = templateSectionOrder ?? DEFAULT_ORDER;
 
   const sensors = useSensors(
