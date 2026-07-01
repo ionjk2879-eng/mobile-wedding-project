@@ -57,9 +57,14 @@ const OrderSection: React.FC = () => {
     }
   };
 
+  const isDefault = order.join(',') === DEFAULT_ORDER.join(',');
+
   return (
     <>
-      <p className="section-desc">미리보기에 표시되는 섹션 순서를 변경할 수 있습니다. <span className="input-hint">항목을 드래그하여 순서를 변경하세요.</span></p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <p className="section-desc" style={{ margin: 0 }}>드래그하여 섹션 순서를 변경하세요.</p>
+        <button type="button" className="order-reset-btn" disabled={isDefault} onClick={() => updateField('sectionOrder', [...DEFAULT_ORDER])}>초기화</button>
+      </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           <div className="order-list" role="list">

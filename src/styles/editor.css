@@ -150,6 +150,9 @@
 .timeline-remove-btn:hover { background: #FECACA; }
 .timeline-order-panel { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; }
 .timeline-order-title { font-size: 0.78rem; font-weight: 800; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.order-reset-btn { padding: 4px 10px; border-radius: 8px; border: 1px solid #E5E7EB; background: white; color: #6B7280; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+.order-reset-btn:hover:not(:disabled) { border-color: #D4A5C6; color: #B07A8E; background: #FDF2F4; }
+.order-reset-btn:disabled { opacity: 0.35; cursor: default; }
 .tl-drag-handle { display: flex; align-items: center; padding: 4px 2px; color: #C4C9D4; cursor: grab; touch-action: none; flex-shrink: 0; }
 .tl-drag-handle:active { cursor: grabbing; }
 .tl-drag-handle:hover { color: #9CA3AF; }

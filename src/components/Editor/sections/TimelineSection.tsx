@@ -86,7 +86,15 @@ const TimelineSection: React.FC = () => {
 
       {list.length >= 2 && (
         <div className="timeline-order-panel">
-          <p className="timeline-order-title">순서 관리</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <p className="timeline-order-title" style={{ margin: 0 }}>순서 관리</p>
+            <button
+              type="button"
+              className="order-reset-btn"
+              disabled={list.every((e, i) => e.id === [...list].sort((a, b) => Number(a.id) - Number(b.id))[i].id)}
+              onClick={() => updateField('timeline', [...list].sort((a, b) => Number(a.id) - Number(b.id)))}
+            >초기화</button>
+          </div>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={list.map((e) => e.id)} strategy={verticalListSortingStrategy}>
               <div className="order-list">
