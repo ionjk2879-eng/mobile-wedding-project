@@ -10,6 +10,7 @@ const TimelineSection: React.FC = () => {
   const addTimelineEvent = useInvitationStore((s) => s.addTimelineEvent);
   const updateTimelineEvent = useInvitationStore((s) => s.updateTimelineEvent);
   const removeTimelineEvent = useInvitationStore((s) => s.removeTimelineEvent);
+  const moveTimelineEvent = useInvitationStore((s) => s.moveTimelineEvent);
   const setData = useInvitationStore((s) => s.setData);
   const data = useInvitationStore((s) => s.data);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
@@ -41,7 +42,11 @@ const TimelineSection: React.FC = () => {
           <div key={event.id} className="timeline-editor-item">
             <div className="timeline-editor-header">
               <span className="timeline-index">{index + 1}</span>
-              <button type="button" className="timeline-remove-btn" onClick={() => removeTimelineEvent(event.id)}>×</button>
+              <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                <button type="button" className="timeline-move-btn" disabled={index === 0} onClick={() => moveTimelineEvent(event.id, -1)}>▲</button>
+                <button type="button" className="timeline-move-btn" disabled={index === (timeline || []).length - 1} onClick={() => moveTimelineEvent(event.id, 1)}>▼</button>
+                <button type="button" className="timeline-remove-btn" onClick={() => removeTimelineEvent(event.id)}>×</button>
+              </div>
             </div>
             <div className="timeline-editor-fields">
               <div className="input-group">

@@ -99,6 +99,7 @@ interface InvitationStore {
   addTimelineEvent: () => void;
   updateTimelineEvent: (id: string, field: keyof TimelineEvent, value: string) => void;
   removeTimelineEvent: (id: string) => void;
+  moveTimelineEvent: (id: string, dir: -1 | 1) => void;
 
   addInterviewQA: () => void;
   updateInterviewQA: (id: string, field: keyof InterviewQA, value: string) => void;
@@ -175,6 +176,16 @@ const useInvitationStore = create<InvitationStore>((set) => ({
     set((state) => ({
       data: { ...state.data, timeline: (state.data.timeline || []).filter(e => e.id !== id) }
     })),
+
+  moveTimelineEvent: (id, dir) =>
+    set((state) => {
+      const list = [...(state.data.timeline || [])];
+      const idx = list.findIndex(e => e.id === id);
+      const target = idx + dir;
+      if (target < 0 || target >= list.length) return state;
+      [list[idx], list[target]] = [list[target], list[idx]];
+      return { data: { ...state.data, timeline: list } };
+    }),
 
   addInterviewQA: () =>
     set((state) => ({

@@ -144,6 +144,9 @@
 .timeline-index { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #D4A5C6; color: white; font-size: 0.75rem; font-weight: 800; }
 .timeline-remove-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #FEE2E2; color: #EF4444; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
 .timeline-remove-btn:hover { background: #FECACA; }
+.timeline-move-btn { width: 26px; height: 26px; border-radius: 6px; border: 1px solid #E5E7EB; background: #F9FAFB; color: #6B7280; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.timeline-move-btn:hover:not(:disabled) { background: #E5E7EB; color: #374151; }
+.timeline-move-btn:disabled { opacity: 0.3; cursor: default; }
 .timeline-editor-fields, .interview-editor-fields { padding: 16px 20px; }
 .timeline-add-btn { width: 100%; padding: 14px; border: 2px dashed #D1D5DB; border-radius: 14px; background: none; color: #9CA3AF; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
 .timeline-add-btn:hover { border-color: #D4A5C6; color: #D4A5C6; background: #FFF9FB; }
