@@ -1,9 +1,38 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { GripVertical } from 'lucide-react';
+import {
+  DndContext, closestCenter, PointerSensor, TouchSensor, KeyboardSensor,
+  useSensor, useSensors, type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext, sortableKeyboardCoordinates, useSortable,
+  verticalListSortingStrategy, arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
 import { getApiErrorMessage } from '../../../utils/apiError';
+import type { TimelineEvent } from '../../../types';
+
+function SortableTimelineOrderItem({ event, index }: { event: TimelineEvent; index: number }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: event.id });
+  const label = [event.date, event.title].filter(Boolean).join(' · ') || `이벤트 ${index + 1}`;
+  return (
+    <div
+      ref={setNodeRef}
+      className={`order-item${isDragging ? ' tl-dragging' : ''}`}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      aria-label={`${index + 1}. ${label}`}
+    >
+      <span className="order-num">{index + 1}</span>
+      <span className="order-label">{label}</span>
+      <span className="tl-drag-handle" {...listeners} {...attributes} aria-label="드래그하여 순서 변경">
+        <GripVertical size={16} />
+      </span>
+    </div>
+  );
+}
 
 const TimelineSection: React.FC = () => {
   const timeline = useInvitationStore((s) => s.data.timeline);
@@ -11,31 +40,24 @@ const TimelineSection: React.FC = () => {
   const addTimelineEvent = useInvitationStore((s) => s.addTimelineEvent);
   const updateTimelineEvent = useInvitationStore((s) => s.updateTimelineEvent);
   const removeTimelineEvent = useInvitationStore((s) => s.removeTimelineEvent);
-  const moveTimelineEvent = useInvitationStore((s) => s.moveTimelineEvent);
+  const updateField = useInvitationStore((s) => s.updateField);
   const setData = useInvitationStore((s) => s.setData);
   const data = useInvitationStore((s) => s.data);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
-  const orderListRef = useRef<HTMLDivElement>(null);
-  const pendingFocusRef = useRef<number | null>(null);
   const list = timeline || [];
 
-  useEffect(() => {
-    if (pendingFocusRef.current !== null && orderListRef.current) {
-      const items = orderListRef.current.querySelectorAll<HTMLElement>('[role="listitem"]');
-      items[pendingFocusRef.current]?.focus();
-      pendingFocusRef.current = null;
-    }
-  }, [timeline]);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
-  const handleOrderKeyDown = (e: React.KeyboardEvent, index: number) => {
-    if (e.key === 'ArrowUp' && index > 0) {
-      e.preventDefault();
-      pendingFocusRef.current = index - 1;
-      moveTimelineEvent(list[index].id, -1);
-    } else if (e.key === 'ArrowDown' && index < list.length - 1) {
-      e.preventDefault();
-      pendingFocusRef.current = index + 1;
-      moveTimelineEvent(list[index].id, 1);
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = list.findIndex((e) => e.id === active.id);
+      const newIndex = list.findIndex((e) => e.id === over.id);
+      updateField('timeline', arrayMove([...list], oldIndex, newIndex));
     }
   };
 
@@ -65,29 +87,15 @@ const TimelineSection: React.FC = () => {
       {list.length >= 2 && (
         <div className="timeline-order-panel">
           <p className="timeline-order-title">순서 관리</p>
-          <div className="order-list" role="list" ref={orderListRef}>
-            {list.map((event, index) => {
-              const label = [event.date, event.title].filter(Boolean).join(' · ') || `이벤트 ${index + 1}`;
-              return (
-                <div
-                  key={event.id}
-                  className="order-item"
-                  role="listitem"
-                  tabIndex={0}
-                  onKeyDown={(e) => handleOrderKeyDown(e, index)}
-                  aria-label={`${index + 1}. ${label}`}
-                  aria-roledescription="이동 가능한 항목"
-                >
-                  <span className="order-num">{index + 1}</span>
-                  <span className="order-label">{label}</span>
-                  <div className="order-btns">
-                    <button type="button" className="order-btn" disabled={index === 0} onClick={() => moveTimelineEvent(event.id, -1)} aria-label="위로 이동"><ChevronUp size={16} /></button>
-                    <button type="button" className="order-btn" disabled={index === list.length - 1} onClick={() => moveTimelineEvent(event.id, 1)} aria-label="아래로 이동"><ChevronDown size={16} /></button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={list.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+              <div className="order-list">
+                {list.map((event, index) => (
+                  <SortableTimelineOrderItem key={event.id} event={event} index={index} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
       )}
 
