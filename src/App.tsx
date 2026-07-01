@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import EditorContainer from './components/Editor/EditorContainer';
 import InvitationView from './components/Preview/InvitationView';
@@ -10,8 +11,7 @@ import { getApiErrorMessage } from './utils/apiError';
 import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Edit3, Eye, Save, ClipboardList, RotateCcw, Trash2, Menu, X } from 'lucide-react';
-import { AI_PRESETS, AIPreset, applyPreset } from './data/aiPresets';
-import { loadInvitationPublic } from './services/publicLoad';
+import { AI_PRESETS, applyPreset } from './data/aiPresets';
 import { InvitationData } from './types';
 import './styles/effects.css';
 import './styles/builder.css';
@@ -28,11 +28,7 @@ const App: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [showSavedPopup, setShowSavedPopup] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [showStartScreen, setShowStartScreen] = useState<string[] | null>(null);
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [previewPreset, setPreviewPreset] = useState<AIPreset | null>(null);
-  const [sampleData, setSampleData] = useState<InvitationData | null>(null);
-  const [loadingSample, setLoadingSample] = useState(false);
+  const [showStartScreen, setShowStartScreen] = useState<{ slug: string; data: InvitationData }[] | null>(null);
   const hasSavedOnceRef = useRef(false);
   const dataReadyRef = useRef(false);
   const showStartScreenRef = useRef(showStartScreen);
@@ -66,7 +62,7 @@ const App: React.FC = () => {
           }
           setShowStartScreen(null);
         } else {
-          setShowStartScreen(items.map((item) => item.slug));
+          setShowStartScreen(items);
         }
       }).catch(() => {
         setShowStartScreen([]);
@@ -83,7 +79,7 @@ const App: React.FC = () => {
       // /edit/:slug → /editor 로 뒤로가기: 시작 화면 표시
       setLoadingData(true);
       fetchMyInvitations().then((items) => {
-        setShowStartScreen(items.map((item) => item.slug));
+        setShowStartScreen(items);
       }).catch(() => setShowStartScreen([])).finally(() => setLoadingData(false));
     } else if (urlSlug && currentShowStartScreen !== null) {
       // 시작 화면에서 /edit/:slug 로 앞으로가기: 해당 청첩장 로드
@@ -116,34 +112,13 @@ const App: React.FC = () => {
     hasSavedOnceRef.current = false;
   };
 
-  const handlePreviewPreset = async (preset: AIPreset) => {
-    setShowTemplateModal(false);
-    setPreviewPreset(preset);
-    if (preset.sampleSlug && !sampleData) {
-      setLoadingSample(true);
-      try {
-        const d = await loadInvitationPublic(preset.sampleSlug);
-        if (d) setSampleData(d);
-      } catch { /* 샘플 로드 실패 시 디자인만 미리보기 */ }
-      setLoadingSample(false);
-    }
-  };
-
-  const handleApplyTemplate = (preset: AIPreset) => {
-    setPreviewPreset(null);
-    setShowStartScreen(null);
-    setData(applyPreset(preset)); // 디자인 설정만, 개인 정보 없음
-    hasSavedOnceRef.current = false;
-  };
-
   const handleDeleteSlug = async (slug: string) => {
     if (!confirm(`'${slug}' 청첩장을 삭제하시겠습니까?`)) return;
     try {
       await deleteInvitation(slug);
       toast.success(`'${slug}' 청첩장이 삭제되었습니다.`);
       const items = await fetchMyInvitations();
-      if (items.length > 0) setShowStartScreen(items.map((item) => item.slug));
-      else setShowStartScreen(null);
+      setShowStartScreen(items);
     } catch { toast.error('삭제에 실패했습니다.'); }
   };
 
@@ -238,157 +213,103 @@ const App: React.FC = () => {
 
   if (showStartScreen !== null) {
     return (
-      <div className="start-screen">
-        <div className="start-logo-wrap" onClick={() => navigate('/')} style={{ cursor: 'pointer', textAlign: 'center' }}>
-          <h1>Sonett</h1>
-          <p className="start-desc">소네트 모바일 청첩장</p>
-        </div>
-        <div className="start-options">
-          <button className="start-btn new" onClick={() => setShowTemplateModal(true)}>새로 만들기</button>
-          {showStartScreen.length > 0 && (
-            <>
-              <div className="start-divider">이전 청첩장 이어서 편집</div>
-              {showStartScreen.map((slug) => (
-                <div key={slug} className="start-item">
-                  <button className="start-btn load" onClick={() => handleLoadExisting(slug)}>
-                    /{slug}
-                  </button>
-                  <button className="start-delete" onClick={() => handleDeleteSlug(slug)} title="삭제">
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              ))}
-            </>
-          )}
+      <div className="start-screen-v2">
+        <div className="ss-logo-area" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+          <h1 className="ss-logo-text">Sonett</h1>
+          <p className="ss-logo-sub">소네트 모바일 청첩장</p>
         </div>
 
-        {showTemplateModal && (
-          <div className="tmpl-overlay" onClick={() => setShowTemplateModal(false)}>
-            <div className="tmpl-sheet" onClick={(e) => e.stopPropagation()}>
-              <div className="tmpl-handle" />
-              <div className="tmpl-header">
-                <span className="tmpl-title">어떻게 시작할까요?</span>
-                <button className="tmpl-close" onClick={() => setShowTemplateModal(false)}>✕</button>
+        {/* 나의 청첩장 */}
+        <section className="ss-section">
+          <h2 className="ss-section-title">나의 청첩장</h2>
+          <div className="ss-inv-row">
+            <button className="ss-inv-card ss-inv-new" onClick={handleStartNew}>
+              <div className="ss-inv-visual ss-inv-visual-new">
+                <span className="ss-inv-plus">+</span>
               </div>
-              <div className="tmpl-body">
-                <button className="tmpl-blank-btn" onClick={handleStartNew}>
-                  <span className="tmpl-blank-title">+ 빈 청첩장으로 시작</span>
-                  <span className="tmpl-blank-sub">처음부터 직접 꾸미기</span>
+              <div className="ss-inv-body">
+                <span className="ss-inv-new-text">새 청첩장</span>
+              </div>
+            </button>
+            {showStartScreen.map(({ slug, data: inv }) => (
+              <div key={slug} className="ss-inv-card" onClick={() => handleLoadExisting(slug)} style={{ cursor: 'pointer' }}>
+                <div className="ss-inv-visual">
+                  {inv.heroPhoto ? (
+                    <img
+                      src={inv.heroPhoto}
+                      className="ss-inv-photo"
+                      style={{ objectPosition: `${inv.heroPhotoX ?? 50}% ${inv.heroPhotoY ?? 50}%` }}
+                      alt=""
+                    />
+                  ) : (
+                    <div className="ss-inv-visual-empty"><span>사진 없음</span></div>
+                  )}
+                </div>
+                <div className="ss-inv-body">
+                  <span className="ss-inv-names">
+                    {inv.groomName && inv.brideName ? `${inv.groomName} & ${inv.brideName}` : slug}
+                  </span>
+                  {inv.date && <span className="ss-inv-date">{inv.date}</span>}
+                  <span className="ss-inv-slug">/{slug}</span>
+                </div>
+                <button
+                  className="ss-inv-del"
+                  onClick={(e) => { e.stopPropagation(); handleDeleteSlug(slug); }}
+                  title="삭제"
+                >
+                  <Trash2 size={11} />
                 </button>
-                {AI_PRESETS.length > 0 && (
-                  <>
-                    <div className="tmpl-section-label">템플릿 선택</div>
-                    <div className="tmpl-cards">
-                      {AI_PRESETS.map((preset) => (
-                        <a
-                          key={preset.id}
-                          href={`/template-preview/${preset.id}`}
-                          className="tmpl-card"
-                          onClick={(e) => {
-                            if (!e.ctrlKey && !e.metaKey) {
-                              e.preventDefault();
-                              navigate(`/template-preview/${preset.id}`);
-                            }
-                          }}
-                        >
-                          <div className="tmpl-card-bar" style={{
-                            background: `linear-gradient(to right, ${preset.previewColors[0]} 0%, ${preset.previewColors[1]} 55%, ${preset.previewColors[2]} 100%)`,
-                          }} />
-                          <div className="tmpl-card-info">
-                            <span className="tmpl-card-name">{preset.emoji} {preset.name}</span>
-                            <span className="tmpl-card-desc">{preset.description}</span>
-                            {preset.tags && (
-                              <div className="tmpl-card-tags">
-                                {preset.tags.map((tag, i) => (
-                                  <span key={i} className="tmpl-card-tag">{tag}</span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          <span className="tmpl-card-arrow">미리보기 →</span>
-                        </a>
-                      ))}
-                    </div>
-                  </>
-                )}
               </div>
-            </div>
+            ))}
           </div>
-        )}
+          {showStartScreen.some(({ data: inv }) => !inv.isPaid) && showStartScreen.length > 0 && (
+            <p className="ss-notice">결제하지 않은 청첩장은 1주일이 지나면 자동으로 삭제됩니다.</p>
+          )}
+        </section>
 
-        {previewPreset && (
-          <div className="tmpl-preview-root">
-            <div className="tmpl-preview-bar">
-              <button className="tmpl-preview-back" onClick={() => { setPreviewPreset(null); setShowTemplateModal(true); }}>
-                ← 목록
-              </button>
-              <span className="tmpl-preview-name">{previewPreset.emoji} {previewPreset.name}</span>
-              <button className="tmpl-preview-apply" onClick={() => handleApplyTemplate(previewPreset)}>
-                이 템플릿으로 제작하기
-              </button>
-            </div>
-            <div className="tmpl-preview-notice">
-              샘플 사진과 정보로 미리 보는 화면입니다. 제작하기를 누르면 빈 청첩장으로 시작합니다.
-            </div>
-            <div className="tmpl-preview-scroll">
-              {loadingSample ? (
-                <div className="tmpl-preview-loading">
-                  <div className="tmpl-spinner" />
-                  <span>샘플 불러오는 중...</span>
+        {/* 템플릿 선택 */}
+        <section className="ss-section">
+          <h2 className="ss-section-title">템플릿 선택</h2>
+          <p className="ss-section-sub">마음에 드는 디자인을 미리 보고 시작하세요</p>
+          <div className="ss-tmpl-grid">
+            <button className="ss-tmpl-card ss-tmpl-blank" onClick={handleStartNew}>
+              <div className="ss-tmpl-visual ss-tmpl-visual-blank">
+                <span className="ss-tmpl-blank-plus">+</span>
+                <span className="ss-tmpl-blank-label">빈 청첩장</span>
+              </div>
+              <div className="ss-tmpl-body">
+                <span className="ss-tmpl-name">직접 꾸미기</span>
+                <span className="ss-tmpl-desc">처음부터 자유롭게 만들기</span>
+              </div>
+            </button>
+            {AI_PRESETS.map((preset) => (
+              <a
+                key={preset.id}
+                href={`/template-preview/${preset.id}`}
+                className="ss-tmpl-card"
+                onClick={(e) => {
+                  if (!e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    navigate(`/template-preview/${preset.id}`);
+                  }
+                }}
+              >
+                <div
+                  className="ss-tmpl-visual"
+                  style={{
+                    background: `linear-gradient(160deg, ${preset.previewColors[0]} 0%, ${preset.previewColors[1]} 55%, ${preset.previewColors[2]} 100%)`,
+                  }}
+                >
+                  <span className="ss-tmpl-emoji">{preset.emoji}</span>
                 </div>
-              ) : (() => {
-                const s = sampleData;
-                const base = applyPreset(previewPreset);
-                const previewData: InvitationData = s ? {
-                  ...base,
-                  groomName: s.groomName,
-                  brideName: s.brideName,
-                  date: s.date,
-                  time: s.time,
-                  weddingDateISO: s.weddingDateISO,
-                  heroPhoto: (previewPreset.sampleHeroFromGallery !== undefined && s.photos?.[previewPreset.sampleHeroFromGallery])
-                    ? s.photos[previewPreset.sampleHeroFromGallery]
-                    : s.heroPhoto || '',
-                  heroPhotoX: previewPreset.sampleHeroFromGallery !== undefined ? 50 : s.heroPhotoX,
-                  heroPhotoY: previewPreset.sampleHeroFromGallery !== undefined ? 50 : s.heroPhotoY,
-                  heroPhoto2: s.heroPhoto2 || '',
-                  heroPhoto2X: s.heroPhoto2X,
-                  heroPhoto2Y: s.heroPhoto2Y,
-                  photos: s.photos || [],
-                  groomPhoto: s.groomPhoto || '',
-                  bridePhoto: s.bridePhoto || '',
-                  timeline: s.timeline?.length ? s.timeline : base.timeline,
-                  parents: {
-                    groomParents: (s.parents?.groomParents || []).map(p => ({ ...p, phone: '' })),
-                    brideParents: (s.parents?.brideParents || []).map(p => ({ ...p, phone: '' })),
-                  },
-                  venueName: '세레나 웨딩홀 그랜드볼룸',
-                  venueAddress: '서울특별시 강남구 테헤란로 123',
-                  transport: {
-                    subway: '2호선 강남역 3번 출구 도보 5분',
-                    bus: '간선 140, 402번 강남역 하차',
-                    parking: '건물 지하 1~3층 (3시간 무료)',
-                  },
-                } : base;
-                const themeClass = previewData.theme ? `theme-${previewData.theme}` : '';
-                return (
-                  <div
-                    className={`invitation-page ${themeClass} tmpl-preview-invitation${previewPreset.accentOnText ? ' tmpl-accent-text' : ''}`}
-                    style={{
-                      ...(previewData.customBgColor ? { '--wedding-bg': previewData.customBgColor } as React.CSSProperties : {}),
-                      ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor, '--wedding-accent': previewData.customAccentColor } as React.CSSProperties : {}),
-                      fontFamily: previewData.fontFamily || undefined,
-                    }}
-                  >
-                    <ScrollRootContext.Provider value={null}>
-                      <InvitationView key={previewPreset.id} data={previewData} showOpening={true} shareEnabled={false} />
-                    </ScrollRootContext.Provider>
-                  </div>
-                );
-              })()}
-            </div>
+                <div className="ss-tmpl-body">
+                  <span className="ss-tmpl-name">{preset.name}</span>
+                  <span className="ss-tmpl-desc">{preset.description}</span>
+                </div>
+              </a>
+            ))}
           </div>
-        )}
+        </section>
       </div>
     );
   }
