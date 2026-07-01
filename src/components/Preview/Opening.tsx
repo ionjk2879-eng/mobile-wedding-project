@@ -284,7 +284,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const mainText = opening.openingText || 'We\'re getting married';
   const subText = opening.openingSubText || date;
   const colorMode = opening.openingColorMode || 'theme';
-  const gradientMode = opening.openingGradientMode || 'preset';
+  const gradientMode = opening.openingGradientMode || 'theme';
   const isThemeGradient = colorMode === 'gradient' && gradientMode === 'theme';
   const themeKey = theme || 'blush';
   const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;

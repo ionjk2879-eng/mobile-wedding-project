@@ -124,7 +124,7 @@ const OpeningSection: React.FC = () => {
               <button type="button" className={`account-style-btn ${opening.openingColorMode === 'custom' ? 'active' : ''}`} onClick={() => update({ openingColorMode: 'custom' })}>
                 <strong>단색</strong><span>원하는 색상을 직접 지정</span>
               </button>
-              <button type="button" className={`account-style-btn ${opening.openingColorMode === 'gradient' ? 'active' : ''}`} onClick={() => update({ openingColorMode: 'gradient' })}>
+              <button type="button" className={`account-style-btn ${opening.openingColorMode === 'gradient' ? 'active' : ''}`} onClick={() => update({ openingColorMode: 'gradient', openingGradientMode: opening.openingGradientMode || 'theme' })}>
                 <strong>그라데이션</strong><span>두 색상이 부드럽게 전환</span>
               </button>
             </div>
