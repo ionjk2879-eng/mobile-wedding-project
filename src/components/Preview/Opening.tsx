@@ -111,8 +111,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [typedCount, setTypedCount] = useState(0);
   const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
 
-  // 전환 스타일이 바뀔 때만 phase와 CSS 애니메이션 재시작
-  // 내용 연출(openingContentStyle) 변경 시에는 phase를 건드리지 않음
   useLayoutEffect(() => {
     const el = rootRef.current;
     if (el) {
@@ -122,26 +120,25 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       el.classList.add(styleClass);
     }
     setPhase('enter');
-  }, [opening.openingStyle]);
+  }, [opening.openingStyle, opening.openingContentStyle]);
 
   useEffect(() => {
     const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
-  }, [opening.openingStyle]);
+  }, [opening.openingStyle, opening.openingContentStyle]);
 
-  // 타이핑 모드 전환 시 리셋
   useLayoutEffect(() => {
     if (!isTyping) return;
     setTypedCount(0);
     setTypingPhase('idle');
-  }, [isTyping, opening.openingStyle]);
+  }, [isTyping, opening.openingStyle, opening.openingContentStyle]);
 
   useEffect(() => {
     if (!isTyping) return;
     const t1 = setTimeout(() => setTypingPhase('heart'), 500);
     const t2 = setTimeout(() => setTypingPhase('typing'), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isTyping, opening.openingStyle]);
+  }, [isTyping, opening.openingStyle, opening.openingContentStyle]);
 
   const mainTextRef = useRef(opening.openingText || 'We\'re getting married');
   mainTextRef.current = opening.openingText || 'We\'re getting married';
