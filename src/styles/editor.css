@@ -62,6 +62,10 @@
 /* Form controls */
 .input-with-btn { display: flex; align-items: center; gap: 8px; }
 .input-with-btn .modern-input { flex: 1; }
+.password-input-wrap { position: relative; }
+.password-input-wrap .modern-input { padding-right: 44px; }
+.password-toggle-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9CA3AF; display: flex; align-items: center; padding: 4px; transition: color 0.2s; }
+.password-toggle-btn:hover { color: #6B7280; }
 .deceased-btn { padding: 8px 14px; border-radius: 10px; font-size: 0.78rem; font-weight: 800; color: #9CA3AF; background: #F3F4F6; border: 1px solid #E5E7EB; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
 .deceased-btn:hover { background: #E5E7EB; color: #6B7280; }
 .deceased-btn.active { background: #4B5563; color: #FFFFFF; border-color: #4B5563; }

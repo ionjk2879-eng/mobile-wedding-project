@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 
 const GuestbookSection: React.FC = () => {
   const isGuestbookEnabled = useInvitationStore((s) => s.data.isGuestbookEnabled);
   const guestbookPassword = useInvitationStore((s) => s.data.guestbookPassword);
   const updateField = useInvitationStore((s) => s.updateField);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <>
@@ -18,7 +20,18 @@ const GuestbookSection: React.FC = () => {
         <>
           <div className="input-group">
             <label>관리 비밀번호</label>
-            <input type="text" value={guestbookPassword} onChange={(e) => updateField('guestbookPassword', e.target.value)} className="modern-input" placeholder="방명록 삭제 시 필요한 비밀번호" />
+            <div className="password-input-wrap">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={guestbookPassword}
+                onChange={(e) => updateField('guestbookPassword', e.target.value)}
+                className="modern-input"
+                placeholder="방명록 삭제 시 필요한 비밀번호"
+              />
+              <button type="button" className="password-toggle-btn" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}>
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
             <span className="input-hint">하객이 남긴 방명록을 삭제할 때 이 비밀번호가 필요합니다.</span>
           </div>
           <div className="rsvp-info-box">
