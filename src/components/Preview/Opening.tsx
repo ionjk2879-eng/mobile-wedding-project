@@ -46,6 +46,60 @@ const DECO_SPARKS = [
   { left: '68%', top: '30%' }, { left: '5%',  top: '80%' },
 ];
 
+const BOKEH_ITEMS = [
+  { left: '12%', top: '22%', s: 90,  o: 0.32, dur: 7.0,  d: 0.0 },
+  { left: '76%', top: '35%', s: 65,  o: 0.26, dur: 8.5,  d: 1.2 },
+  { left: '34%', top: '68%', s: 110, o: 0.22, dur: 9.2,  d: 2.5 },
+  { left: '58%', top: '14%', s: 55,  o: 0.36, dur: 6.5,  d: 3.8 },
+  { left: '88%', top: '72%', s: 80,  o: 0.28, dur: 7.8,  d: 0.8 },
+  { left: '22%', top: '82%', s: 100, o: 0.20, dur: 10.0, d: 4.2 },
+  { left: '50%', top: '48%', s: 50,  o: 0.38, dur: 6.0,  d: 1.8 },
+  { left: '8%',  top: '56%', s: 75,  o: 0.26, dur: 8.2,  d: 5.0 },
+  { left: '92%', top: '24%', s: 85,  o: 0.22, dur: 9.5,  d: 2.0 },
+  { left: '66%', top: '86%', s: 60,  o: 0.32, dur: 7.2,  d: 3.3 },
+  { left: '42%', top: '10%', s: 95,  o: 0.20, dur: 11.0, d: 6.0 },
+  { left: '18%', top: '42%', s: 45,  o: 0.42, dur: 5.8,  d: 4.5 },
+  { left: '80%', top: '58%', s: 105, o: 0.18, dur: 12.0, d: 1.5 },
+  { left: '30%', top: '28%', s: 70,  o: 0.30, dur: 7.5,  d: 7.0 },
+];
+
+const AURORA_BLOBS = [
+  { left: '5%',  top: '10%', s: 280, tx: 30,  ty: -20, o: 0.38, dur: 9.0,  d: 0.0 },
+  { left: '60%', top: '50%', s: 320, tx: -25, ty: 20,  o: 0.30, dur: 11.0, d: 2.5 },
+  { left: '35%', top: '65%', s: 240, tx: 15,  ty: -30, o: 0.34, dur: 8.5,  d: 5.0 },
+  { left: '75%', top: '5%',  s: 260, tx: -20, ty: 25,  o: 0.26, dur: 10.0, d: 3.5 },
+];
+
+const FIREFLY_ITEMS = [
+  { left: '15%', top: '75%', tx: 22,  ty: -30, tx2: -12, ty2: -55, dur: 5.5, d: 0.0 },
+  { left: '70%', top: '60%', tx: -18, ty: -25, tx2:  8,  ty2: -48, dur: 6.8, d: 1.5 },
+  { left: '35%', top: '85%', tx: 30,  ty: -20, tx2:  15, ty2: -60, dur: 5.0, d: 3.0 },
+  { left: '55%', top: '70%', tx: -22, ty: -35, tx2: -8,  ty2: -52, dur: 7.2, d: 0.8 },
+  { left: '85%', top: '80%', tx: 16,  ty: -28, tx2: -18, ty2: -45, dur: 6.0, d: 4.5 },
+  { left: '25%', top: '65%', tx: -28, ty: -22, tx2:  20, ty2: -58, dur: 5.8, d: 2.2 },
+  { left: '45%', top: '88%', tx: 24,  ty: -32, tx2: -14, ty2: -62, dur: 7.5, d: 1.0 },
+  { left: '8%',  top: '72%', tx: 18,  ty: -26, tx2:  10, ty2: -50, dur: 6.3, d: 5.5 },
+  { left: '90%', top: '65%', tx: -20, ty: -30, tx2:  6,  ty2: -55, dur: 5.2, d: 2.8 },
+  { left: '62%', top: '82%', tx: 26,  ty: -18, tx2: -16, ty2: -44, dur: 8.0, d: 3.8 },
+  { left: '32%', top: '55%', tx: -14, ty: -35, tx2:  22, ty2: -60, dur: 6.5, d: 0.5 },
+  { left: '78%', top: '75%', tx: 12,  ty: -24, tx2: -20, ty2: -48, dur: 5.5, d: 6.0 },
+];
+
+const PETAL_ITEMS = [
+  { left: '8%',  w: 7,  h: 11, r0: -15, r1:  200, dx:  25, dur: 8.0,  d: 0.0 },
+  { left: '22%', w: 9,  h: 14, r0:  20, r1: -180, dx: -30, dur: 9.5,  d: 1.8 },
+  { left: '38%', w: 6,  h: 10, r0: -30, r1:  220, dx:  18, dur: 7.5,  d: 3.5 },
+  { left: '52%', w: 10, h: 15, r0:  10, r1: -200, dx: -22, dur: 10.0, d: 0.8 },
+  { left: '67%', w: 7,  h: 11, r0: -20, r1:  180, dx:  28, dur: 8.5,  d: 5.0 },
+  { left: '80%', w: 8,  h: 13, r0:  25, r1: -160, dx: -18, dur: 9.0,  d: 2.5 },
+  { left: '92%', w: 6,  h: 10, r0: -10, r1:  240, dx:  15, dur: 7.0,  d: 4.2 },
+  { left: '15%', w: 9,  h: 14, r0:  30, r1: -190, dx: -26, dur: 11.0, d: 6.5 },
+  { left: '44%', w: 7,  h: 12, r0: -25, r1:  210, dx:  20, dur: 8.8,  d: 1.2 },
+  { left: '70%', w: 8,  h: 13, r0:  15, r1: -170, dx: -24, dur: 9.2,  d: 3.8 },
+  { left: '30%', w: 6,  h: 10, r0: -35, r1:  195, dx:  22, dur: 7.8,  d: 7.0 },
+  { left: '85%', w: 10, h: 15, r0:  20, r1: -215, dx: -16, dur: 10.5, d: 5.5 },
+];
+
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
   blush:      { bg: '#3C2B2B', text: '#F3CDCC', accent: '#D4918E' },
   champagne:  { bg: '#3B3228', text: '#E8DFD2', accent: '#C8A97E' },
@@ -324,6 +378,34 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           ))}
         </div>
       )}
+      {(decoEffect === 'bokeh' || decoEffect === 'aurora-bokeh') && (
+        <div className="op-deco-bokeh" aria-hidden="true">
+          {BOKEH_ITEMS.map((b, i) => (
+            <span key={i} className="op-bokeh" style={{ left: b.left, top: b.top, width: b.s, height: b.s, marginLeft: -b.s / 2, marginTop: -b.s / 2, '--bk-o': b.o, '--bk-dur': `${b.dur}s`, animationDelay: `${b.d}s` } as React.CSSProperties} />
+          ))}
+        </div>
+      )}
+      {(decoEffect === 'aurora' || decoEffect === 'aurora-bokeh') && (
+        <div className="op-deco-aurora" aria-hidden="true">
+          {AURORA_BLOBS.map((a, i) => (
+            <span key={i} className="op-aurora-blob" style={{ left: a.left, top: a.top, width: a.s, height: a.s, marginLeft: -a.s / 2, marginTop: -a.s / 2, '--au-o': a.o, '--au-dur': `${a.dur}s`, animationDelay: `${a.d}s`, '--au-tx': `${a.tx}px`, '--au-ty': `${a.ty}px` } as React.CSSProperties} />
+          ))}
+        </div>
+      )}
+      {(decoEffect === 'firefly' || decoEffect === 'firefly-petal') && (
+        <div className="op-deco-firefly" aria-hidden="true">
+          {FIREFLY_ITEMS.map((f, i) => (
+            <span key={i} className="op-firefly" style={{ left: f.left, top: f.top, '--ff-dur': `${f.dur}s`, animationDelay: `${f.d}s`, '--ff-tx': `${f.tx}px`, '--ff-ty': `${f.ty}px`, '--ff-tx2': `${f.tx2}px`, '--ff-ty2': `${f.ty2}px` } as React.CSSProperties} />
+          ))}
+        </div>
+      )}
+      {(decoEffect === 'petal' || decoEffect === 'firefly-petal') && (
+        <div className="op-deco-petal" aria-hidden="true">
+          {PETAL_ITEMS.map((p, i) => (
+            <span key={i} className="op-petal" style={{ left: p.left, width: p.w, height: p.h, '--pt-dur': `${p.dur}s`, animationDelay: `${p.d}s`, '--pt-r0': `${p.r0}deg`, '--pt-r1': `${p.r1}deg`, '--pt-dx': `${p.dx}px` } as React.CSSProperties} />
+          ))}
+        </div>
+      )}
 
       {displayedIsTyping ? (
         <div
@@ -331,14 +413,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}${isSwitchingContent ? ' op-body-out' : ''}`}
         >
           <div className="op-typing-inner">
-            {decoEffect === 'trace' && (
-              <div className="op-deco-trace" aria-hidden="true">
-                <span className="op-trace-top" />
-                <span className="op-trace-right" />
-                <span className="op-trace-bottom" />
-                <span className="op-trace-left" />
-              </div>
-            )}
             <div className={`op-typing-heart${typingPhase !== 'idle' ? ' visible' : ''}`}>
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34, display: 'block' }}>
                 <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>

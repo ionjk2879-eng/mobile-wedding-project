@@ -249,18 +249,23 @@ const OpeningSection: React.FC = () => {
 
           <div className="input-group">
             <label>배경 불투명도 ({Math.round(opening.openingBgOpacity * 100)}%)</label>
-            <input type="range" min="0.3" max="1" step="0.05" value={opening.openingBgOpacity} onChange={(e) => update({ openingBgOpacity: parseFloat(e.target.value) })} style={{ width: '100%' }} />
+            <input type="range" min="0.3" max="1" step="0.01" value={opening.openingBgOpacity} onChange={(e) => update({ openingBgOpacity: parseFloat(e.target.value) })} style={{ width: '100%' }} />
           </div>
 
           <div className="input-group">
             <label>장식 효과</label>
             <div className="account-style-grid">
               {([
-                { key: 'none'    as const, name: '없음',       desc: '추가 장식 없이 깔끔하게' },
-                { key: 'trace'   as const, name: '선 연결',     desc: '흰 선이 사각형을 그리며 연결' },
-                { key: 'dots'    as const, name: '떠다니는 점', desc: '작은 점들이 은은하게 부유' },
-                { key: 'ripple'  as const, name: '원형 파동',   desc: '중앙에서 원형 파동이 퍼져나감' },
-                { key: 'sparkle' as const, name: '반짝이',      desc: '✦ 별 입자가 감성적으로 반짝임' },
+                { key: 'none'          as const, name: '없음',         desc: '추가 장식 없이 깔끔하게' },
+                { key: 'dots'          as const, name: '떠다니는 점',   desc: '작은 점들이 은은하게 부유' },
+                { key: 'ripple'        as const, name: '원형 파동',     desc: '중앙에서 원형 파동이 퍼져나감' },
+                { key: 'sparkle'       as const, name: '반짝이',        desc: '✦ 별 입자가 감성적으로 반짝임' },
+                { key: 'bokeh'         as const, name: '빛망울',        desc: '사진 bokeh처럼 은은한 빛 입자' },
+                { key: 'aurora'        as const, name: '오로라',        desc: '빛이 부드럽게 번지는 오로라' },
+                { key: 'firefly'       as const, name: '반딧불',        desc: '작은 불빛이 유기적으로 유영' },
+                { key: 'petal'         as const, name: '꽃비',          desc: '꽃잎이 하늘에서 천천히 낙하' },
+                { key: 'aurora-bokeh'  as const, name: '오로라+빛망울', desc: '오로라 위로 빛망울이 떠오름' },
+                { key: 'firefly-petal' as const, name: '반딧불+꽃비',   desc: '꽃잎 낙하와 반딧불이 공존' },
               ]).map(e => (
                 <button key={e.key} type="button"
                   className={`account-style-btn ${(opening.openingDecoEffect || 'none') === e.key ? 'active' : ''}`}

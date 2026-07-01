@@ -662,14 +662,50 @@
 /* === Opening deco effects === */
 /* trace: 사각 선 연결 — op-body / op-typing-inner 기준 상대 위치 */
 .op-typing-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 32px 28px; }
-.op-deco-trace { position: absolute; inset: -6px; pointer-events: none; z-index: 0; }
-.op-trace-top, .op-trace-right, .op-trace-bottom, .op-trace-left { position: absolute; background: var(--op-accent); opacity: 0.5; }
-.op-trace-top    { top: 0; left: 0; height: 1px; width: 0; animation: op-trace-w 0.7s cubic-bezier(0.22,1,0.36,1) 0.5s both; }
-.op-trace-right  { top: 0; right: 0; width: 1px; height: 0; animation: op-trace-h 0.7s cubic-bezier(0.22,1,0.36,1) 1.2s both; }
-.op-trace-bottom { bottom: 0; right: 0; height: 1px; width: 0; animation: op-trace-w 0.7s cubic-bezier(0.22,1,0.36,1) 1.9s both; }
-.op-trace-left   { bottom: 0; left: 0; width: 1px; height: 0; animation: op-trace-h 0.7s cubic-bezier(0.22,1,0.36,1) 2.6s both; }
-@keyframes op-trace-w { from { width: 0; } to { width: 100%; } }
-@keyframes op-trace-h { from { height: 0; } to { height: 100%; } }
+
+/* bokeh: 빛망울 */
+.op-deco-bokeh { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.op-bokeh { position: absolute; border-radius: 50%; background: radial-gradient(circle, var(--op-accent) 0%, var(--op-accent) 15%, transparent 70%); filter: blur(3px); opacity: 0; animation: op-bokeh-rise var(--bk-dur, 7s) ease-in-out infinite both; }
+@keyframes op-bokeh-rise {
+  0%   { opacity: 0; transform: translateY(0) scale(0.85); }
+  20%  { opacity: var(--bk-o, 0.30); }
+  70%  { opacity: calc(var(--bk-o, 0.30) * 0.85); transform: translateY(-35px) scale(1.06); }
+  100% { opacity: 0; transform: translateY(-55px) scale(1.12); }
+}
+
+/* aurora: 오로라 */
+.op-deco-aurora { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.op-aurora-blob { position: absolute; border-radius: 50%; background: radial-gradient(circle, var(--op-accent) 0%, var(--op-accent) 10%, transparent 65%); filter: blur(22px); opacity: 0; animation: op-aurora-drift var(--au-dur, 9s) ease-in-out infinite both; }
+@keyframes op-aurora-drift {
+  0%   { opacity: 0; transform: translate(0, 0); }
+  25%  { opacity: var(--au-o, 0.30); }
+  55%  { transform: translate(var(--au-tx, 20px), var(--au-ty, -15px)); opacity: var(--au-o, 0.30); }
+  80%  { opacity: calc(var(--au-o, 0.30) * 0.7); }
+  100% { opacity: 0; transform: translate(0, 0); }
+}
+
+/* firefly: 반딧불 */
+.op-deco-firefly { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.op-firefly { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--op-accent); box-shadow: 0 0 5px 2px var(--op-accent); opacity: 0; animation: op-firefly-move var(--ff-dur, 6s) ease-in-out infinite; }
+@keyframes op-firefly-move {
+  0%   { opacity: 0; transform: translate(0, 0); }
+  12%  { opacity: 0.9; }
+  38%  { opacity: 0.5; transform: translate(var(--ff-tx, 20px), var(--ff-ty, -25px)); }
+  52%  { opacity: 0; }
+  68%  { opacity: 0.85; transform: translate(var(--ff-tx2, -10px), var(--ff-ty2, -45px)); }
+  84%  { opacity: 0; }
+  100% { opacity: 0; transform: translate(0, -60px); }
+}
+
+/* petal: 꽃비 */
+.op-deco-petal { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.op-petal { position: absolute; top: -16px; border-radius: 80% 0 80% 0; background: var(--op-accent); opacity: 0; animation: op-petal-fall var(--pt-dur, 9s) ease-in infinite; }
+@keyframes op-petal-fall {
+  0%   { opacity: 0;    transform: translateX(0) translateY(-10px) rotate(var(--pt-r0, 0deg)); }
+  8%   { opacity: 0.55; }
+  92%  { opacity: 0.30; }
+  100% { opacity: 0;    transform: translateX(var(--pt-dx, 30px)) translateY(105vh) rotate(var(--pt-r1, 360deg)); }
+}
 
 /* dots: 떠다니는 점 */
 .op-deco-dots { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }

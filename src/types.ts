@@ -107,7 +107,7 @@ export interface OpeningConfig {
   openingText: string;
   openingSubText: string;
   openingFontStyle?: 'elegant' | 'simple' | 'clean';
-  openingDecoEffect?: 'none' | 'trace' | 'dots' | 'ripple' | 'sparkle';
+  openingDecoEffect?: 'none' | 'dots' | 'ripple' | 'sparkle' | 'bokeh' | 'aurora' | 'firefly' | 'petal' | 'aurora-bokeh' | 'firefly-petal';
 }
 
 export interface FeatureConfig {
