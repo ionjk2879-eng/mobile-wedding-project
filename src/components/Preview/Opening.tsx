@@ -190,9 +190,19 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     setIsSwitchingContent(false);
   }, [effectiveStyle]);
 
-  // 내용 연출만 바뀔 때: phase 재시작 (루트 클래스 토글 없음)
+  // 내용 연출만 바뀔 때: phase 재시작
+  // 원형 확산·베일 드롭은 루트 클래스 자체에 애니메이션이 묶여 있어 클래스 토글도 필요
   useLayoutEffect(() => {
     setPhase('enter');
+    if (effectiveStyle === 'circle' || effectiveStyle === 'veil') {
+      const el = rootRef.current;
+      if (el) {
+        const styleClass = `op-${effectiveStyle}`;
+        el.classList.remove(styleClass);
+        void el.offsetWidth;
+        el.classList.add(styleClass);
+      }
+    }
   }, [opening.openingContentStyle]);
 
   useEffect(() => {
