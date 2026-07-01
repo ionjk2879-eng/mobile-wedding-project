@@ -269,7 +269,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       {isBlind && Array.from({ length: 8 }, (_, i) => (
         <div key={i} className="op-blind-slice" style={{ '--slice-i': i } as React.CSSProperties} />
       ))}
-      {isInsta && <div key={`insta-${opening.openingContentStyle || 'seq'}`} className="op-insta-progress"><div className="op-insta-bar" /></div>}
+      {isInsta && <div key={`insta-${opening.openingContentStyle || 'sequential'}`} className="op-insta-progress"><div className="op-insta-bar" /></div>}
 
       {decoEffect === 'dots' && (
         <div className="op-deco-dots" aria-hidden="true">
@@ -295,7 +295,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
       {isTyping ? (
         <div
-          key={`typing-${opening.openingStyle}-${opening.openingContentStyle || 'seq'}`}
+          key={`typing-${opening.openingStyle}-${opening.openingContentStyle || 'sequential'}`}
           className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}`}
         >
           <div className="op-typing-inner">
@@ -326,7 +326,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       ) : (
         <div
           className="op-body"
-          key={`${opening.openingStyle}-${opening.openingContentStyle || 'seq'}`}
+          key={`${opening.openingStyle}-${opening.openingContentStyle || 'sequential'}`}
         >
           {decoEffect === 'trace' && (
             <div className="op-deco-trace" aria-hidden="true">
