@@ -3,6 +3,7 @@ import useInvitationStore from '../../../stores/useInvitationStore';
 import { OpeningConfig } from '../../../types';
 
 const GRADIENT_PRESETS = [
+  { id: 'forest-sunset',  from: '#1A2E18', to: '#E8907A' },  // 포레스트 → 노을
   { id: 'navy-coral',     from: '#1F2937', to: '#E8857A' },  // 네이비 → 코랄
   { id: 'black-gold',     from: '#111111', to: '#B89050' },  // 블랙 → 샴페인 골드
   { id: 'black-rose',     from: '#0D0D0D', to: '#C04870' },  // 블랙 → 딥 로즈
