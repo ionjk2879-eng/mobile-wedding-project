@@ -111,6 +111,17 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [typedCount, setTypedCount] = useState(0);
   const [typingPhase, setTypingPhase] = useState<'idle' | 'heart' | 'typing' | 'done'>('idle');
 
+  // 내용 연출 부드러운 전환용 상태 (순차↔타이핑 전환 시 250ms 페이드아웃 후 교체)
+  const [displayedIsTyping, setDisplayedIsTyping] = useState(isTyping);
+  const [isSwitchingContent, setIsSwitchingContent] = useState(false);
+  const [seqBodyKey, setSeqBodyKey] = useState(0);
+  const [typingBodyKey, setTypingBodyKey] = useState(0);
+  const contentSwitchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const mainTextRef = useRef(opening.openingText || 'We\'re getting married');
+  mainTextRef.current = opening.openingText || 'We\'re getting married';
+
+  // 전환 스타일이 바뀔 때: 루트 클래스 토글 + phase 재시작 + 내용 연출 상태 즉시 동기화
   useLayoutEffect(() => {
     const el = rootRef.current;
     if (el) {
@@ -120,28 +131,48 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       el.classList.add(styleClass);
     }
     setPhase('enter');
-  }, [opening.openingStyle, opening.openingContentStyle]);
+    clearTimeout(contentSwitchTimerRef.current);
+    setDisplayedIsTyping(isTyping);
+    setIsSwitchingContent(false);
+  }, [effectiveStyle]);
+
+  // 내용 연출만 바뀔 때: phase 재시작 (루트 클래스 토글 없음)
+  useLayoutEffect(() => {
+    setPhase('enter');
+  }, [opening.openingContentStyle]);
 
   useEffect(() => {
     const timer = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(timer);
   }, [opening.openingStyle, opening.openingContentStyle]);
 
+  // 순차↔타이핑 전환: 250ms 페이드아웃 후 새 body 마운트
+  useEffect(() => {
+    if (isTyping === displayedIsTyping) return;
+    clearTimeout(contentSwitchTimerRef.current);
+    setIsSwitchingContent(true);
+    const target = isTyping;
+    contentSwitchTimerRef.current = setTimeout(() => {
+      setDisplayedIsTyping(target);
+      setIsSwitchingContent(false);
+      if (target) setTypingBodyKey(k => k + 1);
+      else setSeqBodyKey(k => k + 1);
+    }, 250);
+    return () => clearTimeout(contentSwitchTimerRef.current!);
+  }, [isTyping, displayedIsTyping]);
+
   useLayoutEffect(() => {
     if (!isTyping) return;
     setTypedCount(0);
     setTypingPhase('idle');
-  }, [isTyping, opening.openingStyle, opening.openingContentStyle]);
+  }, [isTyping, opening.openingStyle]);
 
   useEffect(() => {
     if (!isTyping) return;
     const t1 = setTimeout(() => setTypingPhase('heart'), 500);
     const t2 = setTimeout(() => setTypingPhase('typing'), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isTyping, opening.openingStyle, opening.openingContentStyle]);
-
-  const mainTextRef = useRef(opening.openingText || 'We\'re getting married');
-  mainTextRef.current = opening.openingText || 'We\'re getting married';
+  }, [isTyping, opening.openingStyle]);
 
   useEffect(() => {
     if (typingPhase !== 'typing') return;
@@ -263,10 +294,14 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     >
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
-      {isBlind && Array.from({ length: 8 }, (_, i) => (
-        <div key={i} className="op-blind-slice" style={{ '--slice-i': i } as React.CSSProperties} />
-      ))}
-      {isInsta && <div key={`insta-${opening.openingContentStyle || 'sequential'}`} className="op-insta-progress"><div className="op-insta-bar" /></div>}
+      {isBlind && (
+        <React.Fragment key={`blind-${effectiveStyle}-${opening.openingContentStyle}`}>
+          {Array.from({ length: 8 }, (_, i) => (
+            <div key={i} className="op-blind-slice" style={{ '--slice-i': i } as React.CSSProperties} />
+          ))}
+        </React.Fragment>
+      )}
+      {isInsta && <div key={`insta-${opening.openingStyle}-${opening.openingContentStyle}`} className="op-insta-progress"><div className="op-insta-bar" /></div>}
 
       {decoEffect === 'dots' && (
         <div className="op-deco-dots" aria-hidden="true">
@@ -290,10 +325,10 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         </div>
       )}
 
-      {isTyping ? (
+      {displayedIsTyping ? (
         <div
-          key={`typing-${opening.openingStyle}-${opening.openingContentStyle || 'sequential'}`}
-          className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}`}
+          key={`typing-${effectiveStyle}-${typingBodyKey}`}
+          className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}${isSwitchingContent ? ' op-body-out' : ''}`}
         >
           <div className="op-typing-inner">
             {decoEffect === 'trace' && (
@@ -317,13 +352,13 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
             </div>
             <p className={`op-typing-names${typingPhase === 'done' ? ' visible' : ''}`}>{groom} &amp; {bride}</p>
             <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>{subText}</p>
-            <button className="op-enter op-typing-btn" onClick={handleDismiss}>초대장 열기</button>
+            <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>초대장 열기</button>
           </div>
         </div>
       ) : (
         <div
-          className="op-body"
-          key={`${opening.openingStyle}-${opening.openingContentStyle || 'sequential'}`}
+          className={`op-body${isSwitchingContent ? ' op-body-out' : ''}`}
+          key={`seq-${effectiveStyle}-${seqBodyKey}`}
         >
           {decoEffect === 'trace' && (
             <div className="op-deco-trace" aria-hidden="true">

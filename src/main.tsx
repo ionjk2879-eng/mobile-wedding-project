@@ -22,23 +22,21 @@ const Loading = () => (
 )
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route path="/auth/callback" element={<AuthCallbackPage />} />
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/editor" element={<AuthGate><App /></AuthGate>} />
-          <Route path="/edit/:slug" element={<AuthGate><App /></AuthGate>} />
-          <Route path="/manage" element={<AuthGate><ManagePage /></AuthGate>} />
-          <Route path="/template-preview/:presetId" element={<TemplatePreviewPage />} />
-          <Route path="/:slug" element={<ViewPage />} />
-          <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/superadmin" element={<AuthGate><SuperAdminPage /></AuthGate>} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/editor" element={<AuthGate><App /></AuthGate>} />
+        <Route path="/edit/:slug" element={<AuthGate><App /></AuthGate>} />
+        <Route path="/manage" element={<AuthGate><ManagePage /></AuthGate>} />
+        <Route path="/template-preview/:presetId" element={<TemplatePreviewPage />} />
+        <Route path="/:slug" element={<ViewPage />} />
+        <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/superadmin" element={<AuthGate><SuperAdminPage /></AuthGate>} />
+      </Routes>
+    </Suspense>
+  </BrowserRouter>,
 )

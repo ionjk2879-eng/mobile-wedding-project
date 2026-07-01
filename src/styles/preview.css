@@ -560,6 +560,11 @@
 .op-curtain.op-phase-exit .op-deco-bottom { transform: scaleY(1) !important; transition-delay: 0.08s !important; }
 .op-curtain.op-phase-exit { opacity: 0 !important; transition: opacity 0.4s ease 0.9s !important; }
 .op-curtain.op-phase-exit .op-body { animation: none !important; }
+.op-curtain.op-phase-exit .op-typing-body { animation: none !important; }
+/* 커튼 스타일 body 입장: opacity fade-in (순차↔타이핑 전환 시 급격한 전환 방지) */
+@keyframes op-curtain-in { from { opacity: 0; } to { opacity: 1; } }
+.op-curtain .op-body { animation: op-curtain-in 0.5s ease 0s both; }
+.op-curtain .op-typing-body { animation: op-curtain-in 0.5s ease 0s both; }
 .op-circle { clip-path: circle(0% at 50% 50%); animation: op-circle-open 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
 @keyframes op-circle-open { from { clip-path: circle(0% at 50% 50%); } to { clip-path: circle(150% at 50% 50%); } }
 /* exit: @keyframes로 명시적 from/to → animation:none의 forwards fill 소실 문제 해결 */
@@ -588,6 +593,9 @@
 .op-body { position: relative; z-index: 2; text-align: center; color: var(--op-text); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 40px; max-width: 360px; }
 .op-phase-exit .op-body { animation: op-body-exit 0.5s ease forwards; }
 @keyframes op-body-exit { to { opacity: 0; transform: translateY(-30px); } }
+/* 내용 연출 전환 시 구 body 페이드아웃 */
+.op-body-out { animation: op-body-fade-out 0.25s ease forwards !important; pointer-events: none !important; }
+@keyframes op-body-fade-out { to { opacity: 0; transform: translateY(-6px); } }
 .op-char { display: inline-block; opacity: 0; transform: translateY(12px); animation: op-char-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
 @keyframes op-char-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 .op-line { width: 0; height: 1px; background: var(--op-accent); animation: op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both; }
@@ -610,6 +618,7 @@
 @keyframes op-frame-in { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
 .op-frame.op-phase-exit { transition: opacity 0.9s ease; opacity: 0 !important; }
 .op-frame.op-phase-exit .op-body { animation: op-frame-out 0.7s ease forwards; }
+.op-frame.op-phase-exit .op-typing-inner { animation: op-frame-out 0.7s ease forwards; }
 @keyframes op-frame-out { to { opacity: 0; transform: scale(1.05); } }
 /* Frame in typing mode: apply glass effect to inner content box */
 .op-frame .op-typing-inner { background: rgba(255,255,255,0.07); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 0 0 8px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.1); padding: 48px 36px; animation: op-frame-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
@@ -619,10 +628,11 @@
 .op-insta { opacity: var(--op-opacity); }
 .op-insta.op-phase-enter { opacity: 0; animation: op-insta-in 0.5s ease 0.2s both; }
 @keyframes op-insta-in { from { opacity: 0; transform: scale(1.06); } to { opacity: var(--op-opacity); transform: scale(1); } }
-.op-insta-progress { position: absolute; top: 14px; left: 14px; right: 14px; height: 2px; background: rgba(255,255,255,0.28); border-radius: 2px; z-index: 3; }
-.op-insta-bar { height: 100%; width: 0; background: rgba(255,255,255,0.88); border-radius: 2px; animation: op-insta-fill 3s linear 0.5s forwards; }
+.op-insta-progress { position: absolute; top: 14px; left: 14px; right: 14px; height: 2px; background: transparent; border-radius: 2px; z-index: 3; }
+.op-insta-bar { height: 100%; width: 0; background: rgba(255,255,255,0.95); border-radius: 2px; animation: op-insta-fill 3s linear 0.5s forwards; }
 @keyframes op-insta-fill { from { width: 0%; } to { width: 100%; } }
-.op-root:not(.op-insta) .op-insta-progress { display: none !important; }
+/* visibility:hidden 사용 — display:none은 animation을 리셋시켜 재시작 버그 유발 */
+.op-root:not(.op-insta) .op-insta-progress { visibility: hidden !important; }
 .op-insta.op-phase-exit { animation: op-insta-exit 1.4s ease forwards !important; }
 .op-insta.op-phase-exit .op-body { animation: none !important; }
 @keyframes op-insta-exit { from { opacity: var(--op-opacity, 0.95); } to { opacity: 0; } }
@@ -644,8 +654,8 @@
 .op-typing-names.visible { opacity: 0.92; transform: translateY(0); }
 .op-typing-sub { margin: 0; font-size: 0.78em; letter-spacing: 4px; color: var(--op-text); font-family: var(--op-font); font-weight: 300; opacity: 0; transform: translateY(8px); transition: opacity 0.9s ease 0.15s, transform 0.9s ease 0.15s; }
 .op-typing-sub.visible { opacity: 0.88; transform: translateY(0); }
-.op-typing-btn { opacity: 0; pointer-events: none; transform: translateY(12px); animation: none; transition: opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s, background 0.3s, border-color 0.3s; }
-.op-typing-done .op-typing-btn { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.op-typing-btn { opacity: 0; pointer-events: none; transform: translateY(12px); animation: none !important; transition: opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s, background 0.3s, border-color 0.3s; }
+.op-typing-btn.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
 .op-typing.op-phase-exit { transition: opacity 1s ease; opacity: 0 !important; }
 .op-typing.op-phase-exit .op-typing-body { animation: op-body-exit 0.6s ease forwards; }
 
