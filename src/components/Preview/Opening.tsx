@@ -160,21 +160,45 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
+
+    // 에디터 라이브 프리뷰 패널
     const scrollEl = el.closest('.preview-content-scroll') as HTMLElement | null;
-    if (!scrollEl) return;
-    const update = () => {
-      setEditorBounds({
-        top: scrollEl.scrollTop,
-        left: 0,
-        width: scrollEl.clientWidth,
-        height: scrollEl.clientHeight,
-      });
-    };
-    update();
-    scrollEl.addEventListener('scroll', update, { passive: true });
-    const ro = new ResizeObserver(update);
-    ro.observe(scrollEl);
-    return () => { scrollEl.removeEventListener('scroll', update); ro.disconnect(); };
+    if (scrollEl) {
+      const update = () => {
+        setEditorBounds({
+          top: scrollEl.scrollTop,
+          left: 0,
+          width: scrollEl.clientWidth,
+          height: scrollEl.clientHeight,
+        });
+      };
+      update();
+      scrollEl.addEventListener('scroll', update, { passive: true });
+      const ro = new ResizeObserver(update);
+      ro.observe(scrollEl);
+      return () => { scrollEl.removeEventListener('scroll', update); ro.disconnect(); };
+    }
+
+    // 전체화면 프리뷰 — invitation-page 너비에만 맞게 제한
+    const fullEl = el.closest('.full-preview-container') as HTMLElement | null;
+    if (fullEl) {
+      const pageEl = fullEl.querySelector('.invitation-page') as HTMLElement | null;
+      const update = () => {
+        const rect = pageEl ? pageEl.getBoundingClientRect() : null;
+        setEditorBounds({
+          top: fullEl.scrollTop,
+          left: rect ? rect.left : 0,
+          width: rect ? rect.width : fullEl.clientWidth,
+          height: fullEl.clientHeight,
+        });
+      };
+      update();
+      fullEl.addEventListener('scroll', update, { passive: true });
+      const ro = new ResizeObserver(update);
+      ro.observe(fullEl);
+      if (pageEl) ro.observe(pageEl);
+      return () => { fullEl.removeEventListener('scroll', update); ro.disconnect(); };
+    }
   }, []);
 
   // openingStyle === 'typing' 은 구버전 호환용 — 새 데이터는 openingContentStyle로 판단
