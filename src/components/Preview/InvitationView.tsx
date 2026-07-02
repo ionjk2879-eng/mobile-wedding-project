@@ -56,6 +56,12 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
   const sectionOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
+
+  const daysAfterWedding = (() => {
+    if (!data.weddingDateISO) return 0;
+    return Math.floor((Date.now() - new Date(data.weddingDateISO).getTime()) / 86400000);
+  })();
+  const isAnniversaryMode = shareEnabled && daysAfterWedding > 0;
   const [previewActive, setPreviewActive] = useState(false);
   // openingDone: 한 번 dismiss 되면 true → shouldShowOpening = false → 완전히 언마운트
   const [openingDone, setOpeningDone] = useState(false);
@@ -77,6 +83,14 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     }
   }, [openingPreviewKey, showOpening]);
 
+  const effectiveSectionOrder = isAnniversaryMode
+    ? sectionOrder.filter(id => id !== 'accounts' && id !== 'rsvp')
+    : sectionOrder;
+
+  const anniversaryOpening = isAnniversaryMode && data.opening
+    ? { ...data.opening, openingEnabled: true, openingText: `D+${daysAfterWedding}`, openingSubText: '' }
+    : data.opening;
+
   const isPreviewOnly = previewActive && !data.opening?.openingEnabled;
 
   // 에디터 패널(showOpening 없음): previewActive일 때만 표시
@@ -95,7 +109,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       {shouldShowOpening && data.opening && (
         <Opening
           key={openingPreviewKey || 'static'}
-          opening={data.opening}
+          opening={anniversaryOpening!}
           groomName={data.groomName}
           brideName={data.brideName}
           date={data.date}
@@ -103,6 +117,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           autoClose={isPreviewOnly}
           onDismissed={handleOpeningDismissed}
           topOffset={openingTopOffset}
+          anniversaryMode={isAnniversaryMode}
         />
       )}
       <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />
@@ -112,7 +127,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       ) : (
         <Hero data={data} />
       )}
-      {sectionOrder.map((id, i) => {
+      {effectiveSectionOrder.map((id, i) => {
         const eff = data.scrollEffect || 'none';
         const delay = i % 2 === 0 ? 0 : 100;
         const ref = previewRefs?.[id];

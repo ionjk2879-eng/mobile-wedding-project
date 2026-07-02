@@ -136,9 +136,10 @@ interface OpeningProps {
   autoClose?: boolean;
   onDismissed?: () => void;
   topOffset?: number;
+  anniversaryMode?: boolean;
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
@@ -446,7 +447,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
             </div>
             <p className={`op-typing-names${typingPhase === 'done' ? ' visible' : ''}`}>{groom} &amp; {bride}</p>
             <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>{subText}</p>
-            <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>초대장 열기</button>
+            <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>{anniversaryMode ? '추억 보기' : '초대장 열기'}</button>
           </div>
         </div>
       ) : (
@@ -495,7 +496,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
           <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />
 
-          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both` }} onClick={handleDismiss}>초대장 열기</button>
+          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both` }} onClick={handleDismiss}>{anniversaryMode ? '추억 보기' : '초대장 열기'}</button>
         </div>
       )}
 
