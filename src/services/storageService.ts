@@ -16,8 +16,8 @@ const resizeImage = (file: File, maxSize: number, quality: number): Promise<Blob
     img.src = URL.createObjectURL(file);
   });
 
-export const uploadImage = async (file: File, _path: string): Promise<string> => {
-  const resized = await resizeImage(file, 800, 0.6);
+export const uploadImage = async (file: File, _path: string, maxSize = 800): Promise<string> => {
+  const resized = await resizeImage(file, maxSize, maxSize > 800 ? 0.82 : 0.6);
   const resizedFile = new File([resized], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
 
   const formData = new FormData();

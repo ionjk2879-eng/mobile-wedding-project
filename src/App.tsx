@@ -69,6 +69,7 @@ const App: React.FC = () => {
   // 브라우저 뒤로/앞으로 이동 시 URL ↔ 화면 동기화
   useEffect(() => {
     if (!dataReadyRef.current) return;
+    if (searchParams.get('template')) return;
     const currentShowStartScreen = showStartScreenRef.current;
     if (!urlSlug && !currentShowStartScreen) {
       // /edit/:slug → /editor 로 뒤로가기: 시작 화면 표시

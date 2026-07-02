@@ -18,7 +18,7 @@ const HeroSection: React.FC = () => {
     if (!file) return;
     setUploading(true);
     try {
-      const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`);
+      const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`, 1200);
       updateField('heroPhoto', url);
     } catch (err) {
       toast.error(getApiErrorMessage(err));
@@ -33,7 +33,7 @@ const HeroSection: React.FC = () => {
     if (!file) return;
     setUploading2(true);
     try {
-      const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`);
+      const url = await uploadImage(file, `images/${data.slug || 'temp'}/hero/${Date.now()}_${file.name}`, 1200);
       updateField('heroPhoto2', url);
     } catch (err) {
       toast.error(getApiErrorMessage(err));
