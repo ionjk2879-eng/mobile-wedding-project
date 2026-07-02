@@ -27,10 +27,35 @@ interface InvitationViewProps {
   showOpening?: boolean;
   shareEnabled?: boolean;
   openingTopOffset?: number;
+  onSectionNav?: (editorId: string) => void;
 }
 
-const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean }> = ({ id, data, refEl, shareEnabled }) => {
-  const wrap = (children: React.ReactNode) => refEl ? <div ref={refEl}>{children}</div> : <>{children}</>;
+// 미리보기 섹션 ID → 에디터 섹션 ID 매핑
+const PREVIEW_TO_EDITOR: Record<string, string> = {
+  calendar: 'datetime',
+  contacts: 'basic',
+};
+
+const NavIcon = () => (
+  <svg width="13" height="11" viewBox="0 0 13 11" fill="currentColor" aria-hidden="true">
+    <rect x="0" y="0" width="3.5" height="11" rx="1.2"/>
+    <rect x="5" y="0" width="8" height="3" rx="1.2"/>
+    <rect x="5" y="4" width="6" height="3" rx="1.2"/>
+    <rect x="5" y="8" width="4" height="3" rx="1.2"/>
+  </svg>
+);
+
+const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void }> = ({ id, data, refEl, shareEnabled, onNav }) => {
+  const wrap = (children: React.ReactNode) => (
+    <div ref={refEl} className={onNav ? 'preview-nav-section' : undefined}>
+      {onNav && (
+        <button className="preview-section-nav-btn" onClick={onNav} title="편집 섹션으로 이동" aria-label="편집 섹션으로 이동">
+          <NavIcon />
+        </button>
+      )}
+      {children}
+    </div>
+  );
 
   switch (id) {
     case 'greeting': return wrap(<Greeting data={data} />);
@@ -52,7 +77,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 
 const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav }) => {
   const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
   const sectionOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
@@ -124,7 +149,14 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />
       <MusicPlayer url={data.bgMusicUrl} />
       {previewRefs?.basic ? (
-        <div ref={previewRefs.basic}><Hero data={data} /></div>
+        <div ref={previewRefs.basic} className={onSectionNav ? 'preview-nav-section' : undefined}>
+          {onSectionNav && (
+            <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="편집 섹션으로 이동" aria-label="편집 섹션으로 이동">
+              <NavIcon />
+            </button>
+          )}
+          <Hero data={data} />
+        </div>
       ) : (
         <Hero data={data} />
       )}
@@ -132,9 +164,10 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         const eff = data.scrollEffect || 'none';
         const delay = i % 2 === 0 ? 0 : 100;
         const ref = previewRefs?.[id];
+        const editorId = PREVIEW_TO_EDITOR[id] || id;
         return (
           <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={data} refEl={ref} shareEnabled={shareEnabled} />
+            <SectionComponent id={id} data={data} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} />
           </ScrollReveal>
         );
       })}

@@ -22,11 +22,15 @@ import DateTimeSection from './sections/DateTimeSection';
 import OpeningSection from './sections/OpeningSection';
 import EndingSection from './sections/EndingSection';
 
+export interface EditorContainerHandle {
+  navigateTo: (id: string) => void;
+}
+
 interface EditorProps {
   onSectionClick?: (id: string) => void;
 }
 
-const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
+const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ onSectionClick }, ref) => {
   const sectionRefs = {
     hero: React.useRef<HTMLDivElement>(null),
     opening: React.useRef<HTMLDivElement>(null),
@@ -138,6 +142,13 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
     { id: 'order', name: '순서관리', icon: <ListOrdered size={18} />, ref: sectionRefs.order },
   ];
 
+  React.useImperativeHandle(ref, () => ({
+    navigateTo: (id: string) => {
+      const item = navItems.find(n => n.id === id);
+      if (item) scrollToSection(id, item.ref);
+    },
+  }));
+
   const sections = [
     { id: 'share', title: '청첩장 주소', icon: <Send size={20} />, content: <ShareSection /> },
     { id: 'hero', title: '메인화면', icon: <LayoutTemplate size={20} />, content: <HeroSection /> },
@@ -246,6 +257,6 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
 
     </div>
   );
-};
+});
 
 export default EditorContainer;

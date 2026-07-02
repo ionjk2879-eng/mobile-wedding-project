@@ -380,3 +380,32 @@
   .header-text-btn { padding: 7px 8px; font-size: 0.68rem; }
   .header-text-btn svg { display: none; }
 }
+
+/* ===== 미리보기 섹션 내비게이션 아이콘 ===== */
+.preview-nav-section { position: relative; }
+.preview-section-nav-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #6B7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(4px);
+}
+.preview-nav-section:hover .preview-section-nav-btn { opacity: 1; }
+.preview-section-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.97);
+  color: #374151;
+}

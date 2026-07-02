@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import EditorContainer from './components/Editor/EditorContainer';
+import EditorContainer, { EditorContainerHandle } from './components/Editor/EditorContainer';
 import InvitationView from './components/Preview/InvitationView';
 import ToastContainer from './components/Toast';
 import { ScrollRootContext } from './components/Preview/ScrollReveal';
@@ -173,6 +173,11 @@ const App: React.FC = () => {
   };
   const previewScrollRef = React.useRef<HTMLDivElement>(null);
   const fullPreviewScrollRef = React.useRef<HTMLDivElement>(null);
+  const editorRef = React.useRef<EditorContainerHandle>(null);
+
+  const handlePreviewSectionNav = React.useCallback((editorId: string) => {
+    editorRef.current?.navigateTo(editorId);
+  }, []);
 
   if (loadingData) {
     return (
@@ -301,7 +306,7 @@ const App: React.FC = () => {
 
       <main className="builder-main-container">
         <div className={`editor-panel ${mobileView === 'preview' ? 'mobile-hidden' : ''}`}>
-          <EditorContainer onSectionClick={handleSectionScroll} />
+          <EditorContainer ref={editorRef} onSectionClick={handleSectionScroll} />
         </div>
 
         <div className={`preview-panel ${mobileView === 'preview' ? 'mobile-visible' : ''}`}>
@@ -312,7 +317,7 @@ const App: React.FC = () => {
             </div>
             <div className={`preview-content-scroll theme-${data.theme || 'blush'}`} ref={previewScrollRef} style={{ fontFamily: data.fontFamily, fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
               <ScrollRootContext.Provider value={previewScrollRef}>
-                <InvitationView data={data} previewRefs={previewRefs} />
+                <InvitationView data={data} previewRefs={previewRefs} onSectionNav={handlePreviewSectionNav} />
               </ScrollRootContext.Provider>
             </div>
           </div>
