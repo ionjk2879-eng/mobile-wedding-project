@@ -140,6 +140,17 @@ interface OpeningProps {
   language?: 'ko' | 'en' | 'ja';
 }
 
+function hexLuminance(hex: string): number {
+  try {
+    const h = (hex || '').replace('#', '');
+    if (h.length !== 6) return 0;
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  } catch { return 0; }
+}
+
 const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko' }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
@@ -311,11 +322,15 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;
   const bgColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.bg : (opening.openingBgColor || '#1F2937');
 
-  const textColorMode = (colorMode === 'theme' || isThemeGradient) ? 'white' : (opening.openingTextColor || 'white');
+  // 단색 모드는 배경색 밝기로 자동 감지, 그라데이션 모드는 사용자 명시값 우선
+  const bgIsLight = colorMode === 'custom' && hexLuminance(opening.openingBgColor || '#111111') > 0.55;
+  const textColorMode = (colorMode === 'theme' || isThemeGradient)
+    ? 'white'
+    : (bgIsLight || opening.openingTextColor === 'dark') ? 'dark' : 'white';
   const isDark = textColorMode === 'dark';
   const textColor = (colorMode === 'theme' || isThemeGradient) ? 'rgba(255, 255, 255, 0.95)' : (isDark ? 'rgba(28, 20, 20, 0.90)' : '#FFFFFF');
-  const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : (isDark ? 'rgba(175, 120, 95, 0.48)' : 'rgba(255, 228, 220, 0.50)');
-  const heartColor = isDark ? 'rgba(175, 120, 95, 0.68)' : 'rgba(255, 255, 255, 0.88)';
+  const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : (isDark ? 'rgba(175, 120, 95, 0.65)' : 'rgba(255, 228, 220, 0.50)');
+  const heartColor = isDark ? 'rgba(175, 120, 95, 0.80)' : 'rgba(255, 255, 255, 0.88)';
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
