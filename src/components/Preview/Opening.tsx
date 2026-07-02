@@ -314,8 +314,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const textColorMode = (colorMode === 'theme' || isThemeGradient) ? 'white' : (opening.openingTextColor || 'white');
   const isDark = textColorMode === 'dark';
   const textColor = (colorMode === 'theme' || isThemeGradient) ? 'rgba(255, 255, 255, 0.95)' : (isDark ? 'rgba(28, 20, 20, 0.90)' : '#FFFFFF');
-  const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : (isDark ? 'rgba(28, 20, 20, 0.30)' : 'rgba(255, 228, 220, 0.50)');
-  const heartColor = isDark ? 'rgba(40, 20, 20, 0.55)' : 'rgba(255, 255, 255, 0.88)';
+  const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : (isDark ? 'rgba(175, 120, 95, 0.48)' : 'rgba(255, 228, 220, 0.50)');
+  const heartColor = isDark ? 'rgba(175, 120, 95, 0.68)' : 'rgba(255, 255, 255, 0.88)';
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
