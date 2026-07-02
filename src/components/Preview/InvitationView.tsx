@@ -118,6 +118,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           onDismissed={handleOpeningDismissed}
           topOffset={openingTopOffset}
           anniversaryMode={isAnniversaryMode}
+          language={data.language}
         />
       )}
       <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />

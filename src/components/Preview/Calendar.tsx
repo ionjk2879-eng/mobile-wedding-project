@@ -39,23 +39,34 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
     days.push(i);
   }
 
+  const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
+
   const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const monthNames = [
     'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
     'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
   ];
+  const monthNamesEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  const formatKoreanDate = () => {
+  const formatDate = () => {
+    if (isEn) return `${monthNamesEn[month]} ${date}, ${year}`;
+    if (isJa) return `${year}年${month + 1}月${date}日`;
     return `${year}년 ${month + 1}월 ${date}일`;
   };
 
-  const formatKoreanTime = () => {
+  const formatTime = () => {
     if (!data.time) return '';
     const parts = data.time.match(/(AM|PM)\s(\d+):(\d+)/);
     if (parts) {
-      const ampm = parts[1] === 'AM' ? '오전' : '오후';
       const h = parts[2];
       const m = parts[3];
+      if (isEn) return `${h}:${m} ${parts[1]}`;
+      if (isJa) {
+        const ampm = parts[1] === 'AM' ? '午前' : '午後';
+        return `${ampm}${h}時${m === '00' ? '' : m + '分'}`.trim();
+      }
+      const ampm = parts[1] === 'AM' ? '오전' : '오후';
       return `${ampm} ${h}시 ${m === '00' ? '' : m + '분'}`.trim();
     }
     return data.time;
@@ -109,16 +120,16 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
       </div>
 
       <div className="wedding-detail-info">
-        <p className="wedding-date-text">{formatKoreanDate()}</p>
-        <p className="wedding-time-text">{formatKoreanTime()}</p>
+        <p className="wedding-date-text">{formatDate()}</p>
+        <p className="wedding-time-text">{formatTime()}</p>
       </div>
 
       <div className="countdown-area">
         {isPast ? (
-          <p className="countdown-label">{data.language === 'en' ? 'The wedding has begun!' : '결혼식이 시작되었습니다!'}</p>
+          <p className="countdown-label">{isEn ? 'The wedding has begun!' : isJa ? '式が始まりました！' : '결혼식이 시작되었습니다!'}</p>
         ) : (
           <>
-            <p className="countdown-label">{data.language === 'en' ? 'Until the Wedding' : '결혼식까지 남은 시간'}</p>
+            <p className="countdown-label">{isEn ? 'Until the Wedding' : isJa ? '式まであと' : '결혼식까지 남은 시간'}</p>
             <div className="countdown-boxes">
               <div className="countdown-box">
                 <span className="countdown-unit">DAYS</span>

@@ -6,10 +6,16 @@ interface PreviewProps {
 }
 
 const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
+  const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
+  const groomLabel = isEn ? 'Groom' : isJa ? '新郎' : '신랑';
+  const brideLabel = isEn ? 'Bride' : isJa ? '新婦' : '신부';
+  const sectionSub = isEn ? 'A word from the couple' : isJa ? 'ふたりからひとこと' : '서로에게 전하는 한마디';
+
   return (
     <section className="personal-message section" style={{ fontFamily: data.fontFamily }} aria-label="신랑 신부 한마디">
       <h2>MESSAGE</h2>
-      <p className="section-sub">서로에게 전하는 한마디</p>
+      <p className="section-sub">{sectionSub}</p>
       <div className="message-container">
         <div className="message-box groom">
           <div className="msg-profile-row">
@@ -19,7 +25,7 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
               <div className="msg-profile-empty" />
             )}
             <div className="msg-content">
-              <span className="message-name">신랑 {data.groomName || '신랑'}</span>
+              <span className="message-name">{groomLabel} {data.groomName}</span>
               <p>{data.groomMessage}</p>
             </div>
           </div>
@@ -27,7 +33,7 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="message-box bride">
           <div className="msg-profile-row reverse">
             <div className="msg-content">
-              <span className="message-name">신부 {data.brideName || '신부'}</span>
+              <span className="message-name">{brideLabel} {data.brideName}</span>
               <p>{data.brideMessage}</p>
             </div>
             {data.bridePhoto ? (
@@ -48,7 +54,8 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
     && prev.data.brideMessage === next.data.brideMessage
     && prev.data.groomPhoto === next.data.groomPhoto
     && prev.data.bridePhoto === next.data.bridePhoto
-    && prev.data.fontFamily === next.data.fontFamily;
+    && prev.data.fontFamily === next.data.fontFamily
+    && prev.data.language === next.data.language;
 });
 
 export default PersonalMessage;

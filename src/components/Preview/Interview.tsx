@@ -9,19 +9,22 @@ const Interview: React.FC<PreviewProps> = React.memo(({ data }) => {
   const [open, setOpen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
 
   if (qaList.length === 0) return null;
+
+  const storyLabel = isEn ? 'Our Story' : isJa ? '二人のストーリー' : '두 사람에게 물어본 이야기';
 
   return (
     <section className="interview-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef} aria-label="인터뷰">
       <h2>INTERVIEW</h2>
-      <p className="section-sub">{isEn ? 'Our Story' : '두 사람에게 물어본 이야기'}</p>
+      <p className="section-sub">{storyLabel}</p>
 
       <button type="button" className="pf-open-btn" onClick={() => setOpen(true)}>
-        {isEn ? 'Read Interview' : '인터뷰 보기'}
+        {isEn ? 'Read Interview' : isJa ? 'インタビューを見る' : '인터뷰 보기'}
       </button>
 
-      <PreviewOverlay open={open} onClose={() => setOpen(false)} anchorRef={sectionRef} title={isEn ? 'Our Story' : '두 사람에게 물어본 이야기'}>
+      <PreviewOverlay open={open} onClose={() => setOpen(false)} anchorRef={sectionRef} title={storyLabel}>
         <div className="itv-content">
           {qaList.map((qa, index) => (
             <div key={qa.id} className="interview-qa">

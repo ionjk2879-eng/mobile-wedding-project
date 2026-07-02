@@ -72,6 +72,7 @@ const DesignSection: React.FC = () => {
           <div className="tab-group modern">
             <button className={`tab-btn ${data.language === 'ko' ? 'active' : ''}`} onClick={() => updateField('language', 'ko')}>KOREAN</button>
             <button className={`tab-btn ${data.language === 'en' ? 'active' : ''}`} onClick={() => updateField('language', 'en')}>ENGLISH</button>
+            <button className={`tab-btn ${data.language === 'ja' ? 'active' : ''}`} onClick={() => updateField('language', 'ja')}>日本語</button>
           </div>
         </div>
         <div className="input-group">

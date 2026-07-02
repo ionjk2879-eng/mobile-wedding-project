@@ -137,9 +137,10 @@ interface OpeningProps {
   onDismissed?: () => void;
   topOffset?: number;
   anniversaryMode?: boolean;
+  language?: 'ko' | 'en' | 'ja';
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko' }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
@@ -447,7 +448,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
             </div>
             <p className={`op-typing-names${typingPhase === 'done' ? ' visible' : ''}`}>{groom} &amp; {bride}</p>
             <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>{subText}</p>
-            <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>{anniversaryMode ? '추억 보기' : '초대장 열기'}</button>
+            <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
           </div>
         </div>
       ) : (
@@ -496,7 +497,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
           <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />
 
-          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both` }} onClick={handleDismiss}>{anniversaryMode ? '추억 보기' : '초대장 열기'}</button>
+          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both` }} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
         </div>
       )}
 

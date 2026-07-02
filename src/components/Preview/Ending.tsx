@@ -7,10 +7,25 @@ interface PreviewProps {
 
 const Ending: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
-  const groomName = isEn && data.en.groomName ? data.en.groomName : (data.groomName || '신랑');
-  const brideName = isEn && data.en.brideName ? data.en.brideName : (data.brideName || '신부');
-  const dateStr = isEn && data.en.date ? data.en.date : data.date;
-  const message = data.endingMessage || '저희의 새로운 시작을 함께해주셔서\n진심으로 감사합니다.';
+  const isJa = data.language === 'ja';
+  const groomName = isEn && data.en.groomName ? data.en.groomName : isJa && data.ja?.groomName ? data.ja.groomName : (data.groomName || (isJa ? '新郎' : '신랑'));
+  const brideName = isEn && data.en.brideName ? data.en.brideName : isJa && data.ja?.brideName ? data.ja.brideName : (data.brideName || (isJa ? '新婦' : '신부'));
+
+  const dateStr = (() => {
+    if (isEn) return data.en?.date || data.date;
+    if (isJa && data.weddingDateISO) {
+      const d = new Date(data.weddingDateISO);
+      if (!isNaN(d.getTime())) return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+    }
+    return data.date;
+  })();
+
+  const defaultMessage = isEn
+    ? 'Thank you for celebrating\nour new beginning with us.'
+    : isJa
+    ? '私たちの新しい出発を\n共にお祝いくださり、ありがとうございます。'
+    : '저희의 새로운 시작을 함께해주셔서\n진심으로 감사합니다.';
+  const message = data.endingMessage || defaultMessage;
   const photoPos = `${data.endingPhotoX ?? 50}% ${data.endingPhotoY ?? 50}%`;
 
   return (
@@ -39,6 +54,7 @@ const Ending: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.groomName === next.data.groomName
   && prev.data.brideName === next.data.brideName
   && prev.data.date === next.data.date
+  && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
 );
 

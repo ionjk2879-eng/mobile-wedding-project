@@ -84,6 +84,12 @@ export const initialData: InvitationData = {
     venueName: '',
     venueAddress: '',
   },
+  ja: {
+    groomName: '新郎',
+    brideName: '新婦',
+    venueName: '',
+    venueAddress: '',
+  },
 };
 
 interface InvitationStore {

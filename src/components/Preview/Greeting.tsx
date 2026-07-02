@@ -7,7 +7,8 @@ interface PreviewProps {
 
 const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
-  const content = isEn && data.en.greetingContent ? data.en.greetingContent : data.greetingContent;
+  const isJa = data.language === 'ja';
+  const content = isEn && data.en.greetingContent ? data.en.greetingContent : isJa && data.ja?.greetingContent ? data.ja.greetingContent : data.greetingContent;
 
   const groomFather = data.parents.groomParents.find(p => p.role === '아버지');
   const groomMother = data.parents.groomParents.find(p => p.role === '어머니');
@@ -37,16 +38,16 @@ const Greeting: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="family-block">
           <span className="parent-names">
             {formatParent(groomFather)}{groomFather?.name && groomMother?.name ? <> · </> : null}{formatParent(groomMother)}
-            <span className="child-label">{isEn ? 'Son' : '의 아들'}</span>
+            <span className="child-label">{isEn ? 'Son' : isJa ? 'の息子' : '의 아들'}</span>
           </span>
-          <span className="child-name">{data.groomName || '신랑'}</span>
+          <span className="child-name">{data.groomName || (isJa ? '新郎' : '신랑')}</span>
         </div>
         <div className="family-block">
           <span className="parent-names">
             {formatParent(brideFather)}{brideFather?.name && brideMother?.name ? <> · </> : null}{formatParent(brideMother)}
-            <span className="child-label">{isEn ? 'Daughter' : '의 딸'}</span>
+            <span className="child-label">{isEn ? 'Daughter' : isJa ? 'の娘' : '의 딸'}</span>
           </span>
-          <span className="child-name">{data.brideName || '신부'}</span>
+          <span className="child-name">{data.brideName || (isJa ? '新婦' : '신부')}</span>
         </div>
       </div>
 

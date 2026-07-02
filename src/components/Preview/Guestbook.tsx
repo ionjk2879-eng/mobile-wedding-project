@@ -20,6 +20,7 @@ const formatDate = (ts: string | { seconds: number }) => {
 const NoteSlider: React.FC<{
   messages: GuestMessage[];
   isEn: boolean;
+  isJa: boolean;
   label: string;
   onDelete: (id: string) => void;
   deleteTarget: string | null;
@@ -27,7 +28,7 @@ const NoteSlider: React.FC<{
   setDeleteTarget: (id: string | null) => void;
   setDeletePassword: (pw: string) => void;
   handleDelete: () => void;
-}> = ({ messages, isEn, label, onDelete, deleteTarget, deletePassword, setDeleteTarget, setDeletePassword, handleDelete }) => {
+}> = ({ messages, isEn, isJa, label, onDelete, deleteTarget, deletePassword, setDeleteTarget, setDeletePassword, handleDelete }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
   const isDragging = useRef(false);
@@ -88,7 +89,7 @@ const NoteSlider: React.FC<{
         {label}측 <span className="gb-tab-count">{messages.length}</span>
       </p>
       {messages.length === 0 ? (
-        <p className="gb-empty">{isEn ? 'No messages yet.' : '아직 메시지가 없습니다.'}</p>
+        <p className="gb-empty">{isEn ? 'No messages yet.' : isJa ? 'まだメッセージがありません。' : '아직 메시지가 없습니다.'}</p>
       ) : (
         <>
           <div
@@ -127,7 +128,7 @@ const NoteSlider: React.FC<{
                       value={deletePassword}
                       onChange={(e) => setDeletePassword(e.target.value)}
                       className="gb-del-input"
-                      placeholder={isEn ? 'Password' : '비밀번호'}
+                      placeholder={isEn ? 'Password' : isJa ? 'パスワード' : '비밀번호'}
                       autoFocus
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleDelete();
@@ -135,10 +136,10 @@ const NoteSlider: React.FC<{
                       }}
                     />
                     <button type="button" className="gb-del-confirm" onClick={handleDelete}>
-                      {isEn ? 'Delete' : '삭제'}
+                      {isEn ? 'Delete' : isJa ? '削除' : '삭제'}
                     </button>
                     <button type="button" className="gb-del-cancel" onClick={() => { setDeleteTarget(null); setDeletePassword(''); }}>
-                      {isEn ? 'Cancel' : '취소'}
+                      {isEn ? 'Cancel' : isJa ? 'キャンセル' : '취소'}
                     </button>
                   </div>
                 )}
@@ -164,6 +165,7 @@ const NoteSlider: React.FC<{
 
 const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
   const [messages, setMessages] = useState<GuestMessage[]>([]);
   const [name, setName] = useState('');
   const [content, setContent] = useState('');
@@ -191,14 +193,14 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
     if (!data.slug) return;
     if (!name.trim() || !content.trim()) return;
     if (password.length !== 4 || !/^\d{4}$/.test(password)) {
-      toast.warning(isEn ? '4-digit PIN required.' : '4자리 숫자 비밀번호를 입력해주세요.');
+      toast.warning(isEn ? '4-digit PIN required.' : isJa ? '4桁の数字を入力してください。' : '4자리 숫자 비밀번호를 입력해주세요.');
       return;
     }
     setSubmitting(true);
     try {
       await submitGuestMessage(data.slug, { name: name.trim(), content: content.trim(), password, side });
       setName(''); setContent(''); setPassword(''); setFormOpen(false);
-      toast.success(isEn ? 'Message sent!' : '메시지가 등록되었습니다.');
+      toast.success(isEn ? 'Message sent!' : isJa ? 'メッセージを送信しました。' : '메시지가 등록되었습니다.');
       fetchGuestMessages(data.slug).then(setMessages).catch(() => {});
     } catch (err) { toast.error(err instanceof Error ? err.message : '오류가 발생했습니다.'); }
     finally { setSubmitting(false); }
@@ -210,18 +212,19 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
     const ok = await deleteGuestMessage(slug, deleteTarget, deletePassword);
     if (ok) {
       setMessages(prev => prev.filter(m => m.id !== deleteTarget));
-      toast.success(isEn ? 'Deleted.' : '삭제되었습니다.');
+      toast.success(isEn ? 'Deleted.' : isJa ? '削除しました。' : '삭제되었습니다.');
     } else {
-      toast.error(isEn ? 'Wrong password.' : '비밀번호가 일치하지 않습니다.');
+      toast.error(isEn ? 'Wrong password.' : isJa ? 'パスワードが違います。' : '비밀번호가 일치하지 않습니다.');
     }
     setDeleteTarget(null); setDeletePassword('');
   };
 
-  const groomLabel = data.groomName || (isEn ? 'Groom' : '신랑');
-  const brideLabel = data.brideName || (isEn ? 'Bride' : '신부');
+  const groomLabel = data.groomName || (isEn ? 'Groom' : isJa ? '新郎' : '신랑');
+  const brideLabel = data.brideName || (isEn ? 'Bride' : isJa ? '新婦' : '신부');
 
   const sliderProps = {
     isEn,
+    isJa,
     onDelete: (id: string) => { setDeleteTarget(id); setDeletePassword(''); },
     deleteTarget,
     deletePassword,
@@ -233,15 +236,15 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
     <section className="guestbook-section section" style={{ fontFamily: data.fontFamily }} ref={sectionRef} aria-label="방명록">
       <h2>GUESTBOOK</h2>
-      <p className="section-sub">{isEn ? 'Leave a message for the couple' : '방명록'}</p>
+      <p className="section-sub">{isEn ? 'Leave a message for the couple' : isJa ? 'メッセージを残してください' : '방명록'}</p>
 
       {data.slug ? (
         <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>
-          {isEn ? 'Write a Message' : '방명록 작성하기'}
+          {isEn ? 'Write a Message' : isJa ? 'メッセージを書く' : '방명록 작성하기'}
         </button>
       ) : (
         <p className="gb-preview-notice">
-          {isEn ? 'Save your invitation first to enable the guestbook.' : '청첩장을 저장하면 방명록이 활성화됩니다.'}
+          {isEn ? 'Save your invitation first to enable the guestbook.' : isJa ? '招待状を保存するとゲストブックが有効になります。' : '청첩장을 저장하면 방명록이 활성화됩니다.'}
         </p>
       )}
 
@@ -249,31 +252,31 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
       <div className="gb-section-divider" />
       <NoteSlider messages={brideMessages} label={brideLabel} {...sliderProps} />
 
-      <PreviewOverlay open={formOpen} onClose={() => setFormOpen(false)} anchorRef={sectionRef} title={isEn ? 'Write a Message' : '축하 메시지를 남겨주세요'}>
+      <PreviewOverlay open={formOpen} onClose={() => setFormOpen(false)} anchorRef={sectionRef} title={isEn ? 'Write a Message' : isJa ? 'メッセージを書いてください' : '축하 메시지를 남겨주세요'}>
         <form onSubmit={handleSubmit}>
           <div className="pf-group">
-            <label className="pf-label">{isEn ? 'Side' : '구분'}</label>
+            <label className="pf-label">{isEn ? 'Side' : isJa ? '区分' : '구분'}</label>
             <div className="gb-side-pick">
-              <button type="button" className={`gb-side-btn ${side === 'groom' ? 'active' : ''}`} onClick={() => setSide('groom')}>{groomLabel}측</button>
-              <button type="button" className={`gb-side-btn ${side === 'bride' ? 'active' : ''}`} onClick={() => setSide('bride')}>{brideLabel}측</button>
+              <button type="button" className={`gb-side-btn ${side === 'groom' ? 'active' : ''}`} onClick={() => setSide('groom')}>{groomLabel}{isJa ? '側' : '측'}</button>
+              <button type="button" className={`gb-side-btn ${side === 'bride' ? 'active' : ''}`} onClick={() => setSide('bride')}>{brideLabel}{isJa ? '側' : '측'}</button>
             </div>
           </div>
           <div className="pf-row">
             <div className="pf-group">
-              <label className="pf-label">{isEn ? 'Name' : '이름'}</label>
-              <input type="text" className="pf-input" required value={name} onChange={(e) => setName(e.target.value)} placeholder={isEn ? 'Name' : '이름'} />
+              <label className="pf-label">{isEn ? 'Name' : isJa ? 'お名前' : '이름'}</label>
+              <input type="text" className="pf-input" required value={name} onChange={(e) => setName(e.target.value)} placeholder={isEn ? 'Name' : isJa ? 'お名前' : '이름'} />
             </div>
             <div className="pf-group">
-              <label className="pf-label">{isEn ? 'PIN' : '비밀번호'}</label>
-              <input type="password" inputMode="numeric" maxLength={4} className="pf-input" required value={password} onChange={(e) => setPassword(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder={isEn ? '4 digits' : '숫자 4자리'} />
+              <label className="pf-label">{isEn ? 'PIN' : isJa ? '暗証番号' : '비밀번호'}</label>
+              <input type="password" inputMode="numeric" maxLength={4} className="pf-input" required value={password} onChange={(e) => setPassword(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder={isEn ? '4 digits' : isJa ? '数字4桁' : '숫자 4자리'} />
             </div>
           </div>
           <div className="pf-group">
-            <label className="pf-label">{isEn ? 'Message' : '메시지'}</label>
-            <textarea className="pf-input" rows={4} required value={content} onChange={(e) => setContent(e.target.value)} placeholder={isEn ? 'Write your message...' : '축하 메시지를 작성해주세요...'} />
+            <label className="pf-label">{isEn ? 'Message' : isJa ? 'メッセージ' : '메시지'}</label>
+            <textarea className="pf-input" rows={4} required value={content} onChange={(e) => setContent(e.target.value)} placeholder={isEn ? 'Write your message...' : isJa ? 'メッセージをお書きください...' : '축하 메시지를 작성해주세요...'} />
           </div>
           <button type="submit" className="pf-submit" disabled={submitting}>
-            <Send size={16} /> {submitting ? (isEn ? 'Sending...' : '전송 중...') : (isEn ? 'Send' : '등록하기')}
+            <Send size={16} /> {submitting ? (isEn ? 'Sending...' : isJa ? '送信中...' : '전송 중...') : (isEn ? 'Send' : isJa ? '送信' : '등록하기')}
           </button>
         </form>
       </PreviewOverlay>

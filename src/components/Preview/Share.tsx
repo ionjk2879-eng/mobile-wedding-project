@@ -18,6 +18,9 @@ function ensureKakaoInit() {
 }
 
 const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }) => {
+  const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
+
   useEffect(() => {
     if (shareEnabled) ensureKakaoInit();
   }, [shareEnabled]);
@@ -27,18 +30,25 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
   const handleCopyLink = () => {
     if (!shareEnabled) return;
     navigator.clipboard.writeText(shareLink);
-    toast.success('링크가 복사되었습니다');
+    toast.success(isEn ? 'Link copied!' : isJa ? 'コピーしました' : '링크가 복사되었습니다');
   };
 
   const handleKakaoShare = () => {
     if (!shareEnabled) return;
     if (!ensureKakaoInit()) {
-      toast.error('카카오 SDK가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      toast.error(isEn ? 'Kakao SDK not loaded yet. Please try again.' : isJa ? 'Kakao SDKの読み込みが完了していません。' : '카카오 SDK가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
       return;
     }
-    const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
+    const groomFallback = isEn ? 'Groom' : isJa ? '新郎' : '신랑';
+    const brideFallback = isEn ? 'Bride' : isJa ? '新婦' : '신부';
+    const title = data.shareTitle || (isEn
+      ? `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback} Wedding`
+      : isJa
+      ? `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback} 結婚式`
+      : `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback} 결혼합니다`);
     const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
     const slug = data.slug || '';
+    const kakaoButtonLabel = isEn ? 'View Invitation' : isJa ? '招待状を見る' : '청첩장 보기';
     try {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
@@ -48,10 +58,10 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
           imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
           link: { mobileWebUrl: shareLink, webUrl: shareLink },
         },
-        buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareLink, webUrl: shareLink } }],
+        buttons: [{ title: kakaoButtonLabel, link: { mobileWebUrl: shareLink, webUrl: shareLink } }],
       });
     } catch (e: any) {
-      toast.error(`카카오 공유 오류: ${e?.message || '알 수 없는 오류'}`);
+      toast.error(`${isEn ? 'KakaoTalk share error' : isJa ? 'カカオ共有エラー' : '카카오 공유 오류'}: ${e?.message || (isEn ? 'Unknown error' : '알 수 없는 오류')}`);
     }
   };
 
@@ -61,23 +71,23 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
         <div className="share-buttons">
           <button className="share-btn kakao" onClick={handleKakaoShare}>
             <Share2 size={20} />
-            <span>카카오톡 공유하기</span>
+            <span>{isEn ? 'Share on KakaoTalk' : isJa ? 'カカオでシェア' : '카카오톡 공유하기'}</span>
           </button>
           <button className="share-btn link" onClick={handleCopyLink}>
             <Link size={20} />
-            <span>링크 복사하기</span>
+            <span>{isEn ? 'Copy Link' : isJa ? 'リンクをコピー' : '링크 복사하기'}</span>
           </button>
         </div>
       ) : (
         <div className="share-locked">
           <Lock size={20} />
-          <p className="share-locked-title">공유 기능은 유료 서비스입니다</p>
-          <p className="share-locked-desc">유료로 전환하시면<br />카카오톡 공유 및 링크 복사가 가능합니다.</p>
+          <p className="share-locked-title">{isEn ? 'Sharing is a paid feature' : isJa ? '共有は有料サービスです' : '공유 기능은 유료 서비스입니다'}</p>
+          <p className="share-locked-desc">{isEn ? 'Upgrade to share via KakaoTalk\nand copy the link.' : isJa ? '有料プランに変更すると\nカカオ共有とリンクコピーが可能です。' : '유료로 전환하시면\n카카오톡 공유 및 링크 복사가 가능합니다.'}</p>
         </div>
       )}
 
       <footer className="footer">
-        <p>Copyright &copy; 2026 {data.groomName || '신랑'} &amp; {data.brideName || '신부'}. All rights reserved.</p>
+        <p>Copyright &copy; 2026 {data.groomName || (isJa ? '新郎' : '신랑')} &amp; {data.brideName || (isJa ? '新婦' : '신부')}. All rights reserved.</p>
       </footer>
 
     </section>

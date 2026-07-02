@@ -122,8 +122,9 @@ export interface FeatureConfig {
   bgMusicUrl: string;
   sectionOrder: string[];
   templateSectionOrder?: string[];
-  language: 'ko' | 'en';
+  language: 'ko' | 'en' | 'ja';
   en: Partial<InvitationData>;
+  ja?: Partial<InvitationData>;
 }
 
 export interface SharingConfig {

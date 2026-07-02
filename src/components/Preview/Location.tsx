@@ -9,8 +9,9 @@ interface PreviewProps {
 
 const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
-  const venueName = isEn && data.en.venueName ? data.en.venueName : data.venueName;
-  const venueAddress = isEn && data.en.venueAddress ? data.en.venueAddress : data.venueAddress;
+  const isJa = data.language === 'ja';
+  const venueName = isEn && data.en.venueName ? data.en.venueName : isJa && data.ja?.venueName ? data.ja.venueName : data.venueName;
+  const venueAddress = isEn && data.en.venueAddress ? data.en.venueAddress : isJa && data.ja?.venueAddress ? data.ja.venueAddress : data.venueAddress;
 
   const mapRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -78,7 +79,7 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
     <section className="location section" aria-label="오시는 길">
       <h2>LOCATION</h2>
-      <p className="section-sub">오시는 길</p>
+      <p className="section-sub">{isEn ? 'Directions' : isJa ? 'アクセス' : '오시는 길'}</p>
       {(venueName || venueAddress) && (
         <div className="location-info">
           {venueName && <h3 className="venue-name">{venueName}</h3>}
@@ -99,15 +100,15 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
 
       <div className="transport-info">
         <div className="transport-item">
-          <div className="transport-label"><Train size={18} /> {isEn ? 'Subway' : '지하철'}</div>
+          <div className="transport-label"><Train size={18} /> {isEn ? 'Subway' : isJa ? '地下鉄' : '지하철'}</div>
           <div className="transport-detail">{data.transport.subway}</div>
         </div>
         <div className="transport-item">
-          <div className="transport-label"><Bus size={18} /> {isEn ? 'Bus' : '버스'}</div>
+          <div className="transport-label"><Bus size={18} /> {isEn ? 'Bus' : isJa ? 'バス' : '버스'}</div>
           <div className="transport-detail">{data.transport.bus}</div>
         </div>
         <div className="transport-item">
-          <div className="transport-label"><Car size={18} /> {isEn ? 'Parking' : '자가용/주차'}</div>
+          <div className="transport-label"><Car size={18} /> {isEn ? 'Parking' : isJa ? '駐車場' : '자가용/주차'}</div>
           <div className="transport-detail">{data.transport.parking}</div>
         </div>
       </div>
