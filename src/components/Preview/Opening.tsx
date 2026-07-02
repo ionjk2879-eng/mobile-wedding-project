@@ -293,6 +293,17 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   const mainText = opening.openingText || 'We\'re getting married';
   const subText = opening.openingSubText || date;
+  const todayDateStr = (() => {
+    if (!anniversaryMode) return '';
+    const t = new Date();
+    const y = t.getFullYear(), m = t.getMonth(), d = t.getDate();
+    if (language === 'en') {
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      return `${months[m]} ${d}, ${y}`;
+    }
+    if (language === 'ja') return `${y}年${m + 1}月${d}日`;
+    return `${y}년 ${m + 1}월 ${d}일`;
+  })();
   const colorMode = opening.openingColorMode || 'theme';
   const gradientMode = opening.openingGradientMode || 'theme';
   const isThemeGradient = colorMode === 'gradient' && gradientMode === 'theme';
@@ -447,7 +458,10 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
               )}
             </div>
             <p className={`op-typing-names${typingPhase === 'done' ? ' visible' : ''}`}>{groom} &amp; {bride}</p>
-            <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>{subText}</p>
+            <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>
+              {subText}
+              {anniversaryMode && todayDateStr && <span style={{ display: 'block', marginTop: '0.3em', opacity: 0.75, fontSize: '0.88em' }}>{todayDateStr}</span>}
+            </p>
             <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
           </div>
         </div>
@@ -493,7 +507,10 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
             })}
           </h2>
 
-          <p className="op-sub" style={{ animation: `op-fade-up 0.6s ease ${seqSubDelay} both` }}>{subText}</p>
+          <p className="op-sub" style={{ animation: `op-fade-up 0.6s ease ${seqSubDelay} both` }}>
+            {subText}
+            {anniversaryMode && todayDateStr && <span style={{ display: 'block', marginTop: '0.3em', opacity: 0.75, fontSize: '0.88em' }}>{todayDateStr}</span>}
+          </p>
 
           <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />
 
