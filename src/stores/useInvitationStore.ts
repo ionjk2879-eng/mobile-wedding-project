@@ -48,7 +48,7 @@ export const initialData: InvitationData = {
     openingText: '',
     openingSubText: '',
   },
-  theme: 'blush',
+  theme: 'pearl',
   bgTexture: 'none',
   bgEffect: 'none',
   scrollEffect: 'none',
