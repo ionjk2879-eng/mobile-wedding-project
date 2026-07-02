@@ -87,7 +87,22 @@ const EditorContainer: React.FC<EditorProps> = ({ onSectionClick }) => {
   }, []);
 
   const toggleSection = (id: string) => {
+    const willOpen = !expandedSections[id];
     setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }));
+    setActiveSection(id);
+    if (willOpen) {
+      if (onSectionClick && id !== 'share' && id !== 'order' && id !== 'music' && id !== 'hero') {
+        onSectionClick(id);
+      }
+      const ref = sectionRefs[id as keyof typeof sectionRefs];
+      if (ref) {
+        isScrollingRef.current = true;
+        setTimeout(() => {
+          ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setTimeout(() => { isScrollingRef.current = false; }, 800);
+        }, 50);
+      }
+    }
   };
 
   const scrollToSection = (id: string, ref: React.RefObject<HTMLDivElement>) => {
