@@ -80,7 +80,7 @@ const TemplatePreviewPage: React.FC = () => {
       <div className="tmpl-preview-bar">
         <button className="tmpl-preview-back" onClick={handleClose}>← 닫기</button>
         <span className="tmpl-preview-name">{preset.emoji} {preset.name}</span>
-        <a href={`/editor?template=${preset.id}`} className="tmpl-preview-apply">이 템플릿으로 제작하기</a>
+        <a href={`/editor?template=${preset.id}`} className="tmpl-preview-apply">선택</a>
       </div>
       <div className="tmpl-preview-notice">
         샘플 사진과 정보로 미리 보는 화면입니다. 제작하기를 누르면 빈 청첩장으로 시작합니다.
