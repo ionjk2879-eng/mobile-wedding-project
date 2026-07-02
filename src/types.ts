@@ -112,6 +112,7 @@ export interface OpeningConfig {
   openingSubText: string;
   openingFontStyle?: 'elegant' | 'simple' | 'clean';
   openingDecoEffect?: 'none' | 'dots' | 'ripple' | 'sparkle' | 'bokeh' | 'aurora' | 'firefly' | 'petal' | 'aurora-bokeh' | 'firefly-petal' | 'trace';
+  openingBgPattern?: 'none' | 'grid' | 'dots' | 'wave' | 'frame';
 }
 
 export interface FeatureConfig {

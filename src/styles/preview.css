@@ -774,6 +774,46 @@
 .op-spark { position: absolute; font-size: 0.7rem; color: var(--op-accent); opacity: 0; animation: op-spark-twinkle 3.2s ease-in-out infinite; line-height: 1; }
 @keyframes op-spark-twinkle { 0%,100% { opacity: 0; transform: scale(0.5) rotate(0deg); } 30% { opacity: 0.9; transform: scale(1.2) rotate(20deg); } 60% { opacity: 0.7; transform: scale(0.9) rotate(-10deg); } 80% { opacity: 0; transform: scale(0.4) rotate(30deg); } }
 
+/* Opening Patterns — purely decorative overlays, no animation, pointer-events:none */
+.op-pattern { position: absolute; pointer-events: none; z-index: 0; }
+/* 기하학 격자 */
+.op-pattern-grid {
+  inset: 0;
+  background-image:
+    linear-gradient(var(--op-pattern-color, rgba(255,255,255,0.08)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--op-pattern-color, rgba(255,255,255,0.08)) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+/* 미세 도트 */
+.op-pattern-dots {
+  inset: 0;
+  background-image: radial-gradient(circle, var(--op-pattern-color, rgba(255,255,255,0.14)) 1.3px, transparent 1.3px);
+  background-size: 20px 20px;
+}
+/* 대각선 웨이브 */
+.op-pattern-wave {
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 16px,
+    var(--op-pattern-color, rgba(255,255,255,0.06)) 16px,
+    var(--op-pattern-color, rgba(255,255,255,0.06)) 17px
+  );
+}
+/* 이중 테두리 프레임 (luxury invitation style) */
+.op-pattern-frame {
+  inset: 22px;
+  border: 1px solid rgba(255,255,255,0.30);
+}
+.op-pattern-frame::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(255,255,255,0.12);
+  pointer-events: none;
+}
+
 /* Preview overlay popup (portal to body) */
 .pv-overlay-root { animation: pv-overlay-in 0.2s ease; }
 @keyframes pv-overlay-in { from { opacity: 0; } to { opacity: 1; } }

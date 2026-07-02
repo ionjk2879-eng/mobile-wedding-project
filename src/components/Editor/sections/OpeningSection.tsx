@@ -278,6 +278,25 @@ const OpeningSection: React.FC = () => {
           </div>
 
           <div className="input-group">
+            <label>오프닝 패턴</label>
+            <div className="account-style-grid">
+              {([
+                { key: 'none'  as const, name: '없음',       desc: '패턴 없이 깔끔한 배경' },
+                { key: 'grid'  as const, name: '기하학 격자', desc: '격자 라인의 정제되고 모던한 느낌' },
+                { key: 'dots'  as const, name: '미세 도트',   desc: '촘촘한 점 패턴, 고급스러운 질감' },
+                { key: 'wave'  as const, name: '웨이브',      desc: '사선 줄무늬, 세련된 다이내믹' },
+                { key: 'frame' as const, name: '이중 테두리', desc: '고급 초대장의 안쪽 액자 프레임' },
+              ]).map(p => (
+                <button key={p.key} type="button"
+                  className={`account-style-btn ${(opening.openingBgPattern || 'none') === p.key ? 'active' : ''}`}
+                  onClick={() => update({ openingBgPattern: p.key })}>
+                  <strong>{p.name}</strong><span>{p.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="input-group">
             <label>멘트 폰트 스타일</label>
             <div className="account-style-grid">
               {([
