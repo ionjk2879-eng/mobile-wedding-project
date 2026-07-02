@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import useAuthStore from '../stores/useAuthStore';
 import { signInWithGoogle, signOut, deleteAccount, initiateKakaoLogin, initiateNaverLogin } from '../services/auth';
 import { LogIn, LogOut, UserX } from 'lucide-react';
+import { useSiteLang, SiteLang } from '../i18n';
 
 const getProviderLabel = (uid: string) => {
   if (uid.startsWith('kakao_')) return 'Kakao';
@@ -10,10 +11,13 @@ const getProviderLabel = (uid: string) => {
   return 'Google';
 };
 
+const LANG_LABELS: Record<SiteLang, string> = { ko: 'KO', en: 'EN', ja: 'JA' };
+
 const SiteHeader: React.FC = () => {
   const { pathname } = useLocation();
   const user = useAuthStore((s) => s.user);
   const loading = useAuthStore((s) => s.loading);
+  const { lang, setLang, t } = useSiteLang();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -56,11 +60,22 @@ const SiteHeader: React.FC = () => {
       <div className="site-header-left">
         <Link to="/" className="site-logo">Sonett</Link>
         <nav className="site-nav-left">
-          <Link to="/" className={`site-nav-link ${pathname === '/' ? 'active' : ''}`}>모바일 청첩장</Link>
+          <Link to="/" className={`site-nav-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
         </nav>
       </div>
       <div className="site-header-right">
-        <Link to="/manage" className={`site-nav-link ${pathname === '/manage' ? 'active' : ''}`}>청첩장 관리</Link>
+        <Link to="/manage" className={`site-nav-link ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
+        <div className="site-lang-switcher">
+          {(['ko', 'en', 'ja'] as SiteLang[]).map((l) => (
+            <button
+              key={l}
+              className={`site-lang-btn ${lang === l ? 'active' : ''}`}
+              onClick={() => setLang(l)}
+            >
+              {LANG_LABELS[l]}
+            </button>
+          ))}
+        </div>
         <div className="site-auth" ref={menuRef}>
           {loading ? (
             <span className="site-auth-loading">...</span>
@@ -84,10 +99,10 @@ const SiteHeader: React.FC = () => {
                   </div>
                   <div className="site-auth-menu-divider" />
                   <button className="site-auth-menu-btn" onClick={() => { setMenuOpen(false); signOut(); }}>
-                    <LogOut size={14} /> 로그아웃
+                    <LogOut size={14} /> {t.site.logout}
                   </button>
                   <button className="site-auth-menu-btn danger" onClick={() => { setMenuOpen(false); handleDeleteAccount(); }}>
-                    <UserX size={14} /> 회원탈퇴
+                    <UserX size={14} /> {t.site.deleteAccount}
                   </button>
                 </div>
               )}
@@ -95,7 +110,7 @@ const SiteHeader: React.FC = () => {
           ) : (
             <div ref={loginMenuRef} style={{ position: 'relative' }}>
               <button className="site-auth-btn login" onClick={() => setLoginMenuOpen(!loginMenuOpen)}>
-                <LogIn size={14} /> 로그인
+                <LogIn size={14} /> {t.site.login}
               </button>
               {loginMenuOpen && (
                 <div className="site-auth-menu" style={{ minWidth: '200px' }}>
@@ -103,19 +118,19 @@ const SiteHeader: React.FC = () => {
                     <span style={{ width: 16, height: 16, background: '#FEE500', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M10 2C5.03 2 1 5.13 1 8.97c0 2.48 1.65 4.66 4.13 5.88-.18.67-.66 2.42-.75 2.8-.12.47.17.46.36.34.15-.1 2.37-1.61 3.33-2.27.3.04.61.06.93.06 4.97 0 9-3.13 9-6.97C19 5.13 14.97 2 10 2Z" fill="#191919"/></svg>
                     </span>
-                    카카오로 로그인
+                    {t.site.loginWithKakao}
                   </button>
                   <button className="site-auth-menu-btn" onClick={() => { setLoginMenuOpen(false); initiateNaverLogin(pathname); }} style={{ gap: '10px' }}>
                     <span style={{ width: 16, height: 16, background: '#03C75A', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M13.56 10.7 6.15 3H3v14h3.44V9.3L13.85 17H17V3h-3.44v7.7Z" fill="white"/></svg>
                     </span>
-                    네이버로 로그인
+                    {t.site.loginWithNaver}
                   </button>
                   <button className="site-auth-menu-btn" onClick={() => { setLoginMenuOpen(false); signInWithGoogle(); }} style={{ gap: '10px' }}>
                     <span style={{ width: 16, height: 16, background: '#4285F4', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M19.6 10.23c0-.68-.06-1.36-.17-2.01H10v3.8h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.73 2.98-4.3 2.98-7.31Z" fill="white"/><path d="M10 20c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.04.95-3.38.95-2.6 0-4.8-1.76-5.58-4.12H1.08v2.58A9.99 9.99 0 0 0 10 20Z" fill="white"/><path d="M4.42 11.9a6.02 6.02 0 0 1 0-3.82V5.5H1.08a10 10 0 0 0 0 8.98l3.34-2.58Z" fill="white"/><path d="M10 3.96c1.47 0 2.78.5 3.82 1.5l2.86-2.87A10 10 0 0 0 1.08 5.5l3.34 2.58c.78-2.36 2.98-4.12 5.58-4.12Z" fill="white"/></svg>
                     </span>
-                    Google로 로그인
+                    {t.site.loginWithGoogle}
                   </button>
                 </div>
               )}
@@ -308,13 +323,43 @@ const SiteHeader: React.FC = () => {
         .site-auth-btn.login:hover {
           background: #9B6A7E;
         }
+        .site-lang-switcher {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+          background: #F3F4F6;
+          border-radius: 8px;
+          padding: 3px;
+        }
+        .site-lang-btn {
+          border: none;
+          background: none;
+          border-radius: 6px;
+          padding: 4px 8px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: #9CA3AF;
+          cursor: pointer;
+          transition: all 0.15s;
+          font-family: inherit;
+          letter-spacing: 0.03em;
+        }
+        .site-lang-btn.active {
+          background: white;
+          color: #B07A8E;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .site-lang-btn:hover:not(.active) {
+          color: #6B7280;
+        }
         @media (max-width: 480px) {
           .site-header { padding: 12px 16px; }
           .site-header-left { gap: 16px; }
-          .site-header-right { gap: 12px; }
+          .site-header-right { gap: 10px; }
           .site-nav-link { font-size: 0.85rem; }
           .site-auth-btn.login { padding: 6px 12px; font-size: 0.78rem; }
           .site-auth-menu { min-width: 200px; right: -4px; }
+          .site-lang-btn { padding: 3px 6px; font-size: 0.68rem; }
         }
       `}</style>
     </header>

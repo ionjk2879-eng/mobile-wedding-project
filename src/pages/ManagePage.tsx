@@ -8,12 +8,15 @@ import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
+import { useSiteLang } from '../i18n';
 
 const SITE_ORIGIN = 'https://sonett.kr';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 const KMONG_SERVICE_URL = 'https://kmong.com'; // TODO: 실제 크몽 서비스 URL로 변경
 
 const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
+  const { t } = useSiteLang();
+  const tm = t.manage;
   const shareUrl = `${SITE_ORIGIN}/${slug}`;
   const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
   const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
@@ -26,12 +29,12 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
-    toast.success('링크가 복사되었습니다');
+    toast.success(tm.linkCopied);
   };
 
   const handleKakaoShare = () => {
     if (!window.Kakao || !window.Kakao.isInitialized()) {
-      toast.error('카카오 SDK를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      toast.error(tm.kakaoLoading);
       return;
     }
     window.Kakao.Share.sendDefault({
@@ -42,33 +45,33 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
         imageUrl: `${SITE_ORIGIN}/og/${slug}`,
         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
       },
-      buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+      buttons: [{ title: tm.viewInvitation, link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
     });
   };
 
   const handleUrlShare = () => {
     navigator.clipboard.writeText(shareUrl);
-    toast.success('URL이 복사되었습니다. 메신저로 공유해주세요.');
+    toast.success(tm.urlCopied);
   };
 
   return (
     <div className="share-modal-overlay" onClick={onClose}>
       <div className="share-modal" onClick={(e) => e.stopPropagation()}>
         <div className="share-modal-header">
-          <h3>청첩장 공유</h3>
+          <h3>{tm.shareInvitation}</h3>
           <button className="share-modal-close" onClick={onClose}><X size={20} /></button>
         </div>
         <div className="share-modal-qr">
           <QRCodeSVG value={shareUrl} size={140} level="M" bgColor="transparent" fgColor="#1F2937" className="share-qr-svg" />
-          <p className="share-modal-qr-hint">QR 코드를 스캔하면 청첩장으로 이동합니다</p>
+          <p className="share-modal-qr-hint">{tm.qrHint}</p>
         </div>
         <div className="share-modal-url">
           <input type="text" readOnly value={shareUrl} className="share-modal-url-input" />
         </div>
         <div className="share-modal-actions">
-          <button className="share-modal-btn copy" onClick={handleCopyLink}><LinkIcon size={18} /> 링크 복사</button>
-          <button className="share-modal-btn url-share" onClick={handleUrlShare}><Share2 size={18} /> URL 공유</button>
-          <button className="share-modal-btn kakao" onClick={handleKakaoShare}><Share2 size={18} /> 카카오톡</button>
+          <button className="share-modal-btn copy" onClick={handleCopyLink}><LinkIcon size={18} /> {tm.copyLink}</button>
+          <button className="share-modal-btn url-share" onClick={handleUrlShare}><Share2 size={18} /> {tm.urlShare}</button>
+          <button className="share-modal-btn kakao" onClick={handleKakaoShare}><Share2 size={18} /> {tm.kakaoShare}</button>
         </div>
       </div>
     </div>
@@ -76,6 +79,8 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
 };
 
 const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () => void }> = ({ slug, onDone, onClose }) => {
+  const { t } = useSiteLang();
+  const tm = t.manage;
   const [newSlug, setNewSlug] = useState(slug);
   const [saving, setSaving] = useState(false);
   const valid = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(newSlug) && newSlug !== slug;
@@ -85,10 +90,10 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
     setSaving(true);
     try {
       await changeSlug(slug, newSlug);
-      toast.success(`주소가 /${newSlug}로 변경되었습니다.`);
+      toast.success(tm.changeSuccess.replace('{slug}', newSlug));
       onDone();
     } catch (err: any) {
-      toast.error(err?.message || '주소 변경에 실패했습니다.');
+      toast.error(err?.message || tm.changeFailed);
     }
     setSaving(false);
   };
@@ -97,16 +102,16 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
     <div className="share-modal-overlay" onClick={onClose}>
       <div className="slug-modal" onClick={(e) => e.stopPropagation()}>
         <div className="share-modal-header">
-          <h3>주소 변경</h3>
+          <h3>{tm.changeAddress}</h3>
           <button className="share-modal-close" onClick={onClose}><X size={20} /></button>
         </div>
-        <p className="slug-modal-desc">청첩장 주소를 변경합니다. 기존 주소로는 더이상 접속할 수 없습니다.</p>
+        <p className="slug-modal-desc">{tm.changeAddressDesc}</p>
         <div className="slug-modal-current">
-          <span className="slug-modal-label">현재 주소</span>
+          <span className="slug-modal-label">{tm.currentAddress}</span>
           <span className="slug-modal-value">sonett.kr/{slug}</span>
         </div>
         <div className="slug-modal-field">
-          <span className="slug-modal-label">새 주소</span>
+          <span className="slug-modal-label">{tm.newAddress}</span>
           <div className="slug-modal-input-wrap">
             <span className="slug-modal-prefix">sonett.kr/</span>
             <input
@@ -118,13 +123,13 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
             />
           </div>
           {newSlug && !(/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(newSlug)) && (
-            <p className="slug-modal-hint error">영문 소문자, 숫자, 하이픈만 사용 가능합니다.</p>
+            <p className="slug-modal-hint error">{tm.addressHint}</p>
           )}
         </div>
         <div className="slug-modal-actions">
-          <button className="slug-modal-btn cancel" onClick={onClose}>취소</button>
+          <button className="slug-modal-btn cancel" onClick={onClose}>{tm.cancel}</button>
           <button className="slug-modal-btn confirm" disabled={!valid || saving} onClick={handleSubmit}>
-            {saving ? '변경 중...' : '변경하기'}
+            {saving ? tm.confirming : tm.confirm}
           </button>
         </div>
       </div>
@@ -133,6 +138,8 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
 };
 
 const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void }> = ({ slug, isPaid, data, onDelete, onChangeSlug }) => {
+  const { t } = useSiteLang();
+  const tm = t.manage;
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -157,19 +164,19 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
               setOpen(false);
               downloadGuestbookPdf(data)
                 .then(() => {})
-                .catch((e: Error) => toast.error(e.message || '방명록 PDF 생성에 실패했습니다.'));
+                .catch((e: Error) => toast.error(e.message || tm.guestbookPdf));
             }}>
-              <BookOpen size={14} /> 방명록 PDF
+              <BookOpen size={14} /> {tm.guestbookPdf}
             </button>
           )}
           <button className="mc-dropdown-item" onClick={() => { setOpen(false); onChangeSlug(); }}>
-            <Globe size={14} /> 주소 변경
+            <Globe size={14} /> {tm.changeUrl}
           </button>
           <a href={`/admin/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-dropdown-item" onClick={() => setOpen(false)}>
-            <ClipboardList size={14} /> 응답 확인
+            <ClipboardList size={14} /> {tm.viewResponses}
           </a>
           <button className="mc-dropdown-item danger" onClick={() => { setOpen(false); onDelete(); }}>
-            <Trash2 size={14} /> 삭제
+            <Trash2 size={14} /> {tm.delete}
           </button>
         </div>
       )}
@@ -177,15 +184,17 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
   );
 };
 
-function getExpiryInfo(data: InvitationData): { label: string; urgent: boolean } | null {
+function getExpiryInfo(data: InvitationData, expiredLabel: string): { label: string; urgent: boolean } | null {
   if (!data.expiresAt) return null;
   const diff = Math.ceil((new Date(data.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return { label: '만료', urgent: true };
+  if (diff < 0) return { label: expiredLabel, urgent: true };
   if (diff <= 30) return { label: `D-${diff}`, urgent: diff <= 3 };
   return null;
 }
 
 const ManagePage: React.FC = () => {
+  const { t } = useSiteLang();
+  const tm = t.manage;
   const [invitations, setInvitations] = useState<{ slug: string; data: InvitationData }[]>([]);
   const [loading, setLoading] = useState(true);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
@@ -203,13 +212,13 @@ const ManagePage: React.FC = () => {
   useEffect(load, []);
 
   const handleDelete = async (slug: string) => {
-    if (!confirm(`'${slug}' 청첩장을 삭제하시겠습니까?`)) return;
+    if (!confirm(`'${slug}' ${tm.delete}?`)) return;
     try {
       await deleteInvitation(slug);
-      toast.success(`'${slug}' 청첩장이 삭제되었습니다.`);
+      toast.success(`'${slug}' ${tm.deleteSuccess}`);
       load();
     } catch {
-      toast.error('삭제에 실패했습니다.');
+      toast.error(tm.deleteFailed);
     }
   };
 
@@ -221,18 +230,18 @@ const ManagePage: React.FC = () => {
       <ToastContainer />
       <main className="manage-main">
         <div className="manage-title-row">
-          <h2 className="manage-title">내 청첩장</h2>
-          <Link to="/editor" className="manage-new-btn">+ 청첩장 만들기</Link>
+          <h2 className="manage-title">{tm.myInvitations}</h2>
+          <Link to="/editor" className="manage-new-btn">{tm.newInvitation}</Link>
         </div>
         {!loading && invitations.some(i => !i.data.isPaid) && (
-          <p className="manage-notice">결제하지 않은 청첩장은 1주일이 지나면 자동으로 삭제됩니다.</p>
+          <p className="manage-notice">{tm.unpaidNotice}</p>
         )}
         {loading ? (
-          <p className="manage-empty">불러오는 중..</p>
+          <p className="manage-empty">{tm.loading}</p>
         ) : invitations.length === 0 ? (
           <div className="manage-empty">
-            <p>아직 만든 청첩장이 없습니다.</p>
-            <Link to="/editor" className="manage-cta">청첩장 만들기</Link>
+            <p>{tm.empty}</p>
+            <Link to="/editor" className="manage-cta">{tm.createFirst}</Link>
           </div>
         ) : (
           <div className="mc-grid">
@@ -249,11 +258,11 @@ const ManagePage: React.FC = () => {
                       />
                     ) : (
                       <div className="mc-thumb-empty">
-                        <span>사진 없음</span>
+                        <span>{tm.noPhoto}</span>
                       </div>
                     )}
                     <div className="mc-thumb-overlay">
-                      <span>청첩장 보기</span>
+                      <span>{tm.viewInvitation}</span>
                     </div>
                   </div>
                 </a>
@@ -270,33 +279,33 @@ const ManagePage: React.FC = () => {
                   {!data.isPaid && (
                     <div className="mc-purchase-section">
                       <a href={KMONG_SERVICE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
-                        <ShoppingCart size={13} /> 크몽에서 구매하기
+                        <ShoppingCart size={13} /> {tm.buyOnKmong}
                       </a>
                       <div className="mc-slug-guide">
-                        <span className="mc-slug-guide-text">구매 후 채팅에서 아래 주소를 알려주세요</span>
+                        <span className="mc-slug-guide-text">{tm.buyGuideText}</span>
                         <button
                           className="mc-slug-copy-btn"
                           onClick={(e) => {
                             e.stopPropagation();
                             navigator.clipboard.writeText(slug);
-                            toast.success('주소가 복사되었습니다');
+                            toast.success(tm.linkCopied);
                           }}
                         >
                           <span className="mc-slug-copy-code">sonett.kr/{slug}</span>
-                          <span className="mc-slug-copy-label">복사</span>
+                          <span className="mc-slug-copy-label">{tm.copy}</span>
                         </button>
                       </div>
                     </div>
                   )}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
-                      <Share2 size={12} /> 공유
+                      <Share2 size={12} /> {tm.share}
                     </button>
                     <Link to={`/edit/${slug}`} className="mc-action-btn mc-edit-btn">
-                      <Edit3 size={12} /> 편집
+                      <Edit3 size={12} /> {tm.edit}
                     </Link>
                     {(() => {
-                      const expiry = getExpiryInfo(data);
+                      const expiry = getExpiryInfo(data, tm.expiredLabel);
                       return expiry
                         ? <span className={`mc-expiry-badge ${expiry.urgent ? 'urgent' : ''}`}>{expiry.label}</span>
                         : <span className="mc-expiry-badge mc-expiry-empty" />;

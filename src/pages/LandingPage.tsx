@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader';
+import { useSiteLang } from '../i18n';
 
 const useScrollReveal = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -24,6 +25,8 @@ const useScrollReveal = () => {
 
 const LandingPage: React.FC = () => {
   const containerRef = useScrollReveal();
+  const { t } = useSiteLang();
+  const tl = t.landing;
 
   return (
     <div className="landing" ref={containerRef}>
@@ -33,9 +36,9 @@ const LandingPage: React.FC = () => {
       <section className="land-hero">
         <h2 className="land-hero-brand">Sonett</h2>
         <p className="land-hero-sub">MOBILE WEDDING INVITATION</p>
-        <h1 className="land-hero-title">소중한 순간을<br />영원히 간직하세요</h1>
-        <p className="land-hero-desc">세련된 모바일 청첩장을 쉽고 빠르게 만들고,<br />카카오톡으로 간편하게 공유하세요.</p>
-        <Link to="/editor" className="land-cta primary">청첩장 만들기</Link>
+        <h1 className="land-hero-title">{tl.heroTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.heroTitle.split('\n').length - 1 && <br />}</React.Fragment>)}</h1>
+        <p className="land-hero-desc">{tl.heroDesc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.heroDesc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
+        <Link to="/editor" className="land-cta primary">{tl.ctaCreate}</Link>
       </section>
 
       {/* Key Points */}
@@ -43,99 +46,99 @@ const LandingPage: React.FC = () => {
         <div className="land-points-grid">
           <div className="land-point reveal">
             <div className="land-point-num">01</div>
-            <h3>5분이면 완성</h3>
-            <p>AI 추천 디자인으로 원클릭 완성.<br />복잡한 과정 없이 바로 시작하세요.</p>
+            <h3>{tl.point1Title}</h3>
+            <p>{tl.point1Desc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.point1Desc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
           </div>
           <div className="land-point reveal" style={{ transitionDelay: '0.1s' }}>
             <div className="land-point-num">02</div>
-            <h3>무제한 수정</h3>
-            <p>언제든 자유롭게 수정하세요.<br />저장 즉시 반영됩니다.</p>
+            <h3>{tl.point2Title}</h3>
+            <p>{tl.point2Desc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.point2Desc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
           </div>
           <div className="land-point reveal" style={{ transitionDelay: '0.2s' }}>
             <div className="land-point-num">03</div>
-            <h3>영구 보존</h3>
-            <p>결혼식이 끝나도 사라지지 않습니다.<br />소중한 추억을 영원히 간직하세요.</p>
+            <h3>{tl.point3Title}</h3>
+            <p>{tl.point3Desc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.point3Desc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
           </div>
           <div className="land-point reveal" style={{ transitionDelay: '0.3s' }}>
             <div className="land-point-num">04</div>
-            <h3>간편 공유</h3>
-            <p>카카오톡, 링크 복사로<br />하객에게 빠르게 전달하세요.</p>
+            <h3>{tl.point4Title}</h3>
+            <p>{tl.point4Desc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.point4Desc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
           </div>
         </div>
       </section>
 
       {/* How it works */}
       <section className="land-section land-steps">
-        <p className="land-section-sub reveal">HOW IT WORKS</p>
-        <h2 className="land-section-title reveal">3단계로 완성하는 청첩장</h2>
+        <p className="land-section-sub reveal">{tl.howItWorksLabel}</p>
+        <h2 className="land-section-title reveal">{tl.howItWorksTitle}</h2>
 
         <div className="land-steps-list">
           <div className="land-step reveal">
             <div className="land-step-badge">Step 1</div>
-            <h3>디자인 선택</h3>
-            <p>9가지 메인 스타일과 17가지 테마 컬러 중<br />원하는 조합을 골라보세요.<br />AI 추천 프리셋으로 한 번에 적용할 수도 있습니다.</p>
+            <h3>{tl.step1Title}</h3>
+            <p>{tl.step1Desc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.step1Desc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
           </div>
           <div className="land-step-divider reveal" />
           <div className="land-step reveal" style={{ transitionDelay: '0.15s' }}>
             <div className="land-step-badge">Step 2</div>
-            <h3>내용 입력</h3>
-            <p>이름, 날짜, 장소, 사진, 인사말 등<br />청첩장에 들어갈 정보를 채워주세요.<br />실시간 미리보기로 바로 확인할 수 있습니다.</p>
+            <h3>{tl.step2Title}</h3>
+            <p>{tl.step2Desc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.step2Desc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
           </div>
           <div className="land-step-divider reveal" />
           <div className="land-step reveal" style={{ transitionDelay: '0.3s' }}>
             <div className="land-step-badge">Step 3</div>
-            <h3>저장 & 공유</h3>
-            <p>저장하면 고유 주소가 생성됩니다.<br />카카오톡이나 링크로 하객에게 공유하세요.<br />언제든 수정하고 다시 공유할 수 있습니다.</p>
+            <h3>{tl.step3Title}</h3>
+            <p>{tl.step3Desc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.step3Desc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
           </div>
         </div>
       </section>
 
       {/* Features */}
       <section className="land-section land-features">
-        <p className="land-section-sub reveal">FEATURES</p>
-        <h2 className="land-section-title reveal">필요한 기능, 전부 담았습니다</h2>
+        <p className="land-section-sub reveal">{tl.featuresLabel}</p>
+        <h2 className="land-section-title reveal">{tl.featuresTitle}</h2>
 
         <div className="land-features-grid">
           <div className="land-feature reveal">
-            <h4>참석 여부 (RSVP)</h4>
-            <p>하객이 직접 참석 여부를 응답할 수 있습니다. 관리 페이지에서 한눈에 확인하세요.</p>
+            <h4>{tl.feat1Title}</h4>
+            <p>{tl.feat1Desc}</p>
           </div>
           <div className="land-feature reveal" style={{ transitionDelay: '0.1s' }}>
-            <h4>방명록</h4>
-            <p>하객들이 축하 메시지를 남길 수 있는 방명록. 비밀번호로 관리됩니다.</p>
+            <h4>{tl.feat2Title}</h4>
+            <p>{tl.feat2Desc}</p>
           </div>
           <div className="land-feature reveal" style={{ transitionDelay: '0.2s' }}>
-            <h4>포토 갤러리</h4>
-            <p>웨딩 사진을 슬라이드 또는 그리드로 보여주세요. 다양한 레이아웃을 지원합니다.</p>
+            <h4>{tl.feat3Title}</h4>
+            <p>{tl.feat3Desc}</p>
           </div>
           <div className="land-feature reveal" style={{ transitionDelay: '0.1s' }}>
-            <h4>지도 & 길안내</h4>
-            <p>카카오맵 연동으로 예식장 위치를 정확히 안내합니다. 주소 검색으로 간편 등록.</p>
+            <h4>{tl.feat4Title}</h4>
+            <p>{tl.feat4Desc}</p>
           </div>
           <div className="land-feature reveal" style={{ transitionDelay: '0.2s' }}>
-            <h4>카카오톡 공유</h4>
-            <p>카카오톡으로 청첩장을 바로 공유하세요. 제목, 설명, 이미지를 자유롭게 설정할 수 있습니다.</p>
+            <h4>{tl.feat5Title}</h4>
+            <p>{tl.feat5Desc}</p>
           </div>
           <div className="land-feature reveal" style={{ transitionDelay: '0.3s' }}>
-            <h4>축의금 계좌</h4>
-            <p>신랑, 신부 측 계좌를 등록하면 하객이 쉽게 복사하여 송금할 수 있습니다.</p>
+            <h4>{tl.feat6Title}</h4>
+            <p>{tl.feat6Desc}</p>
           </div>
         </div>
       </section>
 
       {/* Bottom CTA */}
       <section className="land-section land-bottom-cta reveal">
-        <h2>지금 바로 시작하세요</h2>
-        <p>소중한 하루를 위한 청첩장,<br />Sonett과 함께 만들어보세요.</p>
-        <Link to="/editor" className="land-cta primary large">청첩장 만들기</Link>
+        <h2>{tl.bottomCtaTitle}</h2>
+        <p>{tl.bottomCtaDesc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.bottomCtaDesc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
+        <Link to="/editor" className="land-cta primary large">{tl.ctaCreate}</Link>
       </section>
 
       {/* Footer */}
       <footer className="land-footer">
         <div className="land-footer-links">
-          <Link to="/terms">이용약관</Link>
+          <Link to="/terms">{tl.terms}</Link>
           <span>|</span>
-          <Link to="/privacy" className="land-footer-privacy">개인정보처리방침</Link>
+          <Link to="/privacy" className="land-footer-privacy">{tl.privacy}</Link>
         </div>
         <p>© 2026 Sonett. All rights reserved.</p>
       </footer>

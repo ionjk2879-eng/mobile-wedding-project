@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import AuthGate from './components/AuthGate'
+import { SiteLangProvider } from './i18n'
 import './index.css'
 
 const LandingPage = React.lazy(() => import('./pages/LandingPage'))
@@ -22,6 +23,7 @@ const Loading = () => (
 )
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
+  <SiteLangProvider>
   <BrowserRouter>
     <Suspense fallback={<Loading />}>
       <Routes>
@@ -38,5 +40,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/superadmin" element={<AuthGate><SuperAdminPage /></AuthGate>} />
       </Routes>
     </Suspense>
-  </BrowserRouter>,
+  </BrowserRouter>
+  </SiteLangProvider>,
 )

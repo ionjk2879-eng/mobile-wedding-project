@@ -11,6 +11,7 @@ import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Edit3, Eye, Save, ClipboardList, RotateCcw, Menu, X } from 'lucide-react';
 import { AI_PRESETS, applyPreset } from './data/aiPresets';
+import { useSiteLang } from './i18n';
 import './styles/effects.css';
 import './styles/builder.css';
 
@@ -18,6 +19,8 @@ const App: React.FC = () => {
   const { slug: urlSlug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useSiteLang();
+  const te = t.editor;
   const data = useInvitationStore((s) => s.data);
   const setData = useInvitationStore((s) => s.setData);
   const [isFullPreview, setIsFullPreview] = useState(false);
@@ -91,11 +94,11 @@ const App: React.FC = () => {
   };
 
   const handleReset = () => {
-    if (!confirm('현재 편집 중인 내용이 초기화됩니다. 계속하시겠습니까?')) return;
+    if (!confirm(te.resetConfirm)) return;
     setData(initialData);
     hasSavedOnceRef.current = false;
     setSaveStatus('idle');
-    toast.info('에디터가 초기화되었습니다.');
+    toast.info(te.resetDone);
   };
   const saveStatusRef = useRef(saveStatus);
   saveStatusRef.current = saveStatus;
@@ -134,14 +137,14 @@ const App: React.FC = () => {
     try {
       const available = await checkSlugAvailable(d.slug);
       if (!available) {
-        toast.warning('이미 사용 중인 주소입니다. 다른 주소를 입력해주세요.');
+        toast.warning(te.slugTaken);
         setSaveStatus('idle');
         return;
       }
       await saveInvitation(d.slug, d);
       hasSavedOnceRef.current = true;
       setSaveStatus('success');
-      toast.success(`저장 완료! 청첩장 주소: /${d.slug}`);
+      toast.success(te.saveSuccess.replace('{slug}', d.slug));
       setShowSavedPopup(true);
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (err) {
@@ -194,17 +197,17 @@ const App: React.FC = () => {
         </div>
 
         <section className="ss-section">
-          <h2 className="ss-section-title">템플릿 선택</h2>
-          <p className="ss-section-sub">마음에 드는 디자인을 미리 보고 시작하세요</p>
+          <h2 className="ss-section-title">{te.templateSelect}</h2>
+          <p className="ss-section-sub">{te.templateSelectSub}</p>
           <div className="ss-tmpl-grid">
             <button className="ss-tmpl-card ss-tmpl-blank" onClick={handleStartNew}>
               <div className="ss-tmpl-visual ss-tmpl-visual-blank">
                 <span className="ss-tmpl-blank-plus">+</span>
-                <span className="ss-tmpl-blank-label">빈 청첩장</span>
+                <span className="ss-tmpl-blank-label">{te.blankCard}</span>
               </div>
               <div className="ss-tmpl-body">
-                <span className="ss-tmpl-name">직접 꾸미기</span>
-                <span className="ss-tmpl-desc">처음부터 자유롭게 만들기</span>
+                <span className="ss-tmpl-name">{te.customizeLabel}</span>
+                <span className="ss-tmpl-desc">{te.customizeDesc}</span>
               </div>
             </button>
             {AI_PRESETS.map((preset) => (
@@ -266,7 +269,7 @@ const App: React.FC = () => {
     return (
       <div className="full-preview-container" style={{ fontFamily: data.fontFamily }} ref={fullPreviewScrollRef}>
         <ToastContainer />
-        <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>편집기로 돌아가기</button>
+        <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>{te.backToEditor}</button>
         <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
           <ScrollRootContext.Provider value={fullPreviewScrollRef}>
             <InvitationView data={data} showOpening />
@@ -288,19 +291,19 @@ const App: React.FC = () => {
         <div className="topbar-right">
           {hasSavedOnceRef.current && autoSaveStatus !== 'idle' && (
             <span className="autosave-indicator">
-              {autoSaveStatus === 'saving' ? '저장 중...' : '자동 저장됨'}
+              {autoSaveStatus === 'saving' ? te.autoSaving : te.autoSaved}
             </span>
           )}
           <button className="save-btn" disabled={saveStatus === 'saving'} onClick={() => {
-            if (!data.slug) { toast.warning('청첩장 주소를 먼저 설정해주세요.'); return; }
-            if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) { toast.warning('주소는 영문 소문자, 숫자, 하이픈만 사용 가능합니다.'); return; }
+            if (!data.slug) { toast.warning(te.noSlug); return; }
+            if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) { toast.warning(te.invalidSlug); return; }
             performSave();
           }}>
             <Save size={15} />
-            {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '완료!' : saveStatus === 'error' ? '실패' : '저장'}
+            {saveStatus === 'saving' ? te.saving : saveStatus === 'success' ? te.saved : saveStatus === 'error' ? te.saveFailed : te.save}
           </button>
-          {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> 응답 확인</a>}
-          <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> 초기화</button>
+          {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> {te.viewResponses}</a>}
+          <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> {te.reset}</button>
         </div>
       </header></div>
 
@@ -313,7 +316,7 @@ const App: React.FC = () => {
           <div className="preview-container-box">
             <div className="preview-header-bar">
               <div className="preview-label">Live Preview</div>
-              <button className="full-preview-btn-mini" onClick={() => setIsFullPreview(true)}>전체화면 보기</button>
+              <button className="full-preview-btn-mini" onClick={() => setIsFullPreview(true)}>{te.fullscreen}</button>
             </div>
             <div className={`preview-content-scroll theme-${data.theme || 'blush'}`} ref={previewScrollRef} style={{ fontFamily: data.fontFamily, fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
               <ScrollRootContext.Provider value={previewScrollRef}>
@@ -360,22 +363,22 @@ const App: React.FC = () => {
       <nav className="mobile-tab-bar" aria-label="보기 전환">
         <button className={`mobile-tab-btn ${mobileView === 'editor' ? 'active' : ''}`} onClick={() => setMobileView('editor')} aria-pressed={mobileView === 'editor'}>
           <Edit3 size={20} />
-          <span>편집</span>
+          <span>{te.tabEdit}</span>
         </button>
         <button className={`mobile-tab-btn ${mobileView === 'preview' ? 'active' : ''}`} onClick={() => setMobileView('preview')} aria-pressed={mobileView === 'preview'}>
           <Eye size={20} />
-          <span>미리보기</span>
+          <span>{te.tabPreview}</span>
         </button>
       </nav>
 
       {showSavedPopup && (
         <div className="saved-popup-overlay" onClick={() => setShowSavedPopup(false)}>
           <div className="saved-popup" onClick={(e) => e.stopPropagation()}>
-            <h3>저장 완료</h3>
-            <p>청첩장이 저장되었습니다.<br />청첩장 관리 페이지로 이동하시겠습니까?</p>
+            <h3>{te.savedTitle}</h3>
+            <p>{te.savedDesc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < te.savedDesc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
             <div className="saved-popup-actions">
-              <button className="saved-popup-btn cancel" onClick={() => setShowSavedPopup(false)}>계속 편집</button>
-              <button className="saved-popup-btn confirm" onClick={() => navigate('/manage')}>관리 페이지로 이동</button>
+              <button className="saved-popup-btn cancel" onClick={() => setShowSavedPopup(false)}>{te.continueEdit}</button>
+              <button className="saved-popup-btn confirm" onClick={() => navigate('/manage')}>{te.goToManage}</button>
             </div>
           </div>
         </div>
