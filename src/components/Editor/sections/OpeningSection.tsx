@@ -286,6 +286,7 @@ const OpeningSection: React.FC = () => {
                 { key: 'dots'  as const, name: '미세 도트',   desc: '촘촘한 점 패턴, 고급스러운 질감' },
                 { key: 'wave'  as const, name: '웨이브',      desc: '사선 줄무늬, 세련된 다이내믹' },
                 { key: 'frame' as const, name: '이중 테두리', desc: '고급 초대장의 안쪽 액자 프레임' },
+                { key: 'grain' as const, name: '그레인 노이즈', desc: '필름 입자 질감, 빈티지·아날로그 감성' },
               ]).map(p => (
                 <button key={p.key} type="button"
                   className={`account-style-btn ${(opening.openingBgPattern || 'none') === p.key ? 'active' : ''}`}
