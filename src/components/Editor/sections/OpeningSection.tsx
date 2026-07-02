@@ -278,22 +278,33 @@ const OpeningSection: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label>오프닝 패턴</label>
+            <label>오프닝 패턴 <span style={{ fontSize: '0.78em', opacity: 0.6, fontWeight: 400 }}>최대 2개 조합 가능</span></label>
             <div className="account-style-grid">
-              {([
-                { key: 'none'  as const, name: '없음',       desc: '패턴 없이 깔끔한 배경' },
-                { key: 'grid'  as const, name: '기하학 격자', desc: '격자 라인의 정제되고 모던한 느낌' },
-                { key: 'dots'  as const, name: '미세 도트',   desc: '촘촘한 점 패턴, 고급스러운 질감' },
-                { key: 'wave'  as const, name: '웨이브',      desc: '사선 줄무늬, 세련된 다이내믹' },
-                { key: 'frame' as const, name: '이중 테두리', desc: '고급 초대장의 안쪽 액자 프레임' },
-                { key: 'grain' as const, name: '그레인 노이즈', desc: '필름 입자 질감, 빈티지·아날로그 감성' },
-              ]).map(p => (
-                <button key={p.key} type="button"
-                  className={`account-style-btn ${(opening.openingBgPattern || 'none') === p.key ? 'active' : ''}`}
-                  onClick={() => update({ openingBgPattern: p.key })}>
-                  <strong>{p.name}</strong><span>{p.desc}</span>
-                </button>
-              ))}
+              {(() => {
+                const raw = opening.openingBgPattern;
+                const selected: string[] = Array.isArray(raw) ? raw.filter(p => p !== 'none') : (raw && raw !== 'none') ? [raw] : [];
+                const toggle = (key: string) => {
+                  if (key === 'none') { update({ openingBgPattern: [] }); return; }
+                  const next = selected.includes(key)
+                    ? selected.filter(p => p !== key)
+                    : selected.length >= 2 ? [selected[1], key] : [...selected, key];
+                  update({ openingBgPattern: next });
+                };
+                return ([
+                  { key: 'none',  name: '없음',        desc: '패턴 없이 깔끔한 배경' },
+                  { key: 'grid',  name: '기하학 격자',  desc: '격자 라인의 정제되고 모던한 느낌' },
+                  { key: 'dots',  name: '미세 도트',    desc: '촘촘한 점 패턴, 고급스러운 질감' },
+                  { key: 'wave',  name: '웨이브',       desc: '사선 줄무늬, 세련된 다이내믹' },
+                  { key: 'frame', name: '이중 테두리',  desc: '고급 초대장의 안쪽 액자 프레임' },
+                  { key: 'grain', name: '그레인 노이즈', desc: '필름 입자 질감, 빈티지·아날로그 감성' },
+                ] as const).map(p => (
+                  <button key={p.key} type="button"
+                    className={`account-style-btn ${p.key === 'none' ? (selected.length === 0 ? 'active' : '') : selected.includes(p.key) ? 'active' : ''}`}
+                    onClick={() => toggle(p.key)}>
+                    <strong>{p.name}</strong><span>{p.desc}</span>
+                  </button>
+                ));
+              })()}
             </div>
           </div>
 

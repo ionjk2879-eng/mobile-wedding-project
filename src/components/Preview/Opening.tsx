@@ -335,7 +335,10 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const isInsta = effectiveStyle === 'insta';
   const isBlind = effectiveStyle === 'blind';
   const decoEffect = opening.openingDecoEffect || 'none';
-  const bgPattern = opening.openingBgPattern || 'none';
+  const rawPattern = opening.openingBgPattern;
+  const bgPatterns: string[] = Array.isArray(rawPattern)
+    ? rawPattern.filter(p => p !== 'none')
+    : (rawPattern && rawPattern !== 'none') ? [rawPattern] : [];
 
   const gradientValue = colorMode === 'gradient'
     ? isThemeGradient
@@ -378,7 +381,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       className={`op-root op-${effectiveStyle} op-phase-${phase}`}
       style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', '--op-pattern-color': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)', ...bgOverride, ...editorBounds, ...(topOffset != null && !Object.keys(editorBounds).length ? { top: topOffset, height: `calc(100% - ${topOffset}px)` } : {}) } as React.CSSProperties}
     >
-      {bgPattern !== 'none' && <div className={`op-pattern op-pattern-${bgPattern}`} aria-hidden="true" />}
+      {bgPatterns.map(pat => <div key={pat} className={`op-pattern op-pattern-${pat}`} aria-hidden="true" />)}
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
       {isBlind && (
