@@ -322,8 +322,15 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;
   const bgColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.bg : (opening.openingBgColor || '#1F2937');
 
-  // 단색 모드는 배경색 밝기로 자동 감지, 그라데이션 모드는 사용자 명시값 우선
-  const bgIsLight = colorMode === 'custom' && hexLuminance(opening.openingBgColor || '#111111') > 0.55;
+  // 단색·그라데이션 모두 배경색 밝기로 자동 감지
+  const bgIsLight = (() => {
+    if (colorMode === 'custom') return hexLuminance(opening.openingBgColor || '#111111') > 0.55;
+    if (colorMode === 'gradient' && !isThemeGradient) {
+      const avg = (hexLuminance(opening.openingBgColor || '#111111') + hexLuminance(opening.openingBgColor2 || '#111111')) / 2;
+      return avg > 0.55;
+    }
+    return false;
+  })();
   const textColorMode = (colorMode === 'theme' || isThemeGradient)
     ? 'white'
     : (bgIsLight || opening.openingTextColor === 'dark') ? 'dark' : 'white';
