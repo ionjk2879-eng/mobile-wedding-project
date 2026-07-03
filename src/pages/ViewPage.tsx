@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { InvitationData } from '../types';
+import { InvitationData, GuestRelation } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
 import { ScrollRootContext } from '../components/Preview/ScrollReveal';
@@ -29,8 +29,15 @@ const PromoSection: React.FC = () => (
   </div>
 );
 
-const ViewPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+interface ViewPageProps {
+  slugOverride?: string;
+  guestName?: string;
+  guestRelation?: GuestRelation;
+}
+
+const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelation }) => {
+  const { slug: slugParam } = useParams<{ slug: string }>();
+  const slug = slugOverride || slugParam;
   const [searchParams] = useSearchParams();
   const [data, setData] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,7 +99,7 @@ const ViewPage: React.FC = () => {
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor, '--wedding-accent': data.customAccentColor } as React.CSSProperties : {}) }}>
         <ScrollRootContext.Provider value={null}>
-          <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} />
+          <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} guestName={guestName} guestRelation={guestRelation} />
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
         {showWatermark && <PromoSection />}

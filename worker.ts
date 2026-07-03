@@ -627,6 +627,18 @@ async function handleGuest(request: Request, env: Env, slug: string, code: strin
   return json({ error: 'Method not allowed' }, 405, origin);
 }
 
+// 공개(비인증) 개인화 링크 조회 — /invite/{code} 진입 시 사용
+async function handleInviteLookup(request: Request, env: Env, code: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  try {
+    const row = await env.DB.prepare('SELECT invitation_slug, name, relation FROM guests WHERE code = ?').bind(code).first();
+    if (!row) return json({ error: '유효하지 않은 링크입니다.' }, 404, origin);
+    return json({ slug: row.invitation_slug, name: row.name, relation: row.relation }, 200, origin);
+  } catch {
+    return json({ error: '조회에 실패했습니다.' }, 500, origin);
+  }
+}
+
 // --- Image Upload & Serve ---
 
 async function handleUpload(request: Request, env: Env): Promise<Response> {
@@ -879,6 +891,9 @@ export default {
       const guestMatch = pathname.match(/^\/api\/guests\/([^/]+)\/([^/]+)$/);
       if (guestMatch) return await handleGuest(request, env, guestMatch[1], guestMatch[2]);
 
+      const inviteMatch = pathname.match(/^\/api\/invite\/([^/]+)$/);
+      if (inviteMatch) return await handleInviteLookup(request, env, inviteMatch[1]);
+
       // Images from R2
       const imgMatch = pathname.match(/^\/images\/(.+)$/);
       if (imgMatch) return await handleImageGet(request, env, imgMatch[1]);
@@ -906,7 +921,7 @@ export default {
       }
 
       // SPA routing with OG tag injection
-      const RESERVED = new Set(['editor', 'edit', 'manage', 'admin', 'auth', 'terms', 'privacy', 'superadmin', 'api', 'og', 'images', 'templates', 'events']);
+      const RESERVED = new Set(['editor', 'edit', 'manage', 'admin', 'auth', 'terms', 'privacy', 'superadmin', 'api', 'og', 'images', 'templates', 'events', 'invite']);
       const slugMatch = pathname.match(/^\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
       if (!slugMatch || RESERVED.has(slugMatch[1]) || pathname.includes('.')) {
         return env.ASSETS.fetch(request);

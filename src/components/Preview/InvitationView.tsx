@@ -4,7 +4,7 @@ import {
   Image as ImageIcon, Milestone, MapPin, CalendarCheck, CreditCard,
   Info, BookOpen, Camera, Send,
 } from 'lucide-react';
-import { InvitationData } from '../../types';
+import { InvitationData, GuestRelation } from '../../types';
 import useInvitationStore from '../../stores/useInvitationStore';
 import '../../styles/preview.css';
 import Hero from './Hero';
@@ -35,6 +35,8 @@ interface InvitationViewProps {
   openingTopOffset?: number;
   onSectionNav?: (editorId: string) => void;
   forceAnniversaryMode?: boolean;
+  guestName?: string;
+  guestRelation?: GuestRelation;
 }
 
 // 미리보기 섹션 ID → 에디터 섹션 ID 매핑
@@ -97,7 +99,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 
 const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'midphoto', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation }) => {
   const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
   const sectionOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
@@ -163,6 +165,8 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           topOffset={openingTopOffset}
           anniversaryMode={isAnniversaryMode}
           language={data.language}
+          guestName={guestName}
+          guestRelation={guestRelation}
         />
       )}
       <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />

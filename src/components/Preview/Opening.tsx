@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { OpeningConfig } from '../../types';
+import { OpeningConfig, GuestRelation } from '../../types';
+import { formatGuestOpeningText } from '../../utils/guestOpeningTemplates';
 
 const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
   elegant: {
@@ -138,6 +139,8 @@ interface OpeningProps {
   topOffset?: number;
   anniversaryMode?: boolean;
   language?: 'ko' | 'en' | 'ja';
+  guestName?: string;
+  guestRelation?: GuestRelation;
 }
 
 function hexLuminance(hex: string): number {
@@ -151,7 +154,7 @@ function hexLuminance(hex: string): number {
   } catch { return 0; }
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko' }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
@@ -273,8 +276,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const contentSwitchTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const phaseTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const mainTextRef = useRef(opening.openingText || 'We\'re getting married');
-  mainTextRef.current = opening.openingText || 'We\'re getting married';
+  // 개인화 링크(guestName)로 들어온 경우 관계별 톤 템플릿을 우선 사용, 없으면 기존 문구로 폴백
+  const guestOpeningText = guestName ? formatGuestOpeningText(guestRelation || 'other', guestName, language) : null;
+  const effectiveOpeningText = guestOpeningText || opening.openingText || 'We\'re getting married';
+
+  const mainTextRef = useRef(effectiveOpeningText);
+  mainTextRef.current = effectiveOpeningText;
 
   // 전환 스타일이 바뀔 때: 루트 클래스 토글 + phase 재시작 + 내용 연출 상태 즉시 동기화
   useLayoutEffect(() => {
@@ -414,7 +421,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   if ((!opening.openingEnabled && !autoClose) || dismissed) return null;
 
-  const mainText = opening.openingText || 'We\'re getting married';
+  const mainText = effectiveOpeningText;
   const subText = opening.openingSubText || date;
   const todayDateStr = (() => {
     if (!anniversaryMode) return '';
