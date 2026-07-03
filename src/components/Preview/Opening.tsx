@@ -353,6 +353,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       tmplScrollEl.style.overflowY = 'hidden';
       return () => { tmplScrollEl.style.overflowY = prev; };
     }
+    const fullEl = document.querySelector('.full-preview-container') as HTMLElement | null;
+    if (fullEl) {
+      const prev = fullEl.style.overflow;
+      fullEl.style.overflow = 'hidden';
+      return () => { fullEl.style.overflow = prev; };
+    }
     const scrollRoot = document.querySelector('.view-container') || document.body;
     const prev = (scrollRoot as HTMLElement).style.overflow;
     (scrollRoot as HTMLElement).style.overflow = 'hidden';
@@ -463,11 +469,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   }, [phase, typingPhase, autoClose, isTyping, opening.openingStyle, onDismissed]);
 
   const handleDismiss = () => {
-    if (isTyping) {
-      if (typingPhase !== 'done') return;
-    } else {
-      if (phase !== 'ready') return;
-    }
+    if (isTyping && typingPhase !== 'done') return;
     setPhase('exit');
     const style = effectiveStyle;
     const delay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : 900;
