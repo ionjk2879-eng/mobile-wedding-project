@@ -249,7 +249,7 @@ const App: React.FC = () => {
         <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>{te.backToEditor}</button>
         <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
           <ScrollRootContext.Provider value={fullPreviewScrollRef}>
-            <InvitationView data={data} showOpening />
+            <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} />
           </ScrollRootContext.Provider>
         </div>
       </div>
@@ -297,7 +297,7 @@ const App: React.FC = () => {
             </div>
             <div className={`preview-content-scroll theme-${data.theme || 'blush'}`} ref={previewScrollRef} style={{ fontFamily: data.fontFamily, fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
               <ScrollRootContext.Provider value={previewScrollRef}>
-                <InvitationView data={data} previewRefs={previewRefs} onSectionNav={handlePreviewSectionNav} />
+                <InvitationView data={data} previewRefs={previewRefs} onSectionNav={handlePreviewSectionNav} shareEnabled={!!data.isPaid} />
               </ScrollRootContext.Provider>
             </div>
           </div>
