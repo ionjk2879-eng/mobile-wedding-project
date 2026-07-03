@@ -795,17 +795,26 @@ async function handleGalleryUpload(request: Request, env: Env, slug: string): Pr
     'INSERT INTO gallery_photos (id, invitation_slug, r2_key, uploader_type, uploader_ref, guest_name) VALUES (?, ?, ?, ?, ?, ?)'
   ).bind(id, slug, r2Key, uploaderType, uploaderRef, guestName || null).run();
 
-  return json({ id, url: `/images/${r2Key}`, guestName: guestName || null, createdAt: new Date().toISOString() }, 200, origin);
+  return json({ id, url: `/images/${r2Key}`, guestName: guestName || null, createdAt: new Date().toISOString(), mine: true }, 200, origin);
 }
 
 async function handleGalleryPhotos(request: Request, env: Env, slug: string): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
+  const url = new URL(request.url);
+  const myGuestCode = (url.searchParams.get('guestCode') || '').trim();
+  const myDeviceToken = (url.searchParams.get('deviceToken') || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 32);
+
   const rows = await env.DB.prepare(
-    'SELECT id, r2_key, guest_name, created_at FROM gallery_photos WHERE invitation_slug = ? AND hidden_at IS NULL ORDER BY created_at DESC'
+    'SELECT id, r2_key, guest_name, created_at, uploader_type, uploader_ref FROM gallery_photos WHERE invitation_slug = ? AND hidden_at IS NULL ORDER BY created_at DESC'
   ).bind(slug).all();
-  return json(rows.results.map((r: Record<string, unknown>) => ({
-    id: r.id, url: `/images/${r.r2_key}`, guestName: r.guest_name ?? null, createdAt: r.created_at,
-  })), 200, origin);
+  // uploader_ref(guest_code/토큰 원본값)는 절대 클라이언트에 노출하지 않고, 요청자가 보낸
+  // 자신의 식별값과 일치하는지만 서버에서 비교해 mine 여부만 계산해 돌려준다.
+  return json(rows.results.map((r: Record<string, unknown>) => {
+    const mine =
+      (!!myGuestCode && r.uploader_type === 'guest_code' && r.uploader_ref === myGuestCode) ||
+      (!!myDeviceToken && r.uploader_type === 'token' && r.uploader_ref === myDeviceToken);
+    return { id: r.id, url: `/images/${r.r2_key}`, guestName: r.guest_name ?? null, createdAt: r.created_at, mine };
+  }), 200, origin);
 }
 
 async function handleGalleryPhotoDelete(request: Request, env: Env, slug: string, photoId: string): Promise<Response> {

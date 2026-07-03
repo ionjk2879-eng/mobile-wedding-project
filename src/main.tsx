@@ -18,6 +18,7 @@ const TemplatePreviewPage = React.lazy(() => import('./pages/TemplatePreviewPage
 const TemplatesPage = React.lazy(() => import('./pages/TemplatesPage'))
 const EventsPage = React.lazy(() => import('./pages/EventsPage'))
 const InvitePage = React.lazy(() => import('./pages/InvitePage'))
+const GalleryPage = React.lazy(() => import('./pages/GalleryPage'))
 
 const Loading = () => (
   <div style={{ width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", color: '#9CA3AF' }}>
@@ -40,6 +41,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/template-preview/:presetId" element={<TemplatePreviewPage />} />
         <Route path="/invite" element={<InvitePage />} />
         <Route path="/invite/:code" element={<InvitePage />} />
+        <Route path="/gallery/:slug" element={<GalleryPage />} />
         <Route path="/:slug" element={<ViewPage />} />
         <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
         <Route path="/terms" element={<TermsPage />} />
