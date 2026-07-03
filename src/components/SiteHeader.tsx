@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import useAuthStore from '../stores/useAuthStore';
 import { signInWithGoogle, signOut, deleteAccount, initiateKakaoLogin, initiateNaverLogin } from '../services/auth';
-import { LogIn, LogOut, UserX, Menu, X } from 'lucide-react';
+import { LogIn, LogOut, UserX, Menu, X, ChevronDown } from 'lucide-react';
 import { useSiteLang, SiteLang } from '../i18n';
 
 const getProviderLabel = (uid: string) => {
@@ -46,6 +46,7 @@ const SiteHeader: React.FC = () => {
 
   const [navMenuOpen, setNavMenuOpen] = useState(false);
   const navMenuRef = useRef<HTMLDivElement>(null);
+  const [navLangOpen, setNavLangOpen] = useState(false);
 
   useEffect(() => {
     if (!navMenuOpen) return;
@@ -59,6 +60,10 @@ const SiteHeader: React.FC = () => {
   }, [navMenuOpen]);
 
   useEffect(() => {
+    if (!navMenuOpen) setNavLangOpen(false);
+  }, [navMenuOpen]);
+
+  useEffect(() => {
     if (!loginMenuOpen) return;
     const handleClick = (e: MouseEvent) => {
       if (loginMenuRef.current && !loginMenuRef.current.contains(e.target as Node)) {
@@ -68,6 +73,52 @@ const SiteHeader: React.FC = () => {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [loginMenuOpen]);
+
+  const renderAuthContent = (close: () => void) => {
+    if (loading) {
+      return <span className="site-auth-loading">...</span>;
+    }
+    if (user) {
+      return (
+        <>
+          <div className="site-auth-menu-info">
+            <span className="site-auth-provider">{getProviderLabel(user.uid)}</span>
+            {user.name && <span className="site-auth-menu-name">{user.name}</span>}
+            {user.email && <span className="site-auth-menu-email">{user.email}</span>}
+          </div>
+          <div className="site-auth-menu-divider" />
+          <button className="site-auth-menu-btn" onClick={() => { close(); signOut(); }}>
+            <LogOut size={14} /> {t.site.logout}
+          </button>
+          <button className="site-auth-menu-btn danger" onClick={() => { close(); handleDeleteAccount(); }}>
+            <UserX size={14} /> {t.site.deleteAccount}
+          </button>
+        </>
+      );
+    }
+    return (
+      <>
+        <button className="site-auth-menu-btn" onClick={() => { close(); initiateKakaoLogin(pathname); }} style={{ gap: '10px' }}>
+          <span style={{ width: 16, height: 16, background: '#FEE500', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M10 2C5.03 2 1 5.13 1 8.97c0 2.48 1.65 4.66 4.13 5.88-.18.67-.66 2.42-.75 2.8-.12.47.17.46.36.34.15-.1 2.37-1.61 3.33-2.27.3.04.61.06.93.06 4.97 0 9-3.13 9-6.97C19 5.13 14.97 2 10 2Z" fill="#191919"/></svg>
+          </span>
+          {t.site.loginWithKakao}
+        </button>
+        <button className="site-auth-menu-btn" onClick={() => { close(); initiateNaverLogin(pathname); }} style={{ gap: '10px' }}>
+          <span style={{ width: 16, height: 16, background: '#03C75A', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M13.56 10.7 6.15 3H3v14h3.44V9.3L13.85 17H17V3h-3.44v7.7Z" fill="white"/></svg>
+          </span>
+          {t.site.loginWithNaver}
+        </button>
+        <button className="site-auth-menu-btn" onClick={() => { close(); signInWithGoogle(); }} style={{ gap: '10px' }}>
+          <span style={{ width: 16, height: 16, background: '#4285F4', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M19.6 10.23c0-.68-.06-1.36-.17-2.01H10v3.8h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.73 2.98-4.3 2.98-7.31Z" fill="white"/><path d="M10 20c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.04.95-3.38.95-2.6 0-4.8-1.76-5.58-4.12H1.08v2.58A9.99 9.99 0 0 0 10 20Z" fill="white"/><path d="M4.42 11.9a6.02 6.02 0 0 1 0-3.82V5.5H1.08a10 10 0 0 0 0 8.98l3.34-2.58Z" fill="white"/><path d="M10 3.96c1.47 0 2.78.5 3.82 1.5l2.86-2.87A10 10 0 0 0 1.08 5.5l3.34 2.58c.78-2.36 2.98-4.12 5.58-4.12Z" fill="white"/></svg>
+          </span>
+          {t.site.loginWithGoogle}
+        </button>
+      </>
+    );
+  };
 
   return (
     <header className="site-header">
@@ -81,21 +132,7 @@ const SiteHeader: React.FC = () => {
       </div>
       <div className="site-header-right">
         <Link to="/manage" className={`site-nav-link site-nav-link-desktop ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
-        <div className="site-nav-mobile" ref={navMenuRef}>
-          <button className="site-nav-toggle" onClick={() => setNavMenuOpen(!navMenuOpen)} aria-label="Menu">
-            {navMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-          {navMenuOpen && (
-            <div className="site-nav-dropdown">
-              <Link to="/" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
-              <Link to="/templates" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/templates' ? 'active' : ''}`}>{t.site.templates}</Link>
-              <Link to="/events" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/events' ? 'active' : ''}`}>{t.site.events}</Link>
-              <div className="site-auth-menu-divider" />
-              <Link to="/manage" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
-            </div>
-          )}
-        </div>
-        <div className="site-lang-switcher">
+        <div className="site-lang-switcher site-lang-switcher-desktop">
           {(['ko', 'en', 'ja'] as SiteLang[]).map((l) => (
             <button
               key={l}
@@ -106,7 +143,7 @@ const SiteHeader: React.FC = () => {
             </button>
           ))}
         </div>
-        <div className="site-auth" ref={menuRef}>
+        <div className="site-auth site-auth-desktop" ref={menuRef}>
           {loading ? (
             <span className="site-auth-loading">...</span>
           ) : user ? (
@@ -122,18 +159,7 @@ const SiteHeader: React.FC = () => {
               </button>
               {menuOpen && (
                 <div className="site-auth-menu">
-                  <div className="site-auth-menu-info">
-                    <span className="site-auth-provider">{getProviderLabel(user.uid)}</span>
-                    {user.name && <span className="site-auth-menu-name">{user.name}</span>}
-                    {user.email && <span className="site-auth-menu-email">{user.email}</span>}
-                  </div>
-                  <div className="site-auth-menu-divider" />
-                  <button className="site-auth-menu-btn" onClick={() => { setMenuOpen(false); signOut(); }}>
-                    <LogOut size={14} /> {t.site.logout}
-                  </button>
-                  <button className="site-auth-menu-btn danger" onClick={() => { setMenuOpen(false); handleDeleteAccount(); }}>
-                    <UserX size={14} /> {t.site.deleteAccount}
-                  </button>
+                  {renderAuthContent(() => setMenuOpen(false))}
                 </div>
               )}
             </>
@@ -144,26 +170,43 @@ const SiteHeader: React.FC = () => {
               </button>
               {loginMenuOpen && (
                 <div className="site-auth-menu" style={{ minWidth: '200px' }}>
-                  <button className="site-auth-menu-btn" onClick={() => { setLoginMenuOpen(false); initiateKakaoLogin(pathname); }} style={{ gap: '10px' }}>
-                    <span style={{ width: 16, height: 16, background: '#FEE500', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M10 2C5.03 2 1 5.13 1 8.97c0 2.48 1.65 4.66 4.13 5.88-.18.67-.66 2.42-.75 2.8-.12.47.17.46.36.34.15-.1 2.37-1.61 3.33-2.27.3.04.61.06.93.06 4.97 0 9-3.13 9-6.97C19 5.13 14.97 2 10 2Z" fill="#191919"/></svg>
-                    </span>
-                    {t.site.loginWithKakao}
-                  </button>
-                  <button className="site-auth-menu-btn" onClick={() => { setLoginMenuOpen(false); initiateNaverLogin(pathname); }} style={{ gap: '10px' }}>
-                    <span style={{ width: 16, height: 16, background: '#03C75A', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M13.56 10.7 6.15 3H3v14h3.44V9.3L13.85 17H17V3h-3.44v7.7Z" fill="white"/></svg>
-                    </span>
-                    {t.site.loginWithNaver}
-                  </button>
-                  <button className="site-auth-menu-btn" onClick={() => { setLoginMenuOpen(false); signInWithGoogle(); }} style={{ gap: '10px' }}>
-                    <span style={{ width: 16, height: 16, background: '#4285F4', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M19.6 10.23c0-.68-.06-1.36-.17-2.01H10v3.8h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.73 2.98-4.3 2.98-7.31Z" fill="white"/><path d="M10 20c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.04.95-3.38.95-2.6 0-4.8-1.76-5.58-4.12H1.08v2.58A9.99 9.99 0 0 0 10 20Z" fill="white"/><path d="M4.42 11.9a6.02 6.02 0 0 1 0-3.82V5.5H1.08a10 10 0 0 0 0 8.98l3.34-2.58Z" fill="white"/><path d="M10 3.96c1.47 0 2.78.5 3.82 1.5l2.86-2.87A10 10 0 0 0 1.08 5.5l3.34 2.58c.78-2.36 2.98-4.12 5.58-4.12Z" fill="white"/></svg>
-                    </span>
-                    {t.site.loginWithGoogle}
-                  </button>
+                  {renderAuthContent(() => setLoginMenuOpen(false))}
                 </div>
               )}
+            </div>
+          )}
+        </div>
+        <div className="site-nav-mobile" ref={navMenuRef}>
+          <button className="site-nav-toggle" onClick={() => setNavMenuOpen(!navMenuOpen)} aria-label="Menu">
+            {navMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          {navMenuOpen && (
+            <div className="site-nav-dropdown">
+              <Link to="/" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
+              <Link to="/templates" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/templates' ? 'active' : ''}`}>{t.site.templates}</Link>
+              <Link to="/events" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/events' ? 'active' : ''}`}>{t.site.events}</Link>
+              <div className="site-auth-menu-divider" />
+              <Link to="/manage" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
+              <div className="site-auth-menu-divider" />
+              <button className="site-nav-dropdown-link site-nav-dropdown-toggle" onClick={() => setNavLangOpen(!navLangOpen)}>
+                <span>{t.site.language} · {LANG_LABELS[lang]}</span>
+                <ChevronDown size={14} className={`site-nav-dropdown-chevron ${navLangOpen ? 'open' : ''}`} />
+              </button>
+              {navLangOpen && (
+                <div className="site-nav-dropdown-submenu">
+                  {(['ko', 'en', 'ja'] as SiteLang[]).map((l) => (
+                    <button
+                      key={l}
+                      className={`site-nav-dropdown-sublink ${lang === l ? 'active' : ''}`}
+                      onClick={() => { setLang(l); setNavLangOpen(false); }}
+                    >
+                      {LANG_LABELS[l]}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="site-auth-menu-divider" />
+              {renderAuthContent(() => setNavMenuOpen(false))}
             </div>
           )}
         </div>
@@ -247,12 +290,16 @@ const SiteHeader: React.FC = () => {
           border-radius: 14px;
           box-shadow: 0 8px 30px rgba(0,0,0,0.12);
           border: 1px solid #F0F0F0;
-          min-width: 180px;
+          min-width: 220px;
+          max-width: calc(100vw - 32px);
           padding: 6px;
           animation: site-menu-in 0.15s ease;
           z-index: 200;
           display: flex;
           flex-direction: column;
+          overflow: hidden;
+          max-height: calc(100vh - 80px);
+          overflow-y: auto;
         }
         .site-nav-dropdown-link {
           display: block;
@@ -270,6 +317,54 @@ const SiteHeader: React.FC = () => {
           color: #1F2937;
         }
         .site-nav-dropdown-link.active {
+          color: #B07A8E;
+          background: #FBF2F5;
+        }
+        .site-nav-dropdown-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          border: none;
+          background: none;
+          cursor: pointer;
+          font-family: inherit;
+          text-align: left;
+        }
+        .site-nav-dropdown-chevron {
+          transition: transform 0.15s;
+          flex-shrink: 0;
+        }
+        .site-nav-dropdown-chevron.open {
+          transform: rotate(180deg);
+        }
+        .site-nav-dropdown-submenu {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          padding: 2px 6px 6px 22px;
+        }
+        .site-nav-dropdown-sublink {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 8px;
+          background: none;
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: #6B7280;
+          cursor: pointer;
+          transition: all 0.15s;
+          font-family: inherit;
+          text-align: left;
+        }
+        .site-nav-dropdown-sublink:hover {
+          background: #F9FAFB;
+          color: #1F2937;
+        }
+        .site-nav-dropdown-sublink.active {
           color: #B07A8E;
           background: #FBF2F5;
         }
@@ -440,6 +535,8 @@ const SiteHeader: React.FC = () => {
         @media (max-width: 860px) {
           .site-nav-left { display: none; }
           .site-nav-link-desktop { display: none; }
+          .site-lang-switcher-desktop { display: none; }
+          .site-auth-desktop { display: none; }
           .site-nav-mobile { display: flex; }
         }
         @media (max-width: 480px) {
