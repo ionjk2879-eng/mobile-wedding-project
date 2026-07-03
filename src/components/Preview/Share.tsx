@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Share2, Link, Lock } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { toast } from '../../stores/useToastStore';
+import { formatShareDateTime } from '../../utils/formatShareDateTime';
 
 interface PreviewProps {
   data: InvitationData;
@@ -46,7 +47,11 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
       : isJa
       ? `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback} 結婚式`
       : `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback} 결혼합니다`);
-    const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
+    const namesLine = `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback}`;
+    const dateTimeLine = !isEn && !isJa && data.weddingDateISO
+      ? formatShareDateTime(data.weddingDateISO, data.time)
+      : `${data.date} ${data.time}`;
+    const description = data.shareDescription || [namesLine, dateTimeLine].filter(Boolean).join('\n');
     const slug = data.slug || '';
     const kakaoButtonLabel = isEn ? 'View Invitation' : isJa ? '招待状を見る' : '청첩장 보기';
     try {

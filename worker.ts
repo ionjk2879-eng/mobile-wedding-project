@@ -748,6 +748,19 @@ function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// "2026년 10월 24일 토요일 오후 12시 30분" 형태로 포맷
+function formatWeddingDateTimeKo(weddingDateISO: string, time: string): string {
+  const d = new Date(weddingDateISO);
+  if (isNaN(d.getTime())) return '';
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  const dateText = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${dayNames[d.getDay()]}요일`;
+  const parts = time?.match(/(AM|PM)\s(\d+):(\d+)/);
+  if (!parts) return dateText;
+  const ampm = parts[1] === 'AM' ? '오전' : '오후';
+  const minuteText = parts[3] === '00' ? '' : ` ${parts[3]}분`;
+  return `${dateText} ${ampm} ${parts[2]}시${minuteText}`;
+}
+
 // --- Notification emails (유료 청첩장 전용) ---
 
 async function sendGuestbookNotification(env: Env, slug: string, guestName: string, content: string, side: string): Promise<void> {
@@ -937,7 +950,9 @@ export default {
       const title = data.groomName && data.brideName
         ? `${data.groomName} ♥ ${data.brideName} 결혼합니다`
         : '모바일 청첩장';
-      const description = [data.date, data.venueName].filter(Boolean).join(' | ') || '소중한 날에 초대합니다.';
+      const namesLine = data.groomName && data.brideName ? `${data.groomName} ♥ ${data.brideName}` : '';
+      const dateTimeLine = data.weddingDateISO ? formatWeddingDateTimeKo(data.weddingDateISO, data.time) : (data.date || '');
+      const description = [namesLine, dateTimeLine].filter(Boolean).join('\n') || '소중한 날에 초대합니다.';
       const heroPhoto = data.heroPhoto || '';
 
       let image: string;
@@ -954,6 +969,7 @@ export default {
 
       const ogTags = `<title>${escapeHtml(title)} - Sonett</title>
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sonett" />
     <meta property="og:title" content="${escapeHtml(title)}" />
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:image" content="${escapeHtml(image)}" />

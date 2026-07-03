@@ -5,6 +5,7 @@ import { fetchRSVPResponses } from '../services/rsvpService';
 import { fetchGuests, createGuest, updateGuest, deleteGuest } from '../services/guestService';
 import { signInWithGoogle, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
+import { formatShareDateTime } from '../utils/formatShareDateTime';
 import { RSVPResponse, Guest, GuestRelation, InvitationData } from '../types';
 import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2 } from 'lucide-react';
 import useAuthStore from '../stores/useAuthStore';
@@ -136,9 +137,11 @@ const AdminPage: React.FC = () => {
     const groomName = invitationInfo?.groomName || groomFallback;
     const brideName = invitationInfo?.brideName || brideFallback;
     const title = `${guest.name}님을 초대합니다`;
-    const description = invitationInfo
-      ? `${groomName} ♥ ${brideName} | ${[invitationInfo.date, invitationInfo.time].filter(Boolean).join(' ')}`
-      : `${groomName} ♥ ${brideName}의 결혼식에 초대합니다`;
+    const namesLine = `${groomName} ♥ ${brideName}`;
+    const dateTimeLine = invitationInfo?.weddingDateISO
+      ? formatShareDateTime(invitationInfo.weddingDateISO, invitationInfo.time)
+      : '';
+    const description = [namesLine, dateTimeLine].filter(Boolean).join('\n');
     try {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',

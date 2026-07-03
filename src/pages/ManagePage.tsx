@@ -5,6 +5,7 @@ import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
 import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen, Heart } from 'lucide-react';
 import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
+import { formatShareDateTime } from '../utils/formatShareDateTime';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
@@ -19,7 +20,11 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
   const tm = t.manage;
   const shareUrl = `${SITE_ORIGIN}/${slug}`;
   const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
-  const description = data.shareDescription || `${data.date} ${data.time} | ${data.venueName}`;
+  const namesLine = `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'}`;
+  const dateTimeLine = data.language !== 'en' && data.language !== 'ja' && data.weddingDateISO
+    ? formatShareDateTime(data.weddingDateISO, data.time)
+    : `${data.date} ${data.time}`;
+  const description = data.shareDescription || [namesLine, dateTimeLine].filter(Boolean).join('\n');
 
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
