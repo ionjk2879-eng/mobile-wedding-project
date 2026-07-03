@@ -7,10 +7,18 @@ interface MusicPlayerProps {
 
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [loopEnabled, setLoopEnabled] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const userPaused = useRef(false);
   const autoPlayed = useRef(false);
+
+  // mount 후 컨텍스트 감지: 샘플 템플릿이면 loop 비활성화
+  useEffect(() => {
+    if (btnRef.current?.closest('.tmpl-preview-scroll')) {
+      setLoopEnabled(false);
+    }
+  }, []);
 
   useEffect(() => {
     setIsPlaying(false);
@@ -26,6 +34,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
     if (!url) return;
 
     const previewArea =
+      btnRef.current?.closest('.tmpl-preview-scroll') ||
       btnRef.current?.closest('.preview-content-scroll') ||
       btnRef.current?.closest('.full-preview-container') ||
       btnRef.current?.closest('.view-container');
@@ -47,6 +56,15 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
     };
   }, [url]);
 
+  // 재생 종료 시 상태 동기화
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const handleEnded = () => setIsPlaying(false);
+    audio.addEventListener('ended', handleEnded);
+    return () => audio.removeEventListener('ended', handleEnded);
+  }, []);
+
   const toggle = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -65,10 +83,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
 
   return (
     <>
-      <audio ref={audioRef} src={url} loop preload="auto" />
+      <audio ref={audioRef} src={url} loop={loopEnabled} preload="auto" />
       <div className="music-float-wrap">
         <button className="music-float-btn" onClick={toggle} ref={btnRef}>
-          {isPlaying ? <Pause size={18} /> : <Play size={18} style={{ marginLeft: 2 }} />}
+          {isPlaying ? <Pause size={14} /> : <Play size={14} style={{ marginLeft: 1 }} />}
         </button>
       </div>
     </>
