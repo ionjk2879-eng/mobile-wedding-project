@@ -35,8 +35,15 @@ const LandingPage: React.FC = () => {
       {/* Hero */}
       <section className="land-hero">
         <div className="land-hero-brand">
-          <img src="/logo-icon.png" alt="" className="land-hero-brand-icon" />
-          <img src="/logo-wordmark.png" alt="Sonett" className="land-hero-brand-wordmark" />
+          <img src="/favicon.svg" alt="" className="land-hero-brand-icon" />
+          <span className="land-hero-brand-wordmark">
+            sonett
+            <span className="land-hero-brand-divider">
+              <span className="land-hero-brand-divider-line" />
+              <span className="land-hero-brand-divider-dot" />
+              <span className="land-hero-brand-divider-line" />
+            </span>
+          </span>
         </div>
         <p className="land-hero-sub">MOBILE WEDDING INVITATION</p>
         <h1 className="land-hero-title">{tl.heroTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.heroTitle.split('\n').length - 1 && <br />}</React.Fragment>)}</h1>
@@ -190,10 +197,33 @@ const LandingPage: React.FC = () => {
           display: block;
         }
         .land-hero-brand-wordmark {
-          height: 48px;
-          width: auto;
-          object-fit: contain;
-          display: block;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          font-family: 'Marcellus', serif;
+          font-size: 2.4rem;
+          font-weight: 400;
+          letter-spacing: 8px;
+          color: #1F2937;
+          line-height: 1;
+        }
+        .land-hero-brand-divider {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .land-hero-brand-divider-line {
+          width: 28px;
+          height: 1px;
+          background: #D9D9D9;
+        }
+        .land-hero-brand-divider-dot {
+          width: 7px;
+          height: 7px;
+          background: #B07A8E;
+          transform: rotate(45deg);
+          flex-shrink: 0;
         }
         .land-hero-sub {
           font-size: 0.75rem;
@@ -437,7 +467,7 @@ const LandingPage: React.FC = () => {
         }
         @media (max-width: 480px) {
           .land-hero-brand-icon { height: 42px; }
-          .land-hero-brand-wordmark { height: 36px; }
+          .land-hero-brand-wordmark { font-size: 1.7rem; letter-spacing: 6px; }
           .land-hero-title { font-size: 1.5rem; }
           .land-points-grid { grid-template-columns: 1fr; }
           .land-cta.primary { width: 100%; text-align: center; box-sizing: border-box; }

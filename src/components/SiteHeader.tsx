@@ -138,8 +138,15 @@ const SiteHeader: React.FC = () => {
     <header className="site-header">
       <div className="site-header-left">
         <Link to="/" className="site-logo">
-          <img src="/logo-icon.png" alt="" className="site-logo-icon" />
-          <img src="/logo-wordmark.png" alt="Sonett" className="site-logo-wordmark" />
+          <img src="/favicon.svg" alt="" className="site-logo-icon" />
+          <span className="site-logo-wordmark">
+            sonett
+            <span className="site-logo-divider">
+              <span className="site-logo-divider-line" />
+              <span className="site-logo-divider-dot" />
+              <span className="site-logo-divider-line" />
+            </span>
+          </span>
         </Link>
         <nav className="site-nav-left">
           <Link to="/" className={`site-nav-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
@@ -273,10 +280,33 @@ const SiteHeader: React.FC = () => {
           display: block;
         }
         .site-logo-wordmark {
-          height: 22px;
-          width: auto;
-          object-fit: contain;
-          display: block;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          font-family: 'Marcellus', serif;
+          font-size: 1.1rem;
+          font-weight: 400;
+          letter-spacing: 3px;
+          color: #1F2937;
+          line-height: 1;
+        }
+        .site-logo-divider {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+        .site-logo-divider-line {
+          width: 14px;
+          height: 1px;
+          background: #D9D9D9;
+        }
+        .site-logo-divider-dot {
+          width: 4px;
+          height: 4px;
+          background: #B07A8E;
+          transform: rotate(45deg);
+          flex-shrink: 0;
         }
         .site-nav-left {
           display: flex;
@@ -583,7 +613,7 @@ const SiteHeader: React.FC = () => {
           .site-header { padding: 12px 16px; }
           .site-header-left { gap: 16px; }
           .site-logo-icon { height: 20px; }
-          .site-logo-wordmark { height: 18px; }
+          .site-logo-wordmark { font-size: 0.95rem; letter-spacing: 2.5px; }
           .site-header-right { gap: 10px; }
           .site-nav-link { font-size: 0.85rem; }
           .site-auth-btn.login { padding: 6px 12px; font-size: 0.78rem; }
