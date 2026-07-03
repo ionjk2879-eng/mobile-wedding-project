@@ -123,7 +123,10 @@ const SiteHeader: React.FC = () => {
   return (
     <header className="site-header">
       <div className="site-header-left">
-        <Link to="/" className="site-logo">Sonett</Link>
+        <Link to="/" className="site-logo">
+          <img src="/logo-icon.png" alt="" className="site-logo-icon" />
+          <img src="/logo-wordmark.png" alt="Sonett" className="site-logo-wordmark" />
+        </Link>
         <nav className="site-nav-left">
           <Link to="/" className={`site-nav-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
           <Link to="/templates" className={`site-nav-link ${pathname === '/templates' ? 'active' : ''}`}>{t.site.templates}</Link>
@@ -235,11 +238,23 @@ const SiteHeader: React.FC = () => {
           gap: 24px;
         }
         .site-logo {
-          font-size: 1.4rem;
-          font-weight: 700;
-          color: #B07A8E;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
           text-decoration: none;
-          letter-spacing: 2px;
+        }
+        .site-logo-icon {
+          height: 24px;
+          width: auto;
+          object-fit: contain;
+          display: block;
+        }
+        .site-logo-wordmark {
+          height: 22px;
+          width: auto;
+          object-fit: contain;
+          display: block;
         }
         .site-nav-left {
           display: flex;
@@ -542,6 +557,8 @@ const SiteHeader: React.FC = () => {
         @media (max-width: 480px) {
           .site-header { padding: 12px 16px; }
           .site-header-left { gap: 16px; }
+          .site-logo-icon { height: 20px; }
+          .site-logo-wordmark { height: 18px; }
           .site-header-right { gap: 10px; }
           .site-nav-link { font-size: 0.85rem; }
           .site-auth-btn.login { padding: 6px 12px; font-size: 0.78rem; }
