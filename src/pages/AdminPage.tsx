@@ -5,13 +5,20 @@ import { fetchRSVPResponses } from '../services/rsvpService';
 import { fetchGuests, createGuest, updateGuest, deleteGuest } from '../services/guestService';
 import { signInWithGoogle, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
-import { RSVPResponse, Guest, GuestRelation } from '../types';
-import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check } from 'lucide-react';
+import { RSVPResponse, Guest, GuestRelation, InvitationData } from '../types';
+import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2 } from 'lucide-react';
 import useAuthStore from '../stores/useAuthStore';
 import ToastContainer from '../components/Toast';
 
 const SITE_ORIGIN = 'https://sonett.kr';
+const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 const RELATION_LABELS: Record<GuestRelation, string> = { family: '가족', friend: '친구', coworker: '직장동료', other: '기타' };
+
+function ensureKakaoInit() {
+  if (!window.Kakao) return false;
+  if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_APP_KEY);
+  return window.Kakao.isInitialized();
+}
 
 const AdminPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -29,6 +36,7 @@ const AdminPage: React.FC = () => {
   const [editingCode, setEditingCode] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editRelation, setEditRelation] = useState<GuestRelation>('friend');
+  const [invitationInfo, setInvitationInfo] = useState<InvitationData | null>(null);
 
   useEffect(() => {
     if (authLoading || !slug) return;
@@ -36,9 +44,12 @@ const AdminPage: React.FC = () => {
     loadInvitation(slug).then((inv) => {
       if (!inv) { setAuthorized(false); setLoading(false); return; }
       const ownerUid = (inv as unknown as Record<string, unknown>).ownerUid as string | undefined;
+      setInvitationInfo(inv);
       setAuthorized(!ownerUid || ownerUid === user.uid);
     });
   }, [user, authLoading, slug]);
+
+  useEffect(() => { ensureKakaoInit(); }, []);
 
   const fetchResponses = async () => {
     if (!slug) return;
@@ -112,6 +123,36 @@ const AdminPage: React.FC = () => {
   const handleCopyGuestLink = (code: string) => {
     navigator.clipboard.writeText(`${SITE_ORIGIN}/invite/${code}`);
     toast.success('링크가 복사되었습니다.');
+  };
+
+  const handleKakaoShareGuest = (guest: Guest) => {
+    if (!ensureKakaoInit()) {
+      toast.error('카카오 SDK가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    const inviteLink = `${SITE_ORIGIN}/invite/${guest.code}`;
+    const groomFallback = '신랑';
+    const brideFallback = '신부';
+    const groomName = invitationInfo?.groomName || groomFallback;
+    const brideName = invitationInfo?.brideName || brideFallback;
+    const title = `${guest.name}님을 초대합니다`;
+    const description = invitationInfo
+      ? `${groomName} ♥ ${brideName} | ${[invitationInfo.date, invitationInfo.time].filter(Boolean).join(' ')}`
+      : `${groomName} ♥ ${brideName}의 결혼식에 초대합니다`;
+    try {
+      window.Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title,
+          description,
+          imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
+          link: { mobileWebUrl: inviteLink, webUrl: inviteLink },
+        },
+        buttons: [{ title: '초대장 보기', link: { mobileWebUrl: inviteLink, webUrl: inviteLink } }],
+      });
+    } catch (e: any) {
+      toast.error(`카카오 공유 오류: ${e?.message || '알 수 없는 오류'}`);
+    }
   };
 
   const attending = responses.filter(r => r.isAttending);
@@ -277,6 +318,7 @@ const AdminPage: React.FC = () => {
                         <td className="date-cell">{g.createdAt ? new Date(g.createdAt).toLocaleDateString('ko') : ''}</td>
                         <td>
                           <button type="button" className="row-icon-btn" title="링크 복사" onClick={() => handleCopyGuestLink(g.code)}><Copy size={15} /></button>
+                          <button type="button" className="row-icon-btn kakao" title="카카오톡 공유" onClick={() => handleKakaoShareGuest(g)}><Share2 size={15} /></button>
                           <button type="button" className="row-icon-btn" title="수정" onClick={() => startEditGuest(g)}><Pencil size={15} /></button>
                           <button type="button" className="row-icon-btn danger" title="삭제" onClick={() => handleDeleteGuest(g)}><Trash2 size={15} /></button>
                         </td>
@@ -334,6 +376,7 @@ const AdminPage: React.FC = () => {
         .row-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; border-radius: 8px; background: none; color: #9CA3AF; cursor: pointer; transition: all 0.15s; margin-right: 2px; }
         .row-icon-btn:hover { background: #F3F4F6; color: #4B5563; }
         .row-icon-btn.danger:hover { background: #FEF2F2; color: #DC2626; }
+        .row-icon-btn.kakao:hover { background: #FEF9E6; color: #C79000; }
         @media (max-width: 768px) { .admin-stats { grid-template-columns: repeat(2, 1fr); } .guest-add-row { flex-wrap: wrap; } }
       `}</style>
     </div>
