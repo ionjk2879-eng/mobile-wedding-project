@@ -450,6 +450,15 @@
 .ending-signature span { opacity: 0.7; font-style: italic; margin: 0 6px; }
 .ending-date { margin: 4px 0 0; font-size: 0.72em; letter-spacing: 2px; opacity: 0.75; }
 
+/* === Mid Photo === */
+.midphoto { background: transparent; }
+.midphoto-frame { position: relative; width: 100%; aspect-ratio: 3/4; min-height: 480px; overflow: hidden; }
+.midphoto-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+.midphoto-photo-empty { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--wedding-card-bg); border: 2px dashed var(--wedding-border); box-sizing: border-box; }
+.midphoto-photo-empty span { font-size: 0.9em; color: var(--wedding-text-sub); }
+.midphoto-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 40px 28px 52px; box-sizing: border-box; text-align: center; color: #fff; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%); gap: 6px; }
+.midphoto-caption { margin: 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 1.15em; line-height: 1.7; letter-spacing: 0.5px; display: flex; flex-direction: column; gap: 2px; }
+
 /* === Share === */
 .share { background-color: transparent; padding-bottom: 40px; }
 .share-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }

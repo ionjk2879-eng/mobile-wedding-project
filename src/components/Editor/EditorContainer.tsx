@@ -21,6 +21,7 @@ import GuestbookSection from './sections/GuestbookSection';
 import DateTimeSection from './sections/DateTimeSection';
 import OpeningSection from './sections/OpeningSection';
 import EndingSection from './sections/EndingSection';
+import MidPhotoSection from './sections/MidPhotoSection';
 
 export interface EditorContainerHandle {
   navigateTo: (id: string) => void;
@@ -45,6 +46,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
     accounts: React.useRef<HTMLDivElement>(null),
     photos: React.useRef<HTMLDivElement>(null),
     timeline: React.useRef<HTMLDivElement>(null),
+    midphoto: React.useRef<HTMLDivElement>(null),
     interview: React.useRef<HTMLDivElement>(null),
     rsvp: React.useRef<HTMLDivElement>(null),
     guestbook: React.useRef<HTMLDivElement>(null),
@@ -60,7 +62,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
     hero: true, opening: false, theme: true, design: false, basic: true, datetime: true,
     greeting: false, message: false, location: true, contacts: false,
-    accounts: false, photos: false, timeline: false, interview: false,
+    accounts: false, photos: false, timeline: false, interview: false, midphoto: false,
     rsvp: false, guestbook: false, ending: false, share: false, order: false, music: false,
   });
 
@@ -134,6 +136,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
     { id: 'photos', name: '갤러리', icon: <ImageIcon size={18} />, ref: sectionRefs.photos },
     { id: 'timeline', name: '타임라인', icon: <Milestone size={18} />, ref: sectionRefs.timeline },
     { id: 'location', name: '장소', icon: <MapPin size={18} />, ref: sectionRefs.location },
+    { id: 'midphoto', name: '중간사진', icon: <Camera size={18} />, ref: sectionRefs.midphoto },
     { id: 'rsvp', name: '참석의사', icon: <CalendarCheck size={18} />, ref: sectionRefs.rsvp },
     { id: 'guestbook', name: '방명록', icon: <BookOpen size={18} />, ref: sectionRefs.guestbook },
     { id: 'accounts', name: '계좌', icon: <CreditCard size={18} />, ref: sectionRefs.accounts },
@@ -163,6 +166,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
     { id: 'photos', title: '갤러리 관리', icon: <ImageIcon size={20} />, content: <PhotosSection /> },
     { id: 'timeline', title: '타임라인', icon: <Milestone size={20} />, content: <TimelineSection /> },
     { id: 'location', title: '장소 및 교통 정보', icon: <MapPin size={20} />, content: <LocationSection /> },
+    { id: 'midphoto', title: '중간 사진', icon: <Camera size={20} />, content: <MidPhotoSection /> },
     { id: 'rsvp', title: '참석의사 (RSVP)', icon: <CalendarCheck size={20} />, content: <RSVPSection /> },
     { id: 'guestbook', title: '방명록', icon: <BookOpen size={20} />, content: <GuestbookSection /> },
     { id: 'accounts', title: '계좌 정보', icon: <CreditCard size={20} />, content: <AccountsSection /> },

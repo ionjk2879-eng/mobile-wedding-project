@@ -96,6 +96,10 @@ export interface ContentData {
   endingPhotoX?: number;
   endingPhotoY?: number;
   endingMessage: string;
+  midPhoto: string;
+  midPhotoX?: number;
+  midPhotoY?: number;
+  midPhotoCaption?: string;
 }
 
 export interface OpeningConfig {

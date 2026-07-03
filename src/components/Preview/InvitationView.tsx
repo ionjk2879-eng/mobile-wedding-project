@@ -19,6 +19,7 @@ import RSVPForm from './RSVPForm';
 import Money from './Money';
 import Contacts from './Contacts';
 import Ending from './Ending';
+import MidPhoto from './MidPhoto';
 import Share from './Share';
 import Guestbook from './Guestbook';
 import ScrollReveal from './ScrollReveal';
@@ -52,6 +53,7 @@ const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: string }>
   photos:    { icon: <ImageIcon size={13} />,      label: '갤러리' },
   timeline:  { icon: <Milestone size={13} />,      label: '타임라인' },
   location:  { icon: <MapPin size={13} />,         label: '장소' },
+  midphoto:  { icon: <Camera size={13} />,         label: '중간사진' },
   rsvp:      { icon: <CalendarCheck size={13} />,  label: '참석의사' },
   accounts:  { icon: <CreditCard size={13} />,     label: '계좌정보' },
   contacts:  { icon: <Info size={13} />,           label: '기본정보' },
@@ -82,6 +84,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
     case 'photos': return wrap(<Gallery data={data} />);
     case 'timeline': return wrap(<Timeline data={data} />);
     case 'location': return wrap(<Location data={data} />);
+    case 'midphoto': return wrap(<MidPhoto data={data} />);
     case 'rsvp': return wrap(<RSVPForm data={data} />);
     case 'accounts': return wrap(<Money data={data} />);
     case 'contacts': return wrap(<Contacts data={data} />);
@@ -92,7 +95,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
   }
 };
 
-const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
+const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'midphoto', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
 
 const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode }) => {
   const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
