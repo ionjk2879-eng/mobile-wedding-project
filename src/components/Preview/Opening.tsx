@@ -199,6 +199,52 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       if (pageEl) ro.observe(pageEl);
       return () => { fullEl.removeEventListener('scroll', update); ro.disconnect(); };
     }
+
+    // 템플릿 미리보기 — invitation-page 너비에만 맞게 제한
+    const tmplEl = el.closest('.tmpl-preview-scroll') as HTMLElement | null;
+    if (tmplEl) {
+      const pageEl = tmplEl.querySelector('.invitation-page') as HTMLElement | null;
+      const update = () => {
+        const rect = pageEl ? pageEl.getBoundingClientRect() : null;
+        setEditorBounds({
+          top: tmplEl.scrollTop,
+          left: rect ? rect.left : 0,
+          width: rect ? rect.width : tmplEl.clientWidth,
+          height: tmplEl.clientHeight,
+        });
+      };
+      update();
+      tmplEl.addEventListener('scroll', update, { passive: true });
+      const ro = new ResizeObserver(update);
+      ro.observe(tmplEl);
+      if (pageEl) ro.observe(pageEl);
+      return () => { tmplEl.removeEventListener('scroll', update); ro.disconnect(); };
+    }
+
+    // 공개 청첩장 보기 페이지 — invitation-page 너비에만 맞게 제한
+    const viewEl = el.closest('.view-container') as HTMLElement | null;
+    if (viewEl) {
+      const pageEl = viewEl.querySelector('.invitation-page') as HTMLElement | null;
+      const update = () => {
+        const rect = pageEl ? pageEl.getBoundingClientRect() : null;
+        setEditorBounds({
+          top: window.scrollY,
+          left: rect ? rect.left : 0,
+          width: rect ? rect.width : window.innerWidth,
+          height: window.innerHeight,
+        });
+      };
+      update();
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      const ro = new ResizeObserver(update);
+      if (pageEl) ro.observe(pageEl);
+      return () => {
+        window.removeEventListener('scroll', update);
+        window.removeEventListener('resize', update);
+        ro.disconnect();
+      };
+    }
   }, []);
 
   // openingStyle === 'typing' 은 구버전 호환용 — 새 데이터는 openingContentStyle로 판단
@@ -300,6 +346,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   useEffect(() => {
     if (dismissed) return;
+    const tmplScrollEl = document.querySelector('.tmpl-preview-scroll') as HTMLElement | null;
+    if (tmplScrollEl) {
+      const prev = tmplScrollEl.style.overflowY;
+      tmplScrollEl.style.overflowY = 'hidden';
+      return () => { tmplScrollEl.style.overflowY = prev; };
+    }
     const scrollRoot = document.querySelector('.view-container') || document.body;
     const prev = (scrollRoot as HTMLElement).style.overflow;
     (scrollRoot as HTMLElement).style.overflow = 'hidden';
