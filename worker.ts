@@ -779,7 +779,9 @@ async function handleGalleryUpload(request: Request, env: Env, slug: string): Pr
     return json({ error: `한 분당 최대 ${GALLERY_PER_UPLOADER_LIMIT}장까지 업로드할 수 있습니다.` }, 429, origin);
   }
 
-  // 전체 총량 제한
+  // 전체 총량 제한 — count 조회와 INSERT 사이에 원자성이 없어 동시 업로드가 몰리면 제한을
+  // 살짝 넘길 수 있음(예: 301장). 결혼식 규모의 동시 접속에서는 영향이 미미해 트랜잭션으로
+  // 막지 않고 감수하는 쪽을 택함. 정말 엄격한 제한이 필요해지면 재검토.
   const totalCount = await env.DB.prepare(
     'SELECT COUNT(*) as cnt FROM gallery_photos WHERE invitation_slug = ?'
   ).bind(slug).first();
