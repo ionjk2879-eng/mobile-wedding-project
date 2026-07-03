@@ -1,4 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import {
+  LayoutTemplate, MessageSquare, Clock, Heart, MessagesSquare,
+  Image as ImageIcon, Milestone, MapPin, CalendarCheck, CreditCard,
+  Info, BookOpen, Camera, Send,
+} from 'lucide-react';
 import { InvitationData } from '../../types';
 import useInvitationStore from '../../stores/useInvitationStore';
 import '../../styles/preview.css';
@@ -36,21 +41,32 @@ const PREVIEW_TO_EDITOR: Record<string, string> = {
   contacts: 'basic',
 };
 
-const NavIcon = () => (
-  <svg width="13" height="11" viewBox="0 0 13 11" fill="currentColor" aria-hidden="true">
-    <rect x="0" y="0" width="3.5" height="11" rx="1.2"/>
-    <rect x="5" y="0" width="8" height="3" rx="1.2"/>
-    <rect x="5" y="4" width="6" height="3" rx="1.2"/>
-    <rect x="5" y="8" width="4" height="3" rx="1.2"/>
-  </svg>
-);
+// 미리보기 섹션 ID → { 아이콘, 레이블 }
+const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: string }> = {
+  hero:      { icon: <LayoutTemplate size={13} />, label: '메인화면' },
+  greeting:  { icon: <MessageSquare size={13} />,  label: '인사말' },
+  calendar:  { icon: <Clock size={13} />,          label: '예식일시' },
+  message:   { icon: <Heart size={13} />,          label: '한마디' },
+  interview: { icon: <MessagesSquare size={13} />, label: '인터뷰' },
+  photos:    { icon: <ImageIcon size={13} />,      label: '갤러리' },
+  timeline:  { icon: <Milestone size={13} />,      label: '타임라인' },
+  location:  { icon: <MapPin size={13} />,         label: '장소' },
+  rsvp:      { icon: <CalendarCheck size={13} />,  label: '참석의사' },
+  accounts:  { icon: <CreditCard size={13} />,     label: '계좌정보' },
+  contacts:  { icon: <Info size={13} />,           label: '기본정보' },
+  guestbook: { icon: <BookOpen size={13} />,       label: '방명록' },
+  ending:    { icon: <Camera size={13} />,         label: '엔딩' },
+  share:     { icon: <Send size={13} />,           label: '주소' },
+};
 
 const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void }> = ({ id, data, refEl, shareEnabled, onNav }) => {
+  const navInfo = SECTION_NAV_INFO[id];
   const wrap = (children: React.ReactNode) => (
     <div ref={refEl} className={onNav ? 'preview-nav-section' : undefined}>
-      {onNav && (
-        <button className="preview-section-nav-btn" onClick={onNav} title="편집 섹션으로 이동" aria-label="편집 섹션으로 이동">
-          <NavIcon />
+      {onNav && navInfo && (
+        <button className="preview-section-nav-btn" onClick={onNav} title={`${navInfo.label} 편집`} aria-label={`${navInfo.label} 편집`}>
+          {navInfo.icon}
+          <span className="preview-nav-label">{navInfo.label}</span>
         </button>
       )}
       {children}
@@ -151,8 +167,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       {previewRefs?.basic ? (
         <div ref={previewRefs.basic} className={onSectionNav ? 'preview-nav-section' : undefined}>
           {onSectionNav && (
-            <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="편집 섹션으로 이동" aria-label="편집 섹션으로 이동">
-              <NavIcon />
+            <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="메인화면 편집" aria-label="메인화면 편집">
+              <LayoutTemplate size={13} />
+              <span className="preview-nav-label">메인화면</span>
             </button>
           )}
           <Hero data={data} />
