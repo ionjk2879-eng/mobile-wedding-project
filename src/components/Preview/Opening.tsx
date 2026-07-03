@@ -157,6 +157,9 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [editorBounds, setEditorBounds] = useState<React.CSSProperties>({});
+  // exit 중에는 editorBounds 갱신을 차단해 레이아웃 재계산으로 인한 순간 이동 방지
+  const phaseRef = useRef<'enter' | 'ready' | 'exit'>('enter');
+
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -165,6 +168,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const scrollEl = el.closest('.preview-content-scroll') as HTMLElement | null;
     if (scrollEl) {
       const update = () => {
+        if (phaseRef.current === 'exit') return;
         setEditorBounds({
           top: scrollEl.scrollTop,
           left: 0,
@@ -184,6 +188,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     if (fullEl) {
       const pageEl = fullEl.querySelector('.invitation-page') as HTMLElement | null;
       const update = () => {
+        if (phaseRef.current === 'exit') return;
         const rect = pageEl ? pageEl.getBoundingClientRect() : null;
         setEditorBounds({
           top: fullEl.scrollTop,
@@ -205,6 +210,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     if (tmplEl) {
       const pageEl = tmplEl.querySelector('.invitation-page') as HTMLElement | null;
       const update = () => {
+        if (phaseRef.current === 'exit') return;
         const containerRect = tmplEl.getBoundingClientRect();
         const rect = pageEl ? pageEl.getBoundingClientRect() : null;
         setEditorBounds({
@@ -227,6 +233,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     if (viewEl) {
       const pageEl = viewEl.querySelector('.invitation-page') as HTMLElement | null;
       const update = () => {
+        if (phaseRef.current === 'exit') return;
         const rect = pageEl ? pageEl.getBoundingClientRect() : null;
         setEditorBounds({
           top: window.scrollY,
@@ -481,7 +488,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const t = setTimeout(() => {
       setPhase('exit');
       const style = effectiveStyle;
-      const exitDelay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : 900;
+      const exitDelay = style === 'curtain' ? 400 : style === 'circle' ? 480 : style === 'veil' ? 460 : style === 'blind' ? 520 : style === 'insta' ? 450 : style === 'frame' ? 430 : 380;
       setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
     }, 2500);
     return () => clearTimeout(t);
@@ -490,9 +497,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const handleDismiss = () => {
     if (isTyping && typingPhase !== 'done') return;
     clearTimeout(phaseTimerRef.current); // 지연된 'ready' 전환이 exit 이후에 발화하지 않도록
+    phaseRef.current = 'exit'; // editorBounds 갱신 즉시 차단
     setPhase('exit');
+    // 모든 exit 애니메이션을 ~400ms로 단축 (CSS와 맞춤)
     const style = effectiveStyle;
-    const delay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : 900;
+    const delay = style === 'curtain' ? 400 : style === 'circle' ? 480 : style === 'veil' ? 460 : style === 'blind' ? 520 : style === 'insta' ? 450 : style === 'frame' ? 430 : 380;
     setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 
