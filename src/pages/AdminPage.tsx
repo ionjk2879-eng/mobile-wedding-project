@@ -137,7 +137,7 @@ const AdminPage: React.FC = () => {
     const groomName = invitationInfo?.groomName || groomFallback;
     const brideName = invitationInfo?.brideName || brideFallback;
     const title = `${guest.name}님을 초대합니다`;
-    const namesLine = `${groomName} ♥ ${brideName}`;
+    const namesLine = `${groomName} ❤️ ${brideName}`;
     const dateTimeLine = invitationInfo?.weddingDateISO
       ? formatShareDateTime(invitationInfo.weddingDateISO, invitationInfo.time)
       : '';

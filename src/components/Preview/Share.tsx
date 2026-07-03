@@ -43,11 +43,11 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
     const groomFallback = isEn ? 'Groom' : isJa ? '新郎' : '신랑';
     const brideFallback = isEn ? 'Bride' : isJa ? '新婦' : '신부';
     const title = data.shareTitle || (isEn
-      ? `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback} Wedding`
+      ? `${data.groomName || groomFallback} ❤️ ${data.brideName || brideFallback} Wedding`
       : isJa
-      ? `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback} 結婚式`
-      : `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback} 결혼합니다`);
-    const namesLine = `${data.groomName || groomFallback} ♥ ${data.brideName || brideFallback}`;
+      ? `${data.groomName || groomFallback} ❤️ ${data.brideName || brideFallback} 結婚式`
+      : `${data.groomName || groomFallback} ❤️ ${data.brideName || brideFallback} 결혼합니다`);
+    const namesLine = `${data.groomName || groomFallback} ❤️ ${data.brideName || brideFallback}`;
     const dateTimeLine = !isEn && !isJa && data.weddingDateISO
       ? formatShareDateTime(data.weddingDateISO, data.time)
       : `${data.date} ${data.time}`;

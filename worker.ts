@@ -748,12 +748,12 @@ function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// "2026년 10월 24일 토요일 오후 12시 30분" 형태로 포맷
+// "2026. 10. 24. 토요일 오후 12시 30분" 형태로 포맷
 function formatWeddingDateTimeKo(weddingDateISO: string, time: string): string {
   const d = new Date(weddingDateISO);
   if (isNaN(d.getTime())) return '';
   const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-  const dateText = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${dayNames[d.getDay()]}요일`;
+  const dateText = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${dayNames[d.getDay()]}요일`;
   const parts = time?.match(/(AM|PM)\s(\d+):(\d+)/);
   if (!parts) return dateText;
   const ampm = parts[1] === 'AM' ? '오전' : '오후';
@@ -948,9 +948,9 @@ export default {
 
       const data = JSON.parse(row.data as string);
       const title = data.groomName && data.brideName
-        ? `${data.groomName} ♥ ${data.brideName} 결혼합니다`
+        ? `${data.groomName} ❤️ ${data.brideName} 결혼합니다`
         : '모바일 청첩장';
-      const namesLine = data.groomName && data.brideName ? `${data.groomName} ♥ ${data.brideName}` : '';
+      const namesLine = data.groomName && data.brideName ? `${data.groomName} ❤️ ${data.brideName}` : '';
       const dateTimeLine = data.weddingDateISO ? formatWeddingDateTimeKo(data.weddingDateISO, data.time) : (data.date || '');
       const description = [namesLine, dateTimeLine].filter(Boolean).join('\n') || '소중한 날에 초대합니다.';
       const heroPhoto = data.heroPhoto || '';

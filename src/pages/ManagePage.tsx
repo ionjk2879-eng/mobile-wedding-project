@@ -19,8 +19,8 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
   const { t } = useSiteLang();
   const tm = t.manage;
   const shareUrl = `${SITE_ORIGIN}/${slug}`;
-  const title = data.shareTitle || `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'} 결혼합니다`;
-  const namesLine = `${data.groomName || '신랑'} ♥ ${data.brideName || '신부'}`;
+  const title = data.shareTitle || `${data.groomName || '신랑'} ❤️ ${data.brideName || '신부'} 결혼합니다`;
+  const namesLine = `${data.groomName || '신랑'} ❤️ ${data.brideName || '신부'}`;
   const dateTimeLine = data.language !== 'en' && data.language !== 'ja' && data.weddingDateISO
     ? formatShareDateTime(data.weddingDateISO, data.time)
     : `${data.date} ${data.time}`;
