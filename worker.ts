@@ -336,6 +336,68 @@ async function handleActivate(request: Request, env: Env, slug: string): Promise
   return json({ ok: true, expiresAt }, 200, origin);
 }
 
+// --- Posts API ---
+
+async function handlePostsPublic(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const url = new URL(request.url);
+  const type = url.searchParams.get('type');
+  const where = type ? 'WHERE type = ?' : '';
+  const params = type ? [type] : [];
+  const rows = await env.DB.prepare(
+    `SELECT id, type, tag, title, content, created_at, updated_at FROM posts ${where} ORDER BY created_at DESC`
+  ).bind(...params).all();
+  return json(rows.results, 200, origin);
+}
+
+async function handleAdminPosts(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== 'ionjk2879@gmail.com')
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+
+  if (request.method === 'GET') {
+    const rows = await env.DB.prepare(
+      'SELECT id, type, tag, title, content, created_at, updated_at FROM posts ORDER BY created_at DESC'
+    ).all();
+    return json(rows.results, 200, origin);
+  }
+
+  if (request.method === 'POST') {
+    const body = await request.json() as { type?: string; tag?: string; title?: string; content?: string };
+    if (!body.type || !body.title) return json({ error: 'type과 title은 필수입니다.' }, 400, origin);
+    const result = await env.DB.prepare(
+      'INSERT INTO posts (type, tag, title, content) VALUES (?, ?, ?, ?)'
+    ).bind(body.type, body.tag || '공지', body.title, body.content || '').run();
+    return json({ id: result.meta.last_row_id }, 201, origin);
+  }
+
+  return json({ error: 'Method Not Allowed' }, 405, origin);
+}
+
+async function handleAdminPost(request: Request, env: Env, id: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== 'ionjk2879@gmail.com')
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+
+  if (request.method === 'PUT') {
+    const body = await request.json() as { type?: string; tag?: string; title?: string; content?: string };
+    await env.DB.prepare(
+      `UPDATE posts SET type = COALESCE(?, type), tag = COALESCE(?, tag), title = COALESCE(?, title),
+       content = COALESCE(?, content), updated_at = datetime('now') WHERE id = ?`
+    ).bind(body.type ?? null, body.tag ?? null, body.title ?? null, body.content ?? null, id).run();
+    return json({ ok: true }, 200, origin);
+  }
+
+  if (request.method === 'DELETE') {
+    await env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(id).run();
+    return json({ ok: true }, 200, origin);
+  }
+
+  return json({ error: 'Method Not Allowed' }, 405, origin);
+}
+
 // --- Admin API ---
 
 async function handleAdminInvitations(request: Request, env: Env): Promise<Response> {
@@ -693,6 +755,14 @@ export default {
       const activateMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/activate$/);
       if (activateMatch) return await handleActivate(request, env, activateMatch[1]);
 
+      // Posts (public)
+      if (pathname === '/api/posts') return await handlePostsPublic(request, env);
+
+      // Posts (admin CRUD)
+      if (pathname === '/api/admin/posts') return await handleAdminPosts(request, env);
+      const postMatch = pathname.match(/^\/api\/admin\/posts\/(\d+)$/);
+      if (postMatch) return await handleAdminPost(request, env, postMatch[1]);
+
       // Admin
       if (pathname === '/api/admin/invitations' && request.method === 'GET')
         return await handleAdminInvitations(request, env);
@@ -738,7 +808,7 @@ export default {
       }
 
       // SPA routing with OG tag injection
-      const RESERVED = new Set(['editor', 'edit', 'manage', 'admin', 'auth', 'terms', 'privacy', 'superadmin', 'api', 'og', 'images']);
+      const RESERVED = new Set(['editor', 'edit', 'manage', 'admin', 'auth', 'terms', 'privacy', 'superadmin', 'api', 'og', 'images', 'templates', 'events']);
       const slugMatch = pathname.match(/^\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
       if (!slugMatch || RESERVED.has(slugMatch[1]) || pathname.includes('.')) {
         return env.ASSETS.fetch(request);
