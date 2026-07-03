@@ -268,6 +268,7 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
     await env.DB.batch([
       env.DB.prepare('DELETE FROM guestbook WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM rsvp WHERE invitation_slug = ?').bind(slug),
+      env.DB.prepare('DELETE FROM guests WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(slug),
     ]);
     return json({ ok: true }, 200, origin);
@@ -307,6 +308,7 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
     env.DB.prepare('INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at) VALUES (?, ?, ?, ?, ?)').bind(newSlug, user.uid, JSON.stringify(data), oldRow.is_paid, oldRow.expires_at),
     env.DB.prepare('UPDATE guestbook SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE rsvp SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
+    env.DB.prepare('UPDATE guests SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(oldSlug),
   ]);
 
@@ -537,6 +539,91 @@ async function handleRSVP(request: Request, env: Env, slug: string): Promise<Res
   return json({ error: 'Method not allowed' }, 405, origin);
 }
 
+// --- Guests API (하객 개인화 링크) ---
+
+const GUEST_RELATIONS = ['family', 'friend', 'coworker', 'other'] as const;
+
+function normalizeGuestRelation(relation: unknown): typeof GUEST_RELATIONS[number] {
+  return (GUEST_RELATIONS as readonly string[]).includes(relation as string) ? relation as typeof GUEST_RELATIONS[number] : 'other';
+}
+
+function generateGuestCode(): string {
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => (b % 36).toString(36)).join('');
+}
+
+async function requireInvitationOwner(request: Request, env: Env, slug: string): Promise<{ error: Response } | { user: { uid: string } }> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user) return { error: json({ error: '로그인이 필요합니다.' }, 401, origin) };
+  const inv = await env.DB.prepare('SELECT owner_uid FROM invitations WHERE slug = ?').bind(slug).first();
+  if (!inv || inv.owner_uid !== user.uid) return { error: json({ error: '권한이 없습니다.' }, 403, origin) };
+  return { user };
+}
+
+async function handleGuests(request: Request, env: Env, slug: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const auth = await requireInvitationOwner(request, env, slug);
+  if ('error' in auth) return auth.error;
+
+  if (request.method === 'GET') {
+    const rows = await env.DB.prepare(
+      'SELECT code, name, relation, created_at FROM guests WHERE invitation_slug = ? ORDER BY created_at DESC'
+    ).bind(slug).all();
+    return json(rows.results.map((r: Record<string, unknown>) => ({
+      code: r.code, name: r.name, relation: r.relation, createdAt: r.created_at,
+    })), 200, origin);
+  }
+
+  if (request.method === 'POST') {
+    const body = await request.json() as { name?: string; relation?: string };
+    const name = body.name?.trim();
+    if (!name) return json({ error: '이름을 입력해주세요.' }, 400, origin);
+    const relation = normalizeGuestRelation(body.relation);
+
+    let code = generateGuestCode();
+    for (let i = 0; i < 5; i++) {
+      const exists = await env.DB.prepare('SELECT 1 FROM guests WHERE code = ?').bind(code).first();
+      if (!exists) break;
+      code = generateGuestCode();
+    }
+
+    await env.DB.prepare(
+      'INSERT INTO guests (code, invitation_slug, name, relation) VALUES (?, ?, ?, ?)'
+    ).bind(code, slug, name, relation).run();
+
+    return json({ code, name, relation, createdAt: new Date().toISOString() }, 200, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+async function handleGuest(request: Request, env: Env, slug: string, code: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const auth = await requireInvitationOwner(request, env, slug);
+  if ('error' in auth) return auth.error;
+
+  const existing = await env.DB.prepare('SELECT code FROM guests WHERE code = ? AND invitation_slug = ?').bind(code, slug).first();
+  if (!existing) return json({ error: '하객을 찾을 수 없습니다.' }, 404, origin);
+
+  if (request.method === 'PUT') {
+    const body = await request.json() as { name?: string; relation?: string };
+    const name = body.name?.trim();
+    if (!name) return json({ error: '이름을 입력해주세요.' }, 400, origin);
+    const relation = normalizeGuestRelation(body.relation);
+    await env.DB.prepare('UPDATE guests SET name = ?, relation = ? WHERE code = ?').bind(name, relation, code).run();
+    return json({ ok: true }, 200, origin);
+  }
+
+  if (request.method === 'DELETE') {
+    await env.DB.prepare('DELETE FROM guests WHERE code = ?').bind(code).run();
+    return json({ ok: true }, 200, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
 // --- Image Upload & Serve ---
 
 async function handleUpload(request: Request, env: Env): Promise<Response> {
@@ -634,6 +721,7 @@ async function deleteExpiredInvitations(env: Env): Promise<void> {
     await env.DB.batch([
       env.DB.prepare('DELETE FROM guestbook WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM rsvp WHERE invitation_slug = ?').bind(slug),
+      env.DB.prepare('DELETE FROM guests WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(slug),
     ]);
   }
@@ -780,6 +868,13 @@ export default {
       // RSVP
       const rsvpMatch = pathname.match(/^\/api\/rsvp\/([^/]+)$/);
       if (rsvpMatch) return await handleRSVP(request, env, rsvpMatch[1]);
+
+      // Guests (하객 개인화 링크)
+      const guestsMatch = pathname.match(/^\/api\/guests\/([^/]+)$/);
+      if (guestsMatch) return await handleGuests(request, env, guestsMatch[1]);
+
+      const guestMatch = pathname.match(/^\/api\/guests\/([^/]+)\/([^/]+)$/);
+      if (guestMatch) return await handleGuest(request, env, guestMatch[1], guestMatch[2]);
 
       // Images from R2
       const imgMatch = pathname.match(/^\/images\/(.+)$/);

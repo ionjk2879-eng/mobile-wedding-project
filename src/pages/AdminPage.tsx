@@ -2,10 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { loadInvitation } from '../services/invitationService';
 import { fetchRSVPResponses } from '../services/rsvpService';
+import { fetchGuests, createGuest, updateGuest, deleteGuest } from '../services/guestService';
 import { signInWithGoogle, signOut } from '../services/auth';
-import { RSVPResponse } from '../types';
-import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut } from 'lucide-react';
+import { toast } from '../stores/useToastStore';
+import { RSVPResponse, Guest, GuestRelation } from '../types';
+import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check } from 'lucide-react';
 import useAuthStore from '../stores/useAuthStore';
+import ToastContainer from '../components/Toast';
+
+const SITE_ORIGIN = 'https://sonett.kr';
+const RELATION_LABELS: Record<GuestRelation, string> = { family: '가족', friend: '친구', coworker: '직장동료', other: '기타' };
 
 const AdminPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -14,6 +20,15 @@ const AdminPage: React.FC = () => {
   const [responses, setResponses] = useState<RSVPResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState<boolean | null>(null);
+
+  const [guests, setGuests] = useState<Guest[]>([]);
+  const [guestsLoading, setGuestsLoading] = useState(true);
+  const [newGuestName, setNewGuestName] = useState('');
+  const [newGuestRelation, setNewGuestRelation] = useState<GuestRelation>('friend');
+  const [adding, setAdding] = useState(false);
+  const [editingCode, setEditingCode] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editRelation, setEditRelation] = useState<GuestRelation>('friend');
 
   useEffect(() => {
     if (authLoading || !slug) return;
@@ -37,6 +52,67 @@ const AdminPage: React.FC = () => {
   };
 
   useEffect(() => { if (authorized) fetchResponses(); }, [slug, authorized]);
+
+  const fetchGuestList = async () => {
+    if (!slug) return;
+    setGuestsLoading(true);
+    try {
+      setGuests(await fetchGuests(slug));
+    } catch (err) {
+      console.error('하객 명단 로드 실패:', err);
+    }
+    setGuestsLoading(false);
+  };
+
+  useEffect(() => { if (authorized) fetchGuestList(); }, [slug, authorized]);
+
+  const handleAddGuest = async () => {
+    if (!slug || !newGuestName.trim() || adding) return;
+    setAdding(true);
+    try {
+      await createGuest(slug, newGuestName.trim(), newGuestRelation);
+      setNewGuestName('');
+      await fetchGuestList();
+      toast.success('하객이 추가되었습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '추가에 실패했습니다.');
+    }
+    setAdding(false);
+  };
+
+  const startEditGuest = (guest: Guest) => {
+    setEditingCode(guest.code);
+    setEditName(guest.name);
+    setEditRelation(guest.relation);
+  };
+
+  const handleSaveGuest = async (code: string) => {
+    if (!slug || !editName.trim()) return;
+    try {
+      await updateGuest(slug, code, editName.trim(), editRelation);
+      setEditingCode(null);
+      await fetchGuestList();
+      toast.success('수정되었습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '수정에 실패했습니다.');
+    }
+  };
+
+  const handleDeleteGuest = async (guest: Guest) => {
+    if (!slug || !confirm(`'${guest.name}'님을 명단에서 삭제할까요?`)) return;
+    try {
+      await deleteGuest(slug, guest.code);
+      await fetchGuestList();
+      toast.success('삭제되었습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '삭제에 실패했습니다.');
+    }
+  };
+
+  const handleCopyGuestLink = (code: string) => {
+    navigator.clipboard.writeText(`${SITE_ORIGIN}/invite/${code}`);
+    toast.success('링크가 복사되었습니다.');
+  };
 
   const attending = responses.filter(r => r.isAttending);
   const totalGuests = attending.reduce((a, r) => a + r.totalGuests, 0);
@@ -142,6 +218,80 @@ const AdminPage: React.FC = () => {
         </div>
       )}
 
+      <section className="admin-guests-section">
+        <h2 className="admin-section-title">하객 명단 · 개인화 링크</h2>
+        <div className="guest-add-row">
+          <input
+            type="text"
+            className="guest-add-input"
+            placeholder="하객 이름"
+            value={newGuestName}
+            onChange={(e) => setNewGuestName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAddGuest(); }}
+          />
+          <select className="guest-add-select" value={newGuestRelation} onChange={(e) => setNewGuestRelation(e.target.value as GuestRelation)}>
+            {(Object.keys(RELATION_LABELS) as GuestRelation[]).map((r) => (
+              <option key={r} value={r}>{RELATION_LABELS[r]}</option>
+            ))}
+          </select>
+          <button type="button" className="admin-btn primary" disabled={!newGuestName.trim() || adding} onClick={handleAddGuest}>
+            {adding ? '추가 중...' : '+ 추가'}
+          </button>
+        </div>
+
+        {guestsLoading ? (
+          <p className="admin-loading">불러오는 중...</p>
+        ) : guests.length === 0 ? (
+          <div className="admin-empty"><p>등록된 하객이 없습니다.</p></div>
+        ) : (
+          <div className="admin-table-wrap">
+            <table>
+              <thead>
+                <tr><th>이름</th><th>관계</th><th>개인화 링크</th><th>등록일</th><th></th></tr>
+              </thead>
+              <tbody>
+                {guests.map((g) => (
+                  <tr key={g.code}>
+                    {editingCode === g.code ? (
+                      <>
+                        <td><input type="text" className="guest-edit-input" value={editName} onChange={(e) => setEditName(e.target.value)} /></td>
+                        <td>
+                          <select className="guest-edit-select" value={editRelation} onChange={(e) => setEditRelation(e.target.value as GuestRelation)}>
+                            {(Object.keys(RELATION_LABELS) as GuestRelation[]).map((r) => (
+                              <option key={r} value={r}>{RELATION_LABELS[r]}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="link-cell">/invite/{g.code}</td>
+                        <td className="date-cell">{g.createdAt ? new Date(g.createdAt).toLocaleDateString('ko') : ''}</td>
+                        <td>
+                          <button type="button" className="row-icon-btn" title="저장" onClick={() => handleSaveGuest(g.code)}><Check size={15} /></button>
+                          <button type="button" className="row-icon-btn" title="취소" onClick={() => setEditingCode(null)}><X size={15} /></button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td>{g.name}</td>
+                        <td><span className="badge relation">{RELATION_LABELS[g.relation]}</span></td>
+                        <td className="link-cell">/invite/{g.code}</td>
+                        <td className="date-cell">{g.createdAt ? new Date(g.createdAt).toLocaleDateString('ko') : ''}</td>
+                        <td>
+                          <button type="button" className="row-icon-btn" title="링크 복사" onClick={() => handleCopyGuestLink(g.code)}><Copy size={15} /></button>
+                          <button type="button" className="row-icon-btn" title="수정" onClick={() => startEditGuest(g)}><Pencil size={15} /></button>
+                          <button type="button" className="row-icon-btn danger" title="삭제" onClick={() => handleDeleteGuest(g)}><Trash2 size={15} /></button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <ToastContainer />
+
       <style>{`
         .admin-page { max-width: 960px; margin: 0 auto; padding: 40px 20px; font-family: 'Pretendard', sans-serif; }
         .admin-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
@@ -169,7 +319,22 @@ const AdminPage: React.FC = () => {
         .date-cell { font-size: 0.8rem; color: #9CA3AF; white-space: nowrap; }
         .admin-empty { padding: 60px; text-align: center; background: white; border: 1px dashed #E5E7EB; border-radius: 16px; color: #9CA3AF; }
         .admin-loading { text-align: center; color: #9CA3AF; }
-        @media (max-width: 768px) { .admin-stats { grid-template-columns: repeat(2, 1fr); } }
+        .admin-btn.primary { background: #B07A8E; border-color: #B07A8E; color: white; }
+        .admin-btn.primary:hover { background: #9B6A7E; border-color: #9B6A7E; color: white; }
+        .admin-btn.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .admin-guests-section { margin-top: 40px; }
+        .admin-section-title { font-size: 1.1rem; font-weight: 700; color: #1F2937; margin: 0 0 16px; }
+        .guest-add-row { display: flex; gap: 8px; margin-bottom: 16px; }
+        .guest-add-input { flex: 1; padding: 10px 14px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.88rem; font-family: inherit; }
+        .guest-add-select { padding: 10px 12px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.88rem; font-family: inherit; color: #374151; background: white; }
+        .guest-edit-input { width: 100%; padding: 6px 8px; border: 1px solid #D4A5C6; border-radius: 6px; font-size: 0.85rem; font-family: inherit; box-sizing: border-box; }
+        .guest-edit-select { padding: 6px 8px; border: 1px solid #D4A5C6; border-radius: 6px; font-size: 0.85rem; font-family: inherit; }
+        .badge.relation { background: #F3F4F6; color: #6B7280; }
+        .link-cell { font-family: monospace; font-size: 0.82rem; color: #6B7280; }
+        .row-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; border-radius: 8px; background: none; color: #9CA3AF; cursor: pointer; transition: all 0.15s; margin-right: 2px; }
+        .row-icon-btn:hover { background: #F3F4F6; color: #4B5563; }
+        .row-icon-btn.danger:hover { background: #FEF2F2; color: #DC2626; }
+        @media (max-width: 768px) { .admin-stats { grid-template-columns: repeat(2, 1fr); } .guest-add-row { flex-wrap: wrap; } }
       `}</style>
     </div>
   );

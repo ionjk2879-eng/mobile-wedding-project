@@ -160,3 +160,12 @@ export interface RSVPResponse {
   message: string;
   createdAt?: string;
 }
+
+export type GuestRelation = 'family' | 'friend' | 'coworker' | 'other';
+
+export interface Guest {
+  code: string;
+  name: string;
+  relation: GuestRelation;
+  createdAt: string;
+}
