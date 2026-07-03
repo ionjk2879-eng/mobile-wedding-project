@@ -525,7 +525,7 @@ async function handleRSVP(request: Request, env: Env, slug: string): Promise<Res
   }
 
   if (request.method === 'POST') {
-    const body = await request.json() as { guestName?: string; isAttending?: boolean; totalGuests?: number; wantsMeal?: boolean; relation?: string; message?: string; guestCode?: string };
+    const body = await request.json() as { guestName?: string; isAttending?: boolean; totalGuests?: number; wantsMeal?: boolean; relation?: string; message?: string; guestCode?: string; deviceToken?: string };
     if (!body.guestName || !body.relation) return json({ error: 'Required fields missing' }, 400, origin);
 
     // guestCode는 클라이언트가 임의로 지정할 수 있으므로, 실제로 이 청첩장에 속한 하객 code인지 검증 후에만 저장
@@ -539,8 +539,15 @@ async function handleRSVP(request: Request, env: Env, slug: string): Promise<Res
     // 같은 이름의 하객이 있을 때 id가 전역으로 충돌해 응답이 서로 덮어써진다.
     // 개인화 링크(guestCode 검증됨)로 들어온 경우엔 이름 대신 code로 식별해
     // 같은 청첩장 내 동명이인끼리도 충돌하지 않도록 한다.
+    // 공개 링크(이름 직접 입력)의 경우, 클라이언트가 보낸 브라우저 고정 deviceToken을
+    // id에 섞어서 "같은 브라우저 재제출=수정" / "다른 브라우저의 동명이인=별도 응답"을 구분한다.
     const nameId = body.guestName.trim().replace(/\s+/g, '_');
-    const id = guestCode ? `${slug}::code::${guestCode}` : `${slug}::${nameId}`;
+    const deviceToken = (body.deviceToken || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 32);
+    const id = guestCode
+      ? `${slug}::code::${guestCode}`
+      : deviceToken
+        ? `${slug}::${nameId}::${deviceToken}`
+        : `${slug}::${nameId}`;
     await env.DB.prepare(
       `INSERT INTO rsvp (id, invitation_slug, guest_name, is_attending, total_guests, wants_meal, relation, message, guest_code)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
