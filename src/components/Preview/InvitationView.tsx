@@ -97,11 +97,36 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
   }
 };
 
-const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'midphoto', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
+// midphoto는 순서 관리 대상이 아니라 활성 섹션 중간에 자동 배치되는 고정 섹션이라 여기서 제외
+const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
+
+// 각 섹션의 on/off 토글 여부 (없는 섹션은 항상 활성)
+function isSectionActive(id: string, data: InvitationData): boolean {
+  switch (id) {
+    case 'interview': return data.isInterviewEnabled !== false;
+    case 'timeline': return data.isTimelineEnabled !== false;
+    case 'message': return data.isMessageEnabled !== false;
+    case 'ending': return data.isEndingEnabled !== false;
+    default: return true;
+  }
+}
+
+// midphoto를 '현재 활성화된 섹션들' 중 중간 위치에 동적으로 삽입
+function buildSectionOrder(data: InvitationData): string[] {
+  const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
+  const baseOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))].filter((id) => id !== 'midphoto');
+  if (data.isMidPhotoEnabled === false) return baseOrder;
+
+  const activeIndices = baseOrder.reduce<number[]>((acc, id, i) => {
+    if (isSectionActive(id, data)) acc.push(i);
+    return acc;
+  }, []);
+  const insertAt = activeIndices.length > 0 ? activeIndices[Math.floor(activeIndices.length / 2)] : baseOrder.length;
+  return [...baseOrder.slice(0, insertAt), 'midphoto', ...baseOrder.slice(insertAt)];
+}
 
 const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation }) => {
-  const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
-  const sectionOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
+  const sectionOrder = buildSectionOrder(data);
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
 
   const daysAfterWedding = (() => {
