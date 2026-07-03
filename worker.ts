@@ -535,7 +535,12 @@ async function handleRSVP(request: Request, env: Env, slug: string): Promise<Res
       if (guestRow) guestCode = body.guestCode;
     }
 
-    const id = body.guestName.trim().replace(/\s+/g, '_');
+    // id는 반드시 invitation_slug로 스코프한다 — 그렇지 않으면 서로 다른 청첩장에
+    // 같은 이름의 하객이 있을 때 id가 전역으로 충돌해 응답이 서로 덮어써진다.
+    // 개인화 링크(guestCode 검증됨)로 들어온 경우엔 이름 대신 code로 식별해
+    // 같은 청첩장 내 동명이인끼리도 충돌하지 않도록 한다.
+    const nameId = body.guestName.trim().replace(/\s+/g, '_');
+    const id = guestCode ? `${slug}::code::${guestCode}` : `${slug}::${nameId}`;
     await env.DB.prepare(
       `INSERT INTO rsvp (id, invitation_slug, guest_name, is_attending, total_guests, wants_meal, relation, message, guest_code)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
