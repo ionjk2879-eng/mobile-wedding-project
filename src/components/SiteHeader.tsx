@@ -62,6 +62,7 @@ const SiteHeader: React.FC = () => {
         <nav className="site-nav-left">
           <Link to="/" className={`site-nav-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
           <Link to="/templates" className={`site-nav-link ${pathname === '/templates' ? 'active' : ''}`}>{t.site.templates}</Link>
+          <Link to="/events" className={`site-nav-link ${pathname === '/events' ? 'active' : ''}`}>{t.site.events}</Link>
         </nav>
       </div>
       <div className="site-header-right">
