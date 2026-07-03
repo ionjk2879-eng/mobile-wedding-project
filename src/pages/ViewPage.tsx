@@ -54,7 +54,7 @@ const ViewPage: React.FC = () => {
   );
   if (error || !data) return <div className="view-error" role="alert"><h2>청첩장을 찾을 수 없습니다</h2><p>주소를 다시 확인해주세요.</p></div>;
 
-  const isExpired = data.expiresAt && new Date(data.expiresAt) < new Date();
+  const isExpired = !data.isPaid && data.expiresAt && new Date(data.expiresAt) < new Date();
   if (isExpired) return (
     <div className="view-error" role="alert">
       <p className="view-expired-icon">⏰</p>

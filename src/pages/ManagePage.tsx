@@ -185,7 +185,7 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
 };
 
 function getExpiryInfo(data: InvitationData, expiredLabel: string): { label: string; urgent: boolean } | null {
-  if (!data.expiresAt) return null;
+  if (data.isPaid || !data.expiresAt) return null;
   const diff = Math.ceil((new Date(data.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   if (diff < 0) return { label: expiredLabel, urgent: true };
   if (diff <= 30) return { label: `D-${diff}`, urgent: diff <= 3 };
