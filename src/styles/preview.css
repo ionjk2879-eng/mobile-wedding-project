@@ -708,8 +708,8 @@
 .op-typing-names.visible { opacity: 0.92; transform: translateY(0); }
 .op-typing-sub { margin: 0; font-size: 0.78em; letter-spacing: 4px; color: var(--op-text); font-family: var(--op-font); font-weight: 300; opacity: 0; transform: translateY(8px); transition: opacity 0.9s ease 0.15s, transform 0.9s ease 0.15s; }
 .op-typing-sub.visible { opacity: 0.88; transform: translateY(0); }
-.op-typing-btn { opacity: 0; pointer-events: none; transform: translateY(12px); animation: none !important; transition: opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s, background 0.3s, border-color 0.3s; }
-.op-typing-btn.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.op-typing-btn { opacity: 0; pointer-events: none; cursor: default; transform: translateY(12px); animation: none !important; transition: opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s, background 0.3s, border-color 0.3s; }
+.op-typing-btn.visible { opacity: 1; pointer-events: auto; cursor: pointer; transform: translateY(0); }
 .op-typing.op-phase-exit { transition: opacity 0.4s ease; opacity: 0 !important; }
 .op-typing.op-phase-exit .op-typing-body { animation: op-body-exit 0.25s ease forwards; }
 

@@ -269,6 +269,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [isSwitchingContent, setIsSwitchingContent] = useState(false);
   const [seqBodyKey, setSeqBodyKey] = useState(0);
   const [typingBodyKey, setTypingBodyKey] = useState(0);
+  const [seqBtnActive, setSeqBtnActive] = useState(false);
   const contentSwitchTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const phaseTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -285,6 +286,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       el.classList.add(styleClass);
     }
     setPhase('enter');
+    setSeqBtnActive(false);
     clearTimeout(contentSwitchTimerRef.current);
     setDisplayedIsTyping(isTyping);
     setIsSwitchingContent(false);
@@ -294,6 +296,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   // 원형 확산·베일 드롭은 루트 클래스 자체에 애니메이션이 묶여 있어 클래스 토글도 필요
   useLayoutEffect(() => {
     setPhase('enter');
+    setSeqBtnActive(false);
     if (effectiveStyle === 'circle' || effectiveStyle === 'veil') {
       const el = rootRef.current;
       if (el) {
@@ -496,6 +499,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   const handleDismiss = () => {
     if (isTyping && typingPhase !== 'done') return;
+    if (!isTyping && !seqBtnActive) return;
     clearTimeout(phaseTimerRef.current); // 지연된 'ready' 전환이 exit 이후에 발화하지 않도록
     phaseRef.current = 'exit'; // editorBounds 갱신 즉시 차단
     setPhase('exit');
@@ -649,7 +653,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
           <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />
 
-          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both` }} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
+          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both`, pointerEvents: seqBtnActive ? 'auto' : 'none', cursor: seqBtnActive ? undefined : 'default' }} onAnimationEnd={() => setSeqBtnActive(true)} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
         </div>
       )}
 
