@@ -1,5 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause } from 'lucide-react';
+import { Play } from 'lucide-react';
+
+const EqBars: React.FC = () => (
+  <div className="music-eq" aria-hidden="true">
+    <span /><span /><span /><span />
+  </div>
+);
 
 interface MusicPlayerProps {
   url: string;
@@ -86,7 +92,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ url }) => {
       <audio ref={audioRef} src={url} loop={loopEnabled} preload="auto" />
       <div className="music-float-wrap">
         <button className="music-float-btn" onClick={toggle} ref={btnRef}>
-          {isPlaying ? <Pause size={14} /> : <Play size={14} style={{ marginLeft: 1 }} />}
+          {isPlaying ? <EqBars /> : <Play size={14} style={{ marginLeft: 1 }} />}
         </button>
       </div>
     </>
