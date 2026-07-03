@@ -33,6 +33,7 @@ interface InvitationViewProps {
   shareEnabled?: boolean;
   openingTopOffset?: number;
   onSectionNav?: (editorId: string) => void;
+  forceAnniversaryMode?: boolean;
 }
 
 // 미리보기 섹션 ID → 에디터 섹션 ID 매핑
@@ -93,7 +94,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 
 const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode }) => {
   const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
   const sectionOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
@@ -102,7 +103,8 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     if (!data.weddingDateISO) return 0;
     return Math.floor((Date.now() - new Date(data.weddingDateISO).getTime()) / 86400000);
   })();
-  const isAnniversaryMode = shareEnabled && daysAfterWedding > 0;
+  // 기념일 모드: ?mode=anniversary 로 명시적으로 접근할 때만 활성화
+  const isAnniversaryMode = forceAnniversaryMode === true;
   const [previewActive, setPreviewActive] = useState(false);
   // openingDone: 한 번 dismiss 되면 true → shouldShowOpening = false → 완전히 언마운트
   const [openingDone, setOpeningDone] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { InvitationData } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
@@ -31,6 +31,7 @@ const PromoSection: React.FC = () => (
 
 const ViewPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
   const [data, setData] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -84,13 +85,14 @@ const ViewPage: React.FC = () => {
   };
 
   const showWatermark = !data.isPaid;
+  const anniversaryMode = data.isPaid && searchParams.get('mode') === 'anniversary';
 
   return (
     <div className="view-container" style={{ fontFamily: data.fontFamily }}>
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor, '--wedding-accent': data.customAccentColor } as React.CSSProperties : {}) }}>
         <ScrollRootContext.Provider value={null}>
-          <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} />
+          <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} />
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
         {showWatermark && <PromoSection />}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../services/invitationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen } from 'lucide-react';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen, Heart } from 'lucide-react';
 import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
@@ -143,6 +143,10 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  const isWeddingPast = data.weddingDateISO
+    ? new Date(data.weddingDateISO).getTime() < Date.now()
+    : false;
+
   useEffect(() => {
     if (!open) return;
     const handleClick = (e: MouseEvent) => {
@@ -168,6 +172,11 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
             }}>
               <BookOpen size={14} /> {tm.guestbookPdf}
             </button>
+          )}
+          {isPaid && isWeddingPast && (
+            <a href={`/${slug}?mode=anniversary`} target="_blank" rel="noopener noreferrer" className="mc-dropdown-item" onClick={() => setOpen(false)}>
+              <Heart size={14} /> 기념일 모드
+            </a>
           )}
           <button className="mc-dropdown-item" onClick={() => { setOpen(false); onChangeSlug(); }}>
             <Globe size={14} /> {tm.changeUrl}
