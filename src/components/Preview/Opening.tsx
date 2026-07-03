@@ -141,6 +141,7 @@ interface OpeningProps {
   language?: 'ko' | 'en' | 'ja';
   guestName?: string;
   guestRelation?: GuestRelation;
+  guestMessageIndex?: number | null;
   weddingDateISO?: string;
 }
 
@@ -155,7 +156,7 @@ function hexLuminance(hex: string): number {
   } catch { return 0; }
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, weddingDateISO }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
@@ -278,7 +279,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const phaseTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // 개인화 링크(guestName)로 들어온 경우 관계별 톤 템플릿을 우선 사용, 없으면 기존 문구로 폴백
-  const guestOpeningText = guestName ? formatGuestOpeningText(guestRelation || 'other', guestName, language) : null;
+  const guestOpeningText = guestName ? formatGuestOpeningText(guestRelation || 'other', guestName, language, guestMessageIndex) : null;
   const effectiveOpeningText = guestOpeningText || opening.openingText || 'We\'re getting married';
 
   const mainTextRef = useRef(effectiveOpeningText);

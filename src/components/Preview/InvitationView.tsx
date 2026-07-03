@@ -38,6 +38,7 @@ interface InvitationViewProps {
   guestName?: string;
   guestRelation?: GuestRelation;
   guestCode?: string;
+  guestMessageIndex?: number | null;
 }
 
 // 미리보기 섹션 ID → 에디터 섹션 ID 매핑
@@ -126,7 +127,7 @@ function buildSectionOrder(data: InvitationData): string[] {
   return [...baseOrder.slice(0, insertAt), 'midphoto', ...baseOrder.slice(insertAt)];
 }
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex }) => {
   const sectionOrder = buildSectionOrder(data);
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
 
@@ -193,6 +194,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           language={data.language}
           guestName={guestName}
           guestRelation={guestRelation}
+          guestMessageIndex={guestMessageIndex}
           weddingDateISO={data.weddingDateISO}
         />
       )}

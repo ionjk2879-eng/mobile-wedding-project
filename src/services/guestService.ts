@@ -21,6 +21,7 @@ export interface InviteLookupResult {
   slug: string;
   name: string;
   relation: GuestRelation;
+  messageIndex: number | null;
 }
 
 // 개인화 링크(/invite/{code}) 조회. 실패(404/DB 에러/네트워크 오류) 시 null로 통일해

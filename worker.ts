@@ -565,6 +565,10 @@ function generateGuestCode(): string {
   return Array.from(bytes, (b) => GUEST_CODE_ALPHABET[b % 32]).join('');
 }
 
+// relation당 준비된 오프닝 문구 배리에이션 개수 — src/utils/guestOpeningTemplates.ts의 배열 길이와 반드시 일치해야 함
+// (worker.ts는 다른 파일을 import하지 않는 독립 파일이라 텍스트 자체가 아닌 개수만 여기서 중복 관리)
+const GUEST_MESSAGE_TEMPLATE_COUNT = 4;
+
 async function requireInvitationOwner(request: Request, env: Env, slug: string): Promise<{ error: Response } | { user: { uid: string } }> {
   const origin = request.headers.get('Origin') || '*';
   const user = await getAuthUser(request, env);
@@ -650,9 +654,21 @@ async function handleInviteLookup(request: Request, env: Env, code: string): Pro
       "UPDATE guests SET visited_at = datetime('now') WHERE code = ? AND visited_at IS NULL"
     ).bind(code).run();
 
-    const row = await env.DB.prepare('SELECT invitation_slug, name, relation FROM guests WHERE code = ?').bind(code).first();
+    const row = await env.DB.prepare('SELECT invitation_slug, name, relation, assigned_message_index FROM guests WHERE code = ?').bind(code).first();
     if (!row) return json({ error: '유효하지 않은 링크입니다.' }, 404, origin);
-    return json({ slug: row.invitation_slug, name: row.name, relation: row.relation }, 200, origin);
+
+    let messageIndex = row.assigned_message_index as number | null;
+    if (messageIndex === null || messageIndex === undefined) {
+      // 최초 방문 시 relation 카테고리 내에서 랜덤 배리에이션을 뽑아 고정 (재접속해도 문구가 안 바뀌도록)
+      const randomIndex = Math.floor(Math.random() * GUEST_MESSAGE_TEMPLATE_COUNT);
+      await env.DB.prepare(
+        'UPDATE guests SET assigned_message_index = ? WHERE code = ? AND assigned_message_index IS NULL'
+      ).bind(randomIndex, code).run();
+      const refreshed = await env.DB.prepare('SELECT assigned_message_index FROM guests WHERE code = ?').bind(code).first();
+      messageIndex = (refreshed?.assigned_message_index as number | null) ?? randomIndex;
+    }
+
+    return json({ slug: row.invitation_slug, name: row.name, relation: row.relation, messageIndex }, 200, origin);
   } catch {
     return json({ error: '조회에 실패했습니다.' }, 500, origin);
   }
