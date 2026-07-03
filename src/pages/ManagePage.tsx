@@ -12,7 +12,7 @@ import { useSiteLang } from '../i18n';
 
 const SITE_ORIGIN = 'https://sonett.kr';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
-const KMONG_SERVICE_URL = 'https://kmong.com'; // TODO: 실제 크몽 서비스 URL로 변경
+const NAVER_STORE_URL = 'https://smartstore.naver.com/sonett/products/13648852696';
 
 const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
   const { t } = useSiteLang();
@@ -278,7 +278,7 @@ const ManagePage: React.FC = () => {
                   </div>
                   {!data.isPaid && (
                     <div className="mc-purchase-section">
-                      <a href={KMONG_SERVICE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
+                      <a href={NAVER_STORE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
                         <ShoppingCart size={13} /> {tm.buyOnKmong}
                       </a>
                       <div className="mc-slug-guide">
