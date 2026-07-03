@@ -141,6 +141,7 @@ interface OpeningProps {
   language?: 'ko' | 'en' | 'ja';
   guestName?: string;
   guestRelation?: GuestRelation;
+  weddingDateISO?: string;
 }
 
 function hexLuminance(hex: string): number {
@@ -154,7 +155,7 @@ function hexLuminance(hex: string): number {
   } catch { return 0; }
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, weddingDateISO }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
@@ -434,6 +435,19 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     if (language === 'ja') return `${y}年${m + 1}月${d}日`;
     return `${y}년 ${m + 1}월 ${d}일`;
   })();
+  // 기념일 모드는 openingText 자체가 D+n으로 대체되므로 여기선 일반 모드에서만 D-day를 서브 멘트 아래 표시
+  const dDayStr = (() => {
+    if (anniversaryMode || !weddingDateISO) return '';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weddingDate = new Date(weddingDateISO);
+    weddingDate.setHours(0, 0, 0, 0);
+    if (isNaN(weddingDate.getTime())) return '';
+    const diffDays = Math.ceil((weddingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return 'D-Day';
+    if (diffDays < 0) return `D+${Math.abs(diffDays)}`;
+    return `D-${diffDays}`;
+  })();
   const colorMode = opening.openingColorMode || 'theme';
   const gradientMode = opening.openingGradientMode || 'theme';
   const isThemeGradient = colorMode === 'gradient' && gradientMode === 'theme';
@@ -607,6 +621,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
             <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>
               {subText}
               {anniversaryMode && todayDateStr && <span style={{ display: 'block', marginTop: '0.3em', opacity: 0.75, fontSize: '0.88em' }}>{todayDateStr}</span>}
+              {dDayStr && <span style={{ display: 'block', marginTop: '0.3em', opacity: 0.75, fontSize: '0.88em' }}>{dDayStr}</span>}
             </p>
             <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
           </div>
@@ -656,6 +671,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           <p className="op-sub" style={{ animation: `op-fade-up 0.6s ease ${seqSubDelay} both` }}>
             {subText}
             {anniversaryMode && todayDateStr && <span style={{ display: 'block', marginTop: '0.3em', opacity: 0.75, fontSize: '0.88em' }}>{todayDateStr}</span>}
+            {dDayStr && <span style={{ display: 'block', marginTop: '0.3em', opacity: 0.75, fontSize: '0.88em' }}>{dDayStr}</span>}
           </p>
 
           <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />

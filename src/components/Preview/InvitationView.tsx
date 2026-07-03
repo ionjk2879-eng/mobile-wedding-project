@@ -167,6 +167,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           language={data.language}
           guestName={guestName}
           guestRelation={guestRelation}
+          weddingDateISO={data.weddingDateISO}
         />
       )}
       <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />
