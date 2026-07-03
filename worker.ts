@@ -948,7 +948,7 @@ export default {
 
       const data = JSON.parse(row.data as string);
       const title = data.groomName && data.brideName
-        ? `${data.groomName} 💕 ${data.brideName} 결혼합니다`
+        ? `${data.groomName} ❤️ ${data.brideName} 결혼합니다`
         : '모바일 청첩장';
       // 신랑/신부 이름은 이미 title(굵게 렌더링되는 영역)에 들어있어 description에는 날짜만 넣어 중복을 없앰
       const dateTimeLine = data.weddingDateISO ? formatWeddingDateTimeKo(data.weddingDateISO, data.time) : (data.date || '');
