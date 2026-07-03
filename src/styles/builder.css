@@ -154,6 +154,12 @@
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 
+/* 에디터 시작 화면 — 새 청첩장 카드 단독 */
+.ss-new-card-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.ss-new-card-full { width: 100%; max-width: 220px; }
+.ss-browse-tmpl-link { font-size: 0.82rem; font-weight: 600; color: #B07A8E; text-decoration: none; }
+.ss-browse-tmpl-link:hover { text-decoration: underline; }
+
 /* Template selection modal (bottom sheet) */
 .tmpl-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2000; display: flex; align-items: flex-end; justify-content: center; animation: tmpl-bg-in 0.2s ease; }
 @keyframes tmpl-bg-in { from { opacity: 0; } to { opacity: 1; } }

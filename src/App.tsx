@@ -199,8 +199,8 @@ const App: React.FC = () => {
         <section className="ss-section">
           <h2 className="ss-section-title">{te.templateSelect}</h2>
           <p className="ss-section-sub">{te.templateSelectSub}</p>
-          <div className="ss-tmpl-grid">
-            <button className="ss-tmpl-card ss-tmpl-blank" onClick={handleStartNew}>
+          <div className="ss-new-card-wrap">
+            <button className="ss-tmpl-card ss-tmpl-blank ss-new-card-full" onClick={handleStartNew}>
               <div className="ss-tmpl-visual ss-tmpl-visual-blank">
                 <span className="ss-tmpl-blank-plus">+</span>
                 <span className="ss-tmpl-blank-label">{te.blankCard}</span>
@@ -210,32 +210,9 @@ const App: React.FC = () => {
                 <span className="ss-tmpl-desc">{te.customizeDesc}</span>
               </div>
             </button>
-            {AI_PRESETS.map((preset) => (
-              <a
-                key={preset.id}
-                href={`/template-preview/${preset.id}`}
-                className="ss-tmpl-card"
-                onClick={(e) => {
-                  if (!e.ctrlKey && !e.metaKey) {
-                    e.preventDefault();
-                    navigate(`/template-preview/${preset.id}`);
-                  }
-                }}
-              >
-                <div
-                  className="ss-tmpl-visual"
-                  style={{
-                    background: `linear-gradient(160deg, ${preset.previewColors[0]} 0%, ${preset.previewColors[1]} 55%, ${preset.previewColors[2]} 100%)`,
-                  }}
-                >
-                  <span className="ss-tmpl-emoji">{preset.emoji}</span>
-                </div>
-                <div className="ss-tmpl-body">
-                  <span className="ss-tmpl-name">{preset.name}</span>
-                  <span className="ss-tmpl-desc">{preset.description}</span>
-                </div>
-              </a>
-            ))}
+            <a href="/templates" className="ss-browse-tmpl-link" onClick={(e) => { e.preventDefault(); navigate('/templates'); }}>
+              템플릿 둘러보기 →
+            </a>
           </div>
         </section>
       </div>

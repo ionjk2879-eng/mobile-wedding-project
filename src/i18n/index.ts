@@ -7,6 +7,7 @@ type Translations = typeof ko;
 const ko = {
   site: {
     mobileWedding: '모바일 청첩장',
+    templates: '템플릿',
     manage: '청첩장 관리',
     login: '로그인',
     logout: '로그아웃',
@@ -128,6 +129,7 @@ const ko = {
 const en: Translations = {
   site: {
     mobileWedding: 'Mobile Invitation',
+    templates: 'Templates',
     manage: 'My Invitations',
     login: 'Sign In',
     logout: 'Sign Out',
@@ -249,6 +251,7 @@ const en: Translations = {
 const ja: Translations = {
   site: {
     mobileWedding: '招待状を作る',
+    templates: 'テンプレート',
     manage: '招待状管理',
     login: 'ログイン',
     logout: 'ログアウト',
