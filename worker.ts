@@ -647,9 +647,12 @@ async function handleGuest(request: Request, env: Env, slug: string, code: strin
 
   if (request.method === 'DELETE') {
     // FK가 실제로 강제되지 않으므로(PRAGMA foreign_keys 미설정), 하객 삭제 시
-    // 연결된 RSVP 응답이 존재하지 않는 code를 가리키는 고아 레코드가 되지 않도록 수동으로 정리
+    // 연결된 RSVP 응답/갤러리 사진이 존재하지 않는 code를 가리키는 고아 레코드가 되지 않도록 수동으로 정리.
+    // 갤러리 사진은 결혼식 당일의 실제 추억이라 하객 삭제(명단 정리 등)로 함께 지워지면 되돌릴 수 없으므로,
+    // 사진(r2_key)은 그대로 두고 uploader_ref만 끊는다 (guest_name은 별도 컬럼이라 표시는 계속 유지됨).
     await env.DB.batch([
       env.DB.prepare('UPDATE rsvp SET guest_code = NULL WHERE guest_code = ?').bind(code),
+      env.DB.prepare("UPDATE gallery_photos SET uploader_ref = NULL WHERE uploader_ref = ? AND uploader_type = 'guest_code'").bind(code),
       env.DB.prepare('DELETE FROM guests WHERE code = ?').bind(code),
     ]);
     return json({ ok: true }, 200, origin);
@@ -689,6 +692,11 @@ async function handleInviteLookup(request: Request, env: Env, code: string): Pro
 
 // --- Image Upload & Serve ---
 
+// file.type/file.name은 클라이언트가 임의로 지정할 수 있으므로, 실제 이미지 MIME 타입
+// 화이트리스트로만 저장을 허용한다. 그렇지 않으면 image/svg+xml 등으로 스크립트를 심어
+// 업로드한 뒤 /images/{key}로 직접 접속시켰을 때 같은 오리진에서 실행되는 저장형 XSS로 이어질 수 있다.
+const IMAGE_EXT_BY_TYPE: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
+
 async function handleUpload(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   const user = await getAuthUser(request, env);
@@ -699,11 +707,7 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
   if (!file) return json({ error: 'file is required' }, 400, origin);
   if (file.size > 2 * 1024 * 1024) return json({ error: '파일 크기는 2MB를 초과할 수 없습니다.' }, 400, origin);
 
-  // file.type/file.name은 클라이언트가 임의로 지정할 수 있으므로, 실제 이미지 MIME 타입
-  // 화이트리스트로만 저장을 허용한다. 그렇지 않으면 image/svg+xml 등으로 스크립트를 심어
-  // 업로드한 뒤 /images/{key}로 직접 접속시켰을 때 같은 오리진에서 실행되는 저장형 XSS로 이어질 수 있다.
-  const EXT_BY_TYPE: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
-  const ext = EXT_BY_TYPE[file.type];
+  const ext = IMAGE_EXT_BY_TYPE[file.type];
   if (!ext) return json({ error: 'JPEG, PNG, WEBP, GIF 이미지 파일만 업로드할 수 있습니다.' }, 400, origin);
 
   const key = `${crypto.randomUUID()}.${ext}`;
@@ -722,6 +726,127 @@ async function handleImageGet(_request: Request, env: Env, key: string): Promise
       'X-Content-Type-Options': 'nosniff',
     },
   });
+}
+
+// --- Wedding Live Gallery (하객 업로드 갤러리) ---
+
+const GALLERY_PER_UPLOADER_LIMIT = 4;
+const GALLERY_TOTAL_LIMIT = 250;
+const GALLERY_MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+async function handleGalleryUpload(request: Request, env: Env, slug: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+
+  const inv = await env.DB.prepare('SELECT slug FROM invitations WHERE slug = ?').bind(slug).first();
+  if (!inv) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
+
+  const formData = await request.formData();
+  const file = formData.get('file') as File | null;
+  if (!file) return json({ error: 'file is required' }, 400, origin);
+  if (file.size > GALLERY_MAX_FILE_SIZE) return json({ error: '파일 크기는 5MB를 초과할 수 없습니다.' }, 400, origin);
+
+  const ext = IMAGE_EXT_BY_TYPE[file.type];
+  if (!ext) return json({ error: 'JPEG, PNG, WEBP, GIF 이미지 파일만 업로드할 수 있습니다.' }, 400, origin);
+
+  const guestCodeInput = ((formData.get('guestCode') as string | null) || '').trim();
+  const deviceTokenInput = ((formData.get('deviceToken') as string | null) || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 32);
+  const nameInput = ((formData.get('guestName') as string | null) || '').trim().slice(0, 40);
+
+  let uploaderType: 'guest_code' | 'token';
+  let uploaderRef: string;
+  let guestName: string;
+
+  if (guestCodeInput) {
+    // guestCode는 클라이언트가 임의로 지정할 수 있으므로, 실제로 이 청첩장에 속한 하객 code인지 검증 후에만 사용
+    const guestRow = await env.DB.prepare('SELECT code, name FROM guests WHERE code = ? AND invitation_slug = ?').bind(guestCodeInput, slug).first();
+    if (!guestRow) return json({ error: '유효하지 않은 하객 코드입니다.' }, 400, origin);
+    uploaderType = 'guest_code';
+    uploaderRef = guestCodeInput;
+    guestName = (guestRow.name as string) || nameInput;
+  } else {
+    if (!deviceTokenInput) return json({ error: '업로더를 식별할 수 없습니다.' }, 400, origin);
+    if (!nameInput) return json({ error: '이름을 입력해주세요.' }, 400, origin);
+    uploaderType = 'token';
+    uploaderRef = deviceTokenInput;
+    guestName = nameInput;
+  }
+
+  // 인당 업로드 제한 (숨김 처리된 사진도 포함해서 카운트 — 신고로 숨겨도 제한을 우회하지 못하게)
+  const perUploaderCount = await env.DB.prepare(
+    'SELECT COUNT(*) as cnt FROM gallery_photos WHERE invitation_slug = ? AND uploader_type = ? AND uploader_ref = ?'
+  ).bind(slug, uploaderType, uploaderRef).first();
+  if (((perUploaderCount?.cnt as number) ?? 0) >= GALLERY_PER_UPLOADER_LIMIT) {
+    return json({ error: `한 분당 최대 ${GALLERY_PER_UPLOADER_LIMIT}장까지 업로드할 수 있습니다.` }, 429, origin);
+  }
+
+  // 전체 총량 제한
+  const totalCount = await env.DB.prepare(
+    'SELECT COUNT(*) as cnt FROM gallery_photos WHERE invitation_slug = ?'
+  ).bind(slug).first();
+  if (((totalCount?.cnt as number) ?? 0) >= GALLERY_TOTAL_LIMIT) {
+    return json({ error: '갤러리 사진이 가득 찼습니다.' }, 429, origin);
+  }
+
+  const id = crypto.randomUUID();
+  const r2Key = `gallery/${slug}/${id}.${ext}`;
+  await env.IMAGES.put(r2Key, file.stream(), { httpMetadata: { contentType: file.type } });
+
+  await env.DB.prepare(
+    'INSERT INTO gallery_photos (id, invitation_slug, r2_key, uploader_type, uploader_ref, guest_name) VALUES (?, ?, ?, ?, ?, ?)'
+  ).bind(id, slug, r2Key, uploaderType, uploaderRef, guestName || null).run();
+
+  return json({ id, url: `/images/${r2Key}`, guestName: guestName || null, createdAt: new Date().toISOString() }, 200, origin);
+}
+
+async function handleGalleryPhotos(request: Request, env: Env, slug: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const rows = await env.DB.prepare(
+    'SELECT id, r2_key, guest_name, created_at FROM gallery_photos WHERE invitation_slug = ? AND hidden_at IS NULL ORDER BY created_at DESC'
+  ).bind(slug).all();
+  return json(rows.results.map((r: Record<string, unknown>) => ({
+    id: r.id, url: `/images/${r.r2_key}`, guestName: r.guest_name ?? null, createdAt: r.created_at,
+  })), 200, origin);
+}
+
+async function handleGalleryPhotoDelete(request: Request, env: Env, slug: string, photoId: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const row = await env.DB.prepare(
+    'SELECT invitation_slug, r2_key, uploader_type, uploader_ref FROM gallery_photos WHERE id = ?'
+  ).bind(photoId).first();
+  if (!row || row.invitation_slug !== slug) return json({ error: '사진을 찾을 수 없습니다.' }, 404, origin);
+
+  const body = await request.json().catch(() => ({})) as { guestCode?: string; deviceToken?: string };
+
+  let authorized = false;
+
+  // 1) 청첩장 소유자(로그인) 확인
+  const user = await getAuthUser(request, env);
+  if (user) {
+    const inv = await env.DB.prepare('SELECT owner_uid FROM invitations WHERE slug = ?').bind(slug).first();
+    if (inv && inv.owner_uid === user.uid) authorized = true;
+  }
+
+  // 2) 업로더 본인 확인 — guest_code 또는 deviceToken이 저장된 uploader_ref와 정확히 일치할 때만.
+  // 하객 삭제로 uploader_ref가 NULL이 된 사진은 이 경로로 삭제 불가(소유자만 삭제 가능)하도록 자연히 막힘.
+  if (!authorized && row.uploader_ref) {
+    if (row.uploader_type === 'guest_code' && body.guestCode && body.guestCode === row.uploader_ref) authorized = true;
+    if (row.uploader_type === 'token' && body.deviceToken && body.deviceToken === row.uploader_ref) authorized = true;
+  }
+
+  if (!authorized) return json({ error: '삭제 권한이 없습니다.' }, 403, origin);
+
+  await env.IMAGES.delete(row.r2_key as string);
+  await env.DB.prepare('DELETE FROM gallery_photos WHERE id = ?').bind(photoId).run();
+  return json({ ok: true }, 200, origin);
+}
+
+async function handleGalleryPhotoReport(request: Request, env: Env, slug: string, photoId: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  // 신고 1건만 접수돼도 즉시 숨김 처리(hidden_at 설정) — 오탐/악용은 신랑신부가 관리 페이지에서 검토
+  await env.DB.prepare(
+    "UPDATE gallery_photos SET hidden_at = datetime('now') WHERE id = ? AND invitation_slug = ? AND hidden_at IS NULL"
+  ).bind(photoId, slug).run();
+  return json({ ok: true }, 200, origin);
 }
 
 // --- Cron: expiry notification + cleanup ---
@@ -961,6 +1086,17 @@ export default {
 
       const inviteMatch = pathname.match(/^\/api\/invite\/([^/]+)$/);
       if (inviteMatch) return await handleInviteLookup(request, env, inviteMatch[1]);
+
+      // Live Gallery (하객 업로드 갤러리)
+      const galleryReportMatch = pathname.match(/^\/api\/gallery\/([^/]+)\/([^/]+)\/report$/);
+      if (galleryReportMatch && request.method === 'POST') return await handleGalleryPhotoReport(request, env, galleryReportMatch[1], galleryReportMatch[2]);
+
+      const galleryPhotoMatch = pathname.match(/^\/api\/gallery\/([^/]+)\/([^/]+)$/);
+      if (galleryPhotoMatch && request.method === 'DELETE') return await handleGalleryPhotoDelete(request, env, galleryPhotoMatch[1], galleryPhotoMatch[2]);
+
+      const galleryMatch = pathname.match(/^\/api\/gallery\/([^/]+)$/);
+      if (galleryMatch && request.method === 'GET') return await handleGalleryPhotos(request, env, galleryMatch[1]);
+      if (galleryMatch && request.method === 'POST') return await handleGalleryUpload(request, env, galleryMatch[1]);
 
       // Images from R2
       const imgMatch = pathname.match(/^\/images\/(.+)$/);
