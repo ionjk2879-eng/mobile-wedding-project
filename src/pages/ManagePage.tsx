@@ -19,12 +19,12 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
   const { t } = useSiteLang();
   const tm = t.manage;
   const shareUrl = `${SITE_ORIGIN}/${slug}`;
-  const title = data.shareTitle || `${data.groomName || '신랑'} ❤️ ${data.brideName || '신부'} 결혼합니다`;
-  const namesLine = `${data.groomName || '신랑'} ❤️ ${data.brideName || '신부'}`;
+  const title = data.shareTitle || `${data.groomName || '신랑'} 💕 ${data.brideName || '신부'} 결혼합니다`;
+  // 신랑/신부 이름은 이미 title(굵게 렌더링되는 영역)에 들어있어 description에는 날짜만 넣어 중복을 없앰
   const dateTimeLine = data.language !== 'en' && data.language !== 'ja' && data.weddingDateISO
     ? formatShareDateTime(data.weddingDateISO, data.time)
     : `${data.date} ${data.time}`;
-  const description = data.shareDescription || [namesLine, dateTimeLine].filter(Boolean).join('\n');
+  const description = data.shareDescription || dateTimeLine;
 
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {

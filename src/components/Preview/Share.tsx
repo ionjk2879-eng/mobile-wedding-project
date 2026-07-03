@@ -43,15 +43,16 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
     const groomFallback = isEn ? 'Groom' : isJa ? '新郎' : '신랑';
     const brideFallback = isEn ? 'Bride' : isJa ? '新婦' : '신부';
     const title = data.shareTitle || (isEn
-      ? `${data.groomName || groomFallback} ❤️ ${data.brideName || brideFallback} Wedding`
+      ? `${data.groomName || groomFallback} 💕 ${data.brideName || brideFallback} Wedding`
       : isJa
-      ? `${data.groomName || groomFallback} ❤️ ${data.brideName || brideFallback} 結婚式`
-      : `${data.groomName || groomFallback} ❤️ ${data.brideName || brideFallback} 결혼합니다`);
-    const namesLine = `${data.groomName || groomFallback} ❤️ ${data.brideName || brideFallback}`;
+      ? `${data.groomName || groomFallback} 💕 ${data.brideName || brideFallback} 結婚式`
+      : `${data.groomName || groomFallback} 💕 ${data.brideName || brideFallback} 결혼합니다`);
+    // 신랑/신부 이름은 이미 title(플랫폼별로 굵게 렌더링되는 영역)에 들어있어
+    // description에는 날짜만 넣어 중복을 없앰
     const dateTimeLine = !isEn && !isJa && data.weddingDateISO
       ? formatShareDateTime(data.weddingDateISO, data.time)
       : `${data.date} ${data.time}`;
-    const description = data.shareDescription || [namesLine, dateTimeLine].filter(Boolean).join('\n');
+    const description = data.shareDescription || dateTimeLine;
     const slug = data.slug || '';
     const kakaoButtonLabel = isEn ? 'View Invitation' : isJa ? '招待状を見る' : '청첩장 보기';
     try {

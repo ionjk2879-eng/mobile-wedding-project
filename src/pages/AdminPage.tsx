@@ -136,12 +136,12 @@ const AdminPage: React.FC = () => {
     const brideFallback = '신부';
     const groomName = invitationInfo?.groomName || groomFallback;
     const brideName = invitationInfo?.brideName || brideFallback;
-    const title = `${guest.name}님을 초대합니다`;
-    const namesLine = `${groomName} ❤️ ${brideName}`;
-    const dateTimeLine = invitationInfo?.weddingDateISO
+    // 초대 문구와 신랑/신부 이름을 title에 함께 넣어 둘 다 굵게 렌더링되도록 함
+    // (title은 대부분 플랫폼에서 굵게 표시되지만, description은 일반 굵기라 여기엔 날짜만 넣음)
+    const title = `${guest.name}님을 초대합니다\n${groomName} 💕 ${brideName}`;
+    const description = invitationInfo?.weddingDateISO
       ? formatShareDateTime(invitationInfo.weddingDateISO, invitationInfo.time)
       : '';
-    const description = [namesLine, dateTimeLine].filter(Boolean).join('\n');
     try {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
