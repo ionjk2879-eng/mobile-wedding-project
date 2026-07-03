@@ -71,8 +71,8 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
       color: '#EF4036',
       textColor: '#fff',
       url: coords
-        ? `https://tmap.life/route?goalname=${nameQuery}&goalx=${coords.lng}&goaly=${coords.lat}`
-        : `https://tmap.life/search?query=${searchQuery}`,
+        ? `tmap://route?goalname=${nameQuery}&goalx=${coords.lng}&goaly=${coords.lat}`
+        : `tmap://search?name=${searchQuery}`,
     },
   ];
 
