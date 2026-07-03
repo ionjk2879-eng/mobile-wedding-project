@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import useAuthStore from '../stores/useAuthStore';
 import { signInWithGoogle, signOut, deleteAccount, initiateKakaoLogin, initiateNaverLogin } from '../services/auth';
-import { LogIn, LogOut, UserX } from 'lucide-react';
+import { LogIn, LogOut, UserX, Menu, X } from 'lucide-react';
 import { useSiteLang, SiteLang } from '../i18n';
 
 const getProviderLabel = (uid: string) => {
@@ -44,6 +44,20 @@ const SiteHeader: React.FC = () => {
   const [loginMenuOpen, setLoginMenuOpen] = useState(false);
   const loginMenuRef = useRef<HTMLDivElement>(null);
 
+  const [navMenuOpen, setNavMenuOpen] = useState(false);
+  const navMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!navMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (navMenuRef.current && !navMenuRef.current.contains(e.target as Node)) {
+        setNavMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [navMenuOpen]);
+
   useEffect(() => {
     if (!loginMenuOpen) return;
     const handleClick = (e: MouseEvent) => {
@@ -66,7 +80,21 @@ const SiteHeader: React.FC = () => {
         </nav>
       </div>
       <div className="site-header-right">
-        <Link to="/manage" className={`site-nav-link ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
+        <Link to="/manage" className={`site-nav-link site-nav-link-desktop ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
+        <div className="site-nav-mobile" ref={navMenuRef}>
+          <button className="site-nav-toggle" onClick={() => setNavMenuOpen(!navMenuOpen)} aria-label="Menu">
+            {navMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          {navMenuOpen && (
+            <div className="site-nav-dropdown">
+              <Link to="/" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
+              <Link to="/templates" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/templates' ? 'active' : ''}`}>{t.site.templates}</Link>
+              <Link to="/events" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/events' ? 'active' : ''}`}>{t.site.events}</Link>
+              <div className="site-auth-menu-divider" />
+              <Link to="/manage" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
+            </div>
+          )}
+        </div>
         <div className="site-lang-switcher">
           {(['ko', 'en', 'ja'] as SiteLang[]).map((l) => (
             <button
@@ -189,6 +217,61 @@ const SiteHeader: React.FC = () => {
         .site-nav-link.active {
           color: #B07A8E;
           border-bottom-color: #B07A8E;
+        }
+        .site-nav-mobile {
+          position: relative;
+          display: none;
+          align-items: center;
+        }
+        .site-nav-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: none;
+          border: none;
+          color: #6B7280;
+          padding: 6px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .site-nav-toggle:hover {
+          background: #F9FAFB;
+          color: #B07A8E;
+        }
+        .site-nav-dropdown {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          background: white;
+          border-radius: 14px;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+          border: 1px solid #F0F0F0;
+          min-width: 180px;
+          padding: 6px;
+          animation: site-menu-in 0.15s ease;
+          z-index: 200;
+          display: flex;
+          flex-direction: column;
+        }
+        .site-nav-dropdown-link {
+          display: block;
+          width: 100%;
+          padding: 10px 14px;
+          border-radius: 10px;
+          text-decoration: none;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #4B5563;
+          transition: all 0.15s;
+        }
+        .site-nav-dropdown-link:hover {
+          background: #F9FAFB;
+          color: #1F2937;
+        }
+        .site-nav-dropdown-link.active {
+          color: #B07A8E;
+          background: #FBF2F5;
         }
         .site-auth {
           position: relative;
@@ -354,6 +437,11 @@ const SiteHeader: React.FC = () => {
         .site-lang-btn:hover:not(.active) {
           color: #6B7280;
         }
+        @media (max-width: 860px) {
+          .site-nav-left { display: none; }
+          .site-nav-link-desktop { display: none; }
+          .site-nav-mobile { display: flex; }
+        }
         @media (max-width: 480px) {
           .site-header { padding: 12px 16px; }
           .site-header-left { gap: 16px; }
@@ -362,6 +450,7 @@ const SiteHeader: React.FC = () => {
           .site-auth-btn.login { padding: 6px 12px; font-size: 0.78rem; }
           .site-auth-menu { min-width: 200px; right: -4px; }
           .site-lang-btn { padding: 3px 6px; font-size: 0.68rem; }
+          .site-nav-dropdown { right: -4px; }
         }
       `}</style>
     </header>
