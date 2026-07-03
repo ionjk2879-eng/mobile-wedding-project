@@ -219,8 +219,8 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
     setDeleteTarget(null); setDeletePassword('');
   };
 
-  const groomLabel = data.groomName || (isEn ? 'Groom' : isJa ? '新郎' : '신랑');
-  const brideLabel = data.brideName || (isEn ? 'Bride' : isJa ? '新婦' : '신부');
+  const groomLabel = isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측';
+  const brideLabel = isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측';
 
   const sliderProps = {
     isEn,
@@ -257,8 +257,8 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
           <div className="pf-group">
             <label className="pf-label">{isEn ? 'Side' : isJa ? '区分' : '구분'}</label>
             <div className="gb-side-pick">
-              <button type="button" className={`gb-side-btn ${side === 'groom' ? 'active' : ''}`} onClick={() => setSide('groom')}>{groomLabel}{isJa ? '側' : '측'}</button>
-              <button type="button" className={`gb-side-btn ${side === 'bride' ? 'active' : ''}`} onClick={() => setSide('bride')}>{brideLabel}{isJa ? '側' : '측'}</button>
+              <button type="button" className={`gb-side-btn ${side === 'groom' ? 'active' : ''}`} onClick={() => setSide('groom')}>{groomLabel}</button>
+              <button type="button" className={`gb-side-btn ${side === 'bride' ? 'active' : ''}`} onClick={() => setSide('bride')}>{brideLabel}</button>
             </div>
           </div>
           <div className="pf-row">
