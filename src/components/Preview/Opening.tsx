@@ -263,6 +263,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const [seqBodyKey, setSeqBodyKey] = useState(0);
   const [typingBodyKey, setTypingBodyKey] = useState(0);
   const contentSwitchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const phaseTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const mainTextRef = useRef(opening.openingText || 'We\'re getting married');
   mainTextRef.current = opening.openingText || 'We\'re getting married';
@@ -298,8 +299,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   }, [opening.openingContentStyle]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setPhase('ready'), 3200);
-    return () => clearTimeout(timer);
+    phaseTimerRef.current = setTimeout(() => setPhase('ready'), 3200);
+    return () => clearTimeout(phaseTimerRef.current);
   }, [opening.openingStyle, opening.openingContentStyle]);
 
   // 순차↔타이핑 전환: 250ms 페이드아웃 후 새 body 마운트
@@ -355,17 +356,29 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     }
     const fullEl = document.querySelector('.full-preview-container') as HTMLElement | null;
     if (fullEl) {
-      const prev = fullEl.style.overflow;
+      // 스크롤바 폭만큼 padding-right 보상: 해제 시 스크롤바 재등장으로 인한 좌측 이동 방지
+      const scrollbarW = fullEl.offsetWidth - fullEl.clientWidth;
+      const prevOverflow = fullEl.style.overflow;
+      const prevPad = fullEl.style.paddingRight;
       fullEl.style.overflow = 'hidden';
-      return () => { fullEl.style.overflow = prev; };
+      if (scrollbarW > 0) fullEl.style.paddingRight = `${scrollbarW}px`;
+      return () => {
+        fullEl.style.overflow = prevOverflow;
+        fullEl.style.paddingRight = prevPad;
+      };
     }
     const scrollRoot = document.querySelector('.view-container') || document.body;
-    const prev = (scrollRoot as HTMLElement).style.overflow;
+    const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+    const prevRootOverflow = (scrollRoot as HTMLElement).style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevBodyPad = document.body.style.paddingRight;
     (scrollRoot as HTMLElement).style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+    if (scrollbarW > 0) document.body.style.paddingRight = `${scrollbarW}px`;
     return () => {
-      (scrollRoot as HTMLElement).style.overflow = prev;
-      document.body.style.overflow = '';
+      (scrollRoot as HTMLElement).style.overflow = prevRootOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.paddingRight = prevBodyPad;
     };
   }, [dismissed]);
 
@@ -470,6 +483,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   const handleDismiss = () => {
     if (isTyping && typingPhase !== 'done') return;
+    clearTimeout(phaseTimerRef.current); // 지연된 'ready' 전환이 exit 이후에 발화하지 않도록
     setPhase('exit');
     const style = effectiveStyle;
     const delay = style === 'curtain' ? 1300 : style === 'circle' ? 1500 : style === 'veil' ? 900 : style === 'blind' ? 1100 : style === 'insta' ? 1500 : style === 'frame' ? 900 : 900;
