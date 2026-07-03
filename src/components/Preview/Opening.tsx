@@ -653,7 +653,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
           <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />
 
-          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both`, pointerEvents: seqBtnActive ? 'auto' : 'none', cursor: seqBtnActive ? undefined : 'default' }} onAnimationEnd={() => setSeqBtnActive(true)} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
+          <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both`, pointerEvents: seqBtnActive ? 'auto' : 'none', cursor: seqBtnActive ? undefined : 'default' }} onAnimationStart={() => setSeqBtnActive(true)} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
         </div>
       )}
 
