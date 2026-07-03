@@ -235,15 +235,13 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
     const existing = await env.DB.prepare('SELECT owner_uid, is_paid, expires_at FROM invitations WHERE slug = ?').bind(slug).first();
     if (existing && existing.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
+    // isPaid는 클라이언트 입력(body.isPaid)을 절대 신뢰하지 않고 DB에 이미 저장된 값만 유지한다.
+    // 유료 전환은 오직 handleActivate(슈퍼관리자 전용, 결제 확인 후 수동 처리)를 통해서만 가능하다.
+    const isPaid = !!existing?.is_paid;
     let expiresAt: string | null;
-    const isPaid = !!body.isPaid;
-    const weddingDateISO = body.weddingDateISO as string;
-    if (existing && existing.is_paid && isPaid && existing.expires_at) {
-      // 기존 유료 → 유료 유지: 만료일 보존
+    if (existing && isPaid && existing.expires_at) {
+      // 기존 유료: 만료일 보존
       expiresAt = existing.expires_at as string;
-    } else if (isPaid && weddingDateISO) {
-      // 유료 전환: 결혼식 날짜 기준 +1년
-      expiresAt = weddingPlusOneYear(weddingDateISO);
     } else if (existing && !isPaid && existing.expires_at) {
       // 기존 미결제 수정: 최초 생성 시점 기준 만료일 유지 (편집할 때마다 리셋 방지)
       expiresAt = existing.expires_at as string;
@@ -318,10 +316,13 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
 async function handleActivate(request: Request, env: Env, slug: string): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   const user = await getAuthUser(request, env);
-  if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+  // 결제 확인 후 유료 전환은 슈퍼관리자만 수행할 수 있다 (SuperAdminPage 전용 기능).
+  // 관리자는 청첩장 소유자가 아니므로 소유권 체크가 아니라 관리자 이메일로 검증한다.
+  if (!user || user.email !== 'ionjk2879@gmail.com')
+    return json({ error: '권한이 없습니다.' }, 403, origin);
 
-  const row = await env.DB.prepare('SELECT owner_uid, data FROM invitations WHERE slug = ?').bind(slug).first();
-  if (!row || row.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
+  const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(slug).first();
+  if (!row) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
 
   const body = await request.json() as { weddingDateISO?: string };
   if (!body.weddingDateISO) return json({ error: 'weddingDateISO is required' }, 400, origin);
@@ -698,9 +699,15 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
   if (!file) return json({ error: 'file is required' }, 400, origin);
   if (file.size > 2 * 1024 * 1024) return json({ error: '파일 크기는 2MB를 초과할 수 없습니다.' }, 400, origin);
 
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  // file.type/file.name은 클라이언트가 임의로 지정할 수 있으므로, 실제 이미지 MIME 타입
+  // 화이트리스트로만 저장을 허용한다. 그렇지 않으면 image/svg+xml 등으로 스크립트를 심어
+  // 업로드한 뒤 /images/{key}로 직접 접속시켰을 때 같은 오리진에서 실행되는 저장형 XSS로 이어질 수 있다.
+  const EXT_BY_TYPE: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
+  const ext = EXT_BY_TYPE[file.type];
+  if (!ext) return json({ error: 'JPEG, PNG, WEBP, GIF 이미지 파일만 업로드할 수 있습니다.' }, 400, origin);
+
   const key = `${crypto.randomUUID()}.${ext}`;
-  await env.IMAGES.put(key, file.stream(), { httpMetadata: { contentType: file.type || 'image/jpeg' } });
+  await env.IMAGES.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
 
   return json({ url: `/images/${key}` }, 200, origin);
 }
@@ -712,6 +719,7 @@ async function handleImageGet(_request: Request, env: Env, key: string): Promise
     headers: {
       'Content-Type': obj.httpMetadata?.contentType || 'image/jpeg',
       'Cache-Control': 'public, max-age=31536000',
+      'X-Content-Type-Options': 'nosniff',
     },
   });
 }
