@@ -547,10 +547,13 @@ function normalizeGuestRelation(relation: unknown): typeof GUEST_RELATIONS[numbe
   return (GUEST_RELATIONS as readonly string[]).includes(relation as string) ? relation as typeof GUEST_RELATIONS[number] : 'other';
 }
 
+// Crockford Base32 alphabet (헷갈리기 쉬운 i/l/o/u 제외) — 32는 256의 약수라 바이트→문자 매핑에 편향이 없음
+const GUEST_CODE_ALPHABET = '0123456789abcdefghjkmnpqrstvwxyz';
+
 function generateGuestCode(): string {
-  const bytes = new Uint8Array(6);
+  const bytes = new Uint8Array(8);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => (b % 36).toString(36)).join('');
+  return Array.from(bytes, (b) => GUEST_CODE_ALPHABET[b % 32]).join('');
 }
 
 async function requireInvitationOwner(request: Request, env: Env, slug: string): Promise<{ error: Response } | { user: { uid: string } }> {
