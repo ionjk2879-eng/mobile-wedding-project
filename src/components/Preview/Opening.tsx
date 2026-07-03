@@ -200,14 +200,15 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       return () => { fullEl.removeEventListener('scroll', update); ro.disconnect(); };
     }
 
-    // 템플릿 미리보기 — invitation-page 너비에만 맞게 제한
+    // 템플릿 미리보기 — invitation-page 너비에만 맞게 제한, 상단 바 높이만큼 top 보정
     const tmplEl = el.closest('.tmpl-preview-scroll') as HTMLElement | null;
     if (tmplEl) {
       const pageEl = tmplEl.querySelector('.invitation-page') as HTMLElement | null;
       const update = () => {
         const rect = pageEl ? pageEl.getBoundingClientRect() : null;
+        const containerRect = tmplEl.getBoundingClientRect();
         setEditorBounds({
-          top: tmplEl.scrollTop,
+          top: containerRect.top + tmplEl.scrollTop,
           left: rect ? rect.left : 0,
           width: rect ? rect.width : tmplEl.clientWidth,
           height: tmplEl.clientHeight,
