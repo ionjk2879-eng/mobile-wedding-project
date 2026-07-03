@@ -60,6 +60,10 @@ const ko = {
   manage: {
     myInvitations: '내 청첩장',
     newInvitation: '+ 청첩장 만들기',
+    filterAll: '전체',
+    filterPaid: '결제완료',
+    filterUnpaid: '미결제',
+    filterEmpty: '해당하는 청첩장이 없습니다.',
     unpaidNotice: '결제하지 않은 청첩장은 1주일이 지나면 자동으로 삭제됩니다.',
     loading: '불러오는 중..',
     empty: '아직 만든 청첩장이 없습니다.',
@@ -184,6 +188,10 @@ const en: Translations = {
   manage: {
     myInvitations: 'My Invitations',
     newInvitation: '+ New Invitation',
+    filterAll: 'All',
+    filterPaid: 'Paid',
+    filterUnpaid: 'Unpaid',
+    filterEmpty: 'No invitations match this filter.',
     unpaidNotice: 'Unpaid invitations are automatically deleted after 1 week.',
     loading: 'Loading...',
     empty: 'No invitations yet.',
@@ -308,6 +316,10 @@ const ja: Translations = {
   manage: {
     myInvitations: '招待状一覧',
     newInvitation: '+ 招待状を作る',
+    filterAll: 'すべて',
+    filterPaid: '決済済み',
+    filterUnpaid: '未決済',
+    filterEmpty: '該当する招待状がありません。',
     unpaidNotice: '未決済の招待状は1週間後に自動削除されます。',
     loading: '読み込み中...',
     empty: 'まだ招待状がありません。',

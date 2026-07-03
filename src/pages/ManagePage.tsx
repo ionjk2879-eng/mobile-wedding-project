@@ -208,6 +208,7 @@ const ManagePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
   const [changeSlugTarget, setChangeSlugTarget] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
 
   const load = () => {
     fetchMyInvitations()
@@ -233,6 +234,14 @@ const ManagePage: React.FC = () => {
 
   const shareTarget = shareSlug ? invitations.find((i) => i.slug === shareSlug) : null;
 
+  const paidCount = invitations.filter(i => i.data.isPaid).length;
+  const unpaidCount = invitations.length - paidCount;
+  const filteredInvitations = invitations.filter(({ data }) => {
+    if (filter === 'paid') return !!data.isPaid;
+    if (filter === 'unpaid') return !data.isPaid;
+    return true;
+  });
+
   return (
     <div className="manage">
       <SiteHeader />
@@ -242,6 +251,19 @@ const ManagePage: React.FC = () => {
           <h2 className="manage-title">{tm.myInvitations}</h2>
           <Link to="/editor" className="manage-new-btn">{tm.newInvitation}</Link>
         </div>
+        {!loading && invitations.length > 0 && (
+          <div className="manage-filter-tabs">
+            <button className={`manage-filter-tab ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>
+              {tm.filterAll} <span className="manage-filter-count">{invitations.length}</span>
+            </button>
+            <button className={`manage-filter-tab ${filter === 'paid' ? 'active' : ''}`} onClick={() => setFilter('paid')}>
+              {tm.filterPaid} <span className="manage-filter-count">{paidCount}</span>
+            </button>
+            <button className={`manage-filter-tab ${filter === 'unpaid' ? 'active' : ''}`} onClick={() => setFilter('unpaid')}>
+              {tm.filterUnpaid} <span className="manage-filter-count">{unpaidCount}</span>
+            </button>
+          </div>
+        )}
         {!loading && invitations.some(i => !i.data.isPaid) && (
           <p className="manage-notice">{tm.unpaidNotice}</p>
         )}
@@ -252,9 +274,11 @@ const ManagePage: React.FC = () => {
             <p>{tm.empty}</p>
             <Link to="/editor" className="manage-cta">{tm.createFirst}</Link>
           </div>
+        ) : filteredInvitations.length === 0 ? (
+          <p className="manage-empty">{tm.filterEmpty}</p>
         ) : (
           <div className="mc-grid">
-            {invitations.map(({ slug, data }) => (
+            {filteredInvitations.map(({ slug, data }) => (
               <div key={slug} className="mc-card">
                 <a href={`/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-thumb-link">
                   <div className="mc-thumb">
@@ -384,6 +408,45 @@ const ManagePage: React.FC = () => {
           transition: opacity 0.2s;
         }
         .manage-new-btn:hover { opacity: 0.85; }
+        .manage-filter-tabs {
+          display: flex;
+          gap: 4px;
+          margin: -8px 0 20px;
+          background: #F3F4F6;
+          border-radius: 12px;
+          padding: 4px;
+          width: fit-content;
+        }
+        .manage-filter-tab {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 16px;
+          border: none;
+          border-radius: 9px;
+          background: none;
+          font-size: 0.84rem;
+          font-weight: 600;
+          color: #6B7280;
+          cursor: pointer;
+          font-family: inherit;
+          transition: all 0.15s;
+          white-space: nowrap;
+        }
+        .manage-filter-tab:hover:not(.active) {
+          color: #374151;
+        }
+        .manage-filter-tab.active {
+          background: white;
+          color: #B07A8E;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .manage-filter-count {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: inherit;
+          opacity: 0.65;
+        }
         .manage-notice {
           margin: -12px 0 20px;
           padding: 10px 14px;
@@ -803,6 +866,14 @@ const ManagePage: React.FC = () => {
         .share-modal-btn.kakao:hover { filter: brightness(0.95); }
 
         @media (max-width: 600px) {
+          .manage-filter-tabs {
+            width: 100%;
+            overflow-x: auto;
+          }
+          .manage-filter-tab {
+            padding: 7px 12px;
+            font-size: 0.78rem;
+          }
           .mc-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
