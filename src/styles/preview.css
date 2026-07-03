@@ -710,8 +710,8 @@
 .op-typing-heart { display: flex; align-items: center; justify-content: center; color: var(--op-heart, rgba(255, 218, 230, 0.82)); opacity: 0; transform: scale(0.6) translateY(6px); transition: opacity 1s cubic-bezier(0.22,1,0.36,1), transform 1s cubic-bezier(0.22,1,0.36,1); }
 .op-typing-heart.visible { opacity: 1; transform: scale(1) translateY(0); }
 .op-typing-heart.visible svg { animation: op-heart-pulse 3s ease-in-out 0.8s infinite; }
-.op-typing-text { font-size: 1.2em; letter-spacing: 2px; font-family: var(--op-font); font-weight: var(--op-weight); color: var(--op-text); min-height: 1.6em; display: flex; align-items: center; justify-content: center; white-space: normal; word-break: keep-all; overflow-wrap: break-word; text-align: center; max-width: 280px; }
-.op-cursor { display: inline-block; color: var(--op-text); animation: op-cursor-blink 0.9s step-end infinite; margin-left: 1px; font-weight: 100; }
+.op-typing-text { font-size: 1.2em; letter-spacing: 2px; font-family: var(--op-font); font-weight: var(--op-weight); color: var(--op-text); min-height: 1.6em; white-space: normal; word-break: keep-all; overflow-wrap: break-word; text-align: center; max-width: 280px; }
+.op-cursor { display: inline; color: var(--op-text); animation: op-cursor-blink 0.9s step-end infinite; margin-left: 1px; font-weight: 100; }
 @keyframes op-cursor-blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
 .op-typing-names { margin: 0; font-size: 0.88em; letter-spacing: 7px; color: var(--op-text); font-family: var(--op-font); font-weight: var(--op-weight); opacity: 0; transform: translateY(10px); transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1); }
 .op-typing-names.visible { opacity: 0.92; transform: translateY(0); }
