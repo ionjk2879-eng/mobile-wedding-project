@@ -168,4 +168,5 @@ export interface Guest {
   name: string;
   relation: GuestRelation;
   createdAt: string;
+  visitedAt: string | null;
 }

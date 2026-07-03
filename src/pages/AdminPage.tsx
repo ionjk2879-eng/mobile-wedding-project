@@ -38,6 +38,7 @@ const AdminPage: React.FC = () => {
   const [editName, setEditName] = useState('');
   const [editRelation, setEditRelation] = useState<GuestRelation>('friend');
   const [invitationInfo, setInvitationInfo] = useState<InvitationData | null>(null);
+  const [showUnvisitedOnly, setShowUnvisitedOnly] = useState(false);
 
   useEffect(() => {
     if (authLoading || !slug) return;
@@ -164,6 +165,7 @@ const AdminPage: React.FC = () => {
   const groomGuests = attending.filter(r => r.relation === 'groom').reduce((a, r) => a + r.totalGuests, 0);
   const brideGuests = attending.filter(r => r.relation === 'bride').reduce((a, r) => a + r.totalGuests, 0);
   const notAttending = responses.filter(r => !r.isAttending).length;
+  const displayedGuests = showUnvisitedOnly ? guests.filter((g) => !g.visitedAt) : guests;
 
   if (authLoading) return <div className="admin-page"><p className="admin-loading">인증 확인 중...</p></div>;
 
@@ -283,18 +285,27 @@ const AdminPage: React.FC = () => {
           </button>
         </div>
 
+        {!guestsLoading && guests.length > 0 && (
+          <label className="guest-filter-toggle">
+            <input type="checkbox" checked={showUnvisitedOnly} onChange={(e) => setShowUnvisitedOnly(e.target.checked)} />
+            <span>아직 안 본 사람만 보기 ({guests.filter((g) => !g.visitedAt).length}명)</span>
+          </label>
+        )}
+
         {guestsLoading ? (
           <p className="admin-loading">불러오는 중...</p>
         ) : guests.length === 0 ? (
           <div className="admin-empty"><p>등록된 하객이 없습니다.</p></div>
+        ) : displayedGuests.length === 0 ? (
+          <div className="admin-empty"><p>모두 청첩장을 확인했습니다.</p></div>
         ) : (
           <div className="admin-table-wrap">
             <table>
               <thead>
-                <tr><th>이름</th><th>관계</th><th>개인화 링크</th><th>등록일</th><th></th></tr>
+                <tr><th>이름</th><th>관계</th><th>개인화 링크</th><th>등록일</th><th>방문 여부</th><th></th></tr>
               </thead>
               <tbody>
-                {guests.map((g) => (
+                {displayedGuests.map((g) => (
                   <tr key={g.code}>
                     {editingCode === g.code ? (
                       <>
@@ -309,6 +320,13 @@ const AdminPage: React.FC = () => {
                         <td className="link-cell">/invite/{g.code}</td>
                         <td className="date-cell">{g.createdAt ? new Date(g.createdAt).toLocaleDateString('ko') : ''}</td>
                         <td>
+                          {g.visitedAt ? (
+                            <span className="badge visited">방문함 · {new Date(g.visitedAt).toLocaleString('ko')}</span>
+                          ) : (
+                            <span className="badge unvisited">아직 안 봄</span>
+                          )}
+                        </td>
+                        <td>
                           <button type="button" className="row-icon-btn" title="저장" onClick={() => handleSaveGuest(g.code)}><Check size={15} /></button>
                           <button type="button" className="row-icon-btn" title="취소" onClick={() => setEditingCode(null)}><X size={15} /></button>
                         </td>
@@ -319,6 +337,13 @@ const AdminPage: React.FC = () => {
                         <td><span className="badge relation">{RELATION_LABELS[g.relation]}</span></td>
                         <td className="link-cell">/invite/{g.code}</td>
                         <td className="date-cell">{g.createdAt ? new Date(g.createdAt).toLocaleDateString('ko') : ''}</td>
+                        <td>
+                          {g.visitedAt ? (
+                            <span className="badge visited">방문함 · {new Date(g.visitedAt).toLocaleString('ko')}</span>
+                          ) : (
+                            <span className="badge unvisited">아직 안 봄</span>
+                          )}
+                        </td>
                         <td>
                           <button type="button" className="row-icon-btn" title="링크 복사" onClick={() => handleCopyGuestLink(g.code)}><Copy size={15} /></button>
                           <button type="button" className="row-icon-btn kakao" title="카카오톡 공유" onClick={() => handleKakaoShareGuest(g)}><Share2 size={15} /></button>
@@ -375,6 +400,10 @@ const AdminPage: React.FC = () => {
         .guest-edit-input { width: 100%; padding: 6px 8px; border: 1px solid #D4A5C6; border-radius: 6px; font-size: 0.85rem; font-family: inherit; box-sizing: border-box; }
         .guest-edit-select { padding: 6px 8px; border: 1px solid #D4A5C6; border-radius: 6px; font-size: 0.85rem; font-family: inherit; }
         .badge.relation { background: #F3F4F6; color: #6B7280; }
+        .badge.visited { background: #D1FAE5; color: #059669; white-space: nowrap; }
+        .badge.unvisited { background: #FEF3C7; color: #92400E; white-space: nowrap; }
+        .guest-filter-toggle { display: flex; align-items: center; gap: 8px; margin: -8px 0 14px; font-size: 0.84rem; color: #4B5563; cursor: pointer; user-select: none; }
+        .guest-filter-toggle input { accent-color: #B07A8E; width: 15px; height: 15px; cursor: pointer; }
         .link-cell { font-family: monospace; font-size: 0.82rem; color: #6B7280; }
         .row-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; border-radius: 8px; background: none; color: #9CA3AF; cursor: pointer; transition: all 0.15s; margin-right: 2px; }
         .row-icon-btn:hover { background: #F3F4F6; color: #4B5563; }

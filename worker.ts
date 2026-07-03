@@ -572,10 +572,10 @@ async function handleGuests(request: Request, env: Env, slug: string): Promise<R
 
   if (request.method === 'GET') {
     const rows = await env.DB.prepare(
-      'SELECT code, name, relation, created_at FROM guests WHERE invitation_slug = ? ORDER BY created_at DESC'
+      'SELECT code, name, relation, created_at, visited_at FROM guests WHERE invitation_slug = ? ORDER BY created_at DESC'
     ).bind(slug).all();
     return json(rows.results.map((r: Record<string, unknown>) => ({
-      code: r.code, name: r.name, relation: r.relation, createdAt: r.created_at,
+      code: r.code, name: r.name, relation: r.relation, createdAt: r.created_at, visitedAt: r.visited_at ?? null,
     })), 200, origin);
   }
 
@@ -596,7 +596,7 @@ async function handleGuests(request: Request, env: Env, slug: string): Promise<R
       'INSERT INTO guests (code, invitation_slug, name, relation) VALUES (?, ?, ?, ?)'
     ).bind(code, slug, name, relation).run();
 
-    return json({ code, name, relation, createdAt: new Date().toISOString() }, 200, origin);
+    return json({ code, name, relation, createdAt: new Date().toISOString(), visitedAt: null }, 200, origin);
   }
 
   return json({ error: 'Method not allowed' }, 405, origin);
@@ -631,6 +631,11 @@ async function handleGuest(request: Request, env: Env, slug: string, code: strin
 async function handleInviteLookup(request: Request, env: Env, code: string): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   try {
+    // 최초 방문이면 visited_at 기록 (이미 값이 있거나 code가 유효하지 않으면 WHERE 조건에 안 걸려 아무 변화 없음)
+    await env.DB.prepare(
+      "UPDATE guests SET visited_at = datetime('now') WHERE code = ? AND visited_at IS NULL"
+    ).bind(code).run();
+
     const row = await env.DB.prepare('SELECT invitation_slug, name, relation FROM guests WHERE code = ?').bind(code).first();
     if (!row) return json({ error: '유효하지 않은 링크입니다.' }, 404, origin);
     return json({ slug: row.invitation_slug, name: row.name, relation: row.relation }, 200, origin);
