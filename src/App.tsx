@@ -9,7 +9,7 @@ import { saveInvitation, checkSlugAvailable, loadInvitation } from './services/i
 import { getApiErrorMessage } from './utils/apiError';
 import { loadAllFonts } from './utils/loadFont';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Edit3, Eye, Save, ClipboardList, RotateCcw, Menu, X } from 'lucide-react';
+import { Edit3, Eye, Save, RotateCcw, Menu, X } from 'lucide-react';
 import { AI_PRESETS, applyPreset } from './data/aiPresets';
 import { useSiteLang } from './i18n';
 import './styles/effects.css';
@@ -280,7 +280,6 @@ const App: React.FC = () => {
             <Save size={15} />
             {saveStatus === 'saving' ? te.saving : saveStatus === 'success' ? te.saved : saveStatus === 'error' ? te.saveFailed : te.save}
           </button>
-          {data.slug && <a href={`/admin/${data.slug}`} target="_blank" className="header-text-btn"><ClipboardList size={15} /> {te.viewResponses}</a>}
           <button className="header-text-btn reset" onClick={handleReset}><RotateCcw size={14} /> {te.reset}</button>
         </div>
       </header></div>

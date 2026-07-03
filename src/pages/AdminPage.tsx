@@ -203,7 +203,7 @@ const AdminPage: React.FC = () => {
       <header className="admin-header">
         <div>
           <h1>SONETT</h1>
-          <p>참석 응답 관리 — {slug}</p>
+          <p>하객 관리 — {slug}</p>
         </div>
         <div className="admin-actions">
           <button onClick={fetchResponses} className="admin-btn"><RefreshCw size={18} /> 새로고침</button>

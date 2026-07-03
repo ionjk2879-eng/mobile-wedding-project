@@ -5,53 +5,22 @@ import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
 import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen, Heart } from 'lucide-react';
 import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
-import { formatShareDateTime } from '../utils/formatShareDateTime';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
 import { useSiteLang } from '../i18n';
 
 const SITE_ORIGIN = 'https://sonett.kr';
-const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 const NAVER_STORE_URL = 'https://smartstore.naver.com/sonett/products/13648852696';
 
-const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => void }> = ({ slug, data, onClose }) => {
+const ShareModal: React.FC<{ slug: string; onClose: () => void }> = ({ slug, onClose }) => {
   const { t } = useSiteLang();
   const tm = t.manage;
   const shareUrl = `${SITE_ORIGIN}/${slug}`;
-  const title = data.shareTitle || `${data.groomName || '신랑'} ❤️ ${data.brideName || '신부'} 결혼합니다`;
-  // 신랑/신부 이름은 이미 title(굵게 렌더링되는 영역)에 들어있어 description에는 날짜만 넣어 중복을 없앰
-  const dateTimeLine = data.language !== 'en' && data.language !== 'ja' && data.weddingDateISO
-    ? formatShareDateTime(data.weddingDateISO, data.time)
-    : `${data.date} ${data.time}`;
-  const description = data.shareDescription || dateTimeLine;
-
-  useEffect(() => {
-    if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init(KAKAO_APP_KEY);
-    }
-  }, []);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
     toast.success(tm.linkCopied);
-  };
-
-  const handleKakaoShare = () => {
-    if (!window.Kakao || !window.Kakao.isInitialized()) {
-      toast.error(tm.kakaoLoading);
-      return;
-    }
-    window.Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title,
-        description,
-        imageUrl: `${SITE_ORIGIN}/og/${slug}`,
-        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
-      },
-      buttons: [{ title: tm.viewInvitation, link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
-    });
   };
 
   const handleUrlShare = () => {
@@ -76,7 +45,6 @@ const ShareModal: React.FC<{ slug: string; data: InvitationData; onClose: () => 
         <div className="share-modal-actions">
           <button className="share-modal-btn copy" onClick={handleCopyLink}><LinkIcon size={18} /> {tm.copyLink}</button>
           <button className="share-modal-btn url-share" onClick={handleUrlShare}><Share2 size={18} /> {tm.urlShare}</button>
-          <button className="share-modal-btn kakao" onClick={handleKakaoShare}><Share2 size={18} /> {tm.kakaoShare}</button>
         </div>
       </div>
     </div>
@@ -364,7 +332,7 @@ const ManagePage: React.FC = () => {
       </main>
 
       {shareTarget && (
-        <ShareModal slug={shareTarget.slug} data={shareTarget.data} onClose={() => setShareSlug(null)} />
+        <ShareModal slug={shareTarget.slug} onClose={() => setShareSlug(null)} />
       )}
 
       {changeSlugTarget && (
@@ -864,11 +832,6 @@ const ManagePage: React.FC = () => {
           color: white;
         }
         .share-modal-btn.url-share:hover { background: #9B6A7E; }
-        .share-modal-btn.kakao {
-          background: #FEE500;
-          color: #3C1E1E;
-        }
-        .share-modal-btn.kakao:hover { filter: brightness(0.95); }
 
         @media (max-width: 600px) {
           .manage-filter-tabs {
