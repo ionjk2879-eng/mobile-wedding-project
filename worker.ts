@@ -858,6 +858,38 @@ async function handleGalleryPhotoReport(request: Request, env: Env, slug: string
   return json({ ok: true }, 200, origin);
 }
 
+// 관리 페이지 전용 — 숨김 처리된 사진까지 전부 포함해서 반환 (청첩장 소유자만 접근 가능)
+async function handleGalleryAdminList(request: Request, env: Env, slug: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const auth = await requireInvitationOwner(request, env, slug);
+  if ('error' in auth) return auth.error;
+
+  const rows = await env.DB.prepare(
+    'SELECT id, r2_key, guest_name, created_at, hidden_at FROM gallery_photos WHERE invitation_slug = ? ORDER BY created_at DESC'
+  ).bind(slug).all();
+
+  return json({
+    photos: rows.results.map((r: Record<string, unknown>) => ({
+      id: r.id, url: `/images/${r.r2_key}`, guestName: r.guest_name ?? null,
+      createdAt: r.created_at, hiddenAt: r.hidden_at ?? null,
+    })),
+    total: rows.results.length,
+    limit: GALLERY_TOTAL_LIMIT,
+  }, 200, origin);
+}
+
+// 신고로 숨겨진 사진을 다시 공개 목록에 노출 (청첩장 소유자만)
+async function handleGalleryPhotoUnhide(request: Request, env: Env, slug: string, photoId: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const auth = await requireInvitationOwner(request, env, slug);
+  if ('error' in auth) return auth.error;
+
+  await env.DB.prepare(
+    'UPDATE gallery_photos SET hidden_at = NULL WHERE id = ? AND invitation_slug = ?'
+  ).bind(photoId, slug).run();
+  return json({ ok: true }, 200, origin);
+}
+
 // --- Cron: expiry notification + cleanup ---
 
 async function sendExpiryNotificationEmail(env: Env, to: string, name: string, slug: string, expiresAt: string): Promise<void> {
@@ -1097,8 +1129,14 @@ export default {
       if (inviteMatch) return await handleInviteLookup(request, env, inviteMatch[1]);
 
       // Live Gallery (하객 업로드 갤러리)
+      const galleryAdminMatch = pathname.match(/^\/api\/gallery\/([^/]+)\/admin$/);
+      if (galleryAdminMatch && request.method === 'GET') return await handleGalleryAdminList(request, env, galleryAdminMatch[1]);
+
       const galleryReportMatch = pathname.match(/^\/api\/gallery\/([^/]+)\/([^/]+)\/report$/);
       if (galleryReportMatch && request.method === 'POST') return await handleGalleryPhotoReport(request, env, galleryReportMatch[1], galleryReportMatch[2]);
+
+      const galleryUnhideMatch = pathname.match(/^\/api\/gallery\/([^/]+)\/([^/]+)\/unhide$/);
+      if (galleryUnhideMatch && request.method === 'POST') return await handleGalleryPhotoUnhide(request, env, galleryUnhideMatch[1], galleryUnhideMatch[2]);
 
       const galleryPhotoMatch = pathname.match(/^\/api\/gallery\/([^/]+)\/([^/]+)$/);
       if (galleryPhotoMatch && request.method === 'DELETE') return await handleGalleryPhotoDelete(request, env, galleryPhotoMatch[1], galleryPhotoMatch[2]);

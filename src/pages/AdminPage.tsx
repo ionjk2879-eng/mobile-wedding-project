@@ -3,11 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { loadInvitation } from '../services/invitationService';
 import { fetchRSVPResponses } from '../services/rsvpService';
 import { fetchGuests, createGuest, updateGuest, deleteGuest } from '../services/guestService';
+import { fetchGalleryAdminList, unhideGalleryPhoto, adminDeleteGalleryPhoto, GalleryAdminPhoto } from '../services/galleryService';
 import { signInWithGoogle, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
 import { formatShareDateTime } from '../utils/formatShareDateTime';
 import { RSVPResponse, Guest, GuestRelation, InvitationData } from '../types';
-import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2 } from 'lucide-react';
+import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2, EyeOff, RotateCcw } from 'lucide-react';
 import useAuthStore from '../stores/useAuthStore';
 import ToastContainer from '../components/Toast';
 
@@ -39,6 +40,12 @@ const AdminPage: React.FC = () => {
   const [editRelation, setEditRelation] = useState<GuestRelation>('friend');
   const [invitationInfo, setInvitationInfo] = useState<InvitationData | null>(null);
   const [showUnvisitedOnly, setShowUnvisitedOnly] = useState(false);
+
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryAdminPhoto[]>([]);
+  const [galleryTotal, setGalleryTotal] = useState(0);
+  const [galleryLimit, setGalleryLimit] = useState(0);
+  const [galleryLoading, setGalleryLoading] = useState(true);
+  const [showHiddenOnly, setShowHiddenOnly] = useState(false);
 
   useEffect(() => {
     if (authLoading || !slug) return;
@@ -78,6 +85,48 @@ const AdminPage: React.FC = () => {
   };
 
   useEffect(() => { if (authorized) fetchGuestList(); }, [slug, authorized]);
+
+  const fetchGalleryList = async () => {
+    if (!slug) return;
+    setGalleryLoading(true);
+    try {
+      const { photos, total, limit } = await fetchGalleryAdminList(slug);
+      setGalleryPhotos(photos);
+      setGalleryTotal(total);
+      setGalleryLimit(limit);
+    } catch (err) {
+      console.error('갤러리 로드 실패:', err);
+    }
+    setGalleryLoading(false);
+  };
+
+  useEffect(() => { if (authorized) fetchGalleryList(); }, [slug, authorized]);
+
+  const handleUnhidePhoto = async (photo: GalleryAdminPhoto) => {
+    if (!slug) return;
+    try {
+      await unhideGalleryPhoto(slug, photo.id);
+      setGalleryPhotos((prev) => prev.map((p) => (p.id === photo.id ? { ...p, hiddenAt: null } : p)));
+      toast.success('사진을 복구했습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '복구에 실패했습니다.');
+    }
+  };
+
+  const handleDeletePhoto = async (photo: GalleryAdminPhoto) => {
+    if (!slug || !confirm('이 사진을 완전히 삭제할까요? 되돌릴 수 없습니다.')) return;
+    try {
+      await adminDeleteGalleryPhoto(slug, photo.id);
+      setGalleryPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+      setGalleryTotal((prev) => Math.max(0, prev - 1));
+      toast.success('사진을 삭제했습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '삭제에 실패했습니다.');
+    }
+  };
+
+  const displayedGalleryPhotos = showHiddenOnly ? galleryPhotos.filter((p) => p.hiddenAt) : galleryPhotos;
+  const hiddenPhotoCount = galleryPhotos.filter((p) => p.hiddenAt).length;
 
   const handleAddGuest = async () => {
     if (!slug || !newGuestName.trim() || adding) return;
@@ -363,6 +412,44 @@ const AdminPage: React.FC = () => {
         )}
       </section>
 
+      <section className="admin-gallery-section">
+        <div className="gallery-section-head">
+          <h2 className="admin-section-title">라이브 갤러리</h2>
+          <span className="gallery-total-count">{galleryTotal}/{galleryLimit}장</span>
+        </div>
+
+        {!galleryLoading && hiddenPhotoCount > 0 && (
+          <label className="guest-filter-toggle">
+            <input type="checkbox" checked={showHiddenOnly} onChange={(e) => setShowHiddenOnly(e.target.checked)} />
+            <span>숨김 처리된 사진만 보기 ({hiddenPhotoCount}장)</span>
+          </label>
+        )}
+
+        {galleryLoading ? (
+          <p className="admin-loading">불러오는 중...</p>
+        ) : displayedGalleryPhotos.length === 0 ? (
+          <div className="admin-empty"><p>{showHiddenOnly ? '숨김 처리된 사진이 없습니다.' : '아직 업로드된 사진이 없습니다.'}</p></div>
+        ) : (
+          <div className="admin-gallery-grid">
+            {displayedGalleryPhotos.map((photo) => (
+              <div className={`admin-gallery-item${photo.hiddenAt ? ' hidden' : ''}`} key={photo.id}>
+                <img src={photo.url} alt={photo.guestName || '갤러리 사진'} loading="lazy" />
+                {photo.hiddenAt && <span className="admin-gallery-hidden-badge"><EyeOff size={11} /> 숨김</span>}
+                <div className="admin-gallery-item-footer">
+                  <span className="admin-gallery-item-name">{photo.guestName || '익명'}</span>
+                  <div className="admin-gallery-item-actions">
+                    {photo.hiddenAt && (
+                      <button type="button" onClick={() => handleUnhidePhoto(photo)} title="복구"><RotateCcw size={13} /></button>
+                    )}
+                    <button type="button" onClick={() => handleDeletePhoto(photo)} title="완전 삭제"><Trash2 size={13} /></button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       <ToastContainer />
 
       <style>{`
@@ -413,6 +500,20 @@ const AdminPage: React.FC = () => {
         .row-icon-btn:hover { background: #F3F4F6; color: #4B5563; }
         .row-icon-btn.danger:hover { background: #FEF2F2; color: #DC2626; }
         .row-icon-btn.kakao:hover { background: #FEF9E6; color: #C79000; }
+        .admin-gallery-section { margin-top: 40px; }
+        .gallery-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .gallery-section-head .admin-section-title { margin: 0; }
+        .gallery-total-count { font-size: 0.82rem; font-weight: 700; color: #9CA3AF; }
+        .admin-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .admin-gallery-item { position: relative; border-radius: 12px; overflow: hidden; background: #F3F4F6; aspect-ratio: 1; }
+        .admin-gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .admin-gallery-item.hidden img { opacity: 0.4; }
+        .admin-gallery-hidden-badge { position: absolute; top: 6px; left: 6px; display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 6px; background: #FEE2E2; color: #DC2626; font-size: 0.68rem; font-weight: 700; }
+        .admin-gallery-item-footer { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; background: linear-gradient(0deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%); }
+        .admin-gallery-item-name { font-size: 0.72rem; color: white; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+        .admin-gallery-item-actions { display: flex; gap: 4px; }
+        .admin-gallery-item-actions button { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border: none; border-radius: 50%; background: rgba(255,255,255,0.85); color: #4B5563; cursor: pointer; }
+        .admin-gallery-item-actions button:hover { background: white; color: #DC2626; }
         @media (max-width: 768px) { .admin-stats { grid-template-columns: repeat(2, 1fr); } .guest-add-row { flex-wrap: wrap; } }
       `}</style>
     </div>
