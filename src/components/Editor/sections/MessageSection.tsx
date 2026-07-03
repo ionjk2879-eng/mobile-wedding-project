@@ -8,6 +8,7 @@ import { getApiErrorMessage } from '../../../utils/apiError';
 const MessageSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
+  const isMessageEnabled = useInvitationStore((s) => s.data.isMessageEnabled);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   const handleProfilePhotoUpload = async (field: 'groomPhoto' | 'bridePhoto', e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +62,18 @@ const MessageSection: React.FC = () => {
     );
   };
 
-  return <>{renderCard('groom')}{renderCard('bride')}</>;
+  return (
+    <>
+      <div className="input-group">
+        <label className="modern-checkbox">
+          <input type="checkbox" checked={isMessageEnabled !== false} onChange={(e) => updateField('isMessageEnabled', e.target.checked)} />
+          <span>신랑/신부 한마디 기능 활성화</span>
+        </label>
+      </div>
+      {renderCard('groom')}
+      {renderCard('bride')}
+    </>
+  );
 };
 
 export default MessageSection;

@@ -6,6 +6,8 @@ interface PreviewProps {
 }
 
 const Ending: React.FC<PreviewProps> = React.memo(({ data }) => {
+  if (data.isEndingEnabled === false) return null;
+
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
   const groomName = isEn && data.en.groomName ? data.en.groomName : isJa && data.ja?.groomName ? data.ja.groomName : (data.groomName || (isJa ? '新郎' : '신랑'));
@@ -47,7 +49,8 @@ const Ending: React.FC<PreviewProps> = React.memo(({ data }) => {
     </section>
   );
 }, (prev, next) =>
-  prev.data.endingPhoto === next.data.endingPhoto
+  prev.data.isEndingEnabled === next.data.isEndingEnabled
+  && prev.data.endingPhoto === next.data.endingPhoto
   && prev.data.endingPhotoX === next.data.endingPhotoX
   && prev.data.endingPhotoY === next.data.endingPhotoY
   && prev.data.endingMessage === next.data.endingMessage

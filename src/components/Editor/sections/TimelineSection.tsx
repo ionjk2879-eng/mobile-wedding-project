@@ -36,6 +36,7 @@ function SortableTimelineOrderItem({ event, index }: { event: TimelineEvent; ind
 
 const TimelineSection: React.FC = () => {
   const timeline = useInvitationStore((s) => s.data.timeline);
+  const isTimelineEnabled = useInvitationStore((s) => s.data.isTimelineEnabled);
   const slug = useInvitationStore((s) => s.data.slug);
   const addTimelineEvent = useInvitationStore((s) => s.addTimelineEvent);
   const updateTimelineEvent = useInvitationStore((s) => s.updateTimelineEvent);
@@ -82,6 +83,12 @@ const TimelineSection: React.FC = () => {
 
   return (
     <>
+      <div className="input-group">
+        <label className="modern-checkbox">
+          <input type="checkbox" checked={isTimelineEnabled !== false} onChange={(e) => updateField('isTimelineEnabled', e.target.checked)} />
+          <span>타임라인 기능 활성화</span>
+        </label>
+      </div>
       <p className="section-desc">연애 시작부터 결혼까지의 과정을 입력해 보세요.</p>
 
       {list.length >= 2 && (

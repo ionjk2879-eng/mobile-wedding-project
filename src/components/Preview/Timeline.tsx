@@ -29,7 +29,7 @@ const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
     setOpen(v => !v);
   }, [open]);
 
-  if (events.length === 0) return null;
+  if (data.isTimelineEnabled === false || events.length === 0) return null;
 
   return (
     <section className="timeline-section section" style={{ fontFamily: data.fontFamily }} aria-label="타임라인">
@@ -88,6 +88,7 @@ const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
   );
 }, (prev, next) =>
   prev.data.timeline === next.data.timeline
+  && prev.data.isTimelineEnabled === next.data.isTimelineEnabled
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
 );

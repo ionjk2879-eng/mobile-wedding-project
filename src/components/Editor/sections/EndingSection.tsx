@@ -29,6 +29,12 @@ const EndingSection: React.FC = () => {
   return (
     <>
       <div className="input-group">
+        <label className="modern-checkbox">
+          <input type="checkbox" checked={data.isEndingEnabled !== false} onChange={(e) => updateField('isEndingEnabled', e.target.checked)} />
+          <span>엔딩 기능 활성화</span>
+        </label>
+      </div>
+      <div className="input-group">
         <label>엔딩 사진</label>
         <div className="modern-hero-upload">
           {uploading ? (

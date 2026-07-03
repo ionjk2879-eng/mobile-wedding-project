@@ -122,6 +122,11 @@ export interface OpeningConfig {
 export interface FeatureConfig {
   isRSVPEnabled: boolean;
   isGuestbookEnabled: boolean;
+  isInterviewEnabled: boolean;
+  isTimelineEnabled: boolean;
+  isMessageEnabled: boolean;
+  isEndingEnabled: boolean;
+  isMidPhotoEnabled: boolean;
   guestbookPassword: string;
   opening: OpeningConfig;
   bgMusicUrl: string;

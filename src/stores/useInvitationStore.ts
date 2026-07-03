@@ -40,6 +40,11 @@ export const initialData: InvitationData = {
   midPhotoCaption: '',
   isRSVPEnabled: true,
   isGuestbookEnabled: true,
+  isInterviewEnabled: true,
+  isTimelineEnabled: true,
+  isMessageEnabled: true,
+  isEndingEnabled: true,
+  isMidPhotoEnabled: true,
   guestbookPassword: '',
   opening: {
     openingEnabled: false,

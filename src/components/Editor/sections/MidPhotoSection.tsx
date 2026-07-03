@@ -29,6 +29,12 @@ const MidPhotoSection: React.FC = () => {
   return (
     <>
       <div className="input-group">
+        <label className="modern-checkbox">
+          <input type="checkbox" checked={data.isMidPhotoEnabled !== false} onChange={(e) => updateField('isMidPhotoEnabled', e.target.checked)} />
+          <span>중간사진 기능 활성화</span>
+        </label>
+      </div>
+      <div className="input-group">
         <label>중간 사진</label>
         <div className="modern-hero-upload">
           {uploading ? (

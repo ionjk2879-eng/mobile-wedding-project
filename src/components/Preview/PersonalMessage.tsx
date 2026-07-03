@@ -6,6 +6,8 @@ interface PreviewProps {
 }
 
 const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
+  if (data.isMessageEnabled === false) return null;
+
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
   const groomLabel = isEn ? 'Groom' : isJa ? '新郎' : '신랑';
@@ -55,7 +57,8 @@ const PersonalMessage: React.FC<PreviewProps> = React.memo(({ data }) => {
     && prev.data.groomPhoto === next.data.groomPhoto
     && prev.data.bridePhoto === next.data.bridePhoto
     && prev.data.fontFamily === next.data.fontFamily
-    && prev.data.language === next.data.language;
+    && prev.data.language === next.data.language
+    && prev.data.isMessageEnabled === next.data.isMessageEnabled;
 });
 
 export default PersonalMessage;

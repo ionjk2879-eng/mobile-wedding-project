@@ -3,12 +3,20 @@ import useInvitationStore from '../../../stores/useInvitationStore';
 
 const InterviewSection: React.FC = () => {
   const interview = useInvitationStore((s) => s.data.interview);
+  const isInterviewEnabled = useInvitationStore((s) => s.data.isInterviewEnabled);
+  const updateField = useInvitationStore((s) => s.updateField);
   const addInterviewQA = useInvitationStore((s) => s.addInterviewQA);
   const updateInterviewQA = useInvitationStore((s) => s.updateInterviewQA);
   const removeInterviewQA = useInvitationStore((s) => s.removeInterviewQA);
 
   return (
     <>
+      <div className="input-group">
+        <label className="modern-checkbox">
+          <input type="checkbox" checked={isInterviewEnabled !== false} onChange={(e) => updateField('isInterviewEnabled', e.target.checked)} />
+          <span>인터뷰 기능 활성화</span>
+        </label>
+      </div>
       <p className="section-desc">신랑과 신부에게 같은 질문을 던지고 각자의 답변을 입력해 보세요.</p>
       <div className="interview-editor-list">
         {(interview || []).map((qa, index) => (

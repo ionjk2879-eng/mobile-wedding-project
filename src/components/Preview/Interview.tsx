@@ -11,7 +11,7 @@ const Interview: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
 
-  if (qaList.length === 0) return null;
+  if (data.isInterviewEnabled === false || qaList.length === 0) return null;
 
   const storyLabel = isEn ? 'Our Story' : isJa ? '二人のストーリー' : '두 사람에게 물어본 이야기';
 
@@ -47,6 +47,6 @@ const Interview: React.FC<PreviewProps> = React.memo(({ data }) => {
 
     </section>
   );
-}, (prev, next) => prev.data.interview === next.data.interview && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily && prev.data.groomName === next.data.groomName && prev.data.brideName === next.data.brideName);
+}, (prev, next) => prev.data.interview === next.data.interview && prev.data.isInterviewEnabled === next.data.isInterviewEnabled && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily && prev.data.groomName === next.data.groomName && prev.data.brideName === next.data.brideName);
 
 export default Interview;

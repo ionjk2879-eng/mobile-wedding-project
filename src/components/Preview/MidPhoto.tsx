@@ -6,6 +6,8 @@ interface PreviewProps {
 }
 
 const MidPhoto: React.FC<PreviewProps> = React.memo(({ data }) => {
+  if (data.isMidPhotoEnabled === false) return null;
+
   const caption = data.midPhotoCaption || '';
   const photoPos = `${data.midPhotoX ?? 50}% ${data.midPhotoY ?? 50}%`;
 
@@ -28,7 +30,8 @@ const MidPhoto: React.FC<PreviewProps> = React.memo(({ data }) => {
     </section>
   );
 }, (prev, next) =>
-  prev.data.midPhoto === next.data.midPhoto
+  prev.data.isMidPhotoEnabled === next.data.isMidPhotoEnabled
+  && prev.data.midPhoto === next.data.midPhoto
   && prev.data.midPhotoX === next.data.midPhotoX
   && prev.data.midPhotoY === next.data.midPhotoY
   && prev.data.midPhotoCaption === next.data.midPhotoCaption
