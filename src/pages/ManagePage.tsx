@@ -264,7 +264,7 @@ const ManagePage: React.FC = () => {
             </button>
           </div>
         )}
-        {!loading && invitations.some(i => !i.data.isPaid) && (
+        {!loading && filter !== 'paid' && invitations.some(i => !i.data.isPaid) && (
           <p className="manage-notice">{tm.unpaidNotice}</p>
         )}
         {loading ? (
