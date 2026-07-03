@@ -44,6 +44,20 @@ const SiteHeader: React.FC = () => {
   const [loginMenuOpen, setLoginMenuOpen] = useState(false);
   const loginMenuRef = useRef<HTMLDivElement>(null);
 
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!langMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
+        setLangMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [langMenuOpen]);
+
   const [navMenuOpen, setNavMenuOpen] = useState(false);
   const navMenuRef = useRef<HTMLDivElement>(null);
   const [navLangOpen, setNavLangOpen] = useState(false);
@@ -135,16 +149,24 @@ const SiteHeader: React.FC = () => {
       </div>
       <div className="site-header-right">
         <Link to="/manage" className={`site-nav-link site-nav-link-desktop ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
-        <div className="site-lang-switcher site-lang-switcher-desktop">
-          {(['ko', 'en', 'ja'] as SiteLang[]).map((l) => (
-            <button
-              key={l}
-              className={`site-lang-btn ${lang === l ? 'active' : ''}`}
-              onClick={() => setLang(l)}
-            >
-              {LANG_LABELS[l]}
-            </button>
-          ))}
+        <div className="site-lang-dropdown site-lang-dropdown-desktop" ref={langMenuRef}>
+          <button className="site-lang-trigger" onClick={() => setLangMenuOpen(!langMenuOpen)}>
+            {LANG_LABELS[lang]}
+            <ChevronDown size={13} className={`site-nav-dropdown-chevron ${langMenuOpen ? 'open' : ''}`} />
+          </button>
+          {langMenuOpen && (
+            <div className="site-auth-menu site-lang-menu">
+              {(['ko', 'en', 'ja'] as SiteLang[]).map((l) => (
+                <button
+                  key={l}
+                  className={`site-auth-menu-btn ${lang === l ? 'active-lang' : ''}`}
+                  onClick={() => { setLang(l); setLangMenuOpen(false); }}
+                >
+                  {LANG_LABELS[l]}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="site-auth site-auth-desktop" ref={menuRef}>
           {loading ? (
@@ -518,39 +540,42 @@ const SiteHeader: React.FC = () => {
         .site-auth-btn.login:hover {
           background: #9B6A7E;
         }
-        .site-lang-switcher {
+        .site-lang-dropdown {
+          position: relative;
           display: flex;
           align-items: center;
-          gap: 2px;
+        }
+        .site-lang-trigger {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          border: none;
           background: #F3F4F6;
           border-radius: 8px;
-          padding: 3px;
-        }
-        .site-lang-btn {
-          border: none;
-          background: none;
-          border-radius: 6px;
-          padding: 4px 8px;
-          font-size: 0.72rem;
+          padding: 6px 10px;
+          font-size: 0.76rem;
           font-weight: 600;
-          color: #9CA3AF;
+          color: #6B7280;
           cursor: pointer;
           transition: all 0.15s;
           font-family: inherit;
           letter-spacing: 0.03em;
         }
-        .site-lang-btn.active {
-          background: white;
+        .site-lang-trigger:hover {
+          background: #E5E7EB;
           color: #B07A8E;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .site-lang-btn:hover:not(.active) {
-          color: #6B7280;
+        .site-lang-menu {
+          min-width: 100px;
+        }
+        .site-auth-menu-btn.active-lang {
+          color: #B07A8E;
+          background: #FBF2F5;
         }
         @media (max-width: 860px) {
           .site-nav-left { display: none; }
           .site-nav-link-desktop { display: none; }
-          .site-lang-switcher-desktop { display: none; }
+          .site-lang-dropdown-desktop { display: none; }
           .site-auth-desktop { display: none; }
           .site-nav-mobile { display: flex; }
         }
@@ -563,7 +588,6 @@ const SiteHeader: React.FC = () => {
           .site-nav-link { font-size: 0.85rem; }
           .site-auth-btn.login { padding: 6px 12px; font-size: 0.78rem; }
           .site-auth-menu { min-width: 200px; right: -4px; }
-          .site-lang-btn { padding: 3px 6px; font-size: 0.68rem; }
           .site-nav-dropdown { right: -4px; }
         }
       `}</style>

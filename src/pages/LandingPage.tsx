@@ -34,7 +34,10 @@ const LandingPage: React.FC = () => {
 
       {/* Hero */}
       <section className="land-hero">
-        <h2 className="land-hero-brand">Sonett</h2>
+        <div className="land-hero-brand">
+          <img src="/logo-icon.png" alt="" className="land-hero-brand-icon" />
+          <img src="/logo-wordmark.png" alt="Sonett" className="land-hero-brand-wordmark" />
+        </div>
         <p className="land-hero-sub">MOBILE WEDDING INVITATION</p>
         <h1 className="land-hero-title">{tl.heroTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.heroTitle.split('\n').length - 1 && <br />}</React.Fragment>)}</h1>
         <p className="land-hero-desc">{tl.heroDesc.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < tl.heroDesc.split('\n').length - 1 && <br />}</React.Fragment>)}</p>
@@ -174,13 +177,23 @@ const LandingPage: React.FC = () => {
           background: linear-gradient(180deg, #FDFBFC 0%, #FDF6F9 100%);
         }
         .land-hero-brand {
-          font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-          font-size: 3.2rem;
-          font-weight: 400;
-          color: #B07A8E;
-          letter-spacing: 4px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
           margin: 0 0 8px;
-          font-style: italic;
+        }
+        .land-hero-brand-icon {
+          height: 54px;
+          width: auto;
+          object-fit: contain;
+          display: block;
+        }
+        .land-hero-brand-wordmark {
+          height: 48px;
+          width: auto;
+          object-fit: contain;
+          display: block;
         }
         .land-hero-sub {
           font-size: 0.75rem;
@@ -423,6 +436,8 @@ const LandingPage: React.FC = () => {
           .land-section-title { font-size: 1.5rem; margin-bottom: 36px; }
         }
         @media (max-width: 480px) {
+          .land-hero-brand-icon { height: 42px; }
+          .land-hero-brand-wordmark { height: 36px; }
           .land-hero-title { font-size: 1.5rem; }
           .land-points-grid { grid-template-columns: 1fr; }
           .land-cta.primary { width: 100%; text-align: center; box-sizing: border-box; }
