@@ -350,9 +350,15 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     if (dismissed) return;
     const tmplScrollEl = document.querySelector('.tmpl-preview-scroll') as HTMLElement | null;
     if (tmplScrollEl) {
-      const prev = tmplScrollEl.style.overflowY;
+      const scrollbarW = tmplScrollEl.offsetWidth - tmplScrollEl.clientWidth;
+      const prevOY = tmplScrollEl.style.overflowY;
+      const prevPad = tmplScrollEl.style.paddingRight;
       tmplScrollEl.style.overflowY = 'hidden';
-      return () => { tmplScrollEl.style.overflowY = prev; };
+      if (scrollbarW > 0) tmplScrollEl.style.paddingRight = `${scrollbarW}px`;
+      return () => {
+        tmplScrollEl.style.overflowY = prevOY;
+        tmplScrollEl.style.paddingRight = prevPad;
+      };
     }
     const fullEl = document.querySelector('.full-preview-container') as HTMLElement | null;
     if (fullEl) {

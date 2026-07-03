@@ -124,10 +124,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     }
   }, [openingPreviewKey, showOpening]);
 
-  // 에디터 프리뷰(previewRefs 있음)에서는 기념일 모드라도 모든 섹션 표시
-  const effectiveSectionOrder = (isAnniversaryMode && !previewRefs)
-    ? sectionOrder.filter(id => id !== 'accounts' && id !== 'rsvp')
-    : sectionOrder;
+  const effectiveSectionOrder = sectionOrder;
 
   const anniversaryOpening = isAnniversaryMode && data.opening
     ? { ...data.opening, openingEnabled: true, openingText: `D+${daysAfterWedding}`, openingSubText: '' }
