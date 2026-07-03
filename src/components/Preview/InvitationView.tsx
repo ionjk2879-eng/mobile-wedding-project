@@ -37,6 +37,7 @@ interface InvitationViewProps {
   forceAnniversaryMode?: boolean;
   guestName?: string;
   guestRelation?: GuestRelation;
+  guestCode?: string;
 }
 
 // 미리보기 섹션 ID → 에디터 섹션 ID 매핑
@@ -64,7 +65,7 @@ const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: string }>
   share:     { icon: <Send size={13} />,           label: '주소' },
 };
 
-const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void }> = ({ id, data, refEl, shareEnabled, onNav }) => {
+const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode }) => {
   const navInfo = SECTION_NAV_INFO[id];
   const wrap = (children: React.ReactNode) => (
     <div ref={refEl} className={onNav ? 'preview-nav-section' : undefined}>
@@ -87,7 +88,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
     case 'timeline': return wrap(<Timeline data={data} />);
     case 'location': return wrap(<Location data={data} />);
     case 'midphoto': return wrap(<MidPhoto data={data} />);
-    case 'rsvp': return wrap(<RSVPForm data={data} />);
+    case 'rsvp': return wrap(<RSVPForm data={data} guestName={guestName} guestCode={guestCode} />);
     case 'accounts': return wrap(<Money data={data} />);
     case 'contacts': return wrap(<Contacts data={data} />);
     case 'guestbook': return wrap(<Guestbook data={data} />);
@@ -125,7 +126,7 @@ function buildSectionOrder(data: InvitationData): string[] {
   return [...baseOrder.slice(0, insertAt), 'midphoto', ...baseOrder.slice(insertAt)];
 }
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode }) => {
   const sectionOrder = buildSectionOrder(data);
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
 
@@ -217,7 +218,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         const editorId = PREVIEW_TO_EDITOR[id] || id;
         return (
           <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={data} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} />
+            <SectionComponent id={id} data={data} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} />
           </ScrollReveal>
         );
       })}

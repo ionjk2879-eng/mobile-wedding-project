@@ -159,6 +159,7 @@ export interface RSVPResponse {
   relation: 'groom' | 'bride';
   message: string;
   createdAt?: string;
+  guestCode?: string | null;
 }
 
 export type GuestRelation = 'family' | 'friend' | 'coworker' | 'other';

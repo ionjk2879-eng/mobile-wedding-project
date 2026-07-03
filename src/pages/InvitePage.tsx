@@ -41,7 +41,7 @@ const InvitePage: React.FC = () => {
 
   if (!result) return <InviteFallback />;
 
-  return <ViewPage slugOverride={result.slug} guestName={result.name} guestRelation={result.relation} />;
+  return <ViewPage slugOverride={result.slug} guestName={result.name} guestRelation={result.relation} guestCode={code} />;
 };
 
 export default InvitePage;

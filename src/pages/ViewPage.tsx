@@ -33,9 +33,10 @@ interface ViewPageProps {
   slugOverride?: string;
   guestName?: string;
   guestRelation?: GuestRelation;
+  guestCode?: string;
 }
 
-const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelation }) => {
+const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelation, guestCode }) => {
   const { slug: slugParam } = useParams<{ slug: string }>();
   const slug = slugOverride || slugParam;
   const [searchParams] = useSearchParams();
@@ -99,7 +100,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor, '--wedding-accent': data.customAccentColor } as React.CSSProperties : {}) }}>
         <ScrollRootContext.Provider value={null}>
-          <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} guestName={guestName} guestRelation={guestRelation} />
+          <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} guestName={guestName} guestRelation={guestRelation} guestCode={guestCode} />
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
         {showWatermark && <PromoSection />}

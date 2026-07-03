@@ -6,13 +6,17 @@ import { toast } from '../../stores/useToastStore';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { PreviewOverlay } from '../../hooks/usePreviewPopup';
 
-interface PreviewProps { data: InvitationData; }
+interface PreviewProps {
+  data: InvitationData;
+  guestName?: string;
+  guestCode?: string;
+}
 
-const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
+const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCode }) => {
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
   const [formData, setFormData] = useState<Omit<RSVPResponse, 'id' | 'createdAt'>>({
-    guestName: '', isAttending: true, totalGuests: 1, wantsMeal: true, relation: 'groom', message: ''
+    guestName: guestName || '', isAttending: true, totalGuests: 1, wantsMeal: true, relation: 'groom', message: '', guestCode: guestCode || null,
   });
   const [submitted, setSubmitted] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -100,6 +104,6 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data }) => {
 
     </section>
   );
-}, (prev, next) => prev.data.isRSVPEnabled === next.data.isRSVPEnabled && prev.data.slug === next.data.slug && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily);
+}, (prev, next) => prev.data.isRSVPEnabled === next.data.isRSVPEnabled && prev.data.slug === next.data.slug && prev.data.language === next.data.language && prev.data.fontFamily === next.data.fontFamily && prev.guestName === next.guestName && prev.guestCode === next.guestCode);
 
 export default RSVPForm;

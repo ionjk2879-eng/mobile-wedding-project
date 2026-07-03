@@ -252,7 +252,10 @@ const AdminPage: React.FC = () => {
                 <tr key={i}>
                   <td>{r.isAttending ? <span className="badge ok">참석</span> : <span className="badge no">불참</span>}</td>
                   <td><span className={`badge side ${r.relation}`}>{r.relation === 'groom' ? '신랑측' : '신부측'}</span></td>
-                  <td>{r.guestName}</td>
+                  <td>
+                    {r.guestName}
+                    {r.guestCode && <span className="badge verified" title="개인화 링크로 확인된 하객"><Check size={11} /> 확인된 하객</span>}
+                  </td>
                   <td>{r.isAttending ? `${r.totalGuests}명` : '-'}</td>
                   <td>{r.isAttending ? (r.wantsMeal ? 'O' : 'X') : '-'}</td>
                   <td className="msg-cell">{r.message || '-'}</td>
@@ -385,6 +388,7 @@ const AdminPage: React.FC = () => {
         .badge.no { background: #FEE2E2; color: #DC2626; }
         .badge.side.groom { background: #DBEAFE; color: #2563EB; }
         .badge.side.bride { background: #FCE7F3; color: #DB2777; }
+        .badge.verified { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; background: #EFF6FF; color: #2563EB; vertical-align: middle; }
         .msg-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #6B7280; font-style: italic; }
         .date-cell { font-size: 0.8rem; color: #9CA3AF; white-space: nowrap; }
         .admin-empty { padding: 60px; text-align: center; background: white; border: 1px dashed #E5E7EB; border-radius: 16px; color: #9CA3AF; }

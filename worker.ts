@@ -514,24 +514,33 @@ async function handleRSVP(request: Request, env: Env, slug: string): Promise<Res
     if (!inv || inv.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
     const rows = await env.DB.prepare(
-      'SELECT id, guest_name, is_attending, total_guests, wants_meal, relation, message, created_at FROM rsvp WHERE invitation_slug = ? ORDER BY created_at DESC'
+      'SELECT id, guest_name, is_attending, total_guests, wants_meal, relation, message, created_at, guest_code FROM rsvp WHERE invitation_slug = ? ORDER BY created_at DESC'
     ).bind(slug).all();
     return json(rows.results.map((r: Record<string, unknown>) => ({
       id: r.id, guestName: r.guest_name, isAttending: !!r.is_attending,
       totalGuests: r.total_guests, wantsMeal: !!r.wants_meal,
       relation: r.relation, message: r.message, createdAt: r.created_at,
+      guestCode: r.guest_code ?? null,
     })), 200, origin);
   }
 
   if (request.method === 'POST') {
-    const body = await request.json() as { guestName?: string; isAttending?: boolean; totalGuests?: number; wantsMeal?: boolean; relation?: string; message?: string };
+    const body = await request.json() as { guestName?: string; isAttending?: boolean; totalGuests?: number; wantsMeal?: boolean; relation?: string; message?: string; guestCode?: string };
     if (!body.guestName || !body.relation) return json({ error: 'Required fields missing' }, 400, origin);
+
+    // guestCode는 클라이언트가 임의로 지정할 수 있으므로, 실제로 이 청첩장에 속한 하객 code인지 검증 후에만 저장
+    let guestCode: string | null = null;
+    if (body.guestCode) {
+      const guestRow = await env.DB.prepare('SELECT code FROM guests WHERE code = ? AND invitation_slug = ?').bind(body.guestCode, slug).first();
+      if (guestRow) guestCode = body.guestCode;
+    }
+
     const id = body.guestName.trim().replace(/\s+/g, '_');
     await env.DB.prepare(
-      `INSERT INTO rsvp (id, invitation_slug, guest_name, is_attending, total_guests, wants_meal, relation, message)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(id) DO UPDATE SET is_attending = excluded.is_attending, total_guests = excluded.total_guests, wants_meal = excluded.wants_meal, message = excluded.message`
-    ).bind(id, slug, body.guestName, body.isAttending ? 1 : 0, body.totalGuests ?? 1, body.wantsMeal ? 1 : 0, body.relation, body.message || '').run();
+      `INSERT INTO rsvp (id, invitation_slug, guest_name, is_attending, total_guests, wants_meal, relation, message, guest_code)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET is_attending = excluded.is_attending, total_guests = excluded.total_guests, wants_meal = excluded.wants_meal, message = excluded.message, guest_code = excluded.guest_code`
+    ).bind(id, slug, body.guestName, body.isAttending ? 1 : 0, body.totalGuests ?? 1, body.wantsMeal ? 1 : 0, body.relation, body.message || '', guestCode).run();
     sendRsvpNotification(env, slug, body.guestName, body.isAttending ?? false, body.totalGuests ?? 1, body.relation, body.message || '').catch(() => {});
     return json({ ok: true }, 200, origin);
   }
@@ -620,7 +629,12 @@ async function handleGuest(request: Request, env: Env, slug: string, code: strin
   }
 
   if (request.method === 'DELETE') {
-    await env.DB.prepare('DELETE FROM guests WHERE code = ?').bind(code).run();
+    // FK가 실제로 강제되지 않으므로(PRAGMA foreign_keys 미설정), 하객 삭제 시
+    // 연결된 RSVP 응답이 존재하지 않는 code를 가리키는 고아 레코드가 되지 않도록 수동으로 정리
+    await env.DB.batch([
+      env.DB.prepare('UPDATE rsvp SET guest_code = NULL WHERE guest_code = ?').bind(code),
+      env.DB.prepare('DELETE FROM guests WHERE code = ?').bind(code),
+    ]);
     return json({ ok: true }, 200, origin);
   }
 
