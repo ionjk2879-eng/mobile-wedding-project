@@ -13,6 +13,12 @@ interface GalleryIdentity {
   guestCode?: string;
 }
 
+// 청첩장 본문 미리보기용 — 신원 식별 없이(토큰 생성도 안 함) 공개 사진 개수만 조회
+export const fetchGalleryPhotoCount = async (slug: string): Promise<number> => {
+  const photos = await apiFetch<GalleryPhoto[]>(`/api/gallery/${slug}`);
+  return photos.length;
+};
+
 export const fetchGalleryPhotos = (slug: string, identity: GalleryIdentity): Promise<GalleryPhoto[]> => {
   const params = new URLSearchParams();
   if (identity.guestCode) params.set('guestCode', identity.guestCode);

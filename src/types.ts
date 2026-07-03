@@ -127,6 +127,7 @@ export interface FeatureConfig {
   isMessageEnabled: boolean;
   isEndingEnabled: boolean;
   isMidPhotoEnabled: boolean;
+  isLiveGalleryEnabled: boolean;
   guestbookPassword: string;
   opening: OpeningConfig;
   bgMusicUrl: string;

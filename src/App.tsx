@@ -169,6 +169,7 @@ const App: React.FC = () => {
     midphoto: React.useRef<HTMLDivElement>(null),
     rsvp: React.useRef<HTMLDivElement>(null),
     guestbook: React.useRef<HTMLDivElement>(null),
+    livegallery: React.useRef<HTMLDivElement>(null),
     contacts: React.useRef<HTMLDivElement>(null),
     accounts: React.useRef<HTMLDivElement>(null),
     ending: React.useRef<HTMLDivElement>(null),

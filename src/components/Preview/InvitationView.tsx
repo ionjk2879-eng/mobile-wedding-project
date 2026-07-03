@@ -22,6 +22,7 @@ import Ending from './Ending';
 import MidPhoto from './MidPhoto';
 import Share from './Share';
 import Guestbook from './Guestbook';
+import LiveGallery from './LiveGallery';
 import ScrollReveal from './ScrollReveal';
 import BackgroundEffects from './BackgroundEffects';
 import MusicPlayer from './MusicPlayer';
@@ -62,6 +63,7 @@ const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: string }>
   accounts:  { icon: <CreditCard size={13} />,     label: '계좌정보' },
   contacts:  { icon: <Info size={13} />,           label: '기본정보' },
   guestbook: { icon: <BookOpen size={13} />,       label: '방명록' },
+  livegallery: { icon: <Camera size={13} />,       label: '라이브 갤러리' },
   ending:    { icon: <Camera size={13} />,         label: '엔딩' },
   share:     { icon: <Send size={13} />,           label: '주소' },
 };
@@ -93,6 +95,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
     case 'accounts': return wrap(<Money data={data} />);
     case 'contacts': return wrap(<Contacts data={data} />);
     case 'guestbook': return wrap(<Guestbook data={data} />);
+    case 'livegallery': return wrap(<LiveGallery data={data} guestCode={guestCode} />);
     case 'ending': return wrap(<Ending data={data} />);
     case 'share': return wrap(<Share data={data} shareEnabled={shareEnabled} />);
     default: return null;
@@ -100,7 +103,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 };
 
 // midphoto는 순서 관리 대상이 아니라 활성 섹션 중간에 자동 배치되는 고정 섹션이라 여기서 제외
-const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
+const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
 
 // 각 섹션의 on/off 토글 여부 (없는 섹션은 항상 활성)
 function isSectionActive(id: string, data: InvitationData): boolean {
@@ -109,6 +112,9 @@ function isSectionActive(id: string, data: InvitationData): boolean {
     case 'timeline': return data.isTimelineEnabled !== false;
     case 'message': return data.isMessageEnabled !== false;
     case 'ending': return data.isEndingEnabled !== false;
+    // 새로 추가된 기능이라 기존 청첩장에는 값이 없으므로, 다른 토글과 반대로
+    // 명시적으로 켠 경우에만 노출한다(기본 꺼짐) — 갑자기 남의 청첩장에 나타나지 않도록.
+    case 'livegallery': return data.isLiveGalleryEnabled === true;
     default: return true;
   }
 }

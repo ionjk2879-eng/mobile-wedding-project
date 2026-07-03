@@ -45,6 +45,7 @@ export const initialData: InvitationData = {
   isMessageEnabled: true,
   isEndingEnabled: true,
   isMidPhotoEnabled: true,
+  isLiveGalleryEnabled: false,
   guestbookPassword: '',
   opening: {
     openingEnabled: false,
