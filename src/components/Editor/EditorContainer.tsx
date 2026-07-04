@@ -94,23 +94,11 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
     return () => observer.disconnect();
   }, []);
 
+  // 섹션 펼치기/접기는 카테고리·미리보기 이동("→" 버튼, scrollToSection)과 분리된 동작 —
+  // 그냥 펼치기만 하고 다른 곳으로 스크롤/이동시키지 않는다.
   const toggleSection = (id: string) => {
-    const willOpen = !expandedSections[id];
     setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }));
     setActiveSection(id);
-    if (willOpen) {
-      if (onSectionClick && id !== 'order' && id !== 'music') {
-        onSectionClick(id);
-      }
-      const ref = sectionRefs[id as keyof typeof sectionRefs];
-      if (ref) {
-        isScrollingRef.current = true;
-        setTimeout(() => {
-          ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          setTimeout(() => { isScrollingRef.current = false; }, 800);
-        }, 50);
-      }
-    }
   };
 
   const scrollToSection = (id: string, ref: React.RefObject<HTMLDivElement>) => {
