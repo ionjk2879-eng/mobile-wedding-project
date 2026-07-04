@@ -7,7 +7,7 @@
 - **프로젝트 유형:** 개인 프로젝트 (풀스택 웹 애플리케이션)
 - **개발 기간:** 진행 중
 - **배포 환경:** Web (SPA)
-- **라이브 데모:** Firebase Hosting 기반 배포
+- **배포:** Cloudflare Workers (GitHub Actions로 push 시 자동 배포 — 테스트 → 빌드 → D1 마이그레이션 → 배포)
 
 ---
 
@@ -20,10 +20,14 @@
 | **애니메이션** | Framer Motion |
 | **아이콘** | Lucide React |
 | **라우팅** | React Router v7 |
-| **Backend / DB** | Firebase (Firestore) |
+| **Backend** | Cloudflare Workers (`worker.ts`, 단일 파일 API 서버) |
+| **DB** | Cloudflare D1 (SQLite) |
+| **파일 저장소** | Cloudflare R2 (라이브 갤러리 업로드 사진) |
+| **인증** | 자체 JWT(HS256) 발급 + Google/Kakao/Naver OAuth |
+| **CI/CD** | GitHub Actions (테스트 → 빌드 → D1 마이그레이션 → `wrangler deploy`) |
 | **지도 / 주소** | Kakao Maps API, Daum Postcode API |
 | **차트** | Recharts |
-| **테스트** | Playwright |
+| **테스트** | Playwright (`@playwright/test`, API 레벨 테스트) |
 
 ---
 
@@ -36,7 +40,7 @@
 - 전체화면 프리뷰 모드 지원
 
 ### 2. 테마 및 디자인 시스템
-- **8가지 컬러 테마:** Blush Pink, Champagne, Sage Green, Classic Navy, Burgundy Wine, Lavender, Dusty Rose, Modern White
+- **16가지 컬러 테마:** 세이지 그린, 미스트, 펄, 월넛, 슬레이트, 위스테리아, 시더, 스톤, 코퍼, 스카이 블루, 리넨, 다크 올리브, 누아르, 피치 코랄, 화이트 미니멀, 화이트 골드
 - **6가지 배경 재질:** 한지, 린넨, 도트, 실크, 수채화 (CSS SVG 필터 기반 구현)
 - **7가지 흩날리는 효과:** 벚꽃, 함박눈, 별빛, 나뭇잎, 하트, 반딧불, 꽃가루 (CSS 파티클 애니메이션)
 - **4가지 스크롤 등장 효과:** Fade Up, Fade In, Slide In (IntersectionObserver 기반)
@@ -57,7 +61,7 @@
 | **갤러리** | 슬라이드 / 메이슨리 2가지 연출, 라이트박스 뷰어, 터치 스와이프 |
 | **타임라인** | 연애~결혼 과정 기록, 사진 첨부, 연도 구분 |
 | **장소 및 교통** | Daum 주소검색 → Kakao Maps 지도 연동, 교통정보 자동 생성 |
-| **참석의사 (RSVP)** | 참석/불참, 인원수, 식사여부, 메시지 수집 (Firebase 저장) |
+| **참석의사 (RSVP)** | 참석/불참, 인원수, 식사여부, 메시지 수집 (D1 저장, 개인정보 전환 정책 적용) |
 | **축의금 계좌** | 3가지 UI 스타일, 계좌번호 복사 기능 |
 | **연락처** | 신랑/신부 + 양가 부모님 연락처, 전화/문자 바로 연결 |
 | **공유** | 카카오톡 공유, URL 복사 |
@@ -74,10 +78,13 @@
 - 사용자 인터랙션 감지 후 자동 재생
 - 플로팅 재생/정지 버튼
 
-### 8. Firebase 연동
-- **청첩장 저장/불러오기:** Firestore에 slug 기반 문서 저장
-- **RSVP 응답 수집:** 하객 응답 실시간 저장
-- **고유 URL 생성:** `/w/{slug}` 형태의 공유 주소
+### 8. Cloudflare 백엔드 연동
+- **청첩장 저장/불러오기:** D1(SQLite)에 slug를 기본 키로 하는 `invitations` 테이블에 JSON으로 저장
+- **RSVP 응답 수집:** `rsvp` 테이블에 청첩장별로 스코프되어 저장(동명이인/여러 청첩장 간 충돌 방지)
+- **라이브 갤러리:** 하객이 올린 사진을 R2에 저장, `gallery_photos` 테이블에서 메타데이터 관리
+- **하객 개인화 링크:** `guests` 테이블 기반으로 `/invite/{code}` 형태의 개인화 링크 발급
+- **고유 URL 생성:** `/{slug}` 형태의 공유 주소
+- **개인정보 자동 전환:** 예식일 기준 일정 기간 후 계좌/RSVP 공개 여부를 자동(또는 수동 오버라이드)으로 전환
 
 ### 9. 관리자 페이지 (`/admin/{slug}`)
 - RSVP 응답 목록 테이블 뷰
@@ -88,31 +95,38 @@
 
 ## 아키텍처
 
+프론트엔드(React SPA)와 백엔드(Cloudflare Workers API)가 하나의 저장소, 하나의 Worker로
+같이 배포된다 — 별도 백엔드 서버가 없다.
+
 ```
+worker.ts                       # 전체 API 서버 (단일 파일, 라우팅+핸들러+D1/R2 접근)
+migrations/                     # D1 스키마 마이그레이션 (0001~)
+wrangler.toml                   # Worker 설정 — D1/R2 바인딩, [env.dev] 로컬 개발 환경
+tests/                          # Playwright API 테스트 (로컬 dev D1 시뮬레이션 대상)
+
 src/
-├── main.tsx                    # 라우팅 설정 (/, /w/:slug, /admin/:slug)
+├── main.tsx                    # 라우팅 설정
 ├── App.tsx                     # 에디터 + 프리뷰 메인 레이아웃
 ├── types.ts                    # TypeScript 인터페이스 정의
-├── firebase.ts                 # Firebase 초기화 및 CRUD 함수
+├── services/                   # worker.ts API를 호출하는 fetch 래퍼들
+│   ├── api.ts                  # 공용 apiFetch (JWT Authorization 헤더 부착)
+│   ├── auth.ts                 # Google/Kakao/Naver 로그인, 세션 관리
+│   ├── invitationService.ts    # 청첩장 CRUD, 개인정보 전환 설정
+│   ├── rsvpService.ts / guestService.ts / guestbookService.ts / galleryService.ts
+│   └── publicLoad.ts           # 인증 헤더 없이 호출하는 공개 조회 전용(하객 화면용)
 ├── pages/
-│   ├── ViewPage.tsx            # 하객용 청첩장 열람 페이지
-│   └── AdminPage.tsx           # RSVP 응답 관리 대시보드
+│   ├── ViewPage.tsx             # 하객용 청첩장 열람 페이지
+│   ├── AdminPage.tsx            # 하객 관리(RSVP/개인화 링크/라이브 갤러리/개인정보 설정)
+│   ├── GalleryPage.tsx          # 하객용 라이브 갤러리 업로드/열람 페이지
+│   ├── SuperAdminPage.tsx       # 슈퍼관리자 전용(결제 활성화, 게시글 관리)
+│   └── ...
 └── components/
     ├── Editor/
-    │   └── EditorContainer.tsx # 전체 에디터 UI (1,400+ lines)
+    │   └── EditorContainer.tsx # 전체 에디터 UI
     └── Preview/
-        ├── Hero.tsx            # 메인화면 (6가지 레이아웃)
-        ├── Greeting.tsx        # 인사말
-        ├── Calendar.tsx        # 달력
-        ├── PersonalMessage.tsx # 신랑/신부 한마디
-        ├── Interview.tsx       # 인터뷰 Q&A
-        ├── Gallery.tsx         # 갤러리 (슬라이드/메이슨리)
-        ├── Timeline.tsx        # 타임라인
-        ├── Location.tsx        # 장소 + 카카오맵
-        ├── RSVPForm.tsx        # 참석의사 폼
-        ├── Money.tsx           # 축의금 계좌
-        ├── Contacts.tsx        # 연락처
-        ├── Share.tsx           # 공유 기능
+        ├── Hero.tsx / Greeting.tsx / Calendar.tsx / PersonalMessage.tsx
+        ├── Interview.tsx / Gallery.tsx / Timeline.tsx / Location.tsx
+        ├── RSVPForm.tsx / Money.tsx / Contacts.tsx / LiveGallery.tsx
         └── ScrollReveal.tsx    # 스크롤 등장 효과 HOC
 ```
 
@@ -120,22 +134,29 @@ src/
 
 | 경로 | 역할 | 접근 대상 |
 |------|------|-----------|
-| `/` | 청첩장 에디터 (빌더) | 제작자 |
-| `/w/:slug` | 청첩장 열람 | 하객 |
-| `/admin/:slug` | RSVP 응답 관리 | 제작자 |
+| `/` | 랜딩 페이지 | 방문자 |
+| `/editor`, `/edit/:slug` | 청첩장 에디터 (빌더) | 제작자(로그인 필요) |
+| `/manage` | 내 청첩장 목록 | 제작자 |
+| `/:slug` | 청첩장 열람 | 하객 |
+| `/gallery/:slug` | 라이브 갤러리 업로드/열람 | 하객 |
+| `/invite/:code` | 하객 개인화 링크 | 하객 |
+| `/admin/:slug` | 하객 관리(RSVP/갤러리/개인정보 설정) | 제작자(로그인 필요) |
+| `/superadmin` | 결제 활성화, 게시글 관리 | 슈퍼관리자 |
 
 ### 데이터 흐름
 
 ```
 [에디터 입력] → useState(InvitationData) → [실시간 프리뷰 렌더링]
-                        ↓ 저장 버튼
-              [Firebase Firestore 저장]
+                        ↓ 저장(자동/수동)
+         PUT /api/invitations/:slug (JWT 인증) → [D1 invitations 테이블에 JSON 저장]
                         ↓
-              [ViewPage에서 slug로 로드 → 하객에게 동일 UI 렌더링]
+   GET /api/invitations/:slug (하객, 비로그인) → [ViewPage가 동일 UI로 렌더링]
+                        ↓ (하객이 본인 소유가 아니면, 개인정보 전환 정책에 따라
+                        ↓  계좌/RSVP 필드를 서버가 마스킹해서 응답)
                         ↓ RSVP 제출
-              [Firestore 서브컬렉션에 응답 저장]
+              POST /api/rsvp/:slug → [D1 rsvp 테이블에 slug로 스코프해서 저장]
                         ↓
-              [AdminPage에서 응답 조회 및 통계]
+              [AdminPage가 소유자 인증 후 응답 조회 및 통계]
 ```
 
 ---
