@@ -442,7 +442,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       return `${months[m]} ${d}, ${y}`;
     }
     if (language === 'ja') return `${y}年${m + 1}月${d}日`;
-    return `${y}년 ${m + 1}월 ${d}일`;
+    // 예식 날짜(subText)와 같은 포맷("2026. 7. 4. 토요일")으로 통일
+    return formatShareDate(t.toISOString());
   })();
   // 기념일 모드는 openingText 자체가 D+n으로 대체되므로 여기선 일반 모드에서만 D-day를 서브 멘트 아래 표시
   const dDayStr = (() => {
@@ -629,7 +630,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
             <p className={`op-typing-names${typingPhase === 'done' ? ' visible' : ''}`}>{groom} &amp; {bride}</p>
             <p className={`op-typing-sub${typingPhase === 'done' ? ' visible' : ''}`}>
               {subText}
-              {anniversaryMode && todayDateStr && <span style={{ display: 'block', marginTop: '0.3em', opacity: 0.75, fontSize: '0.88em' }}>{todayDateStr}</span>}
+              {anniversaryMode && todayDateStr && (
+                <>
+                  <span className="op-date-tilde" aria-hidden="true">~</span>
+                  <span style={{ display: 'block', opacity: 0.75 }}>{todayDateStr}</span>
+                </>
+              )}
               {dDayStr && <span style={{ display: 'block', marginTop: '0.45em', opacity: 0.95, fontSize: '1.6em', fontWeight: 600, letterSpacing: '1px' }}>{dDayStr}</span>}
             </p>
             <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
@@ -679,7 +685,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
           <p className="op-sub" style={{ animation: `op-fade-up 0.6s ease ${seqSubDelay} both` }}>
             {subText}
-            {anniversaryMode && todayDateStr && <span style={{ display: 'block', marginTop: '0.3em', opacity: 0.75, fontSize: '0.88em' }}>{todayDateStr}</span>}
+            {anniversaryMode && todayDateStr && (
+                <>
+                  <span className="op-date-tilde" aria-hidden="true">~</span>
+                  <span style={{ display: 'block', opacity: 0.75 }}>{todayDateStr}</span>
+                </>
+              )}
             {dDayStr && <span style={{ display: 'block', marginTop: '0.45em', opacity: 0.95, fontSize: '1.6em', fontWeight: 600, letterSpacing: '1px' }}>{dDayStr}</span>}
           </p>
 
