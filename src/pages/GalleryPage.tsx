@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Camera, Flag, Trash2, ImagePlus } from 'lucide-react';
+import { Camera, Flag, Trash2, ImagePlus, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchGalleryPhotos, uploadGalleryPhoto, deleteGalleryPhoto, reportGalleryPhoto, GalleryPhoto } from '../services/galleryService';
 import { lookupInviteCode } from '../services/guestService';
 import { resizeImageForUpload } from '../utils/imageResize';
 import { toast } from '../stores/useToastStore';
 import { getApiErrorMessage } from '../utils/apiError';
 import ToastContainer from '../components/Toast';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+
+const SWIPE_THRESHOLD = 50;
 
 const PER_UPLOADER_LIMIT = 4;
 const GUEST_NAME_STORAGE_KEY = 'sonett_gallery_guest_name';
@@ -26,6 +29,10 @@ const GalleryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const lightboxTrapRef = useFocusTrap(lightboxIndex !== null);
+  const touchStartX = useRef(0);
 
   // 개인화 링크(?code=)로 들어온 경우, 서버에 재검증해 실제 하객 이름/코드를 확보
   useEffect(() => {
@@ -114,6 +121,75 @@ const GalleryPage: React.FC = () => {
     }
   };
 
+  // 삭제/신고로 photos 배열에서 항목이 사라질 때 라이트박스 인덱스를 다음(없으면 이전) 사진으로 옮기고,
+  // 마지막 한 장이었으면 모달을 닫는다.
+  const removePhotoFromLightbox = (photoId: string) => {
+    setPhotos((prev) => {
+      const idx = prev.findIndex((p) => p.id === photoId);
+      const next = prev.filter((p) => p.id !== photoId);
+      if (next.length === 0) {
+        setLightboxIndex(null);
+      } else {
+        setLightboxIndex(Math.min(idx, next.length - 1));
+      }
+      return next;
+    });
+  };
+
+  const handleDeleteInLightbox = async (photo: GalleryPhoto) => {
+    if (!slug || !confirm('이 사진을 삭제할까요?')) return;
+    try {
+      await deleteGalleryPhoto(slug, photo.id, { guestCode: guestCode || undefined });
+      removePhotoFromLightbox(photo.id);
+      toast.success('삭제했어요.');
+    } catch (err) {
+      toast.error(getApiErrorMessage(err));
+    }
+  };
+
+  const handleReportInLightbox = async (photo: GalleryPhoto) => {
+    if (!slug || !confirm('부적절한 사진으로 신고할까요? 신고하면 바로 목록에서 숨겨져요.')) return;
+    try {
+      await reportGalleryPhoto(slug, photo.id);
+      removePhotoFromLightbox(photo.id);
+      toast.success('신고가 접수됐어요.');
+    } catch (err) {
+      toast.error(getApiErrorMessage(err));
+    }
+  };
+
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const showNext = useCallback(() => {
+    setLightboxIndex((i) => (i === null ? null : (i + 1) % photos.length));
+  }, [photos.length]);
+  const showPrev = useCallback(() => {
+    setLightboxIndex((i) => (i === null ? null : (i - 1 + photos.length) % photos.length));
+  }, [photos.length]);
+
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowRight') showNext();
+      else if (e.key === 'ArrowLeft') showPrev();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [lightboxIndex, closeLightbox, showNext, showPrev]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (delta <= -SWIPE_THRESHOLD) showNext();
+    else if (delta >= SWIPE_THRESHOLD) showPrev();
+  };
+
   return (
     <div className="gallery-page">
       <ToastContainer />
@@ -157,24 +233,76 @@ const GalleryPage: React.FC = () => {
         <p className="gallery-status">아직 올라온 사진이 없어요. 첫 사진을 올려주세요!</p>
       ) : (
         <div className="gallery-grid">
-          {photos.map((photo) => (
-            <div className="gallery-item" key={photo.id}>
+          {photos.map((photo, index) => (
+            <div className="gallery-item" key={photo.id} onClick={() => setLightboxIndex(index)} role="button" tabIndex={0}>
               <img src={photo.url} alt={photo.guestName || '갤러리 사진'} loading="lazy" />
               <div className="gallery-item-footer">
                 <span className="gallery-item-name">{photo.guestName || '익명'}</span>
                 <div className="gallery-item-actions">
                   {photo.mine && (
-                    <button type="button" onClick={() => handleDelete(photo)} title="삭제" aria-label="삭제">
+                    <button type="button" onClick={(e) => { e.stopPropagation(); handleDelete(photo); }} title="삭제" aria-label="삭제">
                       <Trash2 size={14} />
                     </button>
                   )}
-                  <button type="button" onClick={() => handleReport(photo)} title="신고" aria-label="신고">
+                  <button type="button" onClick={(e) => { e.stopPropagation(); handleReport(photo); }} title="신고" aria-label="신고">
                     <Flag size={14} />
                   </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {lightboxIndex !== null && photos[lightboxIndex] && (
+        <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label="사진 확대 보기" ref={lightboxTrapRef}>
+          <div className="gallery-lightbox-backdrop" onClick={closeLightbox} />
+          <button type="button" className="gallery-lightbox-close" onClick={closeLightbox} aria-label="닫기">
+            <X size={26} />
+          </button>
+
+          {photos.length > 1 && (
+            <button type="button" className="gallery-lightbox-nav gallery-lightbox-prev" onClick={showPrev} aria-label="이전 사진">
+              <ChevronLeft size={28} />
+            </button>
+          )}
+
+          <div
+            className="gallery-lightbox-stage"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <img
+              src={photos[lightboxIndex].url}
+              alt={photos[lightboxIndex].guestName || '갤러리 사진 확대'}
+              draggable="false"
+            />
+          </div>
+
+          {photos.length > 1 && (
+            <button type="button" className="gallery-lightbox-nav gallery-lightbox-next" onClick={showNext} aria-label="다음 사진">
+              <ChevronRight size={28} />
+            </button>
+          )}
+
+          <div className="gallery-lightbox-footer">
+            <div className="gallery-lightbox-info">
+              <span className="gallery-item-name">{photos[lightboxIndex].guestName || '익명'}</span>
+              {photos.length > 1 && (
+                <span className="gallery-lightbox-counter">{lightboxIndex + 1} / {photos.length}</span>
+              )}
+            </div>
+            <div className="gallery-item-actions">
+              {photos[lightboxIndex].mine && (
+                <button type="button" onClick={() => handleDeleteInLightbox(photos[lightboxIndex])} title="삭제" aria-label="삭제">
+                  <Trash2 size={14} />
+                </button>
+              )}
+              <button type="button" onClick={() => handleReportInLightbox(photos[lightboxIndex])} title="신고" aria-label="신고">
+                <Flag size={14} />
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -195,7 +323,7 @@ const GalleryPage: React.FC = () => {
         .gallery-status { text-align: center; color: #9CA3AF; font-size: 0.85rem; padding: 40px 0; }
 
         .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .gallery-item { position: relative; border-radius: 12px; overflow: hidden; background: #F3F4F6; aspect-ratio: 1; }
+        .gallery-item { position: relative; border-radius: 12px; overflow: hidden; background: #F3F4F6; aspect-ratio: 1; cursor: pointer; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .gallery-item-footer { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; background: linear-gradient(0deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%); }
         .gallery-item-name { font-size: 0.72rem; color: white; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
@@ -205,6 +333,26 @@ const GalleryPage: React.FC = () => {
 
         @media (min-width: 420px) {
           .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .gallery-lightbox { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .gallery-lightbox-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.9); }
+        .gallery-lightbox-close { position: absolute; top: 16px; right: 16px; z-index: 2; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
+        .gallery-lightbox-close:hover { background: rgba(255,255,255,0.22); }
+        .gallery-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
+        .gallery-lightbox-nav:hover { background: rgba(255,255,255,0.22); }
+        .gallery-lightbox-prev { left: 8px; }
+        .gallery-lightbox-next { right: 8px; }
+        .gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; display: flex; align-items: center; justify-content: center; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; }
+        .gallery-lightbox-stage img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
+        .gallery-lightbox-footer { position: relative; z-index: 2; width: 100%; max-width: 720px; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; box-sizing: border-box; }
+        .gallery-lightbox-info { display: flex; align-items: center; gap: 10px; }
+        .gallery-lightbox-counter { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
+        .gallery-lightbox-footer .gallery-item-actions button { background: rgba(255,255,255,0.85); }
+
+        @media (max-width: 480px) {
+          .gallery-lightbox-nav { width: 36px; height: 36px; }
+          .gallery-lightbox-stage { padding: 0 44px; }
         }
       `}</style>
     </div>
