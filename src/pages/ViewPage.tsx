@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { Heart, FileHeart } from 'lucide-react';
 import { InvitationData, GuestRelation } from '../types';
 import InvitationView from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
 import { ScrollRootContext } from '../components/Preview/ScrollReveal';
 import { loadFont } from '../utils/loadFont';
 import { loadInvitationPublic } from '../services/publicLoad';
+import useAuthStore from '../stores/useAuthStore';
 import '../styles/effects.css';
 
 const SITE_ORIGIN = 'https://sonett.kr';
@@ -44,6 +46,10 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   const [data, setData] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  // 세션 동안만 유지되는 임시 미리보기 전환 — 새로고침하면 기본값(URL 파라미터 또는
+  // 서버가 계산한 예식일+24시간 경과 여부)으로 되돌아간다.
+  const [modeOverride, setModeOverride] = useState<'invitation' | 'anniversary' | null>(null);
+  const authUser = useAuthStore((s) => s.user);
 
   useEffect(() => {
     if (!slug) return;
@@ -94,7 +100,34 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   };
 
   const showWatermark = !data.isPaid;
-  const anniversaryMode = data.isPaid && searchParams.get('mode') === 'anniversary';
+
+  // 기념일 모드 전환 로직.
+  // - ?mode= URL 파라미터가 있으면(공유 링크 등에서 명시적으로 강제) 그 값을 기본으로 삼는다.
+  // - 없으면 서버가 계산해 내려준 예식일+24시간 경과 여부(isPastAnniversaryThreshold)로 기본값을 정한다.
+  // - modeOverride는 화면에서 토글 버튼을 눌렀을 때만 채워지는 세션 한정 임시 상태다.
+  const canAnniversaryMode = !!data.isPaid;
+  const isPastAnniversaryThreshold = !!data.isPastAnniversaryThreshold;
+  // ownerUid는 공개 응답에도 항상 포함되는 값이라(민감 정보 아님) 클라이언트에서 비교해도 안전하다 —
+  // 관리자 API들처럼 서버가 매번 로그인 헤더로 소유권을 재확인하는 대신, 이미 내려온 값과 현재
+  // 로그인 사용자를 비교하는 방식. 실제 데이터 마스킹(계좌/RSVP)은 이 값과 무관하게 서버가
+  // Authorization 헤더 기준으로 별도 판단하므로, 여기서의 비교는 토글 버튼 노출 여부에만 영향을 준다.
+  const isOwner = !!authUser && !!data.ownerUid && authUser.uid === data.ownerUid;
+
+  const urlMode = searchParams.get('mode');
+  const forcedMode: 'invitation' | 'anniversary' | null = urlMode === 'anniversary' ? 'anniversary' : urlMode === 'invitation' ? 'invitation' : null;
+  const defaultMode: 'invitation' | 'anniversary' = isPastAnniversaryThreshold ? 'anniversary' : 'invitation';
+  const currentMode: 'invitation' | 'anniversary' = canAnniversaryMode ? (modeOverride ?? forcedMode ?? defaultMode) : 'invitation';
+  const anniversaryMode = currentMode === 'anniversary';
+
+  // 예식일+24시간 이전엔 소유자만 토글이 보인다(자기 청첩장 미리보기 목적).
+  // 이후엔 누구나 토글로 오갈 수 있다.
+  const showModeToggle = canAnniversaryMode && (isPastAnniversaryThreshold || isOwner);
+  // 예식 전엔 기본이 청첩장 모드라서, 되돌아가는 방향은 "다른 모드로 전환"이 아니라
+  // "미리보기 종료" 뉘앙스가 자연스럽다. 예식 후엔 둘 다 정식 모드라 "OO 모드로 보기"로 대칭.
+  const modeToggleLabel = !isPastAnniversaryThreshold
+    ? (currentMode === 'invitation' ? '기념일 모드 미리보기' : '미리보기 종료')
+    : (currentMode === 'anniversary' ? '청첩장 모드로 보기' : '기념일 모드로 보기');
+  const handleToggleMode = () => setModeOverride(currentMode === 'anniversary' ? 'invitation' : 'anniversary');
 
   return (
     <div className="view-container" style={{ fontFamily: data.fontFamily }}>
@@ -107,8 +140,24 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
         {showWatermark && <PromoSection />}
       </div>
 
+      {showModeToggle && (
+        <button type="button" className="view-mode-toggle-fab" onClick={handleToggleMode}>
+          {currentMode === 'anniversary' ? <FileHeart size={16} /> : <Heart size={16} />}
+          {modeToggleLabel}
+        </button>
+      )}
+
       <style>{`
         .view-container { width: 100%; min-height: 100svh; background: #EBEBEB; display: flex; justify-content: center; overflow-anchor: none; }
+        .view-mode-toggle-fab {
+          position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 500;
+          display: flex; align-items: center; gap: 6px;
+          padding: 10px 18px; border: none; border-radius: 30px;
+          background: rgba(31,41,55,0.88); color: white; backdrop-filter: blur(6px);
+          font-family: 'Pretendard', sans-serif; font-size: 0.82rem; font-weight: 600;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.18); cursor: pointer; transition: opacity 0.2s;
+        }
+        .view-mode-toggle-fab:hover { opacity: 0.85; }
         .view-container .invitation-page { width: 100%; max-width: 430px; background-color: var(--wedding-bg); min-height: 100svh; overflow-anchor: none; }
         .view-loading, .view-error { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pretendard', sans-serif; color: #6B7280; text-align: center; padding: 20px; box-sizing: border-box; }
         .view-error h2 { color: #1F2937; margin-bottom: 8px; }

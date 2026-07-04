@@ -141,7 +141,8 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     if (!data.weddingDateISO) return 0;
     return Math.floor((Date.now() - new Date(data.weddingDateISO).getTime()) / 86400000);
   })();
-  // 기념일 모드: ?mode=anniversary 로 명시적으로 접근할 때만 활성화
+  // 기념일 모드 여부는 호출자(ViewPage 등)가 URL 파라미터/예식일+24시간 경과/토글 상태를
+  // 종합해 계산한 뒤 이 prop으로 넘겨준다 — 이 컴포넌트는 그 결과만 그대로 반영한다.
   const isAnniversaryMode = forceAnniversaryMode === true;
   const [previewActive, setPreviewActive] = useState(false);
   // openingDone: 한 번 dismiss 되면 true → shouldShowOpening = false → 완전히 언마운트

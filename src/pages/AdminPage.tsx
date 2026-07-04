@@ -66,9 +66,8 @@ const AdminPage: React.FC = () => {
     if (!user) { setAuthorized(false); setLoading(false); return; }
     loadInvitation(slug).then((inv) => {
       if (!inv) { setAuthorized(false); setLoading(false); return; }
-      const ownerUid = (inv as unknown as Record<string, unknown>).ownerUid as string | undefined;
       setInvitationInfo(inv);
-      setAuthorized(!ownerUid || ownerUid === user.uid);
+      setAuthorized(!inv.ownerUid || inv.ownerUid === user.uid);
     });
   }, [user, authLoading, slug]);
 

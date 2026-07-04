@@ -260,7 +260,12 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
       }
     }
 
-    return json({ ...data, slug, ownerUid: row.owner_uid, isPaid: !!row.is_paid, expiresAt: row.expires_at ?? null }, 200, origin);
+    // 기념일 모드 기본 전환 시점(예식일 + 24시간) — 클라이언트 시계를 신뢰하지 않고 서버 기준으로 계산해서
+    // 내려준다. 이 값은 민감 정보가 아니라 로그인 여부와 무관하게 항상 계산해 내려준다.
+    const isPastAnniversaryThreshold = !!data.weddingDateISO
+      && (Date.now() - new Date(data.weddingDateISO).getTime()) >= 24 * 60 * 60 * 1000;
+
+    return json({ ...data, slug, ownerUid: row.owner_uid, isPaid: !!row.is_paid, expiresAt: row.expires_at ?? null, isPastAnniversaryThreshold }, 200, origin);
   }
 
   const user = await getAuthUser(request, env);

@@ -147,6 +147,8 @@ export interface SharingConfig {
   isPaid?: boolean;
   expiresAt?: string | null; // null = 영구, ISO string = 만료일, undefined = 미설정
   isPermanent?: boolean;
+  ownerUid?: string;
+  isPastAnniversaryThreshold?: boolean; // 서버가 weddingDateISO+24시간 경과 여부를 계산해 내려주는 값
 }
 
 export type InvitationData = BasicInfo & DesignConfig & ContentData & FeatureConfig & SharingConfig;
