@@ -18,3 +18,25 @@ bucket_name = "sonett-images"
 
 [triggers]
 crons = ["0 18 * * *"]  # 매일 오전 3시 KST (만료 청첩장 삭제)
+
+# ── 개발 전용 환경 ──────────────────────────────────────────────
+# 프로덕션 리소스와 완전히 분리된 D1/R2. 로컬 개발은 반드시 아래처럼 실행한다:
+#   npm run dev:worker   (= wrangler dev --env dev, 로컬 시뮬레이션만 사용)
+#   npm run migrate:dev  (= 로컬 시뮬레이션 D1에 마이그레이션 적용)
+# --remote 플래그는 로컬 개발 중 절대 사용하지 않는다 — 실제 원격 리소스에
+# 접속하게 되며, --env dev 없이 --remote를 쓰면 프로덕션 DB/R2를 그대로 건드린다.
+# sonett-db-dev / sonett-images-dev는 이미 생성되어 아래에 연결되어 있다
+# (README.md "로컬 개발 환경" 섹션 참고).
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "sonett-db-dev"
+database_id = "dc6711cd-ad67-4486-977a-d97fd9607291"
+
+[[env.dev.r2_buckets]]
+binding = "IMAGES"
+bucket_name = "sonett-images-dev"
+
+[env.dev.assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"

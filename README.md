@@ -184,6 +184,40 @@ npm run dev
 
 ---
 
+## 로컬 개발 환경 (Worker / D1 / R2)
+
+> ⚠️ **`--remote` 플래그를 로컬 개발 중에 절대 사용하지 마세요.** 프로덕션 D1/R2에 직접
+> 연결되어 실제 서비스 데이터를 조회/수정/삭제할 수 있습니다. 로컬에서는 항상 `--env dev`를
+> 붙이고, `wrangler dev`/`wrangler d1` 명령에 `--remote`가 들어가지 않았는지 확인하세요.
+
+### 개발 전용 D1 / R2
+
+프로덕션과 완전히 분리된 개발용 리소스(`sonett-db-dev`, `sonett-images-dev`)는 이미
+생성되어 `wrangler.toml`의 `[env.dev]`에 연결되어 있습니다. 새로 만들 필요 없이 바로
+아래 "이후: 로컬 개발" 단계로 진행하면 됩니다.
+
+(참고: 만약 완전히 새로운 팀/계정으로 이 리소스를 다시 만들어야 한다면
+`npx wrangler d1 create sonett-db-dev`, `npx wrangler r2 bucket create sonett-images-dev`를
+실행하고 나온 `database_id`를 `[[env.dev.d1_databases]]`에 채워 넣으세요.)
+
+### 이후: 로컬 개발
+
+```bash
+npm run migrate:dev   # 로컬 시뮬레이션 D1에 마이그레이션 적용 (파일 기반, 진짜 원격 DB 아님)
+npm run dev:worker    # wrangler dev --env dev — 로컬 D1(sqlite)/R2 시뮬레이션으로 API 서버 실행
+```
+
+`npm run dev`(Vite)는 프론트엔드만 띄우므로, API(`worker.ts`)까지 함께 테스트하려면
+`npm run dev:worker`를 사용하세요.
+
+개발용 D1을 실제 원격(Cloudflare 상의 sonett-db-dev)에도 반영하고 싶다면:
+
+```bash
+npm run migrate:dev:remote   # sonett-db-dev(원격)에 마이그레이션 적용 — 프로덕션과 무관
+```
+
+---
+
 ## 향후 개선 계획
 
 - 커스텀 도메인 연결 지원
