@@ -325,7 +325,7 @@
 .gallery-empty { width: 100%; padding: 60px 0; display: flex; align-items: center; justify-content: center; background: var(--wedding-card-bg); border: 2px dashed var(--wedding-border); border-radius: 12px; }
 .gallery-empty span { font-size: 0.9em; color: var(--wedding-text-sub); }
 .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; }
-.lightbox-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--wedding-lightbox-bg, rgba(0,0,0,0.85)); }
+.lightbox-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--wedding-bg); }
 .close-btn { position: absolute; top: 20px; right: 20px; color: var(--wedding-text-sub); background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: all 0.2s; }
 .close-btn:hover { background: var(--wedding-border); color: var(--wedding-text-main); }
 .lightbox-slide-vp { position: relative; z-index: 1; width: 100%; height: 80vh; overflow: hidden; cursor: grab; user-select: none; }

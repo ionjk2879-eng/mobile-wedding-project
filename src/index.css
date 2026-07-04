@@ -35,10 +35,6 @@ html, body {
 .preview-content-scroll,
 .invitation-page {
   transition: background-color 0.4s ease, color 0.4s ease;
-  /* :root가 아니라 여기서 선언해야 --wedding-accent의 테마별/커스텀컬러 오버라이드가
-     이미 반영된 값으로 color-mix가 계산된다 — :root에 두면 이 두 클래스가 없는
-     html 엘리먼트 기준 기본 accent로 고정되어 테마를 바꿔도 값이 안 바뀐다. */
-  --wedding-lightbox-bg: color-mix(in srgb, var(--wedding-accent) 25%, black 75%);
 }
 
 .invitation-page {
