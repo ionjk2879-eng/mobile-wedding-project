@@ -110,6 +110,16 @@ function weddingPlus21Days(iso: string): string {
   return d.toISOString();
 }
 
+// 계좌/RSVP 노출 여부의 최종 판단.
+// override가 NULL이 아니면(신랑신부가 명시적으로 0 또는 1로 설정) 날짜와 무관하게 그 값을 그대로 따른다.
+// override가 NULL이면(아직 아무도 안 건드림) privacy_transition_date를 기준으로 자동 판단한다 —
+// 날짜가 없으면 항상 공개, 있으면 그 날짜가 지났는지로 결정한다.
+function computeEffectiveVisibility(override: number | null | undefined, transitionDate: string | null | undefined): boolean {
+  if (override !== null && override !== undefined) return override === 1;
+  if (!transitionDate) return true;
+  return new Date(transitionDate).getTime() > Date.now();
+}
+
 // --- Auth handlers ---
 
 async function handleGoogleAuth(request: Request, env: Env): Promise<Response> {
@@ -230,9 +240,27 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
   const method = request.method;
 
   if (method === 'GET') {
-    const row = await env.DB.prepare('SELECT owner_uid, data, is_paid, expires_at FROM invitations WHERE slug = ?').bind(slug).first();
+    const row = await env.DB.prepare(
+      'SELECT owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override FROM invitations WHERE slug = ?'
+    ).bind(slug).first();
     if (!row) return json(null, 404, origin);
-    return json({ ...JSON.parse(row.data as string), slug, ownerUid: row.owner_uid, isPaid: !!row.is_paid, expiresAt: row.expires_at ?? null }, 200, origin);
+
+    const data = JSON.parse(row.data as string);
+
+    // 개인정보 전환 정책은 하객이 보는 화면에만 적용한다 — 청첩장 소유자 본인이 로그인해서
+    // 조회하는 경우(에디터, 관리 페이지)는 이 필터링과 무관하게 항상 전체 데이터를 본다.
+    const requester = await getAuthUser(request, env);
+    const isOwnerRequest = !!requester && requester.uid === row.owner_uid;
+    if (!isOwnerRequest) {
+      if (!computeEffectiveVisibility(row.account_info_visible_override as number | null, row.privacy_transition_date as string | null)) {
+        data.accounts = [];
+      }
+      if (!computeEffectiveVisibility(row.rsvp_form_open_override as number | null, row.privacy_transition_date as string | null)) {
+        data.isRSVPEnabled = false;
+      }
+    }
+
+    return json({ ...data, slug, ownerUid: row.owner_uid, isPaid: !!row.is_paid, expiresAt: row.expires_at ?? null }, 200, origin);
   }
 
   const user = await getAuthUser(request, env);
@@ -306,7 +334,7 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
   if (!body.newSlug) return json({ error: 'newSlug is required' }, 400, origin);
   const newSlug = body.newSlug;
 
-  const oldRow = await env.DB.prepare('SELECT owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible, rsvp_form_open FROM invitations WHERE slug = ?').bind(oldSlug).first();
+  const oldRow = await env.DB.prepare('SELECT owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override FROM invitations WHERE slug = ?').bind(oldSlug).first();
   if (!oldRow) return json({ error: '기존 청첩장을 찾을 수 없습니다.' }, 404, origin);
   if (oldRow.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
@@ -318,10 +346,10 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
 
   await env.DB.batch([
     // slug 변경은 새 행을 만들고 기존 행을 지우는 방식이라, 개인정보 전환 관련 컬럼도
-    // 명시적으로 옮기지 않으면 컬럼 기본값(공개 상태)으로 초기화되어 버린다.
+    // 명시적으로 옮기지 않으면 신랑신부가 수동으로 설정해둔 override(0/1)가 유실되고 NULL(자동 판단)로 되돌아간다.
     env.DB.prepare(
-      'INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible, rsvp_form_open) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-    ).bind(newSlug, user.uid, JSON.stringify(data), oldRow.is_paid, oldRow.expires_at, oldRow.privacy_transition_date, oldRow.account_info_visible, oldRow.rsvp_form_open),
+      'INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).bind(newSlug, user.uid, JSON.stringify(data), oldRow.is_paid, oldRow.expires_at, oldRow.privacy_transition_date, oldRow.account_info_visible_override, oldRow.rsvp_form_open_override),
     env.DB.prepare('UPDATE guestbook SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE rsvp SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE guests SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
@@ -544,6 +572,14 @@ async function handleRSVP(request: Request, env: Env, slug: string): Promise<Res
   }
 
   if (request.method === 'POST') {
+    // RSVP 폼이 전환 정책에 의해 닫혀 있으면(화면에서 숨겼는지와 무관하게) 제출 자체를 막는다.
+    // 클라이언트가 폼을 우회해 직접 이 API를 호출해도 서버에서 최종적으로 거부된다.
+    const inv = await env.DB.prepare('SELECT privacy_transition_date, rsvp_form_open_override FROM invitations WHERE slug = ?').bind(slug).first();
+    if (!inv) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
+    if (!computeEffectiveVisibility(inv.rsvp_form_open_override as number | null, inv.privacy_transition_date as string | null)) {
+      return json({ error: 'RSVP 응답 접수가 마감되었습니다.' }, 403, origin);
+    }
+
     const body = await request.json() as { guestName?: string; isAttending?: boolean; totalGuests?: number; wantsMeal?: boolean; relation?: string; message?: string; guestCode?: string; deviceToken?: string };
     if (!body.guestName || !body.relation) return json({ error: 'Required fields missing' }, 400, origin);
 
