@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { loadInvitation } from '../services/invitationService';
 import { fetchRSVPResponses } from '../services/rsvpService';
@@ -8,9 +8,12 @@ import { signInWithGoogle, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
 import { formatShareDateTime } from '../utils/formatShareDateTime';
 import { RSVPResponse, Guest, GuestRelation, InvitationData } from '../types';
-import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2, EyeOff, RotateCcw } from 'lucide-react';
+import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2, EyeOff, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import useAuthStore from '../stores/useAuthStore';
 import ToastContainer from '../components/Toast';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+
+const LIGHTBOX_SWIPE_THRESHOLD = 50;
 
 const SITE_ORIGIN = 'https://sonett.kr';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
@@ -46,6 +49,12 @@ const AdminPage: React.FC = () => {
   const [galleryLimit, setGalleryLimit] = useState(0);
   const [galleryLoading, setGalleryLoading] = useState(true);
   const [showHiddenOnly, setShowHiddenOnly] = useState(false);
+  const [galleryLightboxIndex, setGalleryLightboxIndex] = useState<number | null>(null);
+  const galleryLightboxTrapRef = useFocusTrap(galleryLightboxIndex !== null);
+  const galleryTouchStartX = useRef(0);
+
+  // 숨김 필터를 토글하면 표시 목록이 바뀌어 인덱스가 다른 사진을 가리킬 수 있으므로 라이트박스를 닫는다
+  useEffect(() => { setGalleryLightboxIndex(null); }, [showHiddenOnly]);
 
   useEffect(() => {
     if (authLoading || !slug) return;
@@ -127,6 +136,76 @@ const AdminPage: React.FC = () => {
 
   const displayedGalleryPhotos = showHiddenOnly ? galleryPhotos.filter((p) => p.hiddenAt) : galleryPhotos;
   const hiddenPhotoCount = galleryPhotos.filter((p) => p.hiddenAt).length;
+
+  const closeGalleryLightbox = useCallback(() => setGalleryLightboxIndex(null), []);
+  const showNextGalleryPhoto = useCallback(() => {
+    setGalleryLightboxIndex((i) => (i === null ? null : (i + 1) % displayedGalleryPhotos.length));
+  }, [displayedGalleryPhotos.length]);
+  const showPrevGalleryPhoto = useCallback(() => {
+    setGalleryLightboxIndex((i) => (i === null ? null : (i - 1 + displayedGalleryPhotos.length) % displayedGalleryPhotos.length));
+  }, [displayedGalleryPhotos.length]);
+
+  // 완전 삭제, 혹은 "숨김만 보기" 필터 상태에서의 복구로 displayedGalleryPhotos에서 항목이 사라질 때
+  // 라이트박스 인덱스를 범위 내로 보정하고, 표시할 사진이 하나도 안 남으면 모달을 닫는다.
+  const adjustLightboxAfterMutation = (mutate: (photos: GalleryAdminPhoto[]) => GalleryAdminPhoto[]) => {
+    setGalleryPhotos((prev) => {
+      const next = mutate(prev);
+      const nextDisplayed = showHiddenOnly ? next.filter((p) => p.hiddenAt) : next;
+      setGalleryLightboxIndex((i) => {
+        if (i === null) return null;
+        if (nextDisplayed.length === 0) return null;
+        return Math.min(i, nextDisplayed.length - 1);
+      });
+      return next;
+    });
+  };
+
+  const handleUnhidePhotoInLightbox = async (photo: GalleryAdminPhoto) => {
+    if (!slug) return;
+    try {
+      await unhideGalleryPhoto(slug, photo.id);
+      adjustLightboxAfterMutation((prev) => prev.map((p) => (p.id === photo.id ? { ...p, hiddenAt: null } : p)));
+      toast.success('사진을 복구했습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '복구에 실패했습니다.');
+    }
+  };
+
+  const handleDeletePhotoInLightbox = async (photo: GalleryAdminPhoto) => {
+    if (!slug || !confirm('이 사진을 완전히 삭제할까요? 되돌릴 수 없습니다.')) return;
+    try {
+      await adminDeleteGalleryPhoto(slug, photo.id);
+      adjustLightboxAfterMutation((prev) => prev.filter((p) => p.id !== photo.id));
+      setGalleryTotal((prev) => Math.max(0, prev - 1));
+      toast.success('사진을 삭제했습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '삭제에 실패했습니다.');
+    }
+  };
+
+  useEffect(() => {
+    if (galleryLightboxIndex === null) return;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeGalleryLightbox();
+      else if (e.key === 'ArrowRight') showNextGalleryPhoto();
+      else if (e.key === 'ArrowLeft') showPrevGalleryPhoto();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [galleryLightboxIndex, closeGalleryLightbox, showNextGalleryPhoto, showPrevGalleryPhoto]);
+
+  const handleGalleryTouchStart = (e: React.TouchEvent) => {
+    galleryTouchStartX.current = e.touches[0].clientX;
+  };
+  const handleGalleryTouchEnd = (e: React.TouchEvent) => {
+    const delta = e.changedTouches[0].clientX - galleryTouchStartX.current;
+    if (delta <= -LIGHTBOX_SWIPE_THRESHOLD) showNextGalleryPhoto();
+    else if (delta >= LIGHTBOX_SWIPE_THRESHOLD) showPrevGalleryPhoto();
+  };
 
   const handleAddGuest = async () => {
     if (!slug || !newGuestName.trim() || adding) return;
@@ -431,17 +510,23 @@ const AdminPage: React.FC = () => {
           <div className="admin-empty"><p>{showHiddenOnly ? '숨김 처리된 사진이 없습니다.' : '아직 업로드된 사진이 없습니다.'}</p></div>
         ) : (
           <div className="admin-gallery-grid">
-            {displayedGalleryPhotos.map((photo) => (
-              <div className={`admin-gallery-item${photo.hiddenAt ? ' hidden' : ''}`} key={photo.id}>
+            {displayedGalleryPhotos.map((photo, index) => (
+              <div
+                className={`admin-gallery-item${photo.hiddenAt ? ' hidden' : ''}`}
+                key={photo.id}
+                onClick={() => setGalleryLightboxIndex(index)}
+                role="button"
+                tabIndex={0}
+              >
                 <img src={photo.url} alt={photo.guestName || '갤러리 사진'} loading="lazy" />
                 {photo.hiddenAt && <span className="admin-gallery-hidden-badge"><EyeOff size={11} /> 숨김</span>}
                 <div className="admin-gallery-item-footer">
                   <span className="admin-gallery-item-name">{photo.guestName || '익명'}</span>
                   <div className="admin-gallery-item-actions">
                     {photo.hiddenAt && (
-                      <button type="button" onClick={() => handleUnhidePhoto(photo)} title="복구"><RotateCcw size={13} /></button>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); handleUnhidePhoto(photo); }} title="복구"><RotateCcw size={13} /></button>
                     )}
-                    <button type="button" onClick={() => handleDeletePhoto(photo)} title="완전 삭제"><Trash2 size={13} /></button>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo); }} title="완전 삭제"><Trash2 size={13} /></button>
                   </div>
                 </div>
               </div>
@@ -449,6 +534,57 @@ const AdminPage: React.FC = () => {
           </div>
         )}
       </section>
+
+      {galleryLightboxIndex !== null && displayedGalleryPhotos[galleryLightboxIndex] && (
+        <div className="admin-gallery-lightbox" role="dialog" aria-modal="true" aria-label="사진 확대 보기" ref={galleryLightboxTrapRef}>
+          <div className="admin-gallery-lightbox-backdrop" onClick={closeGalleryLightbox} />
+          <button type="button" className="admin-gallery-lightbox-close" onClick={closeGalleryLightbox} aria-label="닫기">
+            <X size={26} />
+          </button>
+
+          {displayedGalleryPhotos.length > 1 && (
+            <button type="button" className="admin-gallery-lightbox-nav admin-gallery-lightbox-prev" onClick={showPrevGalleryPhoto} aria-label="이전 사진">
+              <ChevronLeft size={28} />
+            </button>
+          )}
+
+          <div
+            className="admin-gallery-lightbox-stage"
+            onTouchStart={handleGalleryTouchStart}
+            onTouchEnd={handleGalleryTouchEnd}
+          >
+            <img
+              src={displayedGalleryPhotos[galleryLightboxIndex].url}
+              alt={displayedGalleryPhotos[galleryLightboxIndex].guestName || '갤러리 사진 확대'}
+              draggable="false"
+            />
+          </div>
+
+          {displayedGalleryPhotos.length > 1 && (
+            <button type="button" className="admin-gallery-lightbox-nav admin-gallery-lightbox-next" onClick={showNextGalleryPhoto} aria-label="다음 사진">
+              <ChevronRight size={28} />
+            </button>
+          )}
+
+          <div className="admin-gallery-lightbox-footer">
+            <div className="admin-gallery-lightbox-info">
+              <span className="admin-gallery-item-name">{displayedGalleryPhotos[galleryLightboxIndex].guestName || '익명'}</span>
+              {displayedGalleryPhotos[galleryLightboxIndex].hiddenAt && (
+                <span className="admin-gallery-hidden-badge"><EyeOff size={11} /> 숨김</span>
+              )}
+              {displayedGalleryPhotos.length > 1 && (
+                <span className="admin-gallery-lightbox-counter">{galleryLightboxIndex + 1} / {displayedGalleryPhotos.length}</span>
+              )}
+            </div>
+            <div className="admin-gallery-item-actions">
+              {displayedGalleryPhotos[galleryLightboxIndex].hiddenAt && (
+                <button type="button" onClick={() => handleUnhidePhotoInLightbox(displayedGalleryPhotos[galleryLightboxIndex])} title="복구"><RotateCcw size={13} /></button>
+              )}
+              <button type="button" onClick={() => handleDeletePhotoInLightbox(displayedGalleryPhotos[galleryLightboxIndex])} title="완전 삭제"><Trash2 size={13} /></button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ToastContainer />
 
@@ -514,6 +650,28 @@ const AdminPage: React.FC = () => {
         .admin-gallery-item-actions { display: flex; gap: 4px; }
         .admin-gallery-item-actions button { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border: none; border-radius: 50%; background: rgba(255,255,255,0.85); color: #4B5563; cursor: pointer; }
         .admin-gallery-item-actions button:hover { background: white; color: #DC2626; }
+        .admin-gallery-item { cursor: pointer; }
+
+        .admin-gallery-lightbox { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .admin-gallery-lightbox-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.9); }
+        .admin-gallery-lightbox-close { position: absolute; top: 16px; right: 16px; z-index: 2; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
+        .admin-gallery-lightbox-close:hover { background: rgba(255,255,255,0.22); }
+        .admin-gallery-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
+        .admin-gallery-lightbox-nav:hover { background: rgba(255,255,255,0.22); }
+        .admin-gallery-lightbox-prev { left: 8px; }
+        .admin-gallery-lightbox-next { right: 8px; }
+        .admin-gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; display: flex; align-items: center; justify-content: center; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; }
+        .admin-gallery-lightbox-stage img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
+        .admin-gallery-lightbox-footer { position: relative; z-index: 2; width: 100%; max-width: 720px; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; box-sizing: border-box; }
+        .admin-gallery-lightbox-info { display: flex; align-items: center; gap: 10px; }
+        .admin-gallery-lightbox-counter { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
+        .admin-gallery-lightbox-footer .admin-gallery-item-actions button { background: rgba(255,255,255,0.85); width: 28px; height: 28px; }
+
+        @media (max-width: 480px) {
+          .admin-gallery-lightbox-nav { width: 36px; height: 36px; }
+          .admin-gallery-lightbox-stage { padding: 0 44px; }
+        }
+
         @media (max-width: 768px) { .admin-stats { grid-template-columns: repeat(2, 1fr); } .guest-add-row { flex-wrap: wrap; } }
       `}</style>
     </div>
