@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { Camera, Flag, Trash2, ImagePlus, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchGalleryPhotos, uploadGalleryPhoto, deleteGalleryPhoto, reportGalleryPhoto, GalleryPhoto } from '../services/galleryService';
 import { lookupInviteCode } from '../services/guestService';
+import { loadInvitationPublic } from '../services/publicLoad';
 import { resizeImageForUpload } from '../utils/imageResize';
 import { toast } from '../stores/useToastStore';
 import { getApiErrorMessage } from '../utils/apiError';
@@ -36,6 +37,24 @@ const GalleryPage: React.FC = () => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const lightboxTrapRef = useFocusTrap(lightboxIndex !== null);
   const touchStartX = useRef(0);
+
+  // 라이트박스 배경만 청첩장 테마 톤에 맞추기 위한 최소 정보. 업로드 버튼 등 나머지 UI는
+  // 의도적으로 Sonett 고정 배색을 유지하고, 이 값들은 라이트박스 root에만 적용한다.
+  const [themeVars, setThemeVars] = useState<{ theme?: string; customBgColor?: string; customAccentColor?: string }>({});
+  useEffect(() => {
+    if (!slug) return;
+    let cancelled = false;
+    loadInvitationPublic(slug).then((inv) => {
+      if (cancelled || !inv) return;
+      setThemeVars({ theme: inv.theme, customBgColor: inv.customBgColor, customAccentColor: inv.customAccentColor });
+    });
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  const lightboxThemeStyle: React.CSSProperties = {
+    ...(themeVars.customBgColor ? { '--wedding-bg': themeVars.customBgColor } as React.CSSProperties : {}),
+    ...(themeVars.customAccentColor ? { '--wedding-main': themeVars.customAccentColor, '--wedding-accent': themeVars.customAccentColor } as React.CSSProperties : {}),
+  };
 
   // 개인화 링크(?code=)로 들어온 경우, 서버에 재검증해 실제 하객 이름/코드를 확보
   useEffect(() => {
@@ -258,7 +277,14 @@ const GalleryPage: React.FC = () => {
       )}
 
       {lightboxIndex !== null && photos[lightboxIndex] && (
-        <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label="사진 확대 보기" ref={lightboxTrapRef}>
+        <div
+          className={`gallery-lightbox theme-${themeVars.theme || 'blush'}`}
+          style={lightboxThemeStyle}
+          role="dialog"
+          aria-modal="true"
+          aria-label="사진 확대 보기"
+          ref={lightboxTrapRef}
+        >
           <div className="gallery-lightbox-backdrop" onClick={closeLightbox} />
           <button type="button" className="gallery-lightbox-close" onClick={closeLightbox} aria-label="닫기">
             <X size={26} />
@@ -338,8 +364,13 @@ const GalleryPage: React.FC = () => {
           .gallery-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
-        .gallery-lightbox { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .gallery-lightbox-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.9); }
+        .gallery-lightbox {
+          position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          /* theme-* 클래스가 이 엘리먼트 자신에 붙으므로, 여기서 --wedding-accent를 읽으면
+             그 테마(또는 커스텀 컬러)로 이미 오버라이드된 값이 반영된다. */
+          --wedding-lightbox-bg: color-mix(in srgb, var(--wedding-accent, #E8A0A0) 45%, black 55%);
+        }
+        .gallery-lightbox-backdrop { position: absolute; inset: 0; background: var(--wedding-lightbox-bg, rgba(0,0,0,0.9)); }
         .gallery-lightbox-close { position: absolute; top: 16px; right: 16px; z-index: 2; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
         .gallery-lightbox-close:hover { background: rgba(255,255,255,0.22); }
         .gallery-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
