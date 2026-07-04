@@ -366,6 +366,7 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
     env.DB.prepare('UPDATE guestbook SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE rsvp SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE guests SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
+    env.DB.prepare('UPDATE gallery_photos SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(oldSlug),
   ]);
 
@@ -1087,10 +1088,17 @@ async function deleteExpiredInvitations(env: Env): Promise<void> {
   ).bind(now).all();
   for (const row of expired.results) {
     const slug = row.slug as string;
+    // gallery_photos는 R2에 실제 이미지 파일이 딸려있어서, DB에서 지우기 전에
+    // r2_key를 먼저 조회해 R2 쪽도 함께 정리해야 R2에 고아 파일이 남지 않는다.
+    const photos = await env.DB.prepare('SELECT r2_key FROM gallery_photos WHERE invitation_slug = ?').bind(slug).all();
+    const r2Keys = photos.results.map((p) => p.r2_key as string);
+    if (r2Keys.length > 0) await env.IMAGES.delete(r2Keys);
+
     await env.DB.batch([
       env.DB.prepare('DELETE FROM guestbook WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM rsvp WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM guests WHERE invitation_slug = ?').bind(slug),
+      env.DB.prepare('DELETE FROM gallery_photos WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(slug),
     ]);
   }
