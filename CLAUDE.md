@@ -4,6 +4,11 @@
 `git push`만 하면 GitHub Actions를 통해 Cloudflare Workers에 자동 배포된다.
 별도로 `npm run build` 또는 `wrangler deploy`를 실행할 필요 없다.
 
+Cloudflare 대시보드 자체의 Git 연동(Workers Builds)은 사용하지 않는다 — GitHub Actions와
+중복으로 빌드/배포가 걸리면 GitHub Actions의 테스트 게이트(`npm test` 실패 시 배포 중단)를
+우회하게 되므로, 대시보드 쪽 Git 연동은 의도적으로 Disconnect 해뒀다. 커밋에 "Workers
+Builds: sonett" 체크가 다시 나타나면 대시보드에서 재연결된 게 없는지 확인할 것.
+
 ## 로컬 개발 시 절대 규칙
 - 로컬에서 `wrangler dev`/`wrangler d1`/`wrangler r2` 명령을 실행할 때 **`--remote` 플래그를 쓰지 않는다.**
   `--remote`는 실제 프로덕션(또는 실수로 지정 안 하면 프로덕션 기본값) 리소스에 직접 연결된다.
