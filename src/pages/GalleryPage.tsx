@@ -286,9 +286,23 @@ const GalleryPage: React.FC = () => {
           ref={lightboxTrapRef}
         >
           <div className="gallery-lightbox-backdrop" onClick={closeLightbox} />
-          <button type="button" className="gallery-lightbox-close" onClick={closeLightbox} aria-label="닫기">
-            <X size={26} />
-          </button>
+
+          <div className="gallery-lightbox-topbar">
+            <span className="gallery-lightbox-name">{photos[lightboxIndex].guestName || '익명'}</span>
+            <div className="gallery-lightbox-topbar-actions">
+              {photos[lightboxIndex].mine && (
+                <button type="button" onClick={() => handleDeleteInLightbox(photos[lightboxIndex])} title="삭제" aria-label="삭제">
+                  <Trash2 size={16} />
+                </button>
+              )}
+              <button type="button" onClick={() => handleReportInLightbox(photos[lightboxIndex])} title="신고" aria-label="신고">
+                <Flag size={16} />
+              </button>
+              <button type="button" onClick={closeLightbox} aria-label="닫기">
+                <X size={20} />
+              </button>
+            </div>
+          </div>
 
           {photos.length > 1 && (
             <button type="button" className="gallery-lightbox-nav gallery-lightbox-prev" onClick={showPrev} aria-label="이전 사진">
@@ -314,24 +328,19 @@ const GalleryPage: React.FC = () => {
             </button>
           )}
 
-          <div className="gallery-lightbox-footer">
-            <div className="gallery-lightbox-info">
-              <span className="gallery-item-name">{photos[lightboxIndex].guestName || '익명'}</span>
-              {photos.length > 1 && (
-                <span className="gallery-lightbox-counter">{lightboxIndex + 1} / {photos.length}</span>
-              )}
+          {photos.length > 1 && (
+            <div className="gallery-lightbox-dots">
+              {photos.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`gallery-lightbox-dot${i === lightboxIndex ? ' active' : ''}`}
+                  onClick={() => setLightboxIndex(i)}
+                  aria-label={`사진 ${i + 1}`}
+                />
+              ))}
             </div>
-            <div className="gallery-item-actions">
-              {photos[lightboxIndex].mine && (
-                <button type="button" onClick={() => handleDeleteInLightbox(photos[lightboxIndex])} title="삭제" aria-label="삭제">
-                  <Trash2 size={14} />
-                </button>
-              )}
-              <button type="button" onClick={() => handleReportInLightbox(photos[lightboxIndex])} title="신고" aria-label="신고">
-                <Flag size={14} />
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -371,22 +380,28 @@ const GalleryPage: React.FC = () => {
           --wedding-lightbox-bg: color-mix(in srgb, var(--wedding-accent, #E8A0A0) 45%, black 55%);
         }
         .gallery-lightbox-backdrop { position: absolute; inset: 0; background: var(--wedding-lightbox-bg, rgba(0,0,0,0.9)); }
-        .gallery-lightbox-close { position: absolute; top: 16px; right: 16px; z-index: 2; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
-        .gallery-lightbox-close:hover { background: rgba(255,255,255,0.22); }
+
+        .gallery-lightbox-topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; align-items: center; padding: 16px 20px; box-sizing: border-box; }
+        .gallery-lightbox-name { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.85rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+        .gallery-lightbox-topbar-actions { position: relative; z-index: 1; margin-left: auto; display: flex; align-items: center; gap: 6px; }
+        .gallery-lightbox-topbar-actions button { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
+        .gallery-lightbox-topbar-actions button:hover { background: rgba(255,255,255,0.22); }
+
         .gallery-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
         .gallery-lightbox-nav:hover { background: rgba(255,255,255,0.22); }
         .gallery-lightbox-prev { left: 8px; }
         .gallery-lightbox-next { right: 8px; }
         .gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; display: flex; align-items: center; justify-content: center; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; }
         .gallery-lightbox-stage img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
-        .gallery-lightbox-footer { position: relative; z-index: 2; width: 100%; max-width: 720px; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; box-sizing: border-box; }
-        .gallery-lightbox-info { display: flex; align-items: center; gap: 10px; }
-        .gallery-lightbox-counter { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
-        .gallery-lightbox-footer .gallery-item-actions button { background: rgba(255,255,255,0.85); }
+
+        .gallery-lightbox-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; align-items: center; gap: 6px; max-width: 85vw; overflow-x: auto; padding: 4px; }
+        .gallery-lightbox-dot { flex-shrink: 0; width: 6px; height: 6px; padding: 0; border: none; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; }
+        .gallery-lightbox-dot.active { width: 8px; height: 8px; background: #fff; }
 
         @media (max-width: 480px) {
           .gallery-lightbox-nav { width: 36px; height: 36px; }
           .gallery-lightbox-stage { padding: 0 44px; }
+          .gallery-lightbox-name { max-width: 38%; }
         }
       `}</style>
     </div>
