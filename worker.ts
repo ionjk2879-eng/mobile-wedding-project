@@ -847,7 +847,7 @@ async function handleGalleryPhotoDelete(request: Request, env: Env, slug: string
   if (!authorized) return json({ error: '삭제 권한이 없습니다.' }, 403, origin);
 
   await env.IMAGES.delete(row.r2_key as string);
-  await env.DB.prepare('DELETE FROM gallery_photos WHERE id = ?').bind(photoId).run();
+  await env.DB.prepare('DELETE FROM gallery_photos WHERE id = ? AND invitation_slug = ?').bind(photoId, slug).run();
   return json({ ok: true }, 200, origin);
 }
 

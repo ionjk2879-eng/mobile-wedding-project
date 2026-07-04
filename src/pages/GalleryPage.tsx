@@ -12,7 +12,9 @@ import { useFocusTrap } from '../hooks/useFocusTrap';
 const SWIPE_THRESHOLD = 50;
 
 const PER_UPLOADER_LIMIT = 4;
-const GUEST_NAME_STORAGE_KEY = 'sonett_gallery_guest_name';
+// 청첩장(slug)마다 별도로 저장 — 같은 브라우저로 서로 다른 청첩장 갤러리에 들어갔을 때
+// 이름이 그대로 따라와 다른 사람 이름이 잘못 붙는 사고를 막기 위함
+const guestNameStorageKey = (slug: string) => `sonett_gallery_guest_name:${slug}`;
 
 const GalleryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -21,7 +23,8 @@ const GalleryPage: React.FC = () => {
 
   const [guestCode, setGuestCode] = useState<string | null>(null);
   const [guestName, setGuestName] = useState(() => {
-    try { return localStorage.getItem(GUEST_NAME_STORAGE_KEY) || ''; } catch { return ''; }
+    if (!slug) return '';
+    try { return localStorage.getItem(guestNameStorageKey(slug)) || ''; } catch { return ''; }
   });
   const [identityLoading, setIdentityLoading] = useState(!!codeParam);
 
@@ -63,9 +66,9 @@ const GalleryPage: React.FC = () => {
   }, [identityLoading, loadPhotos]);
 
   useEffect(() => {
-    if (guestCode) return; // 개인화 링크는 이름을 직접 입력하지 않으므로 저장하지 않음
-    try { localStorage.setItem(GUEST_NAME_STORAGE_KEY, guestName); } catch { /* noop */ }
-  }, [guestName, guestCode]);
+    if (guestCode || !slug) return; // 개인화 링크는 이름을 직접 입력하지 않으므로 저장하지 않음
+    try { localStorage.setItem(guestNameStorageKey(slug), guestName); } catch { /* noop */ }
+  }, [guestName, guestCode, slug]);
 
   const myCount = photos.filter((p) => p.mine).length;
   const remaining = Math.max(0, PER_UPLOADER_LIMIT - myCount);
