@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 
@@ -80,12 +80,26 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedIndex]);
 
-  const closeLightbox = () => { setSelectedIndex(null); document.body.style.overflow = 'auto'; };
+  const closeLightbox = () => setSelectedIndex(null);
   const nextImage = () => { if (selectedIndex !== null) setSelectedIndex((selectedIndex + 1) % data.photos.length); };
   const prevImage = () => { if (selectedIndex !== null) setSelectedIndex((selectedIndex - 1 + data.photos.length) % data.photos.length); };
 
+  // 라이트박스가 열려있는 동안 배경 스크롤 잠금
+  useEffect(() => {
+    if (selectedIndex === null) return;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [selectedIndex]);
+
   const handleThumbClick = (index: number) => {
     setPreviewIdx(index);
+    setSelectedIndex(index);
+  };
+
+  // 스와이프 드래그 끝에 발생하는 클릭까지 라이트박스가 열리지 않도록,
+  // 드래그 이동량이 작을 때(탭으로 간주)만 실제로 오픈한다.
+  const openIfTap = (deltaRef: React.MutableRefObject<number>, index: number) => {
+    if (Math.abs(deltaRef.current) < 10) setSelectedIndex(index);
   };
 
   const [photoRatios, setPhotoRatios] = useState<number[]>([]);
@@ -130,7 +144,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
         >
           <div className="pv-preview-track" ref={pvTrackRef2} style={{ transform: `translateX(-${previewIdx * 100}%)` }}>
             {data.photos.map((src, i) => (
-              <div key={i} className="pv-preview-item">
+              <div key={i} className="pv-preview-item" onClick={() => openIfTap(pvDragDelta2, i)}>
                 <img src={src} alt={`Preview ${i}`} draggable="false" loading="lazy" decoding="async" />
               </div>
             ))}
@@ -173,7 +187,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
               >
                 <div className="gallery-slide-track" ref={slideTrackRef} style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
                   {data.photos.map((src, index) => (
-                    <div key={index} className="gallery-slide-item">
+                    <div key={index} className="gallery-slide-item" onClick={() => openIfTap(slideDragDelta, index)}>
                       <img src={src} alt={`Gallery ${index}`} draggable="false" loading="lazy" decoding="async" />
                     </div>
                   ))}
@@ -204,6 +218,11 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="lightbox-overlay" role="dialog" aria-modal="true" aria-label="사진 확대 보기" ref={lightboxTrapRef}>
           <div className="lightbox-backdrop" onClick={closeLightbox} />
           <button className="close-btn" onClick={closeLightbox} aria-label="닫기"><X size={32} /></button>
+
+          {data.photos.length > 1 && (
+            <button className="lightbox-nav lightbox-prev" onClick={prevImage} aria-label="이전 사진"><ChevronLeft size={28} /></button>
+          )}
+
           <div
             className="lightbox-slide-vp"
             ref={lbVpRef}
@@ -223,7 +242,18 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
               ))}
             </div>
           </div>
-          <div className="index-indicator">{selectedIndex! + 1} / {data.photos.length}</div>
+
+          {data.photos.length > 1 && (
+            <button className="lightbox-nav lightbox-next" onClick={nextImage} aria-label="다음 사진"><ChevronRight size={28} /></button>
+          )}
+
+          {data.photos.length > 1 && (
+            <div className="gallery-slide-dots lightbox-dots">
+              {data.photos.map((_, i) => (
+                <button key={i} className={`gallery-slide-dot ${i === selectedIndex ? 'active' : ''}`} onClick={() => setSelectedIndex(i)} aria-label={`사진 ${i + 1}`} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
