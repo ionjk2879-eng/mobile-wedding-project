@@ -875,10 +875,10 @@ const AdminPage: React.FC = () => {
         .admin-gallery-lightbox-nav:hover { background: rgba(255,255,255,0.22); }
         .admin-gallery-lightbox-prev { left: 8px; }
         .admin-gallery-lightbox-next { right: 8px; }
-        .admin-gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; overflow: hidden; cursor: grab; }
+        .admin-gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; box-sizing: border-box; touch-action: pan-y; overflow: hidden; cursor: grab; }
         .admin-gallery-lightbox-stage:active { cursor: grabbing; }
         .admin-gallery-lightbox-track { display: flex; height: 78vh; transition: transform 0.35s ease; }
-        .admin-gallery-lightbox-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .admin-gallery-lightbox-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; padding: 0 56px; box-sizing: border-box; }
         .admin-gallery-lightbox-item img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
         .admin-gallery-lightbox-footer { position: relative; z-index: 2; width: 100%; max-width: 720px; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; box-sizing: border-box; }
         .admin-gallery-lightbox-info { display: flex; align-items: center; gap: 10px; }
@@ -887,7 +887,7 @@ const AdminPage: React.FC = () => {
 
         @media (max-width: 480px) {
           .admin-gallery-lightbox-nav { width: 36px; height: 36px; }
-          .admin-gallery-lightbox-stage { padding: 0 44px; }
+          .admin-gallery-lightbox-item { padding: 0 44px; }
         }
 
         @media (max-width: 768px) { .admin-stats { grid-template-columns: repeat(2, 1fr); } .guest-add-row { flex-wrap: wrap; } }

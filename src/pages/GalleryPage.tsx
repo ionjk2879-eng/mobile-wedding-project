@@ -425,10 +425,10 @@ const GalleryPage: React.FC = () => {
         .gallery-lightbox-nav:hover { background: rgba(255,255,255,0.22); }
         .gallery-lightbox-prev { left: 8px; }
         .gallery-lightbox-next { right: 8px; }
-        .gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; overflow: hidden; cursor: grab; }
+        .gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; box-sizing: border-box; touch-action: pan-y; overflow: hidden; cursor: grab; }
         .gallery-lightbox-stage:active { cursor: grabbing; }
         .gallery-lightbox-track { display: flex; height: 78vh; transition: transform 0.35s ease; }
-        .gallery-lightbox-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .gallery-lightbox-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; padding: 0 56px; box-sizing: border-box; }
         .gallery-lightbox-item img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
 
         .gallery-lightbox-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; align-items: center; gap: 6px; max-width: 85vw; overflow-x: auto; padding: 4px; }
@@ -437,7 +437,7 @@ const GalleryPage: React.FC = () => {
 
         @media (max-width: 480px) {
           .gallery-lightbox-nav { width: 36px; height: 36px; }
-          .gallery-lightbox-stage { padding: 0 44px; }
+          .gallery-lightbox-item { padding: 0 44px; }
           .gallery-lightbox-name { max-width: 38%; }
         }
       `}</style>
