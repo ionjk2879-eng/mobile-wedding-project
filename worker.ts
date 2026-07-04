@@ -102,6 +102,14 @@ function weddingPlusOneYear(iso: string): string {
   return d.toISOString();
 }
 
+// 기념일 모드 개인정보 전환 예정일 기본값(결혼식 3주 후). 신랑신부가 관리 페이지에서
+// 수동으로 조정한 뒤에는(privacy_transition_date가 이미 채워진 뒤에는) 다시 계산하지 않는다.
+function weddingPlus21Days(iso: string): string {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + 21);
+  return d.toISOString();
+}
+
 // --- Auth handlers ---
 
 async function handleGoogleAuth(request: Request, env: Env): Promise<Response> {
@@ -232,7 +240,7 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
 
   if (method === 'PUT') {
     const body = await request.json() as Record<string, unknown>;
-    const existing = await env.DB.prepare('SELECT owner_uid, is_paid, expires_at FROM invitations WHERE slug = ?').bind(slug).first();
+    const existing = await env.DB.prepare('SELECT owner_uid, is_paid, expires_at, privacy_transition_date FROM invitations WHERE slug = ?').bind(slug).first();
     if (existing && existing.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
     // isPaid는 클라이언트 입력(body.isPaid)을 절대 신뢰하지 않고 DB에 이미 저장된 값만 유지한다.
@@ -250,11 +258,17 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
       expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     }
 
+    // privacy_transition_date는 한 번 채워지면(자동 계산이든, 관리 페이지에서 수동 조정이든)
+    // weddingDateISO가 나중에 바뀌어도 다시 계산하지 않는다 — 여기선 값이 비어있을 때만 채운다.
+    const weddingDateISO = typeof body.weddingDateISO === 'string' ? body.weddingDateISO : '';
+    const privacyTransitionDate = existing?.privacy_transition_date
+      ?? (weddingDateISO ? weddingPlus21Days(weddingDateISO) : null);
+
     await env.DB.prepare(
-      `INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, datetime('now'))
-       ON CONFLICT(slug) DO UPDATE SET data = excluded.data, is_paid = excluded.is_paid, expires_at = excluded.expires_at, updated_at = excluded.updated_at`
-    ).bind(slug, user.uid, JSON.stringify(body), isPaid ? 1 : 0, expiresAt).run();
+      `INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at, privacy_transition_date, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+       ON CONFLICT(slug) DO UPDATE SET data = excluded.data, is_paid = excluded.is_paid, expires_at = excluded.expires_at, privacy_transition_date = excluded.privacy_transition_date, updated_at = excluded.updated_at`
+    ).bind(slug, user.uid, JSON.stringify(body), isPaid ? 1 : 0, expiresAt, privacyTransitionDate).run();
 
     return json({ ok: true }, 200, origin);
   }
@@ -292,7 +306,7 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
   if (!body.newSlug) return json({ error: 'newSlug is required' }, 400, origin);
   const newSlug = body.newSlug;
 
-  const oldRow = await env.DB.prepare('SELECT owner_uid, data, is_paid, expires_at FROM invitations WHERE slug = ?').bind(oldSlug).first();
+  const oldRow = await env.DB.prepare('SELECT owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible, rsvp_form_open FROM invitations WHERE slug = ?').bind(oldSlug).first();
   if (!oldRow) return json({ error: '기존 청첩장을 찾을 수 없습니다.' }, 404, origin);
   if (oldRow.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
@@ -303,7 +317,11 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
   data.slug = newSlug;
 
   await env.DB.batch([
-    env.DB.prepare('INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at) VALUES (?, ?, ?, ?, ?)').bind(newSlug, user.uid, JSON.stringify(data), oldRow.is_paid, oldRow.expires_at),
+    // slug 변경은 새 행을 만들고 기존 행을 지우는 방식이라, 개인정보 전환 관련 컬럼도
+    // 명시적으로 옮기지 않으면 컬럼 기본값(공개 상태)으로 초기화되어 버린다.
+    env.DB.prepare(
+      'INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible, rsvp_form_open) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).bind(newSlug, user.uid, JSON.stringify(data), oldRow.is_paid, oldRow.expires_at, oldRow.privacy_transition_date, oldRow.account_info_visible, oldRow.rsvp_form_open),
     env.DB.prepare('UPDATE guestbook SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE rsvp SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE guests SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
