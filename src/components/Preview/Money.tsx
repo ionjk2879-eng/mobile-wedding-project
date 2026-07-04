@@ -8,6 +8,7 @@ interface PreviewProps {
 
 const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [activeSide, setActiveSide] = useState<'groom' | 'bride'>('groom');
   const [cardIndex, setCardIndex] = useState(0);
@@ -156,10 +157,10 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="account-list style2">
           <div className="side-tabs">
             <button className={`side-tab ${activeSide === 'groom' ? 'active' : ''}`} onClick={() => handleSideChange('groom')}>
-              {isEn ? "Groom's Side" : '신랑측'}
+              {isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}
             </button>
             <button className={`side-tab ${activeSide === 'bride' ? 'active' : ''}`} onClick={() => handleSideChange('bride')}>
-              {isEn ? "Bride's Side" : '신부측'}
+              {isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}
             </button>
           </div>
           <div
@@ -209,13 +210,13 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="account-list style1">
           {groomAccounts.length > 0 && (
             <div className="account-group">
-              <p className="account-group-label">{isEn ? "Groom's Side" : '신랑측'}</p>
+              <p className="account-group-label">{isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}</p>
               {groomAccounts.map((acc, i) => renderAccountItem(acc, i))}
             </div>
           )}
           {brideAccounts.length > 0 && (
             <div className="account-group">
-              <p className="account-group-label">{isEn ? "Bride's Side" : '신부측'}</p>
+              <p className="account-group-label">{isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}</p>
               {brideAccounts.map((acc, i) => renderAccountItem(acc, i + 100))}
             </div>
           )}
@@ -231,7 +232,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
           {groomAccounts.length > 0 && (
             <div className="accordion-group">
               <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setGroomOpen(v => !v); }} aria-expanded={groomOpen}>
-                <span>{isEn ? "Groom's Side" : '신랑측'}</span>
+                <span>{isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}</span>
                 <ChevronDown size={16} className={`accordion-arrow ${groomOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
               <div className={`accordion-body ${groomOpen ? 'open' : ''}`} ref={groomBodyRef}>
@@ -244,7 +245,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
           {brideAccounts.length > 0 && (
             <div className="accordion-group">
               <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setBrideOpen(v => !v); }} aria-expanded={brideOpen}>
-                <span>{isEn ? "Bride's Side" : '신부측'}</span>
+                <span>{isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}</span>
                 <ChevronDown size={16} className={`accordion-arrow ${brideOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
               <div className={`accordion-body ${brideOpen ? 'open' : ''}`} ref={brideBodyRef}>
@@ -268,10 +269,12 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
     <section className="money section" style={{ fontFamily: data.fontFamily }} aria-label="축의금">
       <h2>GIFT</h2>
-      <p className="section-sub">축하의 마음을 전하실 수 있습니다</p>
+      <p className="section-sub">{isEn ? 'You may share your congratulatory gift here' : isJa ? 'お祝いのお気持ちをお伝えいただけます' : '축하의 마음을 전하실 수 있습니다'}</p>
       <p className="money-desc">
-        {isEn 
-          ? 'Your presence is enough, but if you wish to give,\nwe appreciate your kindness.' 
+        {isEn
+          ? 'Your presence is enough, but if you wish to give,\nwe appreciate your kindness.'
+          : isJa
+          ? 'お越しいただけるだけで十分ですが、お気持ちをいただける場合は\nありがたく頂戴いたします。'
           : '축하의 마음을 담아 축의금을 전달하실 수 있습니다.'}
       </p>
 

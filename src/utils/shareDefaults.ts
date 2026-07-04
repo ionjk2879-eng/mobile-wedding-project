@@ -1,5 +1,5 @@
 import { InvitationData } from '../types';
-import { formatShareDateTime } from './formatShareDateTime';
+import { formatShareDateTime, formatShareDateTimeJa } from './formatShareDateTime';
 
 // 공유 제목/설명을 비워뒀을 때 실제 카카오톡 공유(Share.tsx)에 쓰이는 기본값과
 // 에디터의 placeholder/미리보기가 서로 어긋나지 않도록 로직을 한 곳에 모은다.
@@ -20,6 +20,7 @@ export function getDefaultShareTitle(data: TitleFields): string {
 export function getDefaultShareDescription(data: DescriptionFields): string {
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
+  if (isJa && data.weddingDateISO) return formatShareDateTimeJa(data.weddingDateISO, data.time);
   if (!isEn && !isJa && data.weddingDateISO) return formatShareDateTime(data.weddingDateISO, data.time);
   return `${data.date} ${data.time}`;
 }

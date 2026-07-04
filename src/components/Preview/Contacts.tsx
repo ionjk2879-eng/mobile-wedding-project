@@ -14,6 +14,7 @@ interface ContactEntry {
 
 const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
 
   const groomSelf = data.contacts.find(c => c.role === '신랑');
   const brideSelf = data.contacts.find(c => c.role === '신부');
@@ -27,12 +28,12 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
     return list;
   };
 
-  const groomContacts = buildList(groomSelf, data.parents.groomParents, isEn ? 'Groom' : '신랑');
-  const brideContacts = buildList(brideSelf, data.parents.brideParents, isEn ? 'Bride' : '신부');
+  const groomContacts = buildList(groomSelf, data.parents.groomParents, isEn ? 'Groom' : isJa ? '新郎' : '신랑');
+  const brideContacts = buildList(brideSelf, data.parents.brideParents, isEn ? 'Bride' : isJa ? '新婦' : '신부');
 
   const allGroups = [
-    { label: isEn ? "Groom's Side" : '신랑측', contacts: groomContacts },
-    { label: isEn ? "Bride's Side" : '신부측', contacts: brideContacts },
+    { label: isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측', contacts: groomContacts },
+    { label: isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측', contacts: brideContacts },
   ].filter(g => g.contacts.length > 0);
 
   if (allGroups.length === 0) return null;
@@ -40,7 +41,7 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
     <section className="contacts-section section" style={{ fontFamily: data.fontFamily }} aria-label="연락처">
       <h2>CONTACT</h2>
-      <p className="section-sub">축하의 마음을 직접 전해보세요</p>
+      <p className="section-sub">{isEn ? 'Share your congratulations directly' : isJa ? 'お祝いの気持ちを直接お伝えください' : '축하의 마음을 직접 전해보세요'}</p>
       {allGroups.map((group, gi) => (
         <div key={gi} className="contact-group">
           <p className="contact-group-label">{group.label}</p>

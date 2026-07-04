@@ -24,3 +24,14 @@ export function formatShareDateTime(weddingDateISO: string, time: string): strin
   const minuteText = parts[3] === '00' ? '' : ` ${parts[3]}분`;
   return `${dateText} ${ampm} ${parts[2]}시${minuteText}`;
 }
+
+// "2026年10月24日(土) 午後12時30分" 형태로 포맷 (일본어 공유 카드용)
+export function formatShareDateTimeJa(weddingDateISO: string, time: string): string {
+  const dateText = formatShareDateJa(weddingDateISO);
+  if (!dateText) return '';
+  const parts = time?.match(/(AM|PM)\s(\d+):(\d+)/);
+  if (!parts) return dateText;
+  const ampm = parts[1] === 'AM' ? '午前' : '午後';
+  const minuteText = parts[3] === '00' ? '' : `${parts[3]}分`;
+  return `${dateText} ${ampm}${parts[2]}時${minuteText}`;
+}

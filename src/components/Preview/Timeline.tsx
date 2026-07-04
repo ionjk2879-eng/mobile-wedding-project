@@ -6,6 +6,8 @@ interface PreviewProps {
 }
 
 const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
+  const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
   const events = data.timeline || [];
   const [open, setOpen] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -34,10 +36,12 @@ const Timeline: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
     <section className="timeline-section section" style={{ fontFamily: data.fontFamily }} aria-label="타임라인">
       <h2>OUR STORY</h2>
-      <p className="section-sub">처음 만남부터 결혼까지, 우리의 여정</p>
+      <p className="section-sub">{isEn ? 'Our journey from the first meeting to marriage' : isJa ? '出会いから結婚までの、私たちの歩み' : '처음 만남부터 결혼까지, 우리의 여정'}</p>
 
       <button type="button" className={`timeline-toggle ${open ? 'open' : ''}`} onClick={handleToggle} aria-expanded={open}>
-        {open ? (data.language === 'en' ? 'Close' : '닫기') : (data.language === 'en' ? 'View Our Story' : '이야기 보기')}
+        {open
+          ? (isEn ? 'Close' : isJa ? '閉じる' : '닫기')
+          : (isEn ? 'View Our Story' : isJa ? 'ストーリーを見る' : '이야기 보기')}
       </button>
 
       <div className={`timeline-body ${open ? 'open' : ''}`} ref={bodyRef}>

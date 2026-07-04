@@ -7,11 +7,29 @@ interface PreviewProps {
 
 const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
-  const groomName = isEn && data.en.groomName ? data.en.groomName : (data.groomName || '신랑');
-  const brideName = isEn && data.en.brideName ? data.en.brideName : (data.brideName || '신부');
-  const venueName = isEn && data.en.venueName ? data.en.venueName : data.venueName;
-  const dateStr = isEn && data.en.date ? data.en.date : data.date;
-  const timeStr = isEn && data.en.time ? data.en.time : data.time;
+  const isJa = data.language === 'ja';
+  const groomName = isEn && data.en.groomName ? data.en.groomName : isJa && data.ja?.groomName ? data.ja.groomName : (data.groomName || (isJa ? '新郎' : '신랑'));
+  const brideName = isEn && data.en.brideName ? data.en.brideName : isJa && data.ja?.brideName ? data.ja.brideName : (data.brideName || (isJa ? '新婦' : '신부'));
+  const venueName = isEn && data.en.venueName ? data.en.venueName : isJa && data.ja?.venueName ? data.ja.venueName : data.venueName;
+  const dateStr = (() => {
+    if (isEn && data.en.date) return data.en.date;
+    if (isJa && data.weddingDateISO) {
+      const d = new Date(data.weddingDateISO);
+      if (!isNaN(d.getTime())) return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+    }
+    return data.date;
+  })();
+  const timeStr = (() => {
+    if (isEn && data.en.time) return data.en.time;
+    if (isJa && data.time) {
+      const parts = data.time.match(/(AM|PM)\s(\d+):(\d+)/);
+      if (parts) {
+        const ampm = parts[1] === 'AM' ? '午前' : '午後';
+        return `${ampm}${parts[2]}時${parts[3] === '00' ? '' : parts[3] + '分'}`;
+      }
+    }
+    return data.time;
+  })();
   const style = data.heroStyle || 'classic';
   const yearStr = data.weddingDateISO ? data.weddingDateISO.slice(0, 4) : String(new Date().getFullYear());
 

@@ -9,6 +9,8 @@ interface PreviewProps {
 }
 
 const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
+  const isEn = data.language === 'en';
+  const isJa = data.language === 'ja';
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const lightboxTrapRef = useFocusTrap(selectedIndex !== null);
 
@@ -177,7 +179,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
   return (
     <section className="gallery section" aria-label="갤러리">
       <h2>GALLERY</h2>
-      <p className="section-sub">소중한 순간을 담은 우리의 사진들</p>
+      <p className="section-sub">{isEn ? 'Our precious moments together' : isJa ? '大切な瞬間を収めた私たちの写真' : '소중한 순간을 담은 우리의 사진들'}</p>
       {data.photos.length > 0 ? (
         <>
           {style === 'style3' && renderPreviewSlider()}
