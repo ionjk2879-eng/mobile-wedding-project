@@ -167,8 +167,28 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
 
   const effectiveSectionOrder = sectionOrder;
 
+  // 예식 전(소유자 미리보기 등으로 daysAfterWedding이 음수)에는 "D+n"이 D+-1234처럼 의미 없는
+  // 값이 되므로, 그 경우엔 실제 예식 예정일을 안내하는 문구로 대체한다. 예식 후(0 이상)에는
+  // 기존처럼 D+n 그대로 보여준다.
+  const anniversaryOpeningText = (() => {
+    if (daysAfterWedding >= 0) return `D+${daysAfterWedding}`;
+    if (!data.weddingDateISO) return '';
+    const d = new Date(data.weddingDateISO);
+    if (isNaN(d.getTime())) return '';
+    const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
+    if (data.language === 'en') {
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      return `This is how it will look after ${months[m]} ${day}, ${y}`;
+    }
+    if (data.language === 'ja') return `${y}年${m + 1}月${day}日以降はこのように表示されます`;
+    return `${y}년 ${m + 1}월 ${day}일 이후 이렇게 보입니다`;
+  })();
+  const anniversaryOpeningSubText = daysAfterWedding >= 0 ? '' : (
+    data.language === 'en' ? 'Preview after the wedding' : data.language === 'ja' ? '式後のプレビュー' : '예식일 이후 미리보기'
+  );
+
   const anniversaryOpening = isAnniversaryMode && data.opening
-    ? { ...data.opening, openingEnabled: true, openingText: `D+${daysAfterWedding}`, openingSubText: '' }
+    ? { ...data.opening, openingEnabled: true, openingText: anniversaryOpeningText, openingSubText: anniversaryOpeningSubText }
     : data.opening;
 
   const isPreviewOnly = previewActive && !data.opening?.openingEnabled;

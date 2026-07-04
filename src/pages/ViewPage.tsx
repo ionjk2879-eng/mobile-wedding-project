@@ -150,7 +150,9 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
       <style>{`
         .view-container { width: 100%; min-height: 100svh; background: #EBEBEB; display: flex; justify-content: center; overflow-anchor: none; }
         .view-mode-toggle-fab {
-          position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 500;
+          /* 오프닝 화면(.op-root)의 z-index가 99999라 그보다 낮으면 오프닝 중에 가려져 클릭이 안 된다.
+             오프닝 미리보기를 위한 토글이므로 오프닝보다 항상 위에 떠 있어야 한다. */
+          position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 100000;
           display: flex; align-items: center; gap: 6px;
           padding: 10px 18px; border: none; border-radius: 30px;
           background: rgba(31,41,55,0.88); color: white; backdrop-filter: blur(6px);
