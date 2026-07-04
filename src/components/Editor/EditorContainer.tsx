@@ -232,6 +232,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
               icon={s.icon}
               expanded={expandedSections[s.id] || false}
               onToggle={() => toggleSection(s.id)}
+              onNavigate={() => scrollToSection(s.id, sectionRefs[s.id as keyof typeof sectionRefs])}
               sectionRef={sectionRefs[s.id as keyof typeof sectionRefs]}
             >
               {expandedSections[s.id] ? s.content : null}

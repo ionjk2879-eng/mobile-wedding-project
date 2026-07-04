@@ -21,11 +21,16 @@
 /* Section cards */
 .editor-section-card { width: 100%; background: #FFFFFF; border-radius: 0; border: none; transition: all 0.2s; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
 .editor-section-card.expanded { box-shadow: 0 4px 20px rgba(212, 165, 198, 0.08); }
-.section-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 25px; cursor: pointer; user-select: none; background: white; transition: background 0.2s; width: 100%; border: none; font: inherit; text-align: left; }
+.section-header { display: flex; align-items: center; justify-content: space-between; background: white; transition: background 0.2s; width: 100%; }
 .section-header:hover { background: #FAFBFC; }
-.header-left { display: flex; align-items: center; gap: 12px; color: #1A1A1A; }
+.section-header-main { flex: 1; min-width: 0; display: flex; align-items: center; padding: 20px 12px 20px 25px; cursor: pointer; user-select: none; background: none; border: none; font: inherit; text-align: left; }
+.header-left { display: flex; align-items: center; gap: 12px; color: #1A1A1A; min-width: 0; }
 .section-header h3 { margin: 0; font-size: 1.05rem; font-weight: 800; }
 .section-header svg { color: #D4A5C6; }
+.section-header-actions { display: flex; align-items: center; gap: 2px; padding-right: 21px; flex-shrink: 0; }
+.section-nav-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: none; border-radius: 8px; background: none; cursor: pointer; transition: background 0.2s; }
+.section-nav-btn:hover { background: #F3E9EF; }
+.section-toggle-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: none; background: none; cursor: pointer; padding: 0; }
 .collapse-icon { color: #B2A4B0; transition: transform 0.3s; }
 .expanded .collapse-icon { transform: rotate(90deg); }
 .section-content { padding: 0 25px 25px 25px; border-top: 1px solid #F9FAFB; padding-top: 25px; }
@@ -266,7 +271,9 @@
 /* Focus visible for keyboard navigation */
 .nav-menu-item:focus-visible,
 .order-item:focus-visible,
-.section-header:focus-visible,
+.section-header-main:focus-visible,
+.section-toggle-btn:focus-visible,
+.section-nav-btn:focus-visible,
 .order-btn:focus-visible,
 .account-style-btn:focus-visible,
 .hero-style-btn:focus-visible,
@@ -294,7 +301,8 @@
   .nav-menu-item { padding: 10px 0; }
   .menu-text { font-size: 0.58rem; }
   .editor-content-scrollable { padding: 20px 16px; }
-  .section-header { padding: 16px 20px; }
+  .section-header-main { padding: 16px 8px 16px 20px; }
+  .section-header-actions { padding-right: 16px; }
   .section-content { padding: 0 20px 20px 20px; padding-top: 20px; }
 }
 
