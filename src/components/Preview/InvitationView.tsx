@@ -167,12 +167,21 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
 
   const effectiveSectionOrder = sectionOrder;
 
-  // 예식 전(소유자 미리보기 등으로 daysAfterWedding이 음수)에는 "D+n"이 D+-1234처럼 의미 없는
-  // 값이 되므로, 그 경우엔 실제 예식 예정일을 안내하는 문구로 대체한다. 예식 후(0 이상)에는
-  // 기존처럼 D+n 그대로 보여준다.
-  const anniversaryOpeningText = (() => {
-    if (daysAfterWedding >= 0) return `D+${daysAfterWedding}`;
-    if (!data.weddingDateISO) return '';
+  // 예식 전(소유자 미리보기 등으로 daysAfterWedding이 음수)에도 실제 기념일 모드와 동일한
+  // 구성(D+n)을 그대로 보여주기 위해, 예식일+364일이 지난 것으로 가정한다 — 예식 전 미리보기가
+  // "안내 문구로 대체된 가짜 화면"이 아니라 실제 1주년 즈음 모습 그대로 보이게 하기 위함.
+  const isPreWeddingAnniversaryPreview = isAnniversaryMode && daysAfterWedding < 0;
+  const effectiveDaysAfterWedding = isPreWeddingAnniversaryPreview ? 364 : daysAfterWedding;
+  const anniversaryOpeningText = `D+${effectiveDaysAfterWedding}`;
+  const anniversaryOpeningSubText = '';
+
+  const anniversaryOpening = isAnniversaryMode && data.opening
+    ? { ...data.opening, openingEnabled: true, openingText: anniversaryOpeningText, openingSubText: anniversaryOpeningSubText }
+    : data.opening;
+
+  // 예식 전 미리보기 중임을 알리는 상단 배너 문구 — 실제 기념일 모드(예식 후)에서는 표시하지 않는다.
+  const previewBannerText = (() => {
+    if (!isPreWeddingAnniversaryPreview || !data.weddingDateISO) return '';
     const d = new Date(data.weddingDateISO);
     if (isNaN(d.getTime())) return '';
     const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
@@ -183,13 +192,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     if (data.language === 'ja') return `${y}年${m + 1}月${day}日以降はこのように表示されます`;
     return `${y}년 ${m + 1}월 ${day}일 이후 이렇게 보입니다`;
   })();
-  const anniversaryOpeningSubText = daysAfterWedding >= 0 ? '' : (
-    data.language === 'en' ? 'Preview after the wedding' : data.language === 'ja' ? '式後のプレビュー' : '예식일 이후 미리보기'
-  );
-
-  const anniversaryOpening = isAnniversaryMode && data.opening
-    ? { ...data.opening, openingEnabled: true, openingText: anniversaryOpeningText, openingSubText: anniversaryOpeningSubText }
-    : data.opening;
+  const previewBannerSubText = isPreWeddingAnniversaryPreview
+    ? (data.language === 'en' ? 'Preview after the wedding' : data.language === 'ja' ? '式後のプレビュー' : '예식일 이후 미리보기')
+    : '';
 
   const isPreviewOnly = previewActive && !data.opening?.openingEnabled;
 
@@ -206,6 +211,12 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
 
   return (
     <article className={`preview-wrapper texture-${data.bgTexture || 'none'}`} aria-label="청첩장">
+      {isPreWeddingAnniversaryPreview && previewBannerText && (
+        <div className="anniversary-preview-banner">
+          <strong>{previewBannerText}</strong>
+          {previewBannerSubText && <span>{previewBannerSubText}</span>}
+        </div>
+      )}
       {shouldShowOpening && data.opening && (
         <Opening
           key={openingPreviewKey || 'static'}

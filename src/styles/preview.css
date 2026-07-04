@@ -619,6 +619,18 @@
 .parent-action-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--wedding-bg); border: 1px solid var(--wedding-border); display: flex; align-items: center; justify-content: center; color: var(--wedding-text-body); transition: all 0.2s ease; }
 .parent-action-btn:hover { background: var(--wedding-border); transform: translateY(-1px); }
 
+/* 예식 전 기념일 모드 미리보기 상단 배너 — 오프닝(z-index 99999) 위에서도 보이도록 그보다 높게 설정 */
+.anniversary-preview-banner {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 100000;
+  max-width: 88%; padding: 8px 18px; border-radius: 30px;
+  background: rgba(31,41,55,0.88); color: #fff; backdrop-filter: blur(6px);
+  font-family: 'Pretendard', sans-serif; text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.anniversary-preview-banner strong { font-size: 0.82rem; font-weight: 600; line-height: 1.4; }
+.anniversary-preview-banner span { font-size: 0.72rem; opacity: 0.8; }
+
 /* === Opening === */
 .op-root { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; display: flex; align-items: center; justify-content: center; overflow: hidden; touch-action: none; overscroll-behavior: none; background: var(--op-bg); opacity: var(--op-opacity); }
 /* exit 중 클릭 방지 */

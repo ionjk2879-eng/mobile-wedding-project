@@ -337,18 +337,21 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     return () => clearTimeout(contentSwitchTimerRef.current!);
   }, [isTyping, displayedIsTyping]);
 
+  // effectiveOpeningText도 deps에 포함 — 청첩장/기념일 모드 전환처럼 style은 그대로인 채
+  // 텍스트만 바뀌는 경우에도 타이핑 진행 상태를 리셋해야, 이전 텍스트에서 이미 타이핑된
+  // 글자 수가 새 텍스트에 그대로 남아 "일부가 미리 보였다가 나머지가 뒤늦게 채워지는" 현상을 막는다.
   useLayoutEffect(() => {
     if (!isTyping) return;
     setTypedCount(0);
     setTypingPhase('idle');
-  }, [isTyping, opening.openingStyle]);
+  }, [isTyping, opening.openingStyle, effectiveOpeningText]);
 
   useEffect(() => {
     if (!isTyping) return;
     const t1 = setTimeout(() => setTypingPhase('heart'), 500);
     const t2 = setTimeout(() => setTypingPhase('typing'), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isTyping, opening.openingStyle]);
+  }, [isTyping, opening.openingStyle, effectiveOpeningText]);
 
   useEffect(() => {
     if (typingPhase !== 'typing') return;
