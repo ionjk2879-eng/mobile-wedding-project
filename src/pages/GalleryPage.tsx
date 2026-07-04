@@ -10,8 +10,6 @@ import { getApiErrorMessage } from '../utils/apiError';
 import ToastContainer from '../components/Toast';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 
-const SWIPE_THRESHOLD = 50;
-
 const PER_UPLOADER_LIMIT = 4;
 // 청첩장(slug)마다 별도로 저장 — 같은 브라우저로 서로 다른 청첩장 갤러리에 들어갔을 때
 // 이름이 그대로 따라와 다른 사람 이름이 잘못 붙는 사고를 막기 위함
@@ -36,7 +34,39 @@ const GalleryPage: React.FC = () => {
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const lightboxTrapRef = useFocusTrap(lightboxIndex !== null);
-  const touchStartX = useRef(0);
+
+  // 라이트박스 스와이프: 손가락을 따라 다음/이전 사진이 부드럽게 끌려오다가,
+  // 손을 떼는 순간에만 완전히 넘어가거나 제자리로 돌아온다 (Gallery.tsx 라이트박스와 동일한 방식).
+  const dragStartX = useRef(0);
+  const dragDelta = useRef(0);
+  const dragging = useRef(false);
+  const lbTrackRef = useRef<HTMLDivElement>(null);
+  const lbVpRef = useRef<HTMLDivElement>(null);
+  const lightboxIndexRef = useRef(0);
+  lightboxIndexRef.current = lightboxIndex ?? 0;
+
+  const onDragStart = (x: number) => {
+    dragging.current = true;
+    dragStartX.current = x;
+    dragDelta.current = 0;
+    if (lbTrackRef.current) lbTrackRef.current.style.transition = 'none';
+  };
+  const onDragMove = (x: number) => {
+    if (!dragging.current) return;
+    dragDelta.current = x - dragStartX.current;
+    if (lbTrackRef.current) {
+      const w = lbVpRef.current?.clientWidth || 1;
+      lbTrackRef.current.style.transform = `translateX(${-(lightboxIndexRef.current * 100) + (dragDelta.current / w) * 100}%)`;
+    }
+  };
+  const onDragEnd = () => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    if (lbTrackRef.current) lbTrackRef.current.style.transition = 'transform 0.35s ease';
+    if (dragDelta.current < -40 && lightboxIndexRef.current < photos.length - 1) setLightboxIndex(lightboxIndexRef.current + 1);
+    else if (dragDelta.current > 40 && lightboxIndexRef.current > 0) setLightboxIndex(lightboxIndexRef.current - 1);
+    else if (lbTrackRef.current) lbTrackRef.current.style.transform = `translateX(-${lightboxIndexRef.current * 100}%)`;
+  };
 
   // 라이트박스 배경만 청첩장 테마 톤에 맞추기 위한 최소 정보. 업로드 버튼 등 나머지 UI는
   // 의도적으로 Sonett 고정 배색을 유지하고, 이 값들은 라이트박스 root에만 적용한다.
@@ -203,14 +233,6 @@ const GalleryPage: React.FC = () => {
     };
   }, [lightboxIndex, closeLightbox, showNext, showPrev]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const delta = e.changedTouches[0].clientX - touchStartX.current;
-    if (delta <= -SWIPE_THRESHOLD) showNext();
-    else if (delta >= SWIPE_THRESHOLD) showPrev();
-  };
 
   return (
     <div className="gallery-page">
@@ -312,14 +334,26 @@ const GalleryPage: React.FC = () => {
 
           <div
             className="gallery-lightbox-stage"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
+            ref={lbVpRef}
+            onTouchStart={(e) => onDragStart(e.touches[0].clientX)}
+            onTouchMove={(e) => onDragMove(e.touches[0].clientX)}
+            onTouchEnd={onDragEnd}
+            onMouseDown={(e) => { e.preventDefault(); onDragStart(e.clientX); }}
+            onMouseMove={(e) => onDragMove(e.clientX)}
+            onMouseUp={onDragEnd}
+            onMouseLeave={onDragEnd}
           >
-            <img
-              src={photos[lightboxIndex].url}
-              alt={photos[lightboxIndex].guestName || '갤러리 사진 확대'}
-              draggable="false"
-            />
+            <div className="gallery-lightbox-track" ref={lbTrackRef} style={{ transform: `translateX(-${lightboxIndex * 100}%)` }}>
+              {photos.map((photo) => (
+                <div key={photo.id} className="gallery-lightbox-item">
+                  <img
+                    src={photo.url}
+                    alt={photo.guestName || '갤러리 사진 확대'}
+                    draggable="false"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           {photos.length > 1 && (
@@ -391,8 +425,11 @@ const GalleryPage: React.FC = () => {
         .gallery-lightbox-nav:hover { background: rgba(255,255,255,0.22); }
         .gallery-lightbox-prev { left: 8px; }
         .gallery-lightbox-next { right: 8px; }
-        .gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; display: flex; align-items: center; justify-content: center; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; }
-        .gallery-lightbox-stage img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
+        .gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; overflow: hidden; cursor: grab; }
+        .gallery-lightbox-stage:active { cursor: grabbing; }
+        .gallery-lightbox-track { display: flex; height: 78vh; transition: transform 0.35s ease; }
+        .gallery-lightbox-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .gallery-lightbox-item img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
 
         .gallery-lightbox-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; align-items: center; gap: 6px; max-width: 85vw; overflow-x: auto; padding: 4px; }
         .gallery-lightbox-dot { flex-shrink: 0; width: 6px; height: 6px; padding: 0; border: none; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; }

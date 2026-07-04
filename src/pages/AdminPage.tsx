@@ -13,8 +13,6 @@ import useAuthStore from '../stores/useAuthStore';
 import ToastContainer from '../components/Toast';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 
-const LIGHTBOX_SWIPE_THRESHOLD = 50;
-
 const SITE_ORIGIN = 'https://sonett.kr';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
 const RELATION_LABELS: Record<GuestRelation, string> = { family: '가족', friend: '친구', coworker: '직장동료', other: '기타' };
@@ -57,7 +55,14 @@ const AdminPage: React.FC = () => {
   const [showHiddenOnly, setShowHiddenOnly] = useState(false);
   const [galleryLightboxIndex, setGalleryLightboxIndex] = useState<number | null>(null);
   const galleryLightboxTrapRef = useFocusTrap(galleryLightboxIndex !== null);
-  const galleryTouchStartX = useRef(0);
+  // 라이트박스 스와이프: 손가락을 따라 다음/이전 사진이 부드럽게 끌려오다가,
+  // 손을 떼는 순간에만 완전히 넘어가거나 제자리로 돌아온다.
+  const galleryDragStartX = useRef(0);
+  const galleryDragDelta = useRef(0);
+  const galleryDragging = useRef(false);
+  const galleryLbTrackRef = useRef<HTMLDivElement>(null);
+  const galleryLbVpRef = useRef<HTMLDivElement>(null);
+  const galleryLightboxIndexRef = useRef(0);
 
   // 숨김 필터를 토글하면 표시 목록이 바뀌어 인덱스가 다른 사진을 가리킬 수 있으므로 라이트박스를 닫는다
   useEffect(() => { setGalleryLightboxIndex(null); }, [showHiddenOnly]);
@@ -194,6 +199,7 @@ const AdminPage: React.FC = () => {
 
   const displayedGalleryPhotos = showHiddenOnly ? galleryPhotos.filter((p) => p.hiddenAt) : galleryPhotos;
   const hiddenPhotoCount = galleryPhotos.filter((p) => p.hiddenAt).length;
+  galleryLightboxIndexRef.current = galleryLightboxIndex ?? 0;
 
   const closeGalleryLightbox = useCallback(() => setGalleryLightboxIndex(null), []);
   const showNextGalleryPhoto = useCallback(() => {
@@ -256,13 +262,27 @@ const AdminPage: React.FC = () => {
     };
   }, [galleryLightboxIndex, closeGalleryLightbox, showNextGalleryPhoto, showPrevGalleryPhoto]);
 
-  const handleGalleryTouchStart = (e: React.TouchEvent) => {
-    galleryTouchStartX.current = e.touches[0].clientX;
+  const onGalleryDragStart = (x: number) => {
+    galleryDragging.current = true;
+    galleryDragStartX.current = x;
+    galleryDragDelta.current = 0;
+    if (galleryLbTrackRef.current) galleryLbTrackRef.current.style.transition = 'none';
   };
-  const handleGalleryTouchEnd = (e: React.TouchEvent) => {
-    const delta = e.changedTouches[0].clientX - galleryTouchStartX.current;
-    if (delta <= -LIGHTBOX_SWIPE_THRESHOLD) showNextGalleryPhoto();
-    else if (delta >= LIGHTBOX_SWIPE_THRESHOLD) showPrevGalleryPhoto();
+  const onGalleryDragMove = (x: number) => {
+    if (!galleryDragging.current) return;
+    galleryDragDelta.current = x - galleryDragStartX.current;
+    if (galleryLbTrackRef.current) {
+      const w = galleryLbVpRef.current?.clientWidth || 1;
+      galleryLbTrackRef.current.style.transform = `translateX(${-(galleryLightboxIndexRef.current * 100) + (galleryDragDelta.current / w) * 100}%)`;
+    }
+  };
+  const onGalleryDragEnd = () => {
+    if (!galleryDragging.current) return;
+    galleryDragging.current = false;
+    if (galleryLbTrackRef.current) galleryLbTrackRef.current.style.transition = 'transform 0.35s ease';
+    if (galleryDragDelta.current < -40 && galleryLightboxIndexRef.current < displayedGalleryPhotos.length - 1) setGalleryLightboxIndex(galleryLightboxIndexRef.current + 1);
+    else if (galleryDragDelta.current > 40 && galleryLightboxIndexRef.current > 0) setGalleryLightboxIndex(galleryLightboxIndexRef.current - 1);
+    else if (galleryLbTrackRef.current) galleryLbTrackRef.current.style.transform = `translateX(-${galleryLightboxIndexRef.current * 100}%)`;
   };
 
   const handleAddGuest = async () => {
@@ -709,14 +729,26 @@ const AdminPage: React.FC = () => {
 
           <div
             className="admin-gallery-lightbox-stage"
-            onTouchStart={handleGalleryTouchStart}
-            onTouchEnd={handleGalleryTouchEnd}
+            ref={galleryLbVpRef}
+            onTouchStart={(e) => onGalleryDragStart(e.touches[0].clientX)}
+            onTouchMove={(e) => onGalleryDragMove(e.touches[0].clientX)}
+            onTouchEnd={onGalleryDragEnd}
+            onMouseDown={(e) => { e.preventDefault(); onGalleryDragStart(e.clientX); }}
+            onMouseMove={(e) => onGalleryDragMove(e.clientX)}
+            onMouseUp={onGalleryDragEnd}
+            onMouseLeave={onGalleryDragEnd}
           >
-            <img
-              src={displayedGalleryPhotos[galleryLightboxIndex].url}
-              alt={displayedGalleryPhotos[galleryLightboxIndex].guestName || '갤러리 사진 확대'}
-              draggable="false"
-            />
+            <div className="admin-gallery-lightbox-track" ref={galleryLbTrackRef} style={{ transform: `translateX(-${galleryLightboxIndex * 100}%)` }}>
+              {displayedGalleryPhotos.map((photo) => (
+                <div key={photo.id} className="admin-gallery-lightbox-item">
+                  <img
+                    src={photo.url}
+                    alt={photo.guestName || '갤러리 사진 확대'}
+                    draggable="false"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           {displayedGalleryPhotos.length > 1 && (
@@ -843,8 +875,11 @@ const AdminPage: React.FC = () => {
         .admin-gallery-lightbox-nav:hover { background: rgba(255,255,255,0.22); }
         .admin-gallery-lightbox-prev { left: 8px; }
         .admin-gallery-lightbox-next { right: 8px; }
-        .admin-gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; display: flex; align-items: center; justify-content: center; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; }
-        .admin-gallery-lightbox-stage img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
+        .admin-gallery-lightbox-stage { position: relative; width: 100%; max-width: 720px; max-height: 78vh; padding: 0 56px; box-sizing: border-box; touch-action: pan-y; overflow: hidden; cursor: grab; }
+        .admin-gallery-lightbox-stage:active { cursor: grabbing; }
+        .admin-gallery-lightbox-track { display: flex; height: 78vh; transition: transform 0.35s ease; }
+        .admin-gallery-lightbox-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .admin-gallery-lightbox-item img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
         .admin-gallery-lightbox-footer { position: relative; z-index: 2; width: 100%; max-width: 720px; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; box-sizing: border-box; }
         .admin-gallery-lightbox-info { display: flex; align-items: center; gap: 10px; }
         .admin-gallery-lightbox-counter { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
