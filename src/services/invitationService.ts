@@ -36,3 +36,20 @@ export const changeSlug = async (oldSlug: string, newSlug: string): Promise<void
 export const activatePaidInvitation = async (slug: string, weddingDateISO: string): Promise<void> => {
   await apiFetch(`/api/invitations/${slug}/activate`, { method: 'POST', body: JSON.stringify({ weddingDateISO }) });
 };
+
+export interface PrivacySettings {
+  privacyTransitionDate: string | null;
+  isPastTransition: boolean;
+  accountInfoVisibleOverride: 0 | 1 | null;
+  rsvpFormOpenOverride: 0 | 1 | null;
+}
+
+export const fetchPrivacySettings = (slug: string): Promise<PrivacySettings> =>
+  apiFetch<PrivacySettings>(`/api/invitations/${slug}/privacy-settings`);
+
+// 각 필드는 넘긴 것만 갱신된다. override에 null을 넘기면 "자동으로 전환"(tri-state 중 자동 판단)으로 되돌아간다.
+export const updatePrivacySettings = (
+  slug: string,
+  patch: { privacyTransitionDate?: string; accountInfoVisibleOverride?: 0 | 1 | null; rsvpFormOpenOverride?: 0 | 1 | null }
+): Promise<void> =>
+  apiFetch(`/api/invitations/${slug}/privacy-settings`, { method: 'PUT', body: JSON.stringify(patch) });

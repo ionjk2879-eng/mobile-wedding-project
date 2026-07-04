@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { loadInvitation } from '../services/invitationService';
+import { loadInvitation, fetchPrivacySettings, updatePrivacySettings, PrivacySettings } from '../services/invitationService';
 import { fetchRSVPResponses } from '../services/rsvpService';
 import { fetchGuests, createGuest, updateGuest, deleteGuest } from '../services/guestService';
 import { fetchGalleryAdminList, unhideGalleryPhoto, adminDeleteGalleryPhoto, GalleryAdminPhoto } from '../services/galleryService';
@@ -8,7 +8,7 @@ import { signInWithGoogle, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
 import { formatShareDateTime } from '../utils/formatShareDateTime';
 import { RSVPResponse, Guest, GuestRelation, InvitationData } from '../types';
-import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2, EyeOff, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2, EyeOff, RotateCcw, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 import useAuthStore from '../stores/useAuthStore';
 import ToastContainer from '../components/Toast';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -43,6 +43,11 @@ const AdminPage: React.FC = () => {
   const [editRelation, setEditRelation] = useState<GuestRelation>('friend');
   const [invitationInfo, setInvitationInfo] = useState<InvitationData | null>(null);
   const [showUnvisitedOnly, setShowUnvisitedOnly] = useState(false);
+
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings | null>(null);
+  const [privacyLoading, setPrivacyLoading] = useState(true);
+  const [transitionDateInput, setTransitionDateInput] = useState('');
+  const [savingTransitionDate, setSavingTransitionDate] = useState(false);
 
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryAdminPhoto[]>([]);
   const [galleryTotal, setGalleryTotal] = useState(0);
@@ -94,6 +99,59 @@ const AdminPage: React.FC = () => {
   };
 
   useEffect(() => { if (authorized) fetchGuestList(); }, [slug, authorized]);
+
+  const fetchPrivacy = async () => {
+    if (!slug) return;
+    setPrivacyLoading(true);
+    try {
+      const s = await fetchPrivacySettings(slug);
+      setPrivacySettings(s);
+      setTransitionDateInput(s.privacyTransitionDate ? s.privacyTransitionDate.slice(0, 10) : '');
+    } catch (err) {
+      console.error('개인정보 설정 로드 실패:', err);
+    }
+    setPrivacyLoading(false);
+  };
+
+  useEffect(() => { if (authorized) fetchPrivacy(); }, [slug, authorized]);
+
+  const handleSaveTransitionDate = async () => {
+    if (!slug || !transitionDateInput) return;
+    setSavingTransitionDate(true);
+    try {
+      await updatePrivacySettings(slug, { privacyTransitionDate: new Date(`${transitionDateInput}T00:00:00`).toISOString() });
+      await fetchPrivacy();
+      toast.success('전환일을 저장했습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '저장에 실패했습니다.');
+    }
+    setSavingTransitionDate(false);
+  };
+
+  const handleSetOverride = async (field: 'accountInfoVisibleOverride' | 'rsvpFormOpenOverride', value: 0 | 1 | null) => {
+    if (!slug) return;
+    try {
+      await updatePrivacySettings(slug, { [field]: value });
+      await fetchPrivacy();
+      toast.success('설정을 변경했습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '변경에 실패했습니다.');
+    }
+  };
+
+  const formatDateKo = (iso: string) => {
+    const d = new Date(iso);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  const privacyStatusMessage = (override: 0 | 1 | null, label: string) => {
+    if (!privacySettings) return '';
+    if (override === 1) return `${label}를 계속 공개로 유지 중입니다.`;
+    if (override === 0) return `${label}를 수동으로 비공개 처리했습니다.`;
+    if (!privacySettings.privacyTransitionDate) return `청첩장 날짜가 설정되면 ${label} 자동 비공개 전환일이 계산됩니다.`;
+    if (privacySettings.isPastTransition) return `${label}가 비공개 전환되었습니다.`;
+    return `${label}는 ${formatDateKo(privacySettings.privacyTransitionDate)}부터 자동으로 비공개 전환됩니다.`;
+  };
 
   const fetchGalleryList = async () => {
     if (!slug) return;
@@ -395,6 +453,87 @@ const AdminPage: React.FC = () => {
         </div>
       )}
 
+      <section className="admin-privacy-section">
+        <h2 className="admin-section-title"><Shield size={18} /> 개인정보 공개 설정</h2>
+        {privacyLoading || !privacySettings ? (
+          <p className="admin-loading">불러오는 중...</p>
+        ) : (
+          <>
+            <div className="privacy-date-row">
+              <label htmlFor="privacy-transition-date">비공개 전환일</label>
+              <input
+                id="privacy-transition-date"
+                type="date"
+                className="privacy-date-input"
+                value={transitionDateInput}
+                onChange={(e) => setTransitionDateInput(e.target.value)}
+              />
+              <button type="button" className="admin-btn primary" onClick={handleSaveTransitionDate} disabled={savingTransitionDate || !transitionDateInput}>
+                {savingTransitionDate ? '저장 중...' : '날짜 저장'}
+              </button>
+            </div>
+
+            <div className="privacy-fields">
+              <div className="privacy-field">
+                <h3>계좌번호</h3>
+                <p className="privacy-status">{privacyStatusMessage(privacySettings.accountInfoVisibleOverride, '계좌번호')}</p>
+                <div className="privacy-override-buttons">
+                  <button
+                    type="button"
+                    className={`privacy-override-btn ${privacySettings.accountInfoVisibleOverride === null ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('accountInfoVisibleOverride', null)}
+                  >
+                    자동으로 전환
+                  </button>
+                  <button
+                    type="button"
+                    className={`privacy-override-btn ${privacySettings.accountInfoVisibleOverride === 1 ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('accountInfoVisibleOverride', 1)}
+                  >
+                    계속 공개 유지
+                  </button>
+                  <button
+                    type="button"
+                    className={`privacy-override-btn danger ${privacySettings.accountInfoVisibleOverride === 0 ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('accountInfoVisibleOverride', 0)}
+                  >
+                    지금 바로 비공개
+                  </button>
+                </div>
+              </div>
+
+              <div className="privacy-field">
+                <h3>RSVP</h3>
+                <p className="privacy-status">{privacyStatusMessage(privacySettings.rsvpFormOpenOverride, 'RSVP')}</p>
+                <div className="privacy-override-buttons">
+                  <button
+                    type="button"
+                    className={`privacy-override-btn ${privacySettings.rsvpFormOpenOverride === null ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('rsvpFormOpenOverride', null)}
+                  >
+                    자동으로 전환
+                  </button>
+                  <button
+                    type="button"
+                    className={`privacy-override-btn ${privacySettings.rsvpFormOpenOverride === 1 ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('rsvpFormOpenOverride', 1)}
+                  >
+                    계속 공개 유지
+                  </button>
+                  <button
+                    type="button"
+                    className={`privacy-override-btn danger ${privacySettings.rsvpFormOpenOverride === 0 ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('rsvpFormOpenOverride', 0)}
+                  >
+                    지금 바로 비공개
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
+
       <section className="admin-guests-section">
         <h2 className="admin-section-title">하객 명단 · 개인화 링크</h2>
         <div className="guest-add-row">
@@ -620,7 +759,21 @@ const AdminPage: React.FC = () => {
         .admin-btn.primary:hover { background: #9B6A7E; border-color: #9B6A7E; color: white; }
         .admin-btn.primary:disabled { opacity: 0.5; cursor: not-allowed; }
         .admin-guests-section { margin-top: 40px; }
-        .admin-section-title { font-size: 1.1rem; font-weight: 700; color: #1F2937; margin: 0 0 16px; }
+        .admin-section-title { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: #1F2937; margin: 0 0 16px; }
+        .admin-privacy-section { margin-top: 40px; background: white; border: 1px solid #F3F4F6; border-radius: 16px; padding: 24px; }
+        .privacy-date-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #F3F4F6; }
+        .privacy-date-row label { font-size: 0.85rem; font-weight: 600; color: #4B5563; }
+        .privacy-date-input { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: #374151; }
+        .privacy-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .privacy-field { border: 1px solid #F3F4F6; border-radius: 12px; padding: 16px; }
+        .privacy-field h3 { margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; color: #1F2937; }
+        .privacy-status { margin: 0 0 14px; font-size: 0.85rem; color: #6B7280; line-height: 1.5; min-height: 2.6em; }
+        .privacy-override-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+        .privacy-override-btn { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 8px; background: white; color: #4B5563; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+        .privacy-override-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
+        .privacy-override-btn.active { background: #B07A8E; border-color: #B07A8E; color: white; }
+        .privacy-override-btn.danger.active { background: #DC2626; border-color: #DC2626; color: white; }
+        @media (max-width: 640px) { .privacy-fields { grid-template-columns: 1fr; } .privacy-date-row { flex-wrap: wrap; } }
         .guest-add-row { display: flex; gap: 8px; margin-bottom: 16px; }
         .guest-add-input { flex: 1; padding: 10px 14px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.88rem; font-family: inherit; }
         .guest-add-select { padding: 10px 12px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 0.88rem; font-family: inherit; color: #374151; background: white; }

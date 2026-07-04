@@ -385,6 +385,69 @@ async function handleActivate(request: Request, env: Env, slug: string): Promise
   return json({ ok: true, expiresAt }, 200, origin);
 }
 
+// 기념일 모드 개인정보 전환 설정 — 청첩장 소유자 전용 (관리 페이지)
+async function handlePrivacySettings(request: Request, env: Env, slug: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const auth = await requireInvitationOwner(request, env, slug);
+  if ('error' in auth) return auth.error;
+
+  if (request.method === 'GET') {
+    const row = await env.DB.prepare(
+      'SELECT privacy_transition_date, account_info_visible_override, rsvp_form_open_override FROM invitations WHERE slug = ?'
+    ).bind(slug).first();
+    if (!row) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
+
+    const transitionDate = (row.privacy_transition_date as string | null) ?? null;
+    const isPastTransition = !!transitionDate && new Date(transitionDate).getTime() <= Date.now();
+
+    return json({
+      privacyTransitionDate: transitionDate,
+      isPastTransition,
+      accountInfoVisibleOverride: (row.account_info_visible_override as number | null) ?? null,
+      rsvpFormOpenOverride: (row.rsvp_form_open_override as number | null) ?? null,
+    }, 200, origin);
+  }
+
+  if (request.method === 'PUT') {
+    const body = await request.json() as {
+      privacyTransitionDate?: string | null;
+      accountInfoVisibleOverride?: 0 | 1 | null;
+      rsvpFormOpenOverride?: 0 | 1 | null;
+    };
+
+    const isValidOverride = (v: unknown) => v === null || v === 0 || v === 1;
+
+    const sets: string[] = [];
+    const binds: unknown[] = [];
+
+    // 각 필드가 body에 아예 없으면(undefined) 건드리지 않고, null이 명시적으로 오면
+    // "자동으로 전환"(override를 NULL로 되돌림)으로 처리한다 — 요청에 없는 값과
+    // 명시적으로 null인 값을 구분하기 위해 in 연산자로 키 존재 여부를 확인한다.
+    if ('privacyTransitionDate' in body) {
+      sets.push('privacy_transition_date = ?');
+      binds.push(body.privacyTransitionDate ?? null);
+    }
+    if ('accountInfoVisibleOverride' in body) {
+      if (!isValidOverride(body.accountInfoVisibleOverride)) return json({ error: 'accountInfoVisibleOverride must be 0, 1, or null' }, 400, origin);
+      sets.push('account_info_visible_override = ?');
+      binds.push(body.accountInfoVisibleOverride);
+    }
+    if ('rsvpFormOpenOverride' in body) {
+      if (!isValidOverride(body.rsvpFormOpenOverride)) return json({ error: 'rsvpFormOpenOverride must be 0, 1, or null' }, 400, origin);
+      sets.push('rsvp_form_open_override = ?');
+      binds.push(body.rsvpFormOpenOverride);
+    }
+
+    if (sets.length === 0) return json({ error: '변경할 값이 없습니다.' }, 400, origin);
+
+    binds.push(slug);
+    await env.DB.prepare(`UPDATE invitations SET ${sets.join(', ')} WHERE slug = ?`).bind(...binds).run();
+    return json({ ok: true }, 200, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
 // --- Posts API ---
 
 async function handlePostsPublic(request: Request, env: Env): Promise<Response> {
@@ -1147,6 +1210,9 @@ export default {
 
       const activateMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/activate$/);
       if (activateMatch) return await handleActivate(request, env, activateMatch[1]);
+
+      const privacySettingsMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/privacy-settings$/);
+      if (privacySettingsMatch) return await handlePrivacySettings(request, env, privacySettingsMatch[1]);
 
       // Posts (public)
       if (pathname === '/api/posts') return await handlePostsPublic(request, env);
