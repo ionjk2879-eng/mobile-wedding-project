@@ -6,6 +6,14 @@ export function formatShareDate(weddingDateISO: string): string {
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${dayNames[d.getDay()]}요일`;
 }
 
+// "2026年10月24日(土)" 형태로 포맷 (일본어 오프닝 서브텍스트용)
+export function formatShareDateJa(weddingDateISO: string): string {
+  const d = new Date(weddingDateISO);
+  if (isNaN(d.getTime())) return '';
+  const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日(${dayNames[d.getDay()]})`;
+}
+
 // "2026. 10. 24. 토요일 오후 12시 30분" 형태로 포맷 (공유 카드용)
 export function formatShareDateTime(weddingDateISO: string, time: string): string {
   const dateText = formatShareDate(weddingDateISO);

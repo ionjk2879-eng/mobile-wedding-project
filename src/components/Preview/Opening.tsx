@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { OpeningConfig, GuestRelation } from '../../types';
 import { formatGuestOpeningText } from '../../utils/guestOpeningTemplates';
-import { formatShareDate } from '../../utils/formatShareDateTime';
+import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateTime';
 
 const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
   elegant: {
@@ -429,20 +429,22 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
   const mainText = effectiveOpeningText;
   // 서브텍스트를 따로 안 정했으면 date(자유 텍스트, "2026. 10. 24. SAT" 형태)를 그대로
-  // 노출하지 않고 실제 공유 문구와 같은 한글 요일 표기("2026. 10. 24. 토요일")로 보여준다.
+  // 노출하지 않고 실제 공유 문구와 같은 요일 표기("2026. 10. 24. 토요일" / "2026年10月24日(土)")로 보여준다.
   const subText = opening.openingSubText || (
-    language === 'ko' && weddingDateISO ? (formatShareDate(weddingDateISO) || date) : date
+    language === 'ko' && weddingDateISO ? (formatShareDate(weddingDateISO) || date)
+    : language === 'ja' && weddingDateISO ? (formatShareDateJa(weddingDateISO) || date)
+    : date
   );
   const todayDateStr = (() => {
     if (!anniversaryMode) return '';
     const t = new Date();
-    const y = t.getFullYear(), m = t.getMonth(), d = t.getDate();
     if (language === 'en') {
+      const y = t.getFullYear(), m = t.getMonth(), d = t.getDate();
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       return `${months[m]} ${d}, ${y}`;
     }
-    if (language === 'ja') return `${y}年${m + 1}月${d}日`;
-    // 예식 날짜(subText)와 같은 포맷("2026. 7. 4. 토요일")으로 통일
+    // 예식 날짜(subText)와 같은 포맷으로 통일
+    if (language === 'ja') return formatShareDateJa(t.toISOString());
     return formatShareDate(t.toISOString());
   })();
   // 기념일 모드는 openingText 자체가 D+n으로 대체되므로 여기선 일반 모드에서만 D-day를 서브 멘트 아래 표시
