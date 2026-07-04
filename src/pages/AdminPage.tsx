@@ -8,7 +8,7 @@ import { signInWithGoogle, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
 import { formatShareDateTime } from '../utils/formatShareDateTime';
 import { RSVPResponse, Guest, GuestRelation, InvitationData } from '../types';
-import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2, EyeOff, RotateCcw, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
+import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, Pencil, Check, Share2, EyeOff, RotateCcw, ChevronLeft, ChevronRight, Shield, Menu } from 'lucide-react';
 import useAuthStore from '../stores/useAuthStore';
 import ToastContainer from '../components/Toast';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -43,6 +43,7 @@ const AdminPage: React.FC = () => {
   const [editRelation, setEditRelation] = useState<GuestRelation>('friend');
   const [invitationInfo, setInvitationInfo] = useState<InvitationData | null>(null);
   const [showUnvisitedOnly, setShowUnvisitedOnly] = useState(false);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
 
   const [privacySettings, setPrivacySettings] = useState<PrivacySettings | null>(null);
   const [privacyLoading, setPrivacyLoading] = useState(true);
@@ -397,6 +398,26 @@ const AdminPage: React.FC = () => {
           <Link to={`/${slug}`} className="admin-btn"><ArrowLeft size={18} /> 청첩장 보기</Link>
           <button onClick={() => signOut()} className="admin-btn"><LogOut size={18} /> 로그아웃</button>
         </div>
+        <div className="admin-actions-mobile">
+          <button
+            className="admin-hamburger-btn"
+            onClick={() => setActionsMenuOpen((v) => !v)}
+            aria-label={actionsMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+            aria-expanded={actionsMenuOpen}
+          >
+            {actionsMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          {actionsMenuOpen && (
+            <>
+              <div className="admin-actions-backdrop" onClick={() => setActionsMenuOpen(false)} />
+              <div className="admin-actions-dropdown">
+                <button onClick={() => { fetchResponses(); setActionsMenuOpen(false); }} className="admin-btn"><RefreshCw size={18} /> 새로고침</button>
+                <Link to={`/${slug}`} className="admin-btn" onClick={() => setActionsMenuOpen(false)}><ArrowLeft size={18} /> 청첩장 보기</Link>
+                <button onClick={() => { signOut(); setActionsMenuOpen(false); }} className="admin-btn"><LogOut size={18} /> 로그아웃</button>
+              </div>
+            </>
+          )}
+        </div>
       </header>
 
       <div className="admin-stats">
@@ -734,6 +755,16 @@ const AdminPage: React.FC = () => {
         .admin-actions { display: flex; gap: 8px; }
         .admin-btn { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border: 1px solid #E5E7EB; border-radius: 10px; background: white; color: #4B5563; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.2s; }
         .admin-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
+        .admin-actions-mobile { display: none; position: relative; }
+        .admin-hamburger-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid #E5E7EB; border-radius: 10px; background: white; color: #4B5563; cursor: pointer; transition: all 0.2s; }
+        .admin-hamburger-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
+        .admin-actions-backdrop { position: fixed; inset: 0; z-index: 40; }
+        .admin-actions-dropdown { position: absolute; top: calc(100% + 8px); right: 0; z-index: 50; display: flex; flex-direction: column; gap: 6px; background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); min-width: 170px; }
+        .admin-actions-dropdown .admin-btn { white-space: nowrap; }
+        @media (max-width: 640px) {
+          .admin-actions { display: none; }
+          .admin-actions-mobile { display: block; }
+        }
         .admin-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 28px; }
         .stat-card { background: white; border: 1px solid #F3F4F6; border-radius: 14px; padding: 18px; display: flex; align-items: center; gap: 12px; color: #D4A5C6; }
         .stat-card div span { display: block; font-size: 0.75rem; color: #9CA3AF; }
