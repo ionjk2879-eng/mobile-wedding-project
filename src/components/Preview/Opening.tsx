@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { OpeningConfig, GuestRelation } from '../../types';
 import { formatGuestOpeningText } from '../../utils/guestOpeningTemplates';
+import { formatShareDate } from '../../utils/formatShareDateTime';
 
 const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
   elegant: {
@@ -427,7 +428,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   if ((!opening.openingEnabled && !autoClose) || dismissed) return null;
 
   const mainText = effectiveOpeningText;
-  const subText = opening.openingSubText || date;
+  // 서브텍스트를 따로 안 정했으면 date(자유 텍스트, "2026. 10. 24. SAT" 형태)를 그대로
+  // 노출하지 않고 실제 공유 문구와 같은 한글 요일 표기("2026. 10. 24. 토요일")로 보여준다.
+  const subText = opening.openingSubText || (
+    language === 'ko' && weddingDateISO ? (formatShareDate(weddingDateISO) || date) : date
+  );
   const todayDateStr = (() => {
     if (!anniversaryMode) return '';
     const t = new Date();
@@ -606,7 +611,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
       {displayedIsTyping ? (
         <div
-          key={`typing-${effectiveStyle}-${typingBodyKey}`}
+          key={`typing-${effectiveStyle}-${typingBodyKey}-${effectiveOpeningText}`}
           className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}${isSwitchingContent ? ' op-body-out' : ''}`}
         >
           <div className="op-typing-inner">
@@ -633,7 +638,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       ) : (
         <div
           className={`op-body${isSwitchingContent ? ' op-body-out' : ''}`}
-          key={`seq-${effectiveStyle}-${seqBodyKey}`}
+          key={`seq-${effectiveStyle}-${seqBodyKey}-${effectiveOpeningText}`}
         >
           {decoEffect === 'trace' && (
             <div className="op-deco-trace" aria-hidden="true">
