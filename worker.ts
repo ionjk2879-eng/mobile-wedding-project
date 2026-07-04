@@ -110,12 +110,6 @@ async function upsertUser(env: Env, uid: string, provider: string, name: string,
   ).bind(uid, provider, name, email, photo).run();
 }
 
-function weddingPlusOneYear(iso: string): string {
-  const d = new Date(iso);
-  d.setFullYear(d.getFullYear() + 1);
-  return d.toISOString();
-}
-
 // 기념일 모드 개인정보 전환 예정일 기본값(결혼식 3주 후). 신랑신부가 관리 페이지에서
 // 수동으로 조정한 뒤에는(privacy_transition_date가 이미 채워진 뒤에는) 다시 계산하지 않는다.
 function weddingPlus21Days(iso: string): string {
@@ -392,16 +386,17 @@ async function handleActivate(request: Request, env: Env, slug: string): Promise
   const body = await request.json() as { weddingDateISO?: string };
   if (!body.weddingDateISO) return json({ error: 'weddingDateISO is required' }, 400, origin);
 
-  const expiresAt = weddingPlusOneYear(body.weddingDateISO);
+  // 유료 전환은 만료일 없이 영구로 처리한다 — 예전엔 예식일+1년으로 자동 만료일을
+  // 걸어서, deleteExpiredInvitations 크론이 그 시점에 유료 청첩장까지 함께 삭제해버렸다.
   const data = JSON.parse(row.data as string);
   data.isPaid = true;
-  data.expiresAt = expiresAt;
+  data.expiresAt = null;
 
   await env.DB.prepare(
-    `UPDATE invitations SET is_paid = 1, expires_at = ?, data = ?, updated_at = datetime('now') WHERE slug = ?`
-  ).bind(expiresAt, JSON.stringify(data), slug).run();
+    `UPDATE invitations SET is_paid = 1, expires_at = NULL, data = ?, updated_at = datetime('now') WHERE slug = ?`
+  ).bind(JSON.stringify(data), slug).run();
 
-  return json({ ok: true, expiresAt }, 200, origin);
+  return json({ ok: true, expiresAt: null }, 200, origin);
 }
 
 // 기념일 모드 개인정보 전환 설정 — 청첩장 소유자 전용 (관리 페이지)
