@@ -17,6 +17,13 @@ jobs:
 
       - run: npm ci
 
+      # 로컬 dev D1(sonett-db-dev) 시뮬레이션으로 돌아가는 API 테스트. 프로덕션 리소스는
+      # 전혀 건드리지 않는다. 여기서 실패하면 이후 빌드/마이그레이션/배포 단계는 실행되지 않는다.
+      - name: Run tests
+        run: npm test
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
       - name: Build
         run: npm run build
         env:
