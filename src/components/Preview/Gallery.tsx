@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
@@ -164,6 +165,15 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const style = data.galleryStyle === 'style3' ? 'style3' : 'slide';
 
+  // 라이트박스는 document.body로 포털링되어(아래 참고) 테마 wrapper(.invitation-page)
+  // DOM 서브트리 바깥에 렌더링되므로, CSS 변수/폰트를 이 엘리먼트에 직접 다시 적용해야 한다.
+  const lightboxThemeClass = `theme-${data.theme || 'blush'}`;
+  const lightboxThemeStyle: React.CSSProperties = {
+    fontFamily: data.fontFamily,
+    ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}),
+    ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor, '--wedding-accent': data.customAccentColor } as React.CSSProperties : {}),
+  };
+
   return (
     <section className="gallery section" aria-label="갤러리">
       <h2>GALLERY</h2>
@@ -214,8 +224,8 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
         </div>
       )}
 
-      {selectedIndex !== null && (
-        <div className="lightbox-overlay" role="dialog" aria-modal="true" aria-label="사진 확대 보기" ref={lightboxTrapRef}>
+      {selectedIndex !== null && ReactDOM.createPortal(
+        <div className={`lightbox-overlay ${lightboxThemeClass}`} style={lightboxThemeStyle} role="dialog" aria-modal="true" aria-label="사진 확대 보기" ref={lightboxTrapRef}>
           <div className="lightbox-backdrop" onClick={closeLightbox} />
           <button className="close-btn" onClick={closeLightbox} aria-label="닫기"><X size={32} /></button>
 
@@ -254,7 +264,8 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
               ))}
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
 
     </section>
@@ -264,6 +275,9 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.galleryStyle === next.data.galleryStyle
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
+  && prev.data.theme === next.data.theme
+  && prev.data.customBgColor === next.data.customBgColor
+  && prev.data.customAccentColor === next.data.customAccentColor
 );
 
 interface MasonryProps {
