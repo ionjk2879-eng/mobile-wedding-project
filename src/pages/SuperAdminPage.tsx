@@ -6,8 +6,6 @@ import { toast } from '../stores/useToastStore';
 import ToastContainer from '../components/Toast';
 import { Search, RefreshCw, CheckCircle, ExternalLink, Plus, Pencil, Trash2, X } from 'lucide-react';
 
-const ADMIN_EMAIL = 'ionjk2879@gmail.com';
-
 type Filter = 'all' | 'unpaid' | 'paid';
 type AdminTab = 'orders' | 'posts';
 type PostType = 'event' | 'notice';
@@ -169,6 +167,9 @@ const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
 const SuperAdminPage: React.FC = () => {
   const user = useAuthStore(s => s.user);
   const [adminTab, setAdminTab] = useState<AdminTab>('orders');
+  // 슈퍼관리자 여부를 클라이언트에 이메일로 하드코딩하지 않고, 서버(worker.ts의
+  // SUPER_ADMIN_EMAIL 검사)의 실제 응답 성공/실패로만 판단한다. null=확인 중.
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   // Orders
   const [filter, setFilter] = useState<Filter>('all');
@@ -191,7 +192,9 @@ const SuperAdminPage: React.FC = () => {
       const params = new URLSearchParams({ filter, ...(query ? { q: query } : {}) });
       const data = await apiFetch<InvRow[]>(`/api/admin/invitations?${params}`);
       setRows(data);
+      setAuthorized(true);
     } catch {
+      setAuthorized(false);
       toast.error('목록 조회 실패');
     }
     setLoading(false);
@@ -209,12 +212,13 @@ const SuperAdminPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (user?.email === ADMIN_EMAIL) fetchList();
+    if (!user) { setAuthorized(false); return; }
+    fetchList();
   }, [fetchList, user]);
 
   useEffect(() => {
-    if (user?.email === ADMIN_EMAIL && adminTab === 'posts') fetchPosts();
-  }, [fetchPosts, user, adminTab]);
+    if (authorized && adminTab === 'posts') fetchPosts();
+  }, [fetchPosts, authorized, adminTab]);
 
   const handleActivate = async (row: InvRow) => {
     if (!row.weddingDateISO) { toast.error('결혼 날짜 정보가 없어 활성화할 수 없습니다.'); return; }
@@ -270,11 +274,11 @@ const SuperAdminPage: React.FC = () => {
     }
   };
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (authorized !== true) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: "'Pretendard', sans-serif", color: '#6B7280' }}>
         <ToastContainer />
-        <p>접근 권한이 없습니다.</p>
+        <p>{authorized === null ? '확인 중...' : '접근 권한이 없습니다.'}</p>
       </div>
     );
   }

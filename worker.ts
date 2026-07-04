@@ -10,6 +10,7 @@ interface Env {
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
   RESEND_API_KEY?: string;
+  SUPER_ADMIN_EMAIL: string;
 }
 
 // --- JWT HS256 ---
@@ -369,7 +370,7 @@ async function handleActivate(request: Request, env: Env, slug: string): Promise
   const user = await getAuthUser(request, env);
   // 결제 확인 후 유료 전환은 슈퍼관리자만 수행할 수 있다 (SuperAdminPage 전용 기능).
   // 관리자는 청첩장 소유자가 아니므로 소유권 체크가 아니라 관리자 이메일로 검증한다.
-  if (!user || user.email !== 'ionjk2879@gmail.com')
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
     return json({ error: '권한이 없습니다.' }, 403, origin);
 
   const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(slug).first();
@@ -470,7 +471,7 @@ async function handlePostsPublic(request: Request, env: Env): Promise<Response> 
 async function handleAdminPosts(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   const user = await getAuthUser(request, env);
-  if (!user || user.email !== 'ionjk2879@gmail.com')
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
     return json({ error: '권한이 없습니다.' }, 403, origin);
 
   if (request.method === 'GET') {
@@ -495,7 +496,7 @@ async function handleAdminPosts(request: Request, env: Env): Promise<Response> {
 async function handleAdminPost(request: Request, env: Env, id: string): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   const user = await getAuthUser(request, env);
-  if (!user || user.email !== 'ionjk2879@gmail.com')
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
     return json({ error: '권한이 없습니다.' }, 403, origin);
 
   if (request.method === 'PUT') {
@@ -520,7 +521,7 @@ async function handleAdminPost(request: Request, env: Env, id: string): Promise<
 async function handleAdminInvitations(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   const user = await getAuthUser(request, env);
-  if (!user || user.email !== 'ionjk2879@gmail.com')
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
     return json({ error: '권한이 없습니다.' }, 403, origin);
 
   const url = new URL(request.url);
