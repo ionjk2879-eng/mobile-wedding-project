@@ -75,9 +75,22 @@ async function issueToken(env: Env, uid: string, name: string, email: string, ph
 
 // --- CORS & helpers ---
 
+// 요청의 Origin 헤더를 검증 없이 그대로 반사하면, XSS 등으로 탈취된 세션이 임의의 origin에서
+// 응답을 읽어갈 수 있다. 화이트리스트에 있는 origin만 그대로 반사하고, 그 외(또는 Origin
+// 헤더가 없는 서버-투-서버/curl 요청)는 프로덕션 origin으로 고정한다 — 이 경우 브라우저는
+// 응답 origin과 요청 페이지의 실제 origin이 달라 그 페이지의 JS가 응답을 읽지 못하게 막는다.
+const ALLOWED_ORIGINS = new Set([
+  'https://sonett.kr',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:8787',
+  'http://127.0.0.1:8787',
+]);
+
 function cors(origin: string): Record<string, string> {
+  const allowedOrigin = ALLOWED_ORIGINS.has(origin) ? origin : 'https://sonett.kr';
   return {
-    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
