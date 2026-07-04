@@ -318,10 +318,16 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
     const existing = await env.DB.prepare('SELECT owner_uid FROM invitations WHERE slug = ?').bind(slug).first();
     if (!existing) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
     if (existing.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
+
+    const photos = await env.DB.prepare('SELECT r2_key FROM gallery_photos WHERE invitation_slug = ?').bind(slug).all();
+    const r2Keys = photos.results.map((p) => p.r2_key as string);
+    if (r2Keys.length > 0) await env.IMAGES.delete(r2Keys);
+
     await env.DB.batch([
       env.DB.prepare('DELETE FROM guestbook WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM rsvp WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM guests WHERE invitation_slug = ?').bind(slug),
+      env.DB.prepare('DELETE FROM gallery_photos WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(slug),
     ]);
     return json({ ok: true }, 200, origin);
