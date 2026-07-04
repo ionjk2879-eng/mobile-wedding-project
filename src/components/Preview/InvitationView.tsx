@@ -238,13 +238,24 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       )}
       <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />
       <MusicPlayer url={data.bgMusicUrl} />
-      {previewRefs?.basic ? (
-        <div ref={previewRefs.basic} className={onSectionNav ? 'preview-nav-section' : undefined}>
+      {previewRefs?.hero ? (
+        <div ref={previewRefs.hero} className={onSectionNav ? 'preview-nav-section' : undefined}>
           {onSectionNav && (
-            <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="메인화면 편집" aria-label="메인화면 편집">
-              <LayoutTemplate size={13} />
-              <span className="preview-nav-label">메인화면</span>
-            </button>
+            <>
+              <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="메인화면 편집" aria-label="메인화면 편집">
+                <LayoutTemplate size={13} />
+                <span className="preview-nav-label">메인화면</span>
+              </button>
+              <button
+                className="preview-section-nav-btn preview-section-nav-btn-secondary"
+                onClick={() => { previewRefs?.contacts?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); onSectionNav('basic'); }}
+                title="기본정보 편집"
+                aria-label="기본정보 편집"
+              >
+                <Info size={13} />
+                <span className="preview-nav-label">기본정보</span>
+              </button>
+            </>
           )}
           <Hero data={data} />
         </div>

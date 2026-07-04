@@ -430,6 +430,7 @@
   letter-spacing: 0.01em;
   line-height: 1;
 }
+.preview-section-nav-btn-secondary { top: 40px; }
 .preview-nav-section:hover .preview-section-nav-btn { opacity: 1; }
 .preview-section-nav-btn:hover {
   background: rgba(255, 255, 255, 0.98);

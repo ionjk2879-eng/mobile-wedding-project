@@ -158,8 +158,8 @@ const App: React.FC = () => {
   const previewRefs = {
     theme: React.useRef<HTMLDivElement>(null),
     design: React.useRef<HTMLDivElement>(null),
-    basic: React.useRef<HTMLDivElement>(null),
-    datetime: React.useRef<HTMLDivElement>(null),
+    hero: React.useRef<HTMLDivElement>(null),
+    calendar: React.useRef<HTMLDivElement>(null),
     greeting: React.useRef<HTMLDivElement>(null),
     message: React.useRef<HTMLDivElement>(null),
     interview: React.useRef<HTMLDivElement>(null),
@@ -221,8 +221,14 @@ const App: React.FC = () => {
     );
   }
 
+  // InvitationView.tsx의 PREVIEW_TO_EDITOR(미리보기 id → 편집 섹션 id)를 그대로 뒤집은 매핑.
+  // 편집 섹션 id와 실제 미리보기 DOM에 붙는 ref 키가 다른 두 곳(예식일시↔달력, 기본정보↔연락처)을
+  // 여기서 변환해줘야 카테고리/편집섹션 → 미리보기 스크롤이 올바른 위치로 향한다.
+  const EDITOR_TO_PREVIEW_REF: Record<string, string> = { datetime: 'calendar', basic: 'contacts' };
+
   const handleSectionScroll = (id: string) => {
-    const ref = previewRefs[id as keyof typeof previewRefs];
+    const refId = EDITOR_TO_PREVIEW_REF[id] || id;
+    const ref = previewRefs[refId as keyof typeof previewRefs];
     if (ref?.current) ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -310,7 +316,8 @@ const App: React.FC = () => {
             <div className="preview-nav-overlay" onClick={() => setPreviewNavOpen(false)}>
               <div className="preview-nav-panel" onClick={(e) => e.stopPropagation()}>
                 {[
-                  { id: 'basic', name: '메인/기본정보' },
+                  { id: 'hero', name: '메인화면' },
+                  { id: 'calendar', name: '예식일시' },
                   { id: 'greeting', name: '인사말' },
                   { id: 'message', name: '한마디' },
                   { id: 'interview', name: '인터뷰' },

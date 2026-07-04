@@ -99,7 +99,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
     setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }));
     setActiveSection(id);
     if (willOpen) {
-      if (onSectionClick && id !== 'share' && id !== 'order' && id !== 'music' && id !== 'hero') {
+      if (onSectionClick && id !== 'order' && id !== 'music') {
         onSectionClick(id);
       }
       const ref = sectionRefs[id as keyof typeof sectionRefs];
@@ -117,7 +117,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
     isScrollingRef.current = true;
     setActiveSection(id);
     setExpandedSections(prev => ({ ...prev, [id]: true }));
-    if (onSectionClick && id !== 'share' && id !== 'order' && id !== 'music' && id !== 'hero') onSectionClick(id);
+    if (onSectionClick && id !== 'order' && id !== 'music') onSectionClick(id);
     setTimeout(() => {
       ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setTimeout(() => { isScrollingRef.current = false; }, 800);
