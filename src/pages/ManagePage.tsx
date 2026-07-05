@@ -259,8 +259,26 @@ function getExpiryInfo(data: InvitationData, expiredLabel: string): { label: str
   return null;
 }
 
+// 편집 버튼 옆에 "D-7"로만 붙어 있던 만료 정보를, 카드 썸네일 위에 "언제 삭제되는지"를
+// 바로 알 수 있는 문장으로 바꿔서 보여준다. 관리자 자신이 보는 문구라 청첩장 자체의
+// language(data.language)가 아니라 사이트 UI 언어(lang)를 따른다.
+function formatDeleteNotice(data: InvitationData, lang: 'ko' | 'en' | 'ja', expiredLabel: string): string | null {
+  const expiry = getExpiryInfo(data, expiredLabel);
+  if (!expiry || !data.expiresAt) return null;
+  const d = new Date(data.expiresAt);
+  if (isNaN(d.getTime())) return expiry.label;
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  if (lang === 'en') {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `Deletes ${months[m - 1]} ${day} (${expiry.label})`;
+  }
+  if (lang === 'ja') return `${m}月${day}日に削除（${expiry.label}）`;
+  return `${m}월 ${day}일 삭제 (${expiry.label})`;
+}
+
 const ManagePage: React.FC = () => {
-  const { t } = useSiteLang();
+  const { t, lang } = useSiteLang();
   const tm = t.manage;
   const [invitations, setInvitations] = useState<{ slug: string; data: InvitationData }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -339,8 +357,8 @@ const ManagePage: React.FC = () => {
           <div className="mc-grid">
             {filteredInvitations.map(({ slug, data }) => (
               <div key={slug} className="mc-card">
-                <a href={`/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-thumb-link">
-                  <div className="mc-thumb">
+                <div className="mc-thumb">
+                  <a href={`/${slug}`} target="_blank" rel="noopener noreferrer" className="mc-thumb-link">
                     {data.heroPhoto ? (
                       <img
                         src={data.heroPhoto}
@@ -356,8 +374,26 @@ const ManagePage: React.FC = () => {
                     <div className="mc-thumb-overlay">
                       <span>{tm.viewInvitation}</span>
                     </div>
-                  </div>
-                </a>
+                  </a>
+                  {!data.isPaid && (
+                    <>
+                      <span className="mc-thumb-sample">{tm.sampleInUse}</span>
+                      <a
+                        href={NAVER_STORE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mc-thumb-buy"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <span className="mc-thumb-buy-main"><ShoppingCart size={12} /> {tm.buyOnKmong}</span>
+                        {(() => {
+                          const notice = formatDeleteNotice(data, lang, tm.expiredLabel);
+                          return notice ? <span className="mc-thumb-buy-sub">{notice}</span> : null;
+                        })()}
+                      </a>
+                    </>
+                  )}
+                </div>
                 <div className="mc-body">
                   <div className="mc-info">
                     <h3 className="mc-name">
@@ -375,12 +411,6 @@ const ManagePage: React.FC = () => {
                     <Link to={`/edit/${slug}`} className="mc-action-btn mc-edit-btn">
                       <Edit3 size={12} /> {tm.edit}
                     </Link>
-                    {(() => {
-                      const expiry = getExpiryInfo(data, tm.expiredLabel);
-                      return expiry
-                        ? <span className={`mc-expiry-badge ${expiry.urgent ? 'urgent' : ''}`}>{expiry.label}</span>
-                        : <span className="mc-expiry-badge mc-expiry-empty" />;
-                    })()}
                     <CardDropdown
                       slug={slug}
                       isPaid={!!data.isPaid}
@@ -390,13 +420,6 @@ const ManagePage: React.FC = () => {
                       onActivate={() => setActivateTarget(slug)}
                     />
                   </div>
-                  {!data.isPaid && (
-                    <div className="mc-purchase-section">
-                      <a href={NAVER_STORE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
-                        <ShoppingCart size={13} /> {tm.buyOnKmong}
-                      </a>
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
@@ -548,16 +571,18 @@ const ManagePage: React.FC = () => {
         }
 
         /* Thumbnail */
-        .mc-thumb-link {
-          display: block;
-          text-decoration: none;
-        }
         .mc-thumb {
           position: relative;
           width: 100%;
           aspect-ratio: 3 / 4;
           overflow: hidden;
           background: #F3F4F6;
+        }
+        .mc-thumb-link {
+          position: absolute;
+          inset: 0;
+          display: block;
+          text-decoration: none;
         }
         .mc-thumb-img {
           width: 100%;
@@ -596,6 +621,45 @@ const ManagePage: React.FC = () => {
         .mc-thumb-link:hover .mc-thumb-overlay {
           opacity: 1;
         }
+        .mc-thumb-sample {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          padding: 4px 10px;
+          border-radius: 20px;
+          background: rgba(31,41,55,0.72);
+          color: white;
+          font-size: 0.68rem;
+          font-weight: 700;
+          letter-spacing: 0.2px;
+          backdrop-filter: blur(2px);
+        }
+        .mc-thumb-buy {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          padding: 20px 12px 10px;
+          background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
+          text-decoration: none;
+          transition: opacity 0.15s;
+        }
+        .mc-thumb-buy:hover { opacity: 0.9; }
+        .mc-thumb-buy-main {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: white;
+          font-size: 0.78rem;
+          font-weight: 700;
+        }
+        .mc-thumb-buy-sub {
+          color: rgba(255,255,255,0.75);
+          font-size: 0.68rem;
+        }
 
         /* Body */
         .mc-body {
@@ -620,51 +684,6 @@ const ManagePage: React.FC = () => {
           color: #9CA3AF;
           margin: 0;
         }
-        .mc-expiry-badge {
-          flex: 1;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 7px 4px;
-          border-radius: 8px;
-          font-size: 0.72rem;
-          font-weight: 600;
-          background: #F3F4F6;
-          color: #6B7280;
-          white-space: nowrap;
-        }
-        .mc-expiry-badge.urgent {
-          background: #FEF2F2;
-          color: #DC2626;
-        }
-        .mc-expiry-empty {
-          background: transparent;
-        }
-        .mc-purchase-section {
-          margin: 10px 0 4px;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-        .mc-purchase-btn {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          width: 100%;
-          padding: 9px 0;
-          border-radius: 10px;
-          background: linear-gradient(135deg, #B07A8E, #C994A8);
-          color: white;
-          font-size: 0.78rem;
-          font-weight: 700;
-          border: none;
-          cursor: pointer;
-          justify-content: center;
-          font-family: inherit;
-          transition: opacity 0.15s;
-          text-decoration: none;
-        }
-        .mc-purchase-btn:hover { opacity: 0.88; }
         /* Actions */
         .mc-actions {
           display: flex;
