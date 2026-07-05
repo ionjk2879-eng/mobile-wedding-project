@@ -8,14 +8,17 @@ interface BackgroundEffectsProps {
 const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir }) => {
   if (!effect || effect === 'none') return null;
 
-  const animName = (base: string) => {
-    if (effectDir === 'diagonal') return `${base}-diag`;
-    if (effectDir === 'gentle') return `${base}-gentle`;
-    return base;
-  };
+  const isDiagonal = effectDir === 'diagonal';
+  const animName = (base: string) => (isDiagonal ? `${base}-diag` : base);
 
   const fa = (base: string, dur: number, delay: number) =>
     `${animName(base)} ${dur.toFixed(1)}s linear ${delay.toFixed(1)}s infinite`;
+
+  // 대각선 방향은 낙하하면서 오른쪽으로 드리프트한다(효과별 -diag 키프레임 참고).
+  // 출현 위치를 왼쪽으로 미리 당겨둬야, 드리프트가 끝나는 지점(하단)까지 컨테이너
+  // 안에서 대각선 궤적이 자연스럽게 이어져 보인다(그렇지 않으면 오른쪽에서 출현한
+  // 입자는 화면 밖으로 드리프트해 하단에 닿기도 전에 잘려 사라져 보인다).
+  const spawnLeft = () => isDiagonal ? `${-8 + Math.random() * 88}%` : `${Math.random() * 100}%`;
 
   switch (effect) {
     case 'cherry-blossom':
@@ -23,7 +26,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
         <div className="effect-layer cherry-blossoms">
           {[...Array(35)].map((_, i) => (
             <div key={i} className="particle blossom" style={{
-              left: `${Math.random() * 100}%`,
+              left: spawnLeft(),
               animation: fa('fall', 16 + Math.random() * 14, Math.random() * 14),
             }} />
           ))}
@@ -34,7 +37,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
         <div className="effect-layer snow">
           {[...Array(60)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
-              left: `${Math.random() * 100}%`,
+              left: spawnLeft(),
               animation: fa('fall', 10 + Math.random() * 8, Math.random() * 12),
             }} />
           ))}
@@ -57,7 +60,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
         <div className="effect-layer leaves">
           {[...Array(25)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
-              left: `${Math.random() * 100}%`,
+              left: spawnLeft(),
               animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
             }} />
           ))}
@@ -94,7 +97,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
         <div className="effect-layer confetti-layer">
           {[...Array(50)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
-              left: `${Math.random() * 100}%`,
+              left: spawnLeft(),
               animation: fa('confetti-fall', 10 + Math.random() * 8, Math.random() * 12),
             }} />
           ))}
@@ -105,7 +108,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
         <div className="effect-layer petals-layer">
           {[...Array(30)].map((_, i) => (
             <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
-              left: `${Math.random() * 100}%`,
+              left: spawnLeft(),
               animation: fa('fall', 15 + Math.random() * 12, Math.random() * 14),
             }} />
           ))}
@@ -116,7 +119,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, effectDir
         <div className="effect-layer autumn-layer">
           {[...Array(22)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
-              left: `${Math.random() * 100}%`,
+              left: spawnLeft(),
               animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
             }} />
           ))}

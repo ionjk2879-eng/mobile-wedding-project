@@ -27,7 +27,6 @@ const EFFECTS: { key: NonNullable<InvitationData['bgEffect']>; name: string; ico
 
 const EFFECT_DIRS: { key: NonNullable<InvitationData['bgEffectDir']>; name: string; icon: string }[] = [
   { key: 'down', name: '아래로', icon: '↓' },
-  { key: 'gentle', name: '완만한 대각선', icon: '↘' },
   { key: 'diagonal', name: '대각선', icon: '⬊' },
 ];
 

@@ -110,23 +110,29 @@ const PETAL_ITEMS = [
   { left: '85%', w: 10, h: 15, r0:  20, r1: -215, dx: -16, dur: 10.5, d: 5.5 },
 ];
 
+// ThemeSection.tsx의 THEMES와 반드시 키가 일치해야 한다 — 여기 없는 키로 조회하면
+// THEME_COLORS.sage로 조용히 폴백되어 여러 테마가 같은 색으로 보이는 버그가 난다
+// (과거 테마 이름 체계가 바뀌면서 여기만 갱신이 안 돼 실제로 발생했던 문제).
+// bg/text/accent는 ThemeSection.tsx 각 테마의 colors 배열([연한배경, 밝은톤, 포인트,
+// 중간톤, 어두운톤])에서 각각 인덱스 4/1/2를 그대로 가져온 값 — noir/white만 포인트색이
+// 배경색과 거의 구분이 안 돼(둘 다 거의 검정) 인덱스 3(중간 회색)을 accent로 대신 썼다.
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
-  blush:      { bg: '#3C2B2B', text: '#F3CDCC', accent: '#D4918E' },
-  champagne:  { bg: '#3B3228', text: '#E8DFD2', accent: '#C8A97E' },
   sage:       { bg: '#2B3328', text: '#D6DED0', accent: '#8BA888' },
-  navy:       { bg: '#1E2638', text: '#D0D8E8', accent: '#6A80A0' },
-  burgundy:   { bg: '#2E1A1E', text: '#E8D4D4', accent: '#A8626E' },
-  lavender:   { bg: '#2C2038', text: '#E3DFEE', accent: '#B5A4CC' },
-  dusty:      { bg: '#38282A', text: '#E8D8D4', accent: '#C99498' },
-  modern:     { bg: '#1A1A1A', text: '#E8E8E8', accent: '#AAAAAA' },
-  mocha:      { bg: '#2C1E16', text: '#E8DDD4', accent: '#A68B78' },
-  cloud:      { bg: '#1A2A34', text: '#D8E8F0', accent: '#7BA3B8' },
-  emerald:    { bg: '#0E2218', text: '#D0E8D8', accent: '#4A9E78' },
-  butter:     { bg: '#3A3010', text: '#F0E8C8', accent: '#D4B050' },
-  cobalt:     { bg: '#0A0E20', text: '#D0D8F0', accent: '#5070B0' },
-  terracotta: { bg: '#2E1A10', text: '#E8D8C8', accent: '#D08860' },
-  rosegold:   { bg: '#3A2020', text: '#F0D8D0', accent: '#D4A090' },
-  midnight:   { bg: '#0E0E20', text: '#D0D0E8', accent: '#6A6AA0' },
+  mist:       { bg: '#1E2A33', text: '#D8DFE6', accent: '#6E8899' },
+  pearl:      { bg: '#2E261A', text: '#EDE6D8', accent: '#B0946A' },
+  walnut:     { bg: '#2C1E14', text: '#E0D0C0', accent: '#8A6248' },
+  slate:      { bg: '#1E2830', text: '#D4D8DF', accent: '#5E6F80' },
+  wisteria:   { bg: '#281C3C', text: '#E0D8F0', accent: '#8A70B0' },
+  cedar:      { bg: '#2E1610', text: '#E4CEC4', accent: '#A06048' },
+  stone:      { bg: '#282622', text: '#E0DDD8', accent: '#8C8880' },
+  copper:     { bg: '#2C1E0A', text: '#E8D8C0', accent: '#B87A38' },
+  sky:        { bg: '#1A2240', text: '#C8D6EC', accent: '#6070A8' },
+  linen:      { bg: '#2C2218', text: '#E2D5C2', accent: '#9A8468' },
+  olive:      { bg: '#1E2814', text: '#C8D2BE', accent: '#5A6C40' },
+  noir:       { bg: '#1A1816', text: '#DCDAD6', accent: '#4E4C4A' },
+  peach:      { bg: '#38201A', text: '#F0D8CC', accent: '#D4785C' },
+  white:      { bg: '#1A1A1A', text: '#E5E5E5', accent: '#595959' },
+  whitegold:  { bg: '#3A2E10', text: '#EDE0C8', accent: '#C9A227' },
 };
 
 interface OpeningProps {
@@ -471,8 +477,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const colorMode = opening.openingColorMode || 'theme';
   const gradientMode = opening.openingGradientMode || 'theme';
   const isThemeGradient = colorMode === 'gradient' && gradientMode === 'theme';
-  const themeKey = theme || 'blush';
-  const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.blush;
+  const themeKey = theme || 'pearl';
+  const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.pearl;
   const bgColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.bg : (opening.openingBgColor || '#1F2937');
 
   // 단색·그라데이션 모두 배경색 밝기로 자동 감지

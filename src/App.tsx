@@ -224,7 +224,9 @@ const App: React.FC = () => {
   // InvitationView.tsx의 PREVIEW_TO_EDITOR(미리보기 id → 편집 섹션 id)를 그대로 뒤집은 매핑.
   // 편집 섹션 id와 실제 미리보기 DOM에 붙는 ref 키가 다른 두 곳(예식일시↔달력, 기본정보↔연락처)을
   // 여기서 변환해줘야 카테고리/편집섹션 → 미리보기 스크롤이 올바른 위치로 향한다.
-  const EDITOR_TO_PREVIEW_REF: Record<string, string> = { datetime: 'calendar', basic: 'contacts' };
+  // design(배경 효과/텍스처 등)은 미리보기에 독립된 섹션이 없어 previewRefs.design이 항상
+  // null이었다 — 배경 효과가 가장 잘 보이는 메인화면(hero)으로 대신 이동시킨다.
+  const EDITOR_TO_PREVIEW_REF: Record<string, string> = { datetime: 'calendar', basic: 'contacts', design: 'hero' };
 
   const handleSectionScroll = (id: string) => {
     const refId = EDITOR_TO_PREVIEW_REF[id] || id;

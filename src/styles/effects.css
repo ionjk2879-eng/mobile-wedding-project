@@ -35,15 +35,13 @@
 @keyframes fall-sway { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(90deg) translateX(20px); } 50% { transform: rotate(180deg) translateX(-20px); } 75% { transform: rotate(270deg) translateX(15px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
 @keyframes confetti-fall { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(-10px); } 75% { transform: rotate(300deg) translateX(12px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
 
-/* === 대각선 (왼쪽 위→오른쪽 아래) 키프레임 === */
-@keyframes fall-diag { 0% { top: -20px; transform: translateX(-80px); } 100% { top: 100%; transform: translateX(120px); } }
-@keyframes fall-sway-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-60px); } 25% { transform: rotate(90deg) translateX(0px); } 50% { transform: rotate(180deg) translateX(40px); } 75% { transform: rotate(270deg) translateX(80px); } 100% { top: 100%; transform: rotate(360deg) translateX(130px); } }
-@keyframes confetti-fall-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-70px); } 25% { transform: rotate(120deg) translateX(-20px); } 50% { transform: rotate(240deg) translateX(30px); } 75% { transform: rotate(300deg) translateX(80px); } 100% { top: 100%; transform: rotate(360deg) translateX(120px); } }
-
-/* === 완만한 대각선 키프레임 === */
-@keyframes fall-gentle { 0% { top: -20px; transform: translateX(-30px); } 100% { top: 100%; transform: translateX(50px); } }
-@keyframes fall-sway-gentle { 0% { top: -20px; transform: rotate(0deg) translateX(-20px); } 25% { transform: rotate(90deg) translateX(10px); } 50% { transform: rotate(180deg) translateX(0px); } 75% { transform: rotate(270deg) translateX(30px); } 100% { top: 100%; transform: rotate(360deg) translateX(50px); } }
-@keyframes confetti-fall-gentle { 0% { top: -20px; transform: rotate(0deg) translateX(-25px); } 25% { transform: rotate(120deg) translateX(0px); } 50% { transform: rotate(240deg) translateX(10px); } 75% { transform: rotate(300deg) translateX(30px); } 100% { top: 100%; transform: rotate(360deg) translateX(50px); } }
+/* === 대각선 (왼쪽 위→오른쪽 아래) 키프레임 ===
+   출현 위치(BackgroundEffects.tsx의 spawnLeft)를 왼쪽으로 당겨둔 만큼, 드리프트 폭도
+   컨테이너 폭 대비 과하지 않게 줄여서(이전엔 최대 200px 이동) 대부분의 입자가 화면
+   가장자리에서 도중에 잘리지 않고 끝까지 대각선 궤적을 그리며 떨어지도록 했다. */
+@keyframes fall-diag { 0% { top: -20px; transform: translateX(-40px); } 100% { top: 100%; transform: translateX(50px); } }
+@keyframes fall-sway-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-30px); } 25% { transform: rotate(90deg) translateX(-5px); } 50% { transform: rotate(180deg) translateX(15px); } 75% { transform: rotate(270deg) translateX(35px); } 100% { top: 100%; transform: rotate(360deg) translateX(55px); } }
+@keyframes confetti-fall-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-35px); } 25% { transform: rotate(120deg) translateX(-10px); } 50% { transform: rotate(240deg) translateX(15px); } 75% { transform: rotate(300deg) translateX(40px); } 100% { top: 100%; transform: rotate(360deg) translateX(60px); } }
 
 /* === 파티클 스타일 === */
 .particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: 0.7; animation: fall linear infinite; }
