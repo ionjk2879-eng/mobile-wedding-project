@@ -5,7 +5,8 @@ import { InvitationData } from '../../../types';
 import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
 import { getApiErrorMessage } from '../../../utils/apiError';
-import { isFixedLookHeroStyle } from '../../../data/heroStyleConfig';
+import { isFixedLookHeroStyle, isCaptionDisabledHeroStyle } from '../../../data/heroStyleConfig';
+import { HERO_CAPTIONS, HeroCaptionStyle } from '../../../data/heroCaptions';
 
 const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; name: string; desc: string }[] = [
   { key: 'basic', name: '기본', desc: '사각형 그대로' },
@@ -16,7 +17,14 @@ const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; n
   { key: 'blob', name: '물방울형', desc: '불규칙한 유기적 곡선' },
   { key: 'polaroid', name: '폴라로이드형', desc: '하단 여백 + 살짝 기울임' },
   { key: 'hexagon', name: '육각형', desc: '각진 다각형으로' },
+  { key: 'hairline', name: '헤어라인', desc: '얇은 선 + 비대칭 여백' },
 ];
+
+const CAPTION_STYLE_LABELS: Record<HeroCaptionStyle, string> = {
+  script: '흘림체',
+  'large-number': '큰 숫자',
+  vertical: '세로쓰기',
+};
 
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -25,6 +33,7 @@ const HeroSection: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [uploading2, setUploading2] = useState(false);
   const isFixedLook = isFixedLookHeroStyle(data.heroStyle);
+  const isCaptionDisabled = isCaptionDisabledHeroStyle(data.heroStyle);
 
   const handleHeroPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -152,6 +161,36 @@ const HeroSection: React.FC = () => {
               </button>
             ))}
           </div>
+        )}
+      </div>
+      <div className="input-group">
+        <label>캡션</label>
+        {isCaptionDisabled ? (
+          <p className="hero-fixed-look-notice">이 스타일은 이미 자체 문구 배치가 있어 캡션과 겹칠 수 있습니다.</p>
+        ) : (
+          <>
+            <div className="hero-caption-grid">
+              <button
+                type="button"
+                className={`hero-caption-btn ${!data.heroCaption ? 'active' : ''}`}
+                onClick={() => updateField('heroCaption', undefined)}
+              >
+                <strong>사용 안 함</strong>
+              </button>
+              {HERO_CAPTIONS.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className={`hero-caption-btn ${data.heroCaption === c.id ? 'active' : ''}`}
+                  onClick={() => updateField('heroCaption', c.id)}
+                >
+                  <strong>{c.text}</strong>
+                  <span>{CAPTION_STYLE_LABELS[c.style]}</span>
+                </button>
+              ))}
+            </div>
+            <span className="input-hint">라이브 프리뷰에서 바로 확인할 수 있어요. 사진 모형과 자유롭게 조합 가능합니다.</span>
+          </>
         )}
       </div>
       <div className="input-group">
