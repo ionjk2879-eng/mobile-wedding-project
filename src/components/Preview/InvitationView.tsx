@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   LayoutTemplate, MessageSquare, Clock, Heart, MessagesSquare,
   Image as ImageIcon, Milestone, MapPin, CalendarCheck, CreditCard,
-  Info, BookOpen, Camera, Send,
+  Info, BookOpen, Camera, Send, Palette,
 } from 'lucide-react';
 import { InvitationData, GuestRelation, OpeningConfig } from '../../types';
 import useInvitationStore from '../../stores/useInvitationStore';
@@ -261,10 +261,16 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       {previewRefs?.hero ? (
         <div ref={previewRefs.hero} className={onSectionNav ? 'preview-nav-section' : undefined}>
           {onSectionNav && (
-            <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="메인화면 편집" aria-label="메인화면 편집">
-              <LayoutTemplate size={13} />
-              <span className="preview-nav-label">메인화면</span>
-            </button>
+            <div className="preview-nav-btn-stack">
+              <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="메인화면 편집" aria-label="메인화면 편집">
+                <LayoutTemplate size={13} />
+                <span className="preview-nav-label">메인화면</span>
+              </button>
+              <button className="preview-section-nav-btn" onClick={() => onSectionNav('design')} title="디자인 편집" aria-label="디자인 편집">
+                <Palette size={13} />
+                <span className="preview-nav-label">디자인</span>
+              </button>
+            </div>
           )}
           <Hero data={effectiveData} />
         </div>

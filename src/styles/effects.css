@@ -27,7 +27,15 @@
 }
 
 /* Particle effects */
-.effect-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; }
+/* position:fixed — 청첩장 본문(.preview-wrapper)은 섹션이 많으면 수천 px까지도 늘어나는데,
+   이 레이어가 absolute로 그 전체 높이를 기준 삼으면 "top:-20px→100%" 낙하 한 번이 문서
+   전체 높이를 가로지르게 된다. 대각선(-diag) 키프레임의 translateX 드리프트가 그 거대한
+   세로 거리 대비 상대적으로 너무 작아져 사실상 안 보이고, 직선 낙하와 구분이 안 되는
+   문제가 있었다. fixed로 바꿔 화면(뷰포트, 에디터 미리보기에서는 transform:translateZ(0)이
+   걸린 .preview-content-scroll이 새 컨테이닝 블록이 되어 그 영역)에 낙하 범위를 고정하면
+   낙하 거리가 항상 뷰포트 높이 수준으로 일정해져, 대각선 드리프트 폭도 그와 비례해 눈에
+   보이는 각도로 설계할 수 있다. */
+.effect-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; }
 .particle { position: absolute; top: -20px; }
 
 /* === 기본 (아래로) 키프레임 === */
@@ -36,12 +44,13 @@
 @keyframes confetti-fall { 0% { top: -20px; transform: rotate(0deg) translateX(0); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(-10px); } 75% { transform: rotate(300deg) translateX(12px); } 100% { top: 100%; transform: rotate(360deg) translateX(0); } }
 
 /* === 대각선 (왼쪽 위→오른쪽 아래) 키프레임 ===
-   출현 위치(BackgroundEffects.tsx의 spawnLeft)를 왼쪽으로 당겨둔 만큼, 드리프트 폭도
-   컨테이너 폭 대비 과하지 않게 줄여서(이전엔 최대 200px 이동) 대부분의 입자가 화면
-   가장자리에서 도중에 잘리지 않고 끝까지 대각선 궤적을 그리며 떨어지도록 했다. */
-@keyframes fall-diag { 0% { top: -20px; transform: translateX(-40px); } 100% { top: 100%; transform: translateX(50px); } }
-@keyframes fall-sway-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-30px); } 25% { transform: rotate(90deg) translateX(-5px); } 50% { transform: rotate(180deg) translateX(15px); } 75% { transform: rotate(270deg) translateX(35px); } 100% { top: 100%; transform: rotate(360deg) translateX(55px); } }
-@keyframes confetti-fall-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-35px); } 25% { transform: rotate(120deg) translateX(-10px); } 50% { transform: rotate(240deg) translateX(15px); } 75% { transform: rotate(300deg) translateX(40px); } 100% { top: 100%; transform: rotate(360deg) translateX(60px); } }
+   낙하 범위가 뷰포트 높이(대략 700~900px)로 고정된 만큼, 그 절반에 가까운 폭(380px)을
+   가로로 드리프트시켜야 눈으로 봤을 때 확실히 "왼쪽 위 → 오른쪽 아래"로 가는 대각선으로
+   읽힌다(수직 대비 약 25~30도). 출현 위치(BackgroundEffects.tsx의 spawnLeft)도 그만큼
+   왼쪽으로 더 당겨서, 드리프트가 끝나는 하단까지 화면 안에서 궤적이 이어지도록 했다. */
+@keyframes fall-diag { 0% { top: -20px; transform: translateX(-70px); } 100% { top: 100%; transform: translateX(310px); } }
+@keyframes fall-sway-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-60px); } 25% { transform: rotate(90deg) translateX(10px); } 50% { transform: rotate(180deg) translateX(90px); } 75% { transform: rotate(270deg) translateX(220px); } 100% { top: 100%; transform: rotate(360deg) translateX(320px); } }
+@keyframes confetti-fall-diag { 0% { top: -20px; transform: rotate(0deg) translateX(-65px); } 25% { transform: rotate(120deg) translateX(15px); } 50% { transform: rotate(240deg) translateX(100px); } 75% { transform: rotate(300deg) translateX(230px); } 100% { top: 100%; transform: rotate(360deg) translateX(330px); } }
 
 /* === 파티클 스타일 === */
 .particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: 0.7; animation: fall linear infinite; }

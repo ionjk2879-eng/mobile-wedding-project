@@ -436,3 +436,16 @@
   color: #1F2937;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
 }
+
+/* 메인화면처럼 버튼이 두 개 이상 겹치는 경우: 겹치지 않게 세로로 쌓는다 */
+.preview-nav-btn-stack {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.preview-nav-btn-stack .preview-section-nav-btn { position: static; }
