@@ -491,12 +491,16 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     }
     return false;
   })();
-  const textColorMode = (colorMode === 'theme' || isThemeGradient)
+  // 글자 색상: 사용자가 흰색/검정을 명시적으로 고르면 배경 모드와 무관하게 항상 그 값을 따르고,
+  // 지정하지 않았을 때만(자동) 기존처럼 배경 모드/밝기로 자동 결정한다.
+  const textColorMode = opening.openingTextColor === 'white'
     ? 'white'
-    : (bgIsLight || opening.openingTextColor === 'dark') ? 'dark' : 'white';
+    : opening.openingTextColor === 'dark'
+      ? 'dark'
+      : (colorMode === 'theme' || isThemeGradient) ? 'white' : (bgIsLight ? 'dark' : 'white');
   const isDark = textColorMode === 'dark';
-  const textColor = (colorMode === 'theme' || isThemeGradient) ? 'rgba(255, 255, 255, 0.95)' : (isDark ? 'rgba(28, 20, 20, 0.90)' : '#FFFFFF');
-  const accentColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.accent : (isDark ? 'rgba(175, 120, 95, 0.65)' : 'rgba(255, 228, 220, 0.50)');
+  const textColor = isDark ? 'rgba(28, 20, 20, 0.90)' : ((colorMode === 'theme' || isThemeGradient) ? 'rgba(255, 255, 255, 0.95)' : '#FFFFFF');
+  const accentColor = isDark ? 'rgba(175, 120, 95, 0.65)' : ((colorMode === 'theme' || isThemeGradient) ? themeColor.accent : 'rgba(255, 228, 220, 0.50)');
   const heartColor = isDark ? 'rgba(175, 120, 95, 0.80)' : 'rgba(255, 255, 255, 0.88)';
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
