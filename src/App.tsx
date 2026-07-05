@@ -282,6 +282,12 @@ const App: React.FC = () => {
           <button className="save-btn" disabled={saveStatus === 'saving'} onClick={() => {
             if (!data.slug) { toast.warning(te.noSlug); return; }
             if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) { toast.warning(te.invalidSlug); return; }
+            // 최초 저장(아직 한 번도 저장/불러온 적 없는 새 청첩장)일 때만 신랑/신부 이름도
+            // 필수로 요구한다 — 이미 저장된 청첩장을 다시 편집/저장할 때는 굳이 막지 않는다.
+            if (!hasSavedOnceRef.current && (!data.groomName?.trim() || !data.brideName?.trim())) {
+              toast.warning(te.noGroomBrideName);
+              return;
+            }
             performSave();
           }}>
             <Save size={15} />
