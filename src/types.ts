@@ -136,6 +136,11 @@ export interface FeatureConfig {
   language: 'ko' | 'en' | 'ja';
   en: Partial<InvitationData>;
   ja?: Partial<InvitationData>;
+  anniversaryMode?: {
+    heroPhoto: string;
+    photos: string[]; // 최대 10장
+    openingStyle?: string; // 기존 오프닝 스타일 키, 없으면 청첩장 모드 값 상속
+  };
 }
 
 export interface SharingConfig {

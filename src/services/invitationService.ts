@@ -53,3 +53,10 @@ export const updatePrivacySettings = (
   patch: { privacyTransitionDate?: string; accountInfoVisibleOverride?: 0 | 1 | null; rsvpFormOpenOverride?: 0 | 1 | null }
 ): Promise<void> =>
   apiFetch(`/api/invitations/${slug}/privacy-settings`, { method: 'PUT', body: JSON.stringify(patch) });
+
+// anniversaryMode 키만 원자적으로 갱신 (서버가 json_set으로 처리 — 메인 에디터 저장과 겹쳐도 서로 덮어쓰지 않음)
+export const updateAnniversaryMode = (
+  slug: string,
+  patch: { heroPhoto: string; photos: string[]; openingStyle?: string }
+): Promise<void> =>
+  apiFetch(`/api/invitations/${slug}/anniversary`, { method: 'PATCH', body: JSON.stringify(patch) });

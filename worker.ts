@@ -91,7 +91,7 @@ function cors(origin: string): Record<string, string> {
   const allowedOrigin = ALLOWED_ORIGINS.has(origin) ? origin : 'https://sonett.kr';
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
 }
@@ -467,6 +467,41 @@ async function handlePrivacySettings(request: Request, env: Env, slug: string): 
   }
 
   return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+// 평생소장 아카이브(anniversaryMode) 설정 — 청첩장 소유자 전용.
+// data 컬럼이 JSON 통째로 저장되는 구조라, 여기서 "읽어서-고쳐서-전체 다시쓰기"를 하면
+// 그 사이(read와 write 사이)에 메인 에디터(PUT /api/invitations/:slug)가 다른 필드를
+// 저장할 경우 그 변경사항을 조용히 덮어써버릴 위험이 있다. 대신 SQLite JSON1의 json_set으로
+// data 안의 anniversaryMode 키만 원자적으로 갱신해서, 동시 저장이 겹쳐도 서로의 필드를
+// 침범하지 않게 한다.
+async function handleAnniversaryMode(request: Request, env: Env, slug: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const auth = await requireInvitationOwner(request, env, slug);
+  if ('error' in auth) return auth.error;
+
+  if (request.method !== 'PATCH') return json({ error: 'Method not allowed' }, 405, origin);
+
+  const body = await request.json() as { heroPhoto?: unknown; photos?: unknown; openingStyle?: unknown };
+
+  if (typeof body.heroPhoto !== 'string') return json({ error: 'heroPhoto is required' }, 400, origin);
+  if (!Array.isArray(body.photos) || !body.photos.every((p) => typeof p === 'string'))
+    return json({ error: 'photos must be a string array' }, 400, origin);
+  if (body.photos.length > 10) return json({ error: '사진은 최대 10장까지 등록할 수 있습니다.' }, 400, origin);
+  if (body.openingStyle !== undefined && typeof body.openingStyle !== 'string')
+    return json({ error: 'openingStyle must be a string' }, 400, origin);
+
+  const anniversaryMode: { heroPhoto: string; photos: string[]; openingStyle?: string } = {
+    heroPhoto: body.heroPhoto,
+    photos: body.photos as string[],
+    ...(body.openingStyle !== undefined ? { openingStyle: body.openingStyle as string } : {}),
+  };
+
+  await env.DB.prepare(
+    `UPDATE invitations SET data = json_set(data, '$.anniversaryMode', json(?)), updated_at = datetime('now') WHERE slug = ?`
+  ).bind(JSON.stringify(anniversaryMode), slug).run();
+
+  return json({ ok: true }, 200, origin);
 }
 
 // --- Posts API ---
@@ -1241,6 +1276,9 @@ export default {
 
       const privacySettingsMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/privacy-settings$/);
       if (privacySettingsMatch) return await handlePrivacySettings(request, env, privacySettingsMatch[1]);
+
+      const anniversaryMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/anniversary$/);
+      if (anniversaryMatch) return await handleAnniversaryMode(request, env, anniversaryMatch[1]);
 
       // Posts (public)
       if (pathname === '/api/posts') return await handlePostsPublic(request, env);

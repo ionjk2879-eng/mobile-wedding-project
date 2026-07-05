@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchMyInvitations, deleteInvitation, changeSlug } from '../services/invitationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
@@ -113,6 +113,7 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
 const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void }> = ({ slug, isPaid, data, onDelete, onChangeSlug }) => {
   const { t } = useSiteLang();
   const tm = t.manage;
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -150,6 +151,11 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
             <a href={`/${slug}?mode=anniversary`} target="_blank" rel="noopener noreferrer" className="mc-dropdown-item" onClick={() => setOpen(false)}>
               <Heart size={14} /> 기념일 모드
             </a>
+          )}
+          {isPaid && isWeddingPast && (
+            <button className="mc-dropdown-item" onClick={() => { setOpen(false); navigate(`/manage/${slug}/anniversary`); }}>
+              <Edit3 size={14} /> 기념일 모드 편집
+            </button>
           )}
           <button className="mc-dropdown-item" onClick={() => { setOpen(false); onChangeSlug(); }}>
             <Globe size={14} /> {tm.changeUrl}
