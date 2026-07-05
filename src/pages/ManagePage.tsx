@@ -721,6 +721,7 @@ const ManagePage: React.FC = () => {
           font-family: inherit;
           transition: all 0.12s;
           box-sizing: border-box;
+          white-space: nowrap;
         }
         .mc-dropdown-item:hover {
           background: #F9FAFB;
