@@ -408,6 +408,24 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
   return json({ ok: true }, 200, origin);
 }
 
+// 유료 전환은 만료일 없이 영구로 처리한다 — 예전엔 예식일+1년으로 자동 만료일을
+// 걸어서, deleteExpiredInvitations 크론이 그 시점에 유료 청첩장까지 함께 삭제해버렸다.
+// handleActivate(슈퍼관리자 수동 활성화)와 handleRedeemCode(코드 자동 활성화)가
+// 동일한 활성화 로직을 공유하도록 여기 하나로 모아둔다.
+async function activateInvitationPaid(env: Env, slug: string): Promise<boolean> {
+  const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(slug).first();
+  if (!row) return false;
+
+  const data = JSON.parse(row.data as string);
+  data.isPaid = true;
+  data.expiresAt = null;
+
+  await env.DB.prepare(
+    `UPDATE invitations SET is_paid = 1, expires_at = NULL, data = ?, updated_at = datetime('now') WHERE slug = ?`
+  ).bind(JSON.stringify(data), slug).run();
+  return true;
+}
+
 async function handleActivate(request: Request, env: Env, slug: string): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   const user = await getAuthUser(request, env);
@@ -416,23 +434,72 @@ async function handleActivate(request: Request, env: Env, slug: string): Promise
   if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
     return json({ error: '권한이 없습니다.' }, 403, origin);
 
-  const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(slug).first();
-  if (!row) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
-
   const body = await request.json() as { weddingDateISO?: string };
   if (!body.weddingDateISO) return json({ error: 'weddingDateISO is required' }, 400, origin);
 
-  // 유료 전환은 만료일 없이 영구로 처리한다 — 예전엔 예식일+1년으로 자동 만료일을
-  // 걸어서, deleteExpiredInvitations 크론이 그 시점에 유료 청첩장까지 함께 삭제해버렸다.
-  const data = JSON.parse(row.data as string);
-  data.isPaid = true;
-  data.expiresAt = null;
-
-  await env.DB.prepare(
-    `UPDATE invitations SET is_paid = 1, expires_at = NULL, data = ?, updated_at = datetime('now') WHERE slug = ?`
-  ).bind(JSON.stringify(data), slug).run();
+  const ok = await activateInvitationPaid(env, slug);
+  if (!ok) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
 
   return json({ ok: true, expiresAt: null }, 200, origin);
+}
+
+// 12자 랜덤 활성화 코드 — 헷갈리는 문자(0/O, 1/I) 제외. 알파벳 크기가 32(2의 거듭제곱)라
+// crypto.getRandomValues 바이트를 %32 해도 편향이 없다 (guests의 GUEST_CODE_ALPHABET과 동일 기법).
+const ACTIVATION_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function generateActivationCode(): string {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => ACTIVATION_CODE_ALPHABET[b % 32]).join('');
+}
+
+// 청첩장 소유자가 구매 후 발급받은 활성화 코드를 직접 입력해 유료 전환하는 셀프서비스 경로.
+// 기존 handleActivate(슈퍼관리자 수동 활성화)는 코드를 잃어버렸거나 예외 상황을 위한
+// 백업 수단으로 그대로 남겨둔다.
+async function handleRedeemCode(request: Request, env: Env, slug: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const auth = await requireInvitationOwner(request, env, slug);
+  if ('error' in auth) return auth.error;
+
+  const body = await request.json() as { code?: string };
+  const code = (body.code || '').trim().toUpperCase();
+  if (!code) return json({ error: '코드를 입력해주세요.' }, 400, origin);
+
+  // status='unused' 조건을 가진 단일 UPDATE로 원자적으로 소비한다 — 동시에 같은 코드로
+  // 두 청첩장을 활성화하려는 경쟁 상황에서도 하나만 성공하도록 SELECT-then-UPDATE 대신 사용.
+  const result = await env.DB.prepare(
+    "UPDATE activation_codes SET status = 'used', used_by_slug = ?, used_at = datetime('now') WHERE code = ? AND status = 'unused'"
+  ).bind(slug, code).run();
+  if (!result.meta.changes) return json({ error: '유효하지 않거나 이미 사용된 코드입니다.' }, 400, origin);
+
+  await activateInvitationPaid(env, slug);
+  return json({ ok: true }, 200, origin);
+}
+
+// 슈퍼관리자 전용 — 활성화 코드 일괄 생성 (SuperAdminPage). count개의 새 코드를 생성해
+// DB에 저장하고, 방금 생성한 코드 목록을 그대로 응답해 클라이언트가 바로 CSV로 받게 한다.
+async function handleGenerateActivationCodes(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+
+  const body = await request.json() as { count?: number; note?: string };
+  const count = Math.floor(body.count ?? 0);
+  if (!count || count < 1 || count > 500) return json({ error: 'count는 1~500 사이여야 합니다.' }, 400, origin);
+  const note = (body.note || '').trim().slice(0, 200) || null;
+
+  const codes = new Set<string>();
+  while (codes.size < count) codes.add(generateActivationCode());
+  const codeList = Array.from(codes);
+
+  await env.DB.batch(
+    codeList.map((code) =>
+      env.DB.prepare('INSERT INTO activation_codes (code, status, note) VALUES (?, ?, ?)').bind(code, 'unused', note)
+    )
+  );
+
+  return json({ codes: codeList }, 200, origin);
 }
 
 // 기념일 모드 개인정보 전환 설정 — 청첩장 소유자 전용 (관리 페이지)
@@ -1377,6 +1444,9 @@ export default {
       const anniversaryMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/anniversary$/);
       if (anniversaryMatch) return await handleAnniversaryMode(request, env, anniversaryMatch[1]);
 
+      const redeemMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/redeem$/);
+      if (redeemMatch && request.method === 'POST') return await handleRedeemCode(request, env, redeemMatch[1]);
+
       // Posts (public)
       if (pathname === '/api/posts') return await handlePostsPublic(request, env);
 
@@ -1388,6 +1458,9 @@ export default {
       // Admin
       if (pathname === '/api/admin/invitations' && request.method === 'GET')
         return await handleAdminInvitations(request, env);
+
+      if (pathname === '/api/admin/activation-codes' && request.method === 'POST')
+        return await handleGenerateActivationCodes(request, env);
 
       // Upload
       if (pathname === '/api/upload') return await handleUpload(request, env);

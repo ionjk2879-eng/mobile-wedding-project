@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { fetchMyInvitations, deleteInvitation, changeSlug } from '../services/invitationService';
+import { fetchMyInvitations, deleteInvitation, changeSlug, redeemActivationCode } from '../services/invitationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen, Heart } from 'lucide-react';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen, Heart, KeyRound } from 'lucide-react';
 import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
@@ -105,6 +105,54 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
             {saving ? tm.confirming : tm.confirm}
           </button>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// 구매 후 발급받은 활성화 코드를 고객이 직접 입력해 유료 전환하는 셀프서비스 폼.
+const CodeRedeemForm: React.FC<{ slug: string; onActivated: () => void }> = ({ slug, onActivated }) => {
+  const { t } = useSiteLang();
+  const tm = t.manage;
+  const [code, setCode] = useState('');
+  const [redeeming, setRedeeming] = useState(false);
+
+  const handleRedeem = async () => {
+    const trimmed = code.trim();
+    if (!trimmed || redeeming) return;
+    setRedeeming(true);
+    try {
+      await redeemActivationCode(slug, trimmed);
+      toast.success(tm.codeActivateSuccess);
+      setCode('');
+      onActivated();
+    } catch (err: any) {
+      toast.error(err?.message || tm.codeActivateFailed);
+    }
+    setRedeeming(false);
+  };
+
+  return (
+    <div className="mc-code-redeem">
+      <span className="mc-code-redeem-label"><KeyRound size={11} /> {tm.haveCodeLabel}</span>
+      <div className="mc-code-redeem-row">
+        <input
+          type="text"
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          onKeyDown={(e) => e.key === 'Enter' && handleRedeem()}
+          placeholder={tm.codePlaceholder}
+          className="mc-code-redeem-input"
+          maxLength={12}
+        />
+        <button
+          type="button"
+          className="mc-code-redeem-btn"
+          onClick={handleRedeem}
+          disabled={!code.trim() || redeeming}
+        >
+          {redeeming ? tm.activatingCode : tm.activateCode}
+        </button>
       </div>
     </div>
   );
@@ -307,6 +355,7 @@ const ManagePage: React.FC = () => {
                           <span className="mc-slug-copy-label">{tm.copy}</span>
                         </button>
                       </div>
+                      <CodeRedeemForm slug={slug} onActivated={load} />
                     </div>
                   )}
                   <div className="mc-actions">
@@ -629,6 +678,51 @@ const ManagePage: React.FC = () => {
           color: #B07A8E;
           flex-shrink: 0;
         }
+        .mc-code-redeem {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          margin-top: 6px;
+          padding-top: 8px;
+          border-top: 1px dashed #F0E4E9;
+        }
+        .mc-code-redeem-label {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.68rem;
+          color: #9CA3AF;
+        }
+        .mc-code-redeem-row {
+          display: flex;
+          gap: 6px;
+        }
+        .mc-code-redeem-input {
+          flex: 1;
+          min-width: 0;
+          padding: 7px 9px;
+          border: 1px solid #E5E7EB;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-family: monospace;
+          letter-spacing: 0.5px;
+          color: #1F2937;
+          box-sizing: border-box;
+        }
+        .mc-code-redeem-input:focus { outline: none; border-color: #B07A8E; }
+        .mc-code-redeem-btn {
+          flex-shrink: 0;
+          padding: 7px 12px;
+          border: none;
+          border-radius: 6px;
+          background: #1F2937;
+          color: white;
+          font-size: 0.72rem;
+          font-weight: 700;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .mc-code-redeem-btn:disabled { opacity: 0.4; cursor: default; }
 
         /* Actions */
         .mc-actions {

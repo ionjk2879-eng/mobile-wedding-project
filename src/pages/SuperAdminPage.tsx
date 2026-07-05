@@ -4,10 +4,10 @@ import { activatePaidInvitation } from '../services/invitationService';
 import useAuthStore from '../stores/useAuthStore';
 import { toast } from '../stores/useToastStore';
 import ToastContainer from '../components/Toast';
-import { Search, RefreshCw, CheckCircle, ExternalLink, Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Search, RefreshCw, CheckCircle, ExternalLink, Plus, Pencil, Trash2, X, KeyRound, Download, Copy } from 'lucide-react';
 
 type Filter = 'all' | 'unpaid' | 'paid';
-type AdminTab = 'orders' | 'posts';
+type AdminTab = 'orders' | 'codes' | 'posts';
 type PostType = 'event' | 'notice';
 
 interface InvRow {
@@ -181,6 +181,12 @@ const SuperAdminPage: React.FC = () => {
   const [lookupInfo, setLookupInfo] = useState<InvRow | null>(null);
   const [looking, setLooking] = useState(false);
 
+  // Activation codes
+  const [codeCount, setCodeCount] = useState('10');
+  const [codeNote, setCodeNote] = useState('');
+  const [generatingCodes, setGeneratingCodes] = useState(false);
+  const [generatedCodes, setGeneratedCodes] = useState<string[] | null>(null);
+
   // Posts
   const [posts, setPosts] = useState<Post[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
@@ -251,6 +257,41 @@ const SuperAdminPage: React.FC = () => {
     setLooking(false);
   };
 
+  const handleGenerateCodes = async () => {
+    const count = parseInt(codeCount, 10);
+    if (!count || count < 1 || count > 500) { toast.error('1~500 사이 숫자를 입력해주세요.'); return; }
+    setGeneratingCodes(true);
+    try {
+      const res = await apiFetch<{ codes: string[] }>('/api/admin/activation-codes', {
+        method: 'POST',
+        body: JSON.stringify({ count, note: codeNote.trim() || undefined }),
+      });
+      setGeneratedCodes(res.codes);
+      toast.success(`코드 ${res.codes.length}개를 생성했습니다.`);
+    } catch (e: any) {
+      toast.error(e?.message || '코드 생성에 실패했습니다.');
+    }
+    setGeneratingCodes(false);
+  };
+
+  const handleDownloadCodesCsv = () => {
+    if (!generatedCodes || generatedCodes.length === 0) return;
+    const csv = 'code\n' + generatedCodes.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `activation-codes-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyCodes = () => {
+    if (!generatedCodes || generatedCodes.length === 0) return;
+    navigator.clipboard.writeText(generatedCodes.join('\n'));
+    toast.success('코드 목록이 복사되었습니다.');
+  };
+
   const handleCreatePost = async (data: { type: PostType; tag: string; title: string; content: string }) => {
     await apiFetch('/api/admin/posts', { method: 'POST', body: JSON.stringify(data) });
     toast.success('게시글이 등록되었습니다.');
@@ -292,7 +333,7 @@ const SuperAdminPage: React.FC = () => {
       {/* Header */}
       <div style={{ background: 'white', borderBottom: '1px solid #F0F0F0', padding: '0 24px', display: 'flex', alignItems: 'stretch', gap: 0 }}>
         <h1 style={{ margin: '0 24px 0 0', fontSize: '1.05rem', fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center' }}>관리자</h1>
-        {(['orders', 'posts'] as AdminTab[]).map(t => (
+        {(['orders', 'codes', 'posts'] as AdminTab[]).map(t => (
           <button
             key={t}
             onClick={() => setAdminTab(t)}
@@ -303,7 +344,7 @@ const SuperAdminPage: React.FC = () => {
               transition: 'all 0.15s',
             }}
           >
-            {t === 'orders' ? '주문 관리' : '게시글 관리'}
+            {t === 'orders' ? '주문 관리' : t === 'codes' ? '활성화 코드' : '게시글 관리'}
             {t === 'orders' && unpaidCount > 0 && (
               <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 20, background: '#FEF3C7', color: '#D97706', fontSize: '0.68rem', fontWeight: 700 }}>
                 {unpaidCount}
@@ -421,6 +462,75 @@ const SuperAdminPage: React.FC = () => {
                 </div>
               )}
             </div>
+          </>
+        )}
+
+        {/* ── Activation Codes Tab ── */}
+        {adminTab === 'codes' && (
+          <>
+            <div style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #F0F0F0', marginBottom: 20 }}>
+              <h2 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <KeyRound size={16} /> 코드 일괄 생성
+              </h2>
+              <p style={{ margin: '0 0 20px', fontSize: '0.8rem', color: '#9CA3AF' }}>
+                고객이 청첩장 관리 페이지에서 직접 입력해 활성화할 수 있는 코드를 생성합니다. 12자 영숫자, 헷갈리는 문자(0/O, 1/I) 제외.
+              </p>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>개수</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={500}
+                    value={codeCount}
+                    onChange={e => setCodeCount(e.target.value)}
+                    style={{ width: 100, padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: '#1F2937' }}
+                  />
+                </div>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>메모 (선택)</label>
+                  <input
+                    type="text"
+                    value={codeNote}
+                    onChange={e => setCodeNote(e.target.value)}
+                    placeholder="예: 네이버스토어 2026-07 배치"
+                    style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: '#1F2937' }}
+                  />
+                </div>
+                <button
+                  onClick={handleGenerateCodes}
+                  disabled={generatingCodes}
+                  style={{ padding: '11px 22px', border: 'none', borderRadius: 10, background: '#B07A8E', color: 'white', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit', opacity: generatingCodes ? 0.5 : 1 }}
+                >
+                  {generatingCodes ? '생성 중...' : '코드 생성'}
+                </button>
+              </div>
+            </div>
+
+            {generatedCodes && (
+              <div style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #F0F0F0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#1F2937' }}>
+                    방금 생성한 코드 {generatedCodes.length}개
+                  </h2>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={handleCopyCodes} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', border: '1px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.78rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      <Copy size={12} /> 전체 복사
+                    </button>
+                    <button onClick={handleDownloadCodesCsv} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', border: 'none', borderRadius: 8, background: '#1F2937', color: 'white', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      <Download size={12} /> CSV 다운로드
+                    </button>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8, maxHeight: 360, overflowY: 'auto', padding: 4 }}>
+                  {generatedCodes.map(code => (
+                    <span key={code} style={{ padding: '8px 10px', background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 8, fontFamily: 'monospace', fontSize: '0.82rem', color: '#1F2937', textAlign: 'center', letterSpacing: '0.5px' }}>
+                      {code}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
 

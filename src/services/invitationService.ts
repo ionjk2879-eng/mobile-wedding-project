@@ -37,6 +37,11 @@ export const activatePaidInvitation = async (slug: string, weddingDateISO: strin
   await apiFetch(`/api/invitations/${slug}/activate`, { method: 'POST', body: JSON.stringify({ weddingDateISO }) });
 };
 
+// 구매 후 발급받은 활성화 코드를 고객이 직접 입력해 유료 전환하는 셀프서비스 경로.
+export const redeemActivationCode = async (slug: string, code: string): Promise<void> => {
+  await apiFetch(`/api/invitations/${slug}/redeem`, { method: 'POST', body: JSON.stringify({ code }) });
+};
+
 export interface PrivacySettings {
   privacyTransitionDate: string | null;
   isPastTransition: boolean;
