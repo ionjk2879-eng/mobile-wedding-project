@@ -395,20 +395,6 @@ const ManagePage: React.FC = () => {
                       <a href={NAVER_STORE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
                         <ShoppingCart size={13} /> {tm.buyOnKmong}
                       </a>
-                      <div className="mc-slug-guide">
-                        <span className="mc-slug-guide-text">{tm.buyGuideText}</span>
-                        <button
-                          className="mc-slug-copy-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(slug);
-                            toast.success(tm.linkCopied);
-                          }}
-                        >
-                          <span className="mc-slug-copy-code">sonett.kr/{slug}</span>
-                          <span className="mc-slug-copy-label">{tm.copy}</span>
-                        </button>
-                      </div>
                     </div>
                   )}
                 </div>
@@ -679,48 +665,6 @@ const ManagePage: React.FC = () => {
           text-decoration: none;
         }
         .mc-purchase-btn:hover { opacity: 0.88; }
-        .mc-slug-guide {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          padding: 8px 10px;
-          background: #FDF6F9;
-          border-radius: 8px;
-          border: 1px solid #F3E0E6;
-        }
-        .mc-slug-guide-text {
-          font-size: 0.68rem;
-          color: #9CA3AF;
-        }
-        .mc-slug-copy-btn {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          background: white;
-          border: 1px solid #E5E7EB;
-          border-radius: 6px;
-          padding: 5px 8px;
-          cursor: pointer;
-          font-family: inherit;
-          transition: border-color 0.15s;
-          gap: 6px;
-        }
-        .mc-slug-copy-btn:hover { border-color: #B07A8E; }
-        .mc-slug-copy-code {
-          font-size: 0.7rem;
-          color: #4B5563;
-          font-family: monospace;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .mc-slug-copy-label {
-          font-size: 0.68rem;
-          font-weight: 700;
-          color: #B07A8E;
-          flex-shrink: 0;
-        }
         /* Actions */
         .mc-actions {
           display: flex;
