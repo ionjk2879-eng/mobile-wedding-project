@@ -689,9 +689,22 @@ const AdminPage: React.FC = () => {
       {galleryLightboxIndex !== null && displayedGalleryPhotos[galleryLightboxIndex] && (
         <div className="admin-gallery-lightbox" role="dialog" aria-modal="true" aria-label="사진 확대 보기" ref={galleryLightboxTrapRef}>
           <div className="admin-gallery-lightbox-backdrop" onClick={closeGalleryLightbox} />
-          <button type="button" className="admin-gallery-lightbox-close" onClick={closeGalleryLightbox} aria-label="닫기">
-            <X size={26} />
-          </button>
+
+          <div className="admin-gallery-lightbox-topbar">
+            <span className="admin-gallery-lightbox-name">
+              {displayedGalleryPhotos[galleryLightboxIndex].guestName || '익명'}
+              {displayedGalleryPhotos[galleryLightboxIndex].hiddenAt && (
+                <span className="admin-gallery-hidden-badge"><EyeOff size={11} /> 숨김</span>
+              )}
+            </span>
+            <div className="admin-gallery-lightbox-topbar-actions">
+              {displayedGalleryPhotos[galleryLightboxIndex].hiddenAt && (
+                <button type="button" onClick={() => handleUnhidePhotoInLightbox(displayedGalleryPhotos[galleryLightboxIndex])} title="복구" aria-label="복구"><RotateCcw size={16} /></button>
+              )}
+              <button type="button" onClick={() => handleDeletePhotoInLightbox(displayedGalleryPhotos[galleryLightboxIndex])} title="완전 삭제" aria-label="완전 삭제"><Trash2 size={16} /></button>
+              <button type="button" onClick={closeGalleryLightbox} aria-label="닫기"><X size={20} /></button>
+            </div>
+          </div>
 
           {displayedGalleryPhotos.length > 1 && (
             <button type="button" className="admin-gallery-lightbox-nav admin-gallery-lightbox-prev" onClick={showPrevGalleryPhoto} aria-label="이전 사진">
@@ -729,23 +742,19 @@ const AdminPage: React.FC = () => {
             </button>
           )}
 
-          <div className="admin-gallery-lightbox-footer">
-            <div className="admin-gallery-lightbox-info">
-              <span className="admin-gallery-item-name">{displayedGalleryPhotos[galleryLightboxIndex].guestName || '익명'}</span>
-              {displayedGalleryPhotos[galleryLightboxIndex].hiddenAt && (
-                <span className="admin-gallery-hidden-badge"><EyeOff size={11} /> 숨김</span>
-              )}
-              {displayedGalleryPhotos.length > 1 && (
-                <span className="admin-gallery-lightbox-counter">{galleryLightboxIndex + 1} / {displayedGalleryPhotos.length}</span>
-              )}
+          {displayedGalleryPhotos.length > 1 && (
+            <div className="admin-gallery-lightbox-dots">
+              {displayedGalleryPhotos.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`admin-gallery-lightbox-dot${i === galleryLightboxIndex ? ' active' : ''}`}
+                  onClick={() => setGalleryLightboxIndex(i)}
+                  aria-label={`사진 ${i + 1}`}
+                />
+              ))}
             </div>
-            <div className="admin-gallery-item-actions">
-              {displayedGalleryPhotos[galleryLightboxIndex].hiddenAt && (
-                <button type="button" onClick={() => handleUnhidePhotoInLightbox(displayedGalleryPhotos[galleryLightboxIndex])} title="복구"><RotateCcw size={13} /></button>
-              )}
-              <button type="button" onClick={() => handleDeletePhotoInLightbox(displayedGalleryPhotos[galleryLightboxIndex])} title="완전 삭제"><Trash2 size={13} /></button>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -841,8 +850,12 @@ const AdminPage: React.FC = () => {
 
         .admin-gallery-lightbox { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .admin-gallery-lightbox-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.9); }
-        .admin-gallery-lightbox-close { position: absolute; top: 16px; right: 16px; z-index: 2; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
-        .admin-gallery-lightbox-close:hover { background: rgba(255,255,255,0.22); }
+        .admin-gallery-lightbox-topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; align-items: center; padding: 16px 20px; box-sizing: border-box; }
+        .admin-gallery-lightbox-name { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.85rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 6px; }
+        .admin-gallery-lightbox-name .admin-gallery-hidden-badge { position: static; flex-shrink: 0; }
+        .admin-gallery-lightbox-topbar-actions { position: relative; z-index: 1; margin-left: auto; display: flex; align-items: center; gap: 6px; }
+        .admin-gallery-lightbox-topbar-actions button { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
+        .admin-gallery-lightbox-topbar-actions button:hover { background: rgba(255,255,255,0.22); }
         .admin-gallery-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; border-radius: 50%; background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
         .admin-gallery-lightbox-nav:hover { background: rgba(255,255,255,0.22); }
         .admin-gallery-lightbox-prev { left: 8px; }
@@ -852,14 +865,14 @@ const AdminPage: React.FC = () => {
         .admin-gallery-lightbox-track { display: flex; height: 78vh; transition: transform 0.35s ease; }
         .admin-gallery-lightbox-item { width: 100%; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; padding: 0 56px; box-sizing: border-box; }
         .admin-gallery-lightbox-item img { max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 8px; user-select: none; }
-        .admin-gallery-lightbox-footer { position: relative; z-index: 2; width: 100%; max-width: 720px; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; box-sizing: border-box; }
-        .admin-gallery-lightbox-info { display: flex; align-items: center; gap: 10px; }
-        .admin-gallery-lightbox-counter { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
-        .admin-gallery-lightbox-footer .admin-gallery-item-actions button { background: rgba(255,255,255,0.85); width: 28px; height: 28px; }
+        .admin-gallery-lightbox-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; align-items: center; gap: 6px; max-width: 85vw; overflow-x: auto; padding: 4px; }
+        .admin-gallery-lightbox-dot { flex-shrink: 0; width: 6px; height: 6px; padding: 0; border: none; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; }
+        .admin-gallery-lightbox-dot.active { width: 8px; height: 8px; background: #fff; }
 
         @media (max-width: 480px) {
           .admin-gallery-lightbox-nav { width: 36px; height: 36px; }
           .admin-gallery-lightbox-item { padding: 0 44px; }
+          .admin-gallery-lightbox-name { max-width: 38%; }
         }
 
         @media (max-width: 768px) { .admin-stats { grid-template-columns: repeat(2, 1fr); } .guest-add-row { flex-wrap: wrap; } }
