@@ -106,6 +106,7 @@ const ko = {
     activatingCode: '활성화 중...',
     codeActivateSuccess: '청첩장이 활성화되었습니다!',
     codeActivateFailed: '활성화에 실패했습니다.',
+    activateInvitation: '청첩장 활성화',
   },
   editor: {
     templateSelect: '템플릿 선택',
@@ -240,6 +241,7 @@ const en: Translations = {
     activatingCode: 'Activating...',
     codeActivateSuccess: 'Your invitation is now activated!',
     codeActivateFailed: 'Activation failed.',
+    activateInvitation: 'Activate Invitation',
   },
   editor: {
     templateSelect: 'Choose a Template',
@@ -374,6 +376,7 @@ const ja: Translations = {
     activatingCode: '有効化中...',
     codeActivateSuccess: '招待状が有効化されました！',
     codeActivateFailed: '有効化に失敗しました。',
+    activateInvitation: '招待状を有効化',
   },
   editor: {
     templateSelect: 'テンプレートを選ぶ',

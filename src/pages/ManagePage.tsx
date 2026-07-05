@@ -111,55 +111,63 @@ const SlugChangeModal: React.FC<{ slug: string; onDone: () => void; onClose: () 
   );
 };
 
-// 구매 후 발급받은 활성화 코드를 고객이 직접 입력해 유료 전환하는 셀프서비스 폼.
-const CodeRedeemForm: React.FC<{ slug: string; onActivated: () => void }> = ({ slug, onActivated }) => {
+// 구매 후 발급받은 활성화 코드를 고객이 직접 입력해 유료 전환하는 셀프서비스 팝업.
+// 카드 안에 항상 펼쳐져 있던 입력폼이 결제/미결제 카드의 높이 차이를 키우는 원인 중
+// 하나였어서, 드롭다운의 "청첩장 활성화" 버튼을 눌렀을 때만 뜨는 모달로 옮겼다.
+const ActivateCodeModal: React.FC<{ slug: string; onDone: () => void; onClose: () => void }> = ({ slug, onDone, onClose }) => {
   const { t } = useSiteLang();
   const tm = t.manage;
   const [code, setCode] = useState('');
-  const [redeeming, setRedeeming] = useState(false);
+  const [activating, setActivating] = useState(false);
 
-  const handleRedeem = async () => {
+  const handleSubmit = async () => {
     const trimmed = code.trim();
-    if (!trimmed || redeeming) return;
-    setRedeeming(true);
+    if (!trimmed || activating) return;
+    setActivating(true);
     try {
       await redeemActivationCode(slug, trimmed);
       toast.success(tm.codeActivateSuccess);
-      setCode('');
-      onActivated();
+      onDone();
     } catch (err: any) {
       toast.error(err?.message || tm.codeActivateFailed);
     }
-    setRedeeming(false);
+    setActivating(false);
   };
 
   return (
-    <div className="mc-code-redeem">
-      <span className="mc-code-redeem-label"><KeyRound size={11} /> {tm.haveCodeLabel}</span>
-      <div className="mc-code-redeem-row">
-        <input
-          type="text"
-          value={code}
-          onChange={(e) => setCode(e.target.value.toUpperCase())}
-          onKeyDown={(e) => e.key === 'Enter' && handleRedeem()}
-          placeholder={tm.codePlaceholder}
-          className="mc-code-redeem-input"
-          maxLength={12}
-        />
-        <button
-          type="button"
-          className="mc-code-redeem-btn"
-          onClick={handleRedeem}
-          disabled={!code.trim() || redeeming}
-        >
-          {redeeming ? tm.activatingCode : tm.activateCode}
-        </button>
+    <div className="share-modal-overlay" onClick={onClose}>
+      <div className="slug-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="share-modal-header">
+          <h3><KeyRound size={17} style={{ verticalAlign: 'middle', marginRight: 6 }} />{tm.activateInvitation}</h3>
+          <button className="share-modal-close" onClick={onClose}><X size={20} /></button>
+        </div>
+        <p className="slug-modal-desc">{tm.haveCodeLabel}</p>
+        <div className="slug-modal-field">
+          <div className="slug-modal-input-wrap">
+            <input
+              type="text"
+              autoFocus
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+              placeholder={tm.codePlaceholder}
+              className="slug-modal-input activate-modal-input"
+              maxLength={12}
+            />
+          </div>
+        </div>
+        <div className="slug-modal-actions">
+          <button className="slug-modal-btn cancel" onClick={onClose}>{tm.cancel}</button>
+          <button className="slug-modal-btn confirm" disabled={!code.trim() || activating} onClick={handleSubmit}>
+            {activating ? tm.activatingCode : tm.activateCode}
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void }> = ({ slug, isPaid, data, onDelete, onChangeSlug }) => {
+const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void; onActivate: () => void }> = ({ slug, isPaid, data, onDelete, onChangeSlug, onActivate }) => {
   const { t } = useSiteLang();
   const tm = t.manage;
   const navigate = useNavigate();
@@ -186,6 +194,11 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
       </button>
       {open && (
         <div className="mc-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+          {!isPaid && (
+            <button className="mc-dropdown-item highlight" onClick={() => { setOpen(false); onActivate(); }}>
+              <KeyRound size={14} /> {tm.activateInvitation}
+            </button>
+          )}
           {isPaid && (
             <button className="mc-dropdown-item highlight" onClick={() => {
               setOpen(false);
@@ -253,6 +266,7 @@ const ManagePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
   const [changeSlugTarget, setChangeSlugTarget] = useState<string | null>(null);
+  const [activateTarget, setActivateTarget] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
 
   const load = () => {
@@ -354,28 +368,6 @@ const ManagePage: React.FC = () => {
                     {data.date && <p className="mc-date">{formatCardDate(data)}</p>}
                     <p className="mc-slug">sonett.kr/{slug}</p>
                   </div>
-                  {!data.isPaid && (
-                    <div className="mc-purchase-section">
-                      <a href={NAVER_STORE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
-                        <ShoppingCart size={13} /> {tm.buyOnKmong}
-                      </a>
-                      <div className="mc-slug-guide">
-                        <span className="mc-slug-guide-text">{tm.buyGuideText}</span>
-                        <button
-                          className="mc-slug-copy-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(slug);
-                            toast.success(tm.linkCopied);
-                          }}
-                        >
-                          <span className="mc-slug-copy-code">sonett.kr/{slug}</span>
-                          <span className="mc-slug-copy-label">{tm.copy}</span>
-                        </button>
-                      </div>
-                      <CodeRedeemForm slug={slug} onActivated={load} />
-                    </div>
-                  )}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
                       <Share2 size={12} /> {tm.share}
@@ -395,8 +387,30 @@ const ManagePage: React.FC = () => {
                       data={data}
                       onDelete={() => handleDelete(slug)}
                       onChangeSlug={() => setChangeSlugTarget(slug)}
+                      onActivate={() => setActivateTarget(slug)}
                     />
                   </div>
+                  {!data.isPaid && (
+                    <div className="mc-purchase-section">
+                      <a href={NAVER_STORE_URL} target="_blank" rel="noopener noreferrer" className="mc-purchase-btn">
+                        <ShoppingCart size={13} /> {tm.buyOnKmong}
+                      </a>
+                      <div className="mc-slug-guide">
+                        <span className="mc-slug-guide-text">{tm.buyGuideText}</span>
+                        <button
+                          className="mc-slug-copy-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(slug);
+                            toast.success(tm.linkCopied);
+                          }}
+                        >
+                          <span className="mc-slug-copy-code">sonett.kr/{slug}</span>
+                          <span className="mc-slug-copy-label">{tm.copy}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -413,6 +427,14 @@ const ManagePage: React.FC = () => {
           slug={changeSlugTarget}
           onClose={() => setChangeSlugTarget(null)}
           onDone={() => { setChangeSlugTarget(null); load(); }}
+        />
+      )}
+
+      {activateTarget && (
+        <ActivateCodeModal
+          slug={activateTarget}
+          onClose={() => setActivateTarget(null)}
+          onDone={() => { setActivateTarget(null); load(); }}
         />
       )}
 
@@ -523,6 +545,9 @@ const ManagePage: React.FC = () => {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
           gap: 20px;
+          /* 기본값(stretch)이면 같은 줄의 미결제 카드(구매 안내가 붙어 더 김)에 맞춰 결제완료
+             카드까지 늘어나면서 밑에 빈 여백만 남는다. 카드마다 자기 내용 높이만큼만 차지하게 한다. */
+          align-items: start;
         }
         .mc-card {
           background: white;
@@ -696,52 +721,6 @@ const ManagePage: React.FC = () => {
           color: #B07A8E;
           flex-shrink: 0;
         }
-        .mc-code-redeem {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-          margin-top: 6px;
-          padding-top: 8px;
-          border-top: 1px dashed #F0E4E9;
-        }
-        .mc-code-redeem-label {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 0.68rem;
-          color: #9CA3AF;
-        }
-        .mc-code-redeem-row {
-          display: flex;
-          gap: 6px;
-        }
-        .mc-code-redeem-input {
-          flex: 1;
-          min-width: 0;
-          padding: 7px 9px;
-          border: 1px solid #E5E7EB;
-          border-radius: 6px;
-          font-size: 0.75rem;
-          font-family: monospace;
-          letter-spacing: 0.5px;
-          color: #1F2937;
-          box-sizing: border-box;
-        }
-        .mc-code-redeem-input:focus { outline: none; border-color: #B07A8E; }
-        .mc-code-redeem-btn {
-          flex-shrink: 0;
-          padding: 7px 12px;
-          border: none;
-          border-radius: 6px;
-          background: #1F2937;
-          color: white;
-          font-size: 0.72rem;
-          font-weight: 700;
-          cursor: pointer;
-          font-family: inherit;
-        }
-        .mc-code-redeem-btn:disabled { opacity: 0.4; cursor: default; }
-
         /* Actions */
         .mc-actions {
           display: flex;
@@ -1056,6 +1035,9 @@ const ManagePage: React.FC = () => {
           font-family: monospace;
           background: transparent;
         }
+        /* activate-modal-input: 슬러그 변경 모달과 달리 앞에 "sonett.kr/" 같은 접두사 span이
+           없어서, 왼쪽 패딩을 직접 채워준다. */
+        .activate-modal-input { padding-left: 14px; letter-spacing: 1px; }
         .slug-modal-hint {
           font-size: 0.75rem;
           margin: 6px 0 0;
