@@ -461,6 +461,12 @@ async function handleRedeemCode(request: Request, env: Env, slug: string): Promi
   const auth = await requireInvitationOwner(request, env, slug);
   if ('error' in auth) return auth.error;
 
+  // 이미 유료 전환된 청첩장이면 코드를 아예 소비하지 않고 거부한다 — 여기서 막지 않으면
+  // 고객이 이미 결제된 자기 청첩장에 코드를 실수로 또 입력했을 때 멀쩡한 코드 하나가
+  // (실제로는 아무 효과 없이) "사용됨"으로 낭비되어버린다.
+  const inv = await env.DB.prepare('SELECT is_paid FROM invitations WHERE slug = ?').bind(slug).first();
+  if (inv?.is_paid) return json({ error: '이미 활성화된 청첩장입니다.' }, 400, origin);
+
   const body = await request.json() as { code?: string };
   const code = (body.code || '').trim().toUpperCase();
   if (!code) return json({ error: '코드를 입력해주세요.' }, 400, origin);
