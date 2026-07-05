@@ -5,6 +5,7 @@ import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
 import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen, Heart, KeyRound } from 'lucide-react';
 import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
+import { formatShareDate, formatShareDateJa } from '../utils/formatShareDateTime';
 import { QRCodeSVG } from 'qrcode.react';
 import SiteHeader from '../components/SiteHeader';
 import ToastContainer from '../components/Toast';
@@ -220,6 +221,15 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
   );
 };
 
+// data.date는 항상 영문 요일("2026. 10. 24. SAT")로 저장돼 있다(DateTimeSection.tsx).
+// 실제 청첩장(Opening.tsx의 서브텍스트)이 언어별로 요일을 로컬라이즈해 보여주는 것과
+// 동일하게, 관리 카드에서도 language가 ko/ja면 그에 맞는 요일 표기로 바꿔서 보여준다.
+function formatCardDate(data: InvitationData): string {
+  if (data.language === 'ko' && data.weddingDateISO) return formatShareDate(data.weddingDateISO) || data.date;
+  if (data.language === 'ja' && data.weddingDateISO) return formatShareDateJa(data.weddingDateISO) || data.date;
+  return data.date;
+}
+
 function getExpiryInfo(data: InvitationData, expiredLabel: string): { label: string; urgent: boolean } | null {
   if (data.isPaid || !data.expiresAt) return null;
   const diff = Math.ceil((new Date(data.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -333,7 +343,7 @@ const ManagePage: React.FC = () => {
                         ? `${data.groomName} & ${data.brideName}`
                         : slug}
                     </h3>
-                    {data.date && <p className="mc-date">{data.date}</p>}
+                    {data.date && <p className="mc-date">{formatCardDate(data)}</p>}
                     <p className="mc-slug">sonett.kr/{slug}</p>
                   </div>
                   {!data.isPaid && (
