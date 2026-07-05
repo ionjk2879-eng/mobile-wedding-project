@@ -47,6 +47,10 @@ const ShareModal: React.FC<{ slug: string; onClose: () => void }> = ({ slug, onC
           <button className="share-modal-btn copy" onClick={handleCopyLink}><LinkIcon size={18} /> {tm.copyLink}</button>
           <button className="share-modal-btn url-share" onClick={handleUrlShare}><Share2 size={18} /> {tm.urlShare}</button>
         </div>
+        <p className="share-modal-guest-hint">{tm.shareModalGuestHint}</p>
+        <a href={`/admin/${slug}`} className="share-modal-guest-link-btn">
+          <ClipboardList size={16} /> {tm.sendGuestLink}
+        </a>
       </div>
     </div>
   );
@@ -893,6 +897,30 @@ const ManagePage: React.FC = () => {
           color: white;
         }
         .share-modal-btn.url-share:hover { background: #9B6A7E; }
+        .share-modal-guest-hint {
+          margin: 16px 0 10px;
+          padding-top: 16px;
+          border-top: 1px solid #F3F4F6;
+          font-size: 0.78rem;
+          line-height: 1.5;
+          color: #9CA3AF;
+        }
+        .share-modal-guest-link-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 12px;
+          border-radius: 10px;
+          background: #F9FAFB;
+          border: 1px solid #E5E7EB;
+          color: #6B7280;
+          font-size: 0.85rem;
+          font-weight: 600;
+          text-decoration: none;
+          transition: background 0.2s;
+        }
+        .share-modal-guest-link-btn:hover { background: #F3F4F6; }
 
         @media (max-width: 600px) {
           .manage-filter-tabs {
