@@ -9,6 +9,7 @@ import { toast } from '../stores/useToastStore';
 import { getApiErrorMessage } from '../utils/apiError';
 import ToastContainer from '../components/Toast';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useLightboxDrag } from '../hooks/useLightboxDrag';
 
 const PER_UPLOADER_LIMIT = 4;
 // 청첩장(slug)마다 별도로 저장 — 같은 브라우저로 서로 다른 청첩장 갤러리에 들어갔을 때
@@ -35,38 +36,8 @@ const GalleryPage: React.FC = () => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const lightboxTrapRef = useFocusTrap(lightboxIndex !== null);
 
-  // 라이트박스 스와이프: 손가락을 따라 다음/이전 사진이 부드럽게 끌려오다가,
-  // 손을 떼는 순간에만 완전히 넘어가거나 제자리로 돌아온다 (Gallery.tsx 라이트박스와 동일한 방식).
-  const dragStartX = useRef(0);
-  const dragDelta = useRef(0);
-  const dragging = useRef(false);
-  const lbTrackRef = useRef<HTMLDivElement>(null);
-  const lbVpRef = useRef<HTMLDivElement>(null);
-  const lightboxIndexRef = useRef(0);
-  lightboxIndexRef.current = lightboxIndex ?? 0;
-
-  const onDragStart = (x: number) => {
-    dragging.current = true;
-    dragStartX.current = x;
-    dragDelta.current = 0;
-    if (lbTrackRef.current) lbTrackRef.current.style.transition = 'none';
-  };
-  const onDragMove = (x: number) => {
-    if (!dragging.current) return;
-    dragDelta.current = x - dragStartX.current;
-    if (lbTrackRef.current) {
-      const w = lbVpRef.current?.clientWidth || 1;
-      lbTrackRef.current.style.transform = `translateX(${-(lightboxIndexRef.current * 100) + (dragDelta.current / w) * 100}%)`;
-    }
-  };
-  const onDragEnd = () => {
-    if (!dragging.current) return;
-    dragging.current = false;
-    if (lbTrackRef.current) lbTrackRef.current.style.transition = 'transform 0.35s ease';
-    if (dragDelta.current < -40 && lightboxIndexRef.current < photos.length - 1) setLightboxIndex(lightboxIndexRef.current + 1);
-    else if (dragDelta.current > 40 && lightboxIndexRef.current > 0) setLightboxIndex(lightboxIndexRef.current - 1);
-    else if (lbTrackRef.current) lbTrackRef.current.style.transform = `translateX(-${lightboxIndexRef.current * 100}%)`;
-  };
+  const { trackRef: lbTrackRef, viewportRef: lbVpRef, onDragStart, onDragMove, onDragEnd } =
+    useLightboxDrag(photos.length, lightboxIndex ?? 0, setLightboxIndex);
 
   // 라이트박스 배경만 청첩장 테마 톤에 맞추기 위한 최소 정보. 업로드 버튼 등 나머지 UI는
   // 의도적으로 Sonett 고정 배색을 유지하고, 이 값들은 라이트박스 root에만 적용한다.

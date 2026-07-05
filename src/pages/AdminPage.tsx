@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { loadInvitation, fetchPrivacySettings, updatePrivacySettings, PrivacySettings } from '../services/invitationService';
 import { fetchRSVPResponses } from '../services/rsvpService';
@@ -12,6 +12,7 @@ import { Users, Utensils, X, RefreshCw, ArrowLeft, LogIn, LogOut, Copy, Trash2, 
 import useAuthStore from '../stores/useAuthStore';
 import ToastContainer from '../components/Toast';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useLightboxDrag } from '../hooks/useLightboxDrag';
 
 const SITE_ORIGIN = 'https://sonett.kr';
 const KAKAO_APP_KEY = '5a920b742f037d8e9cb29865ca00c909';
@@ -55,14 +56,6 @@ const AdminPage: React.FC = () => {
   const [showHiddenOnly, setShowHiddenOnly] = useState(false);
   const [galleryLightboxIndex, setGalleryLightboxIndex] = useState<number | null>(null);
   const galleryLightboxTrapRef = useFocusTrap(galleryLightboxIndex !== null);
-  // 라이트박스 스와이프: 손가락을 따라 다음/이전 사진이 부드럽게 끌려오다가,
-  // 손을 떼는 순간에만 완전히 넘어가거나 제자리로 돌아온다.
-  const galleryDragStartX = useRef(0);
-  const galleryDragDelta = useRef(0);
-  const galleryDragging = useRef(false);
-  const galleryLbTrackRef = useRef<HTMLDivElement>(null);
-  const galleryLbVpRef = useRef<HTMLDivElement>(null);
-  const galleryLightboxIndexRef = useRef(0);
 
   // 숨김 필터를 토글하면 표시 목록이 바뀌어 인덱스가 다른 사진을 가리킬 수 있으므로 라이트박스를 닫는다
   useEffect(() => { setGalleryLightboxIndex(null); }, [showHiddenOnly]);
@@ -199,7 +192,6 @@ const AdminPage: React.FC = () => {
 
   const displayedGalleryPhotos = showHiddenOnly ? galleryPhotos.filter((p) => p.hiddenAt) : galleryPhotos;
   const hiddenPhotoCount = galleryPhotos.filter((p) => p.hiddenAt).length;
-  galleryLightboxIndexRef.current = galleryLightboxIndex ?? 0;
 
   const closeGalleryLightbox = useCallback(() => setGalleryLightboxIndex(null), []);
   const showNextGalleryPhoto = useCallback(() => {
@@ -262,28 +254,8 @@ const AdminPage: React.FC = () => {
     };
   }, [galleryLightboxIndex, closeGalleryLightbox, showNextGalleryPhoto, showPrevGalleryPhoto]);
 
-  const onGalleryDragStart = (x: number) => {
-    galleryDragging.current = true;
-    galleryDragStartX.current = x;
-    galleryDragDelta.current = 0;
-    if (galleryLbTrackRef.current) galleryLbTrackRef.current.style.transition = 'none';
-  };
-  const onGalleryDragMove = (x: number) => {
-    if (!galleryDragging.current) return;
-    galleryDragDelta.current = x - galleryDragStartX.current;
-    if (galleryLbTrackRef.current) {
-      const w = galleryLbVpRef.current?.clientWidth || 1;
-      galleryLbTrackRef.current.style.transform = `translateX(${-(galleryLightboxIndexRef.current * 100) + (galleryDragDelta.current / w) * 100}%)`;
-    }
-  };
-  const onGalleryDragEnd = () => {
-    if (!galleryDragging.current) return;
-    galleryDragging.current = false;
-    if (galleryLbTrackRef.current) galleryLbTrackRef.current.style.transition = 'transform 0.35s ease';
-    if (galleryDragDelta.current < -40 && galleryLightboxIndexRef.current < displayedGalleryPhotos.length - 1) setGalleryLightboxIndex(galleryLightboxIndexRef.current + 1);
-    else if (galleryDragDelta.current > 40 && galleryLightboxIndexRef.current > 0) setGalleryLightboxIndex(galleryLightboxIndexRef.current - 1);
-    else if (galleryLbTrackRef.current) galleryLbTrackRef.current.style.transform = `translateX(-${galleryLightboxIndexRef.current * 100}%)`;
-  };
+  const { trackRef: galleryLbTrackRef, viewportRef: galleryLbVpRef, onDragStart: onGalleryDragStart, onDragMove: onGalleryDragMove, onDragEnd: onGalleryDragEnd } =
+    useLightboxDrag(displayedGalleryPhotos.length, galleryLightboxIndex ?? 0, setGalleryLightboxIndex);
 
   const handleAddGuest = async () => {
     if (!slug || !newGuestName.trim() || adding) return;
