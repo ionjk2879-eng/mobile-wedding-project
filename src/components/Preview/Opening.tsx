@@ -168,6 +168,7 @@ function hexLuminance(hex: string): number {
 const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO, slug, enableAnonymousOpening }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
+  const [instaPercent, setInstaPercent] = useState(0);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [editorBounds, setEditorBounds] = useState<React.CSSProperties>({});
@@ -515,6 +516,27 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const isCurtain = effectiveStyle === 'curtain';
   const isInsta = effectiveStyle === 'insta';
   const isBlind = effectiveStyle === 'blind';
+
+  // op-insta-fill 키프레임(3s linear, 0.5s delay)과 같은 타이밍으로 0~100 숫자를 올려서
+  // 진짜 로딩 중인 것 같은 느낌을 준다. CSS width 애니메이션만으로는 숫자 표시가
+  // 불가능해 JS 타이머로 별도 추적한다.
+  useEffect(() => {
+    if (!isInsta) { setInstaPercent(0); return; }
+    setInstaPercent(0);
+    const delayMs = 500, durationMs = 3000;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const elapsed = now - start - delayMs;
+      if (elapsed <= 0) { raf = requestAnimationFrame(tick); return; }
+      const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
+      setInstaPercent(pct);
+      if (pct < 100) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [isInsta, opening.openingStyle, opening.openingContentStyle]);
+
   const decoEffect = opening.openingDecoEffect || 'none';
   const rawPattern = opening.openingBgPattern;
   const bgPatterns: string[] = Array.isArray(rawPattern)
@@ -572,8 +594,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           ))}
         </React.Fragment>
       )}
-      {isInsta && <div key={`insta-${opening.openingStyle}-${opening.openingContentStyle}`} className="op-insta-progress"><div className="op-insta-bar" /></div>}
-
       {decoEffect === 'dots' && (
         <div className="op-deco-dots" aria-hidden="true">
           {DECO_DOTS.map((d, i) => (
@@ -632,6 +652,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}${isSwitchingContent ? ' op-body-out' : ''}`}
         >
           <div className="op-typing-inner">
+            {isInsta && (
+              <div className="op-insta-progress">
+                <div className="op-insta-bar" />
+                <span className="op-insta-percent">{instaPercent}%</span>
+              </div>
+            )}
             <div className={`op-typing-heart${typingPhase !== 'idle' ? ' visible' : ''}`}>
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34, display: 'block' }}>
                 <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>
@@ -668,6 +694,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
               <span className="op-trace-right" />
               <span className="op-trace-bottom" />
               <span className="op-trace-left" />
+            </div>
+          )}
+          {isInsta && (
+            <div className="op-insta-progress">
+              <div className="op-insta-bar" />
+              <span className="op-insta-percent">{instaPercent}%</span>
             </div>
           )}
           <div className="op-heart-deco">

@@ -201,8 +201,14 @@
 .bc-bg { position: absolute; inset: 0; }
 .bc-bg .hero-photo { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85) saturate(0.82) contrast(1.04); }
 .bc-bg .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
-/* 그라데이션 오버레이: 상단 투명 → 하단 짙은 어둠 */
-.bc-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,4,2,0.08) 0%, rgba(8,4,2,0.04) 30%, rgba(8,4,2,0.48) 60%, rgba(8,4,2,0.82) 85%, rgba(8,4,2,0.90) 100%); }
+/* 그라데이션 오버레이: 상/하단 모두 어둡고 중간만 밝은 비네트.
+   사진 모형(oval 등)을 적용하면 사진이 그 모형만큼만 나타나고 나머지 사각형
+   모서리는 배경색이 그대로 드러나는데, 하단은 이 오버레이가 원래도 짙어서
+   사진과 모서리 배경이 자연스럽게 이어져 보이지만, 상단은 거의 투명해서
+   사진 위쪽 밝은 부분이 모서리 배경과 만나는 경계선이 뚝 잘린 것처럼 보였다.
+   하단과 대칭으로 상단도 어둡게 시작해 빠르게 옅어지도록 해서 모형 상단
+   경계가 배경과 자연스럽게 섞이게 했다. */
+.bc-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,4,2,0.55) 0%, rgba(8,4,2,0.14) 14%, rgba(8,4,2,0.04) 28%, rgba(8,4,2,0.48) 60%, rgba(8,4,2,0.82) 85%, rgba(8,4,2,0.90) 100%); }
 /* 이중 테두리 제거 → 코너 마크만 */
 .bc-frame { position: absolute; inset: 24px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; padding: 18px 28px 38px; text-align: center; color: white;
   background:
@@ -332,8 +338,8 @@
 .ds-photo .hero-photo { width: 100%; height: 100%; object-fit: cover; }
 .ds-photo .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
 .ds-panel { flex: 1.15; background: var(--wedding-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 26px 14px 22px; box-sizing: border-box; }
-.ds-date { display: flex; flex-direction: column; gap: 0; line-height: 0.92; }
-.ds-date span { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 2.8em; color: var(--wedding-text-main); }
+.ds-date { display: flex; flex-direction: column; gap: 0; line-height: 0.86; }
+.ds-date span { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 4.4em; color: var(--wedding-text-main); }
 .ds-names { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
 .ds-names p { margin: 0; font-size: 1em; color: var(--wedding-text-body); letter-spacing: 0.5px; }
 .ds-names em { font-style: italic; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-size: 1.3em; margin-right: 4px; }
@@ -763,11 +769,12 @@
 .op-insta { opacity: var(--op-opacity); }
 .op-insta.op-phase-enter { opacity: 0; animation: op-insta-in 0.5s ease 0.2s both; }
 @keyframes op-insta-in { from { opacity: 0; transform: scale(1.06); } to { opacity: var(--op-opacity); transform: scale(1); } }
-.op-insta-progress { position: absolute; top: 14px; left: 14px; right: 14px; height: 2px; background: transparent; border-radius: 2px; z-index: 3; }
+/* 하트 바로 위에 오도록 화면 최상단 고정이 아니라 op-body/op-typing-inner의 flex 흐름
+   안에 넣었다(heart 위치가 콘텐츠 길이에 따라 달라져도 항상 그 바로 위에 붙는다). */
+.op-insta-progress { position: relative; width: 70%; max-width: 200px; height: 2px; background: rgba(255,255,255,0.22); border-radius: 2px; overflow: visible; }
 .op-insta-bar { height: 100%; width: 0; background: rgba(255,255,255,0.95); border-radius: 2px; animation: op-insta-fill 3s linear 0.5s forwards; }
 @keyframes op-insta-fill { from { width: 0%; } to { width: 100%; } }
-/* visibility:hidden 사용 — display:none은 animation을 리셋시켜 재시작 버그 유발 */
-.op-root:not(.op-insta) .op-insta-progress { visibility: hidden !important; }
+.op-insta-percent { position: absolute; top: 7px; right: 0; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.5px; color: rgba(255,255,255,0.85); font-variant-numeric: tabular-nums; }
 .op-insta.op-phase-exit { animation: op-insta-exit 0.4s ease forwards !important; }
 .op-insta.op-phase-exit .op-body { animation: none !important; }
 @keyframes op-insta-exit { from { opacity: var(--op-opacity, 0.95); } to { opacity: 0; } }
