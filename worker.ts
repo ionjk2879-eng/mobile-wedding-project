@@ -322,6 +322,7 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
     const photos = await env.DB.prepare('SELECT r2_key FROM gallery_photos WHERE invitation_slug = ?').bind(slug).all();
     const r2Keys = photos.results.map((p) => p.r2_key as string);
     if (r2Keys.length > 0) await env.IMAGES.delete(r2Keys);
+    await deleteAnniversaryImages(env, slug);
 
     await env.DB.batch([
       env.DB.prepare('DELETE FROM guestbook WHERE invitation_slug = ?').bind(slug),
@@ -362,6 +363,23 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
 
   const data = JSON.parse(oldRow.data as string);
   data.slug = newSlug;
+
+  // anniversaryMode.heroPhoto/photos는 R2 키에 slug가 박혀 있어서(anniversary/{slug}/...),
+  // 슬러그만 바꾸고 파일을 그대로 두면 나중에 이 청첩장이 삭제/만료될 때 새 슬러그 접두사로만
+  // 찾다가 옛 슬러그 파일들을 영영 못 찾아 R2에 고아로 남는다. 그래서 실제로 옮기고 URL도 갱신한다.
+  if (data.anniversaryMode) {
+    const keyMap = await moveAnniversaryImages(env, oldSlug, newSlug);
+    if (keyMap.size > 0) {
+      const remap = (url: string) => {
+        for (const [oldKey, newKey] of keyMap) {
+          if (url === `/images/${oldKey}`) return `/images/${newKey}`;
+        }
+        return url;
+      };
+      if (data.anniversaryMode.heroPhoto) data.anniversaryMode.heroPhoto = remap(data.anniversaryMode.heroPhoto);
+      if (Array.isArray(data.anniversaryMode.photos)) data.anniversaryMode.photos = data.anniversaryMode.photos.map(remap);
+    }
+  }
 
   await env.DB.batch([
     // slug 변경은 새 행을 만들고 기존 행을 지우는 방식이라, 개인정보 전환 관련 컬럼도
@@ -834,17 +852,36 @@ async function handleGuest(request: Request, env: Env, slug: string, code: strin
   return json({ error: 'Method not allowed' }, 405, origin);
 }
 
-// 공개(비인증) 개인화 링크 조회 — /invite/{code} 진입 시 사용
+// 공개(비인증) 개인화 링크 조회 — /invite/{code} 진입 시 사용.
+// Authorization 헤더가 있으면(소유자 본인 확인용) 검사하지만, 없어도 정상 동작하는 공개 엔드포인트.
 async function handleInviteLookup(request: Request, env: Env, code: string): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   try {
-    // 최초 방문이면 visited_at 기록 (이미 값이 있거나 code가 유효하지 않으면 WHERE 조건에 안 걸려 아무 변화 없음)
+    const row = await env.DB.prepare(
+      `SELECT g.invitation_slug, g.name, g.relation, g.assigned_message_index,
+              i.owner_uid, i.privacy_transition_date
+       FROM guests g JOIN invitations i ON g.invitation_slug = i.slug
+       WHERE g.code = ?`
+    ).bind(code).first();
+    if (!row) return json({ error: '유효하지 않은 링크입니다.' }, 404, origin);
+
+    // 계좌/RSVP 비공개 전환과 같은 기준(privacy_transition_date, 예식일+3주)이 지나면
+    // 개인화 링크 접근 자체를 막는다 — 하객 데이터(guests row)는 그대로 두고 "접근"만 차단.
+    // 소유자 본인이 로그인해서 확인하는 경우엔 만료와 무관하게 항상 정상 조회한다.
+    const transitionDate = row.privacy_transition_date as string | null;
+    const isExpired = !!transitionDate && new Date(transitionDate).getTime() <= Date.now();
+    const requester = await getAuthUser(request, env);
+    const isOwnerRequest = !!requester && requester.uid === row.owner_uid;
+    if (isExpired && !isOwnerRequest) {
+      // slug는 그대로 내려줘서 클라이언트가 일반 청첩장 링크(/{slug})로 자연스럽게 리디렉트할 수 있게 하되,
+      // name/relation/messageIndex는 아예 응답에 넣지 않아 개인화 오프닝 문구가 절대 뜨지 않게 한다.
+      return json({ slug: row.invitation_slug, expired: true }, 200, origin);
+    }
+
+    // 최초 방문이면 visited_at 기록 (이미 값이 있으면 WHERE 조건에 안 걸려 아무 변화 없음)
     await env.DB.prepare(
       "UPDATE guests SET visited_at = datetime('now') WHERE code = ? AND visited_at IS NULL"
     ).bind(code).run();
-
-    const row = await env.DB.prepare('SELECT invitation_slug, name, relation, assigned_message_index FROM guests WHERE code = ?').bind(code).first();
-    if (!row) return json({ error: '유효하지 않은 링크입니다.' }, 404, origin);
 
     let messageIndex = row.assigned_message_index as number | null;
     if (messageIndex === null || messageIndex === undefined) {
@@ -870,6 +907,42 @@ async function handleInviteLookup(request: Request, env: Env, code: string): Pro
 // 업로드한 뒤 /images/{key}로 직접 접속시켰을 때 같은 오리진에서 실행되는 저장형 XSS로 이어질 수 있다.
 const IMAGE_EXT_BY_TYPE: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
 
+// 일반 업로드는 여전히 평평한 랜덤 키를 쓴다 — 이 화이트리스트에 맞는 folder 값을 보낸 요청만
+// (지금은 평생소장 아카이브 전용) slug가 R2 키에 포함되어, 청첩장 삭제/만료/슬러그 변경 시
+// anniversary/{slug} 접두사로 정리할 수 있게 한다. 패턴에 안 맞으면 무시하고 기존과 동일하게 처리 —
+// 그래서 이 값을 아예 보내지 않는 기존 호출부들은 동작이 전혀 바뀌지 않는다.
+const UPLOAD_FOLDER_PATTERN = /^anniversary\/[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+// anniversaryMode.heroPhoto/photos는 gallery_photos처럼 DB에 r2_key가 개별 추적되지 않고
+// data JSON 안의 URL 문자열로만 존재한다. 그래서 삭제/만료 시에는 slug가 접두사로 박힌
+// R2 키를 통째로 리스팅해서 지우는 방식으로만 정리할 수 있다 (개별 URL을 몰라도 됨).
+async function deleteAnniversaryImages(env: Env, slug: string): Promise<void> {
+  const prefix = `anniversary/${slug}/`;
+  const listed = await env.IMAGES.list({ prefix });
+  if (listed.objects.length > 0) await env.IMAGES.delete(listed.objects.map((o) => o.key));
+}
+
+// 슬러그 변경 시에는 anniversary/{oldSlug}/... 키를 삭제해버리면 안 되고(아직 쓰는 파일),
+// anniversary/{newSlug}/...로 실제로 옮겨야 한다 — 안 옮기면 이후 그 청첩장이 삭제/만료될 때
+// deleteAnniversaryImages가 새 슬러그 접두사만 찾아서 옛 슬러그 파일들이 영영 고아로 남는다.
+// R2에는 rename이 없어 get→put→delete로 직접 복사한다. 반환값은 data.anniversaryMode의
+// heroPhoto/photos URL을 새 키로 바꿔 쓸 수 있도록 (oldKey → newKey) 매핑이다.
+async function moveAnniversaryImages(env: Env, oldSlug: string, newSlug: string): Promise<Map<string, string>> {
+  const oldPrefix = `anniversary/${oldSlug}/`;
+  const newPrefix = `anniversary/${newSlug}/`;
+  const listed = await env.IMAGES.list({ prefix: oldPrefix });
+  const keyMap = new Map<string, string>();
+  for (const obj of listed.objects) {
+    const newKey = newPrefix + obj.key.slice(oldPrefix.length);
+    const got = await env.IMAGES.get(obj.key);
+    if (!got) continue;
+    await env.IMAGES.put(newKey, got.body, { httpMetadata: got.httpMetadata });
+    keyMap.set(obj.key, newKey);
+  }
+  if (listed.objects.length > 0) await env.IMAGES.delete(listed.objects.map((o) => o.key));
+  return keyMap;
+}
+
 async function handleUpload(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   const user = await getAuthUser(request, env);
@@ -883,7 +956,18 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
   const ext = IMAGE_EXT_BY_TYPE[file.type];
   if (!ext) return json({ error: 'JPEG, PNG, WEBP, GIF 이미지 파일만 업로드할 수 있습니다.' }, 400, origin);
 
-  const key = `${crypto.randomUUID()}.${ext}`;
+  const folder = (formData.get('folder') as string | null) || '';
+  let prefix = '';
+  if (UPLOAD_FOLDER_PATTERN.test(folder)) {
+    // folder가 특정 청첩장(anniversary/{slug})의 네임스페이스를 가리키므로, 패턴 모양만
+    // 검사하고 끝내면 다른 로그인 사용자가 남의 청첩장 슬러그로 파일을 끼워넣을 수 있다.
+    // requireInvitationOwner와 동일한 방식(소유자 uid 일치)으로 실제 소유권을 확인한다.
+    const slug = folder.slice('anniversary/'.length);
+    const auth = await requireInvitationOwner(request, env, slug);
+    if ('error' in auth) return auth.error;
+    prefix = `${folder}/`;
+  }
+  const key = `${prefix}${crypto.randomUUID()}.${ext}`;
   await env.IMAGES.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
 
   return json({ url: `/images/${key}` }, 200, origin);
@@ -1134,6 +1218,7 @@ async function deleteExpiredInvitations(env: Env): Promise<void> {
     const photos = await env.DB.prepare('SELECT r2_key FROM gallery_photos WHERE invitation_slug = ?').bind(slug).all();
     const r2Keys = photos.results.map((p) => p.r2_key as string);
     if (r2Keys.length > 0) await env.IMAGES.delete(r2Keys);
+    await deleteAnniversaryImages(env, slug);
 
     await env.DB.batch([
       env.DB.prepare('DELETE FROM guestbook WHERE invitation_slug = ?').bind(slug),

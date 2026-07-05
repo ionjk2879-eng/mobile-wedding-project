@@ -16,12 +16,16 @@ const resizeImage = (file: File, maxSize: number, quality: number): Promise<Blob
     img.src = URL.createObjectURL(file);
   });
 
-export const uploadImage = async (file: File, _path: string, maxSize = 800): Promise<string> => {
+// folder: R2 키 접두사 힌트. 서버(handleUpload)가 허용 목록(anniversary/{slug} 등)에 맞는
+// 값일 때만 실제로 키에 반영하고, 그 외에는 기존과 동일하게 무시하고 평평한 랜덤 키를 쓴다 —
+// 그래서 이 값을 넘기지 않던 기존 호출부들은 동작이 전혀 바뀌지 않는다.
+export const uploadImage = async (file: File, folder?: string, maxSize = 800): Promise<string> => {
   const resized = await resizeImage(file, maxSize, maxSize > 800 ? 0.82 : 0.6);
   const resizedFile = new File([resized], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
 
   const formData = new FormData();
   formData.append('file', resizedFile);
+  if (folder) formData.append('folder', folder);
 
   const token = localStorage.getItem('sonett_token');
   const res = await fetch('/api/upload', {

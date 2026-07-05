@@ -63,7 +63,9 @@ const GalleryPage: React.FC = () => {
     let cancelled = false;
     lookupInviteCode(codeParam).then((result) => {
       if (cancelled) return;
-      if (result) { setGuestCode(codeParam); setGuestName(result.name); }
+      // 만료된 개인화 링크(result.expired)는 "무효한 코드"와 동일하게 취급 — 이름을 직접
+      // 입력하는 일반 하객 흐름으로 그대로 폴백한다 (라이브 갤러리 접근 자체는 계속 가능).
+      if (result && !result.expired && result.name) { setGuestCode(codeParam); setGuestName(result.name); }
       setIdentityLoading(false);
     });
     return () => { cancelled = true; };

@@ -74,7 +74,8 @@ const AnniversaryEditPage: React.FC = () => {
     if (!file || !slug) return;
     setUploadingHero(true);
     try {
-      const url = await uploadImage(file, `images/${slug}/anniversary-hero/${Date.now()}_${file.name}`, 1200);
+      // anniversary/{slug} 접두사로 저장해야 청첩장 삭제/만료/슬러그 변경 시 R2 정리 대상에 잡힌다
+      const url = await uploadImage(file, `anniversary/${slug}`, 1200);
       setHeroPhoto(url);
     } catch (err) {
       toast.error(getApiErrorMessage(err));
@@ -105,7 +106,7 @@ const AnniversaryEditPage: React.FC = () => {
     setUploadingPhotos(true);
     try {
       const urls = await Promise.all(
-        toUpload.map((file) => uploadImage(file, `images/${slug}/anniversary-gallery/${Date.now()}_${file.name}`))
+        toUpload.map((file) => uploadImage(file, `anniversary/${slug}`))
       );
       setPhotos((prev) => [...prev, ...urls]);
     } catch (err) {

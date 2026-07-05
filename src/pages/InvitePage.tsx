@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { lookupInviteCode, InviteLookupResult } from '../services/guestService';
 import ViewPage from './ViewPage';
 
@@ -40,6 +40,10 @@ const InvitePage: React.FC = () => {
   );
 
   if (!result) return <InviteFallback />;
+
+  // 개인화 링크 만료(예식일+3주 경과) — 개인화 인사말 없이, 일반 청첩장 링크로 자연스럽게 보낸다.
+  // 이 시점엔 이미 기념일 모드로 전환돼 있어(예식일+24시간 기준이 더 이르므로) D+n 문구가 정상적으로 보인다.
+  if (result.expired) return <Navigate to={`/${result.slug}`} replace />;
 
   return <ViewPage slugOverride={result.slug} guestName={result.name} guestRelation={result.relation} guestCode={code} guestMessageIndex={result.messageIndex} />;
 };
