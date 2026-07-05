@@ -508,6 +508,29 @@ async function handleGenerateActivationCodes(request: Request, env: Env): Promis
   return json({ codes: codeList }, 200, origin);
 }
 
+// 슈퍼관리자 전용 — SuperAdminPage에 방금 생성한 코드 목록이 떠 있는 동안, 그중 어떤 코드가
+// 이미 고객에게 사용됐는지 다시 조회해서 취소선으로 표시할 수 있게 한다.
+async function handleActivationCodesStatus(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+
+  const url = new URL(request.url);
+  const codes = (url.searchParams.get('codes') || '')
+    .split(',').map((c) => c.trim().toUpperCase()).filter(Boolean).slice(0, 500);
+  if (codes.length === 0) return json({ statuses: {} }, 200, origin);
+
+  const placeholders = codes.map(() => '?').join(',');
+  const rows = await env.DB.prepare(
+    `SELECT code, status FROM activation_codes WHERE code IN (${placeholders})`
+  ).bind(...codes).all();
+
+  const statuses: Record<string, string> = {};
+  for (const r of rows.results) statuses[r.code as string] = r.status as string;
+  return json({ statuses }, 200, origin);
+}
+
 // 기념일 모드 개인정보 전환 설정 — 청첩장 소유자 전용 (관리 페이지)
 async function handlePrivacySettings(request: Request, env: Env, slug: string): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
@@ -1467,6 +1490,9 @@ export default {
 
       if (pathname === '/api/admin/activation-codes' && request.method === 'POST')
         return await handleGenerateActivationCodes(request, env);
+
+      if (pathname === '/api/admin/activation-codes/status' && request.method === 'GET')
+        return await handleActivationCodesStatus(request, env);
 
       // Upload
       if (pathname === '/api/upload') return await handleUpload(request, env);

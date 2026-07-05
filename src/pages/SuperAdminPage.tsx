@@ -186,6 +186,8 @@ const SuperAdminPage: React.FC = () => {
   const [codeNote, setCodeNote] = useState('');
   const [generatingCodes, setGeneratingCodes] = useState(false);
   const [generatedCodes, setGeneratedCodes] = useState<string[] | null>(null);
+  const [codeStatuses, setCodeStatuses] = useState<Record<string, string>>({});
+  const [checkingCodeStatuses, setCheckingCodeStatuses] = useState(false);
 
   // Posts
   const [posts, setPosts] = useState<Post[]>([]);
@@ -267,11 +269,28 @@ const SuperAdminPage: React.FC = () => {
         body: JSON.stringify({ count, note: codeNote.trim() || undefined }),
       });
       setGeneratedCodes(res.codes);
+      setCodeStatuses({});
       toast.success(`코드 ${res.codes.length}개를 생성했습니다.`);
     } catch (e: any) {
       toast.error(e?.message || '코드 생성에 실패했습니다.');
     }
     setGeneratingCodes(false);
+  };
+
+  // 방금 생성한 코드들 중 이미 고객이 사용한 코드를 다시 조회해 취소선으로 표시한다.
+  const handleCheckCodeStatuses = async () => {
+    if (!generatedCodes || generatedCodes.length === 0) return;
+    setCheckingCodeStatuses(true);
+    try {
+      const params = new URLSearchParams({ codes: generatedCodes.join(',') });
+      const res = await apiFetch<{ statuses: Record<string, string> }>(`/api/admin/activation-codes/status?${params}`);
+      setCodeStatuses(res.statuses);
+      const usedCount = Object.values(res.statuses).filter(s => s === 'used').length;
+      toast.success(usedCount > 0 ? `${usedCount}개가 이미 사용되었습니다.` : '아직 사용된 코드가 없습니다.');
+    } catch (e: any) {
+      toast.error(e?.message || '상태 조회에 실패했습니다.');
+    }
+    setCheckingCodeStatuses(false);
   };
 
   const handleDownloadCodesCsv = () => {
@@ -384,7 +403,7 @@ const SuperAdminPage: React.FC = () => {
               ) : (
                 <>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px 120px 90px 100px', gap: 12, padding: '10px 20px', background: '#F9FAFB', borderBottom: '1px solid #F0F0F0', fontSize: '0.72rem', fontWeight: 700, color: '#9CA3AF' }}>
-                    <span>청첩장</span><span>결혼일</span><span>고객</span><span>주소</span><span>만료</span><span></span>
+                    <span>청첩장</span><span>결혼일</span><span>고객</span><span style={{ paddingLeft: 10 }}>주소</span><span>만료</span><span></span>
                   </div>
                   {rows.map((row, i) => {
                     const days = daysUntil(row.expiresAt);
@@ -402,7 +421,7 @@ const SuperAdminPage: React.FC = () => {
                           <p style={{ margin: 0, fontSize: '0.78rem', color: '#4B5563' }}>{row.ownerName || '—'}</p>
                           <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: '#9CA3AF' }}>{row.ownerEmail || '—'}</p>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 10 }}>
                           <span style={{ fontSize: '0.75rem', color: '#6B7280', fontFamily: 'monospace' }}>{row.slug}</span>
                           <a href={`https://sonett.kr/${row.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: '#9CA3AF', lineHeight: 1 }}><ExternalLink size={11} /></a>
                         </div>
@@ -514,6 +533,9 @@ const SuperAdminPage: React.FC = () => {
                     방금 생성한 코드 {generatedCodes.length}개
                   </h2>
                   <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={handleCheckCodeStatuses} disabled={checkingCodeStatuses} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', border: '1px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.78rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit', opacity: checkingCodeStatuses ? 0.5 : 1 }}>
+                      <RefreshCw size={12} style={{ animation: checkingCodeStatuses ? 'spin 0.8s linear infinite' : 'none' }} /> 사용 여부 확인
+                    </button>
                     <button onClick={handleCopyCodes} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', border: '1px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.78rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit' }}>
                       <Copy size={12} /> 전체 복사
                     </button>
@@ -523,11 +545,23 @@ const SuperAdminPage: React.FC = () => {
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8, maxHeight: 360, overflowY: 'auto', padding: 4 }}>
-                  {generatedCodes.map(code => (
-                    <span key={code} style={{ padding: '8px 10px', background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 8, fontFamily: 'monospace', fontSize: '0.82rem', color: '#1F2937', textAlign: 'center', letterSpacing: '0.5px' }}>
-                      {code}
-                    </span>
-                  ))}
+                  {generatedCodes.map(code => {
+                    const used = codeStatuses[code] === 'used';
+                    return (
+                      <span
+                        key={code}
+                        title={used ? '이미 사용된 코드입니다' : undefined}
+                        style={{
+                          padding: '8px 10px', background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 8, fontFamily: 'monospace', fontSize: '0.82rem',
+                          textAlign: 'center', letterSpacing: '0.5px',
+                          color: used ? '#B0B7C0' : '#1F2937',
+                          textDecoration: used ? 'line-through' : 'none',
+                        }}
+                      >
+                        {code}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
