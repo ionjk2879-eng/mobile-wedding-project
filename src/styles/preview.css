@@ -56,70 +56,9 @@
   border: 0.5px solid var(--wedding-border);
 }
 
-/* 캡션(heroCaption) — heroPhotoShape와 독립적인 축. 사진과 같은 박스 안에 놓이며, 텍스트가
-   앉는 영역에만 그라데이션 스크림을 깔아 사진 밝기/피사체와 무관하게 항상 또렷하게 보이도록
-   한다(사진 전체를 어둡게 하지 않음). 텍스트는 완전 불투명한 흰색 + 굵은 글자 + 넓은 자간. */
-.hero-caption { position: absolute; z-index: 3; pointer-events: none; box-sizing: border-box; display: flex; }
-.hero-caption-script {
-  top: 0; left: 0; right: 0;
-  height: 30%;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 7%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.45), transparent);
-}
-.hero-caption-script span {
-  color: #fff;
-  font-weight: 600;
-  font-size: 1.05em;
-  letter-spacing: 0.06em;
-  text-align: center;
-  padding: 0 12%;
-}
-.hero-caption-vertical {
-  top: 0; right: 0; bottom: 0;
-  width: 26%;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 6%;
-  background: linear-gradient(to left, rgba(0,0,0,0.45), transparent);
-}
-.hero-caption-vertical span {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.95em;
-  letter-spacing: 0.2em;
-}
-.hero-caption-largenum {
-  top: 0; left: 0; right: 0;
-  height: 34%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 6%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
-}
-.hero-caption-largenum-day {
-  color: #fff;
-  font-weight: 800;
-  font-size: 2.1em;
-  letter-spacing: 0.02em;
-  line-height: 1;
-}
-.hero-caption-largenum-label {
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.7em;
-  letter-spacing: 0.28em;
-  margin-top: 6px;
-  text-transform: uppercase;
-}
-
 /* Classic */
 .hero-classic { padding: 40px 20px 60px; }
-.hero-classic .hero-img-wrap { margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+.hero-classic .hero-img-wrap { aspect-ratio: 3/4; margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 .hero-info { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .hero-quote { font-size: 0.85em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 12px; opacity: 0.8; }
 .hero-dday { display: inline-block; padding: 4px 12px; background: color-mix(in srgb, var(--wedding-accent) 10%, transparent); color: var(--wedding-accent); border: 1px solid var(--wedding-accent); border-radius: 4px; font-size: 0.75em; font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; }
@@ -153,7 +92,7 @@
 .minimal-date { font-size: 1em; color: var(--wedding-text-main); margin: 0; letter-spacing: 2px; font-weight: 500; }
 .minimal-time { font-size: 0.85em; color: var(--wedding-text-sub); margin: 8px 0 0; }
 .minimal-dday { display: inline-block; margin-top: 20px; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
-.minimal-img { margin-top: 40px; border-radius: 16px; }
+.minimal-img { aspect-ratio: 3/4; margin-top: 40px; border-radius: 16px; }
 
 /* Editorial */
 .hero-editorial { padding: 50px 24px 60px; }

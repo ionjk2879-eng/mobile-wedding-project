@@ -23,20 +23,3 @@ export const FIXED_LOOK_HERO_STYLES: HeroStyle[] = [
 export function isFixedLookHeroStyle(style: HeroStyle): boolean {
   return FIXED_LOOK_HERO_STYLES.includes(style);
 }
-
-// 캡션(heroCaption) 축은 사진 박스 위/우측에 상단 또는 우측 가장자리 스크림으로 얹히므로,
-// heroPhotoShape와는 다른 기준으로 충돌을 확인했다(실제 script 캡션을 얹어 스크린샷으로 검증).
-// - bookcover: 상단에 이미 있는 "WEDDING INVITATION" 라벨과 코너 장식 위에 캡션이 그대로
-//   겹쳐 라벨 글자가 캡션 텍스트에 가려 거의 안 보이게 된다.
-// - magcover: 신랑·신부 이름 타이틀이 이미 상단에 딱 붙어 있어, 어떤 상단 캡션을 얹어도
-//   여백 없이 바로 위에 붙어버려 두 텍스트가 구분 없이 뭉쳐 보인다.
-// 나머지 스타일(overlay/fullscreen/boldtype/glassframe/magframe/instacard 포함)은 실제
-// 렌더링 결과 자체 텍스트와 겹치지 않아 캡션을 그대로 허용한다.
-export const CAPTION_DISABLED_HERO_STYLES: HeroStyle[] = [
-  'bookcover',
-  'magcover',
-];
-
-export function isCaptionDisabledHeroStyle(style: HeroStyle): boolean {
-  return CAPTION_DISABLED_HERO_STYLES.includes(style);
-}

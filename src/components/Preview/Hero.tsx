@@ -1,7 +1,6 @@
 import React from 'react';
 import { InvitationData } from '../../types';
-import { isFixedLookHeroStyle, isCaptionDisabledHeroStyle } from '../../data/heroStyleConfig';
-import { findHeroCaption } from '../../data/heroCaptions';
+import { isFixedLookHeroStyle } from '../../data/heroStyleConfig';
 
 interface PreviewProps {
   data: InvitationData;
@@ -52,40 +51,18 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   // 갖고 있어 이 축을 무시(항상 basic 취급)한다.
   const heroShape = isFixedLookHeroStyle(style) ? 'basic' : (data.heroPhotoShape || 'basic');
 
-  // 캡션(heroCaption) 축 — heroPhotoShape와 독립적으로 선택 가능. 사진과 같은 박스 안에
-  // 놓이며, 텍스트가 앉는 영역(상/우측 25~34%)에만 그라데이션 스크림을 깔아 사진 밝기와
-  // 무관하게 항상 또렷하게 보이도록 한다(사진 전체를 어둡게 하지 않음).
-  const captionPreset = isCaptionDisabledHeroStyle(style) ? undefined : findHeroCaption(data.heroCaption);
-  const captionOverlay: React.ReactNode = (() => {
-    if (!captionPreset) return null;
-    if (captionPreset.style === 'large-number') {
-      const d = data.weddingDateISO ? new Date(data.weddingDateISO) : null;
-      const valid = d && !isNaN(d.getTime());
-      const bigDate = valid ? `${String(d!.getMonth() + 1).padStart(2, '0')}.${String(d!.getDate()).padStart(2, '0')}` : '--.--';
-      return (
-        <div className="hero-caption hero-caption-largenum">
-          <span className="hero-caption-largenum-day">{bigDate}</span>
-          <span className="hero-caption-largenum-label">{captionPreset.text}</span>
-        </div>
-      );
-    }
-    return <div className={`hero-caption hero-caption-${captionPreset.style}`}><span>{captionPreset.text}</span></div>;
-  })();
-
   const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode): React.ReactNode => {
     const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={{ objectPosition: pos }} /> : fallback;
-    const shapeClass = heroShape !== 'basic' ? `hero-shape-${heroShape}` : '';
-    if (!shapeClass && !captionOverlay) return img;
+    if (heroShape === 'basic') return img;
     if (heroShape === 'polaroid') {
       return (
         <div className="hero-shape hero-shape-polaroid">
           {src && <img src={src} alt="" aria-hidden="true" className="hero-photo hero-photo-back" style={{ objectPosition: pos }} />}
           <div className="hero-photo-front">{img}</div>
-          {captionOverlay}
         </div>
       );
     }
-    return <div className={`hero-shape ${shapeClass}`}>{img}{captionOverlay}</div>;
+    return <div className={`hero-shape hero-shape-${heroShape}`}>{img}</div>;
   };
 
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
@@ -475,7 +452,6 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhoto2Y === next.data.heroPhoto2Y
   && prev.data.heroStyle === next.data.heroStyle
   && prev.data.heroPhotoShape === next.data.heroPhotoShape
-  && prev.data.heroCaption === next.data.heroCaption
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
