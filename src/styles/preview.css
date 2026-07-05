@@ -5,10 +5,7 @@
 
 /* === Hero === */
 .hero { text-align: center; background-color: transparent; position: relative; }
-/* position:relative + z-index:auto를 줘서, DOM 순서상 뒤에 오는 이 요소가 형제인
-   .hero-caption-largenum(역시 z-index:auto)보다 항상 위에 그려지도록 한다.
-   (음수 z-index는 overflow:auto 스크롤 조상 안에서 신뢰할 수 없게 렌더링되는 경우가 있어 피한다) */
-.hero-entrance { position: relative; animation: hero-fade-in 0.8s ease both; }
+.hero-entrance { animation: hero-fade-in 0.8s ease both; }
 @keyframes hero-fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .hero-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hero-photo-empty { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; background: var(--wedding-card-bg); border: 2px dashed var(--wedding-border); text-align: center; }
@@ -48,71 +45,6 @@
   z-index: 0;
 }
 .hero-shape-polaroid .hero-photo-front { position: relative; z-index: 1; width: 100%; height: 100%; }
-
-/* 캡션(heroCaption) — heroPhotoShape와 독립적인 축. script/vertical은 사진 박스 안(hero-shape/hero-photo-box)에
-   얹혀 사진과 함께 어디서든 보이고, large-number는 아래에서 별도로 섹션 전체 배경에 배치한다. */
-.hero-caption { position: absolute; z-index: 2; pointer-events: none; }
-.hero-caption-script {
-  top: 6%; left: 50%; transform: translateX(-50%);
-  max-width: 86%;
-  padding: 7px 20px;
-  background: rgba(255,255,255,0.26);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-  border-radius: 30px;
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.25em;
-  color: #fff;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.hero-caption-vertical {
-  top: 8%; right: 6%; bottom: 8%;
-  display: flex;
-  align-items: center;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-size: 0.85em;
-  letter-spacing: 6px;
-  font-weight: 600;
-  color: #fff;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.35);
-}
-/* justify-content:center 대신 flex-end로 하단에 붙인다 — 사진이 없는 여백/텍스트 영역
-   (다수의 heroStyle에서 배경이 투명해 사진 뒤가 아니라 그 아래 여백에서 그대로 비쳐 보임)에
-   걸치도록 해, 사진이 전체를 덮는 스타일(fullscreen 등)이 아닌 한 실제로 보이게 한다. */
-.hero-caption-largenum {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 6%;
-  box-sizing: border-box;
-  overflow: hidden;
-  pointer-events: none;
-}
-.hero-caption-largenum-day {
-  font-size: 5.6em;
-  font-weight: 800;
-  color: var(--wedding-text-main, #1F2937);
-  opacity: 0.09;
-  line-height: 1;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-.hero-caption-largenum-label {
-  font-size: 0.72em;
-  letter-spacing: 6px;
-  color: var(--wedding-text-main, #1F2937);
-  opacity: 0.16;
-  text-transform: uppercase;
-  margin-top: 10px;
-  white-space: nowrap;
-}
 
 /* Classic */
 .hero-classic { padding: 40px 20px 60px; }

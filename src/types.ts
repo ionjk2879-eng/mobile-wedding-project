@@ -77,8 +77,6 @@ export interface DesignConfig {
   // 사진 모형(테두리 형태) 축. Hero.tsx(메인화면 대표 사진)에만 적용되며, 자체 프레임을
   // 가진 heroStyle(glassframe/magframe)에서는 무시된다. 미지정 시 'basic'(기존과 동일한 사각형).
   heroPhotoShape?: 'basic' | 'fill' | 'arch' | 'oval' | 'frame' | 'blob' | 'polaroid' | 'hexagon';
-  // 선택한 캡션 프리셋(src/data/heroCaptions.ts)의 id. heroPhotoShape와 완전히 독립적인 축.
-  heroCaption?: string;
   fontFamily: string;
   fontSize: 'small' | 'medium' | 'large';
 }

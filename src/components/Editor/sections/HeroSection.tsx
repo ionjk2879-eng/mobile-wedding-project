@@ -5,13 +5,7 @@ import { InvitationData } from '../../../types';
 import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
 import { getApiErrorMessage } from '../../../utils/apiError';
-import { HERO_CAPTIONS, HERO_CAPTION_DISABLED_STYLES, HeroCaptionStyle } from '../../../data/heroCaptions';
-
-const CAPTION_STYLE_LABELS: Record<HeroCaptionStyle, string> = {
-  script: '흘림체',
-  'large-number': '큰 숫자',
-  vertical: '세로쓰기',
-};
+import { isFixedLookHeroStyle } from '../../../data/heroStyleConfig';
 
 const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; name: string; desc: string }[] = [
   { key: 'basic', name: '기본', desc: '사각형 그대로' },
@@ -24,17 +18,13 @@ const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; n
   { key: 'hexagon', name: '육각형', desc: '각진 다각형으로' },
 ];
 
-// 자체 액자 프레임을 가진 스타일 — 사진 모형(heroPhotoShape) 축을 적용해도 무시되므로 선택 UI 자체를 숨긴다.
-const FRAMED_HERO_STYLES: InvitationData['heroStyle'][] = ['glassframe', 'magframe'];
-
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
   const updateFields = useInvitationStore((s) => s.updateFields);
   const [uploading, setUploading] = useState(false);
   const [uploading2, setUploading2] = useState(false);
-  const hasOwnFrame = FRAMED_HERO_STYLES.includes(data.heroStyle);
-  const hasOwnCaptionLayout = HERO_CAPTION_DISABLED_STYLES.includes(data.heroStyle);
+  const isFixedLook = isFixedLookHeroStyle(data.heroStyle);
 
   const handleHeroPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -143,9 +133,11 @@ const HeroSection: React.FC = () => {
           )}
         </>
       )}
-      {!hasOwnFrame && (
-        <div className="input-group">
-          <label>사진 모형</label>
+      <div className="input-group">
+        <label>사진 모형</label>
+        {isFixedLook ? (
+          <p className="hero-fixed-look-notice">이 스타일은 사진 모형과 무관하게 고유한 디자인을 사용합니다.</p>
+        ) : (
           <div className="hero-shape-grid">
             {HERO_PHOTO_SHAPES.map((s) => (
               <button
@@ -160,34 +152,8 @@ const HeroSection: React.FC = () => {
               </button>
             ))}
           </div>
-        </div>
-      )}
-      {!hasOwnCaptionLayout && (
-        <div className="input-group">
-          <label>캡션</label>
-          <div className="hero-caption-grid">
-            <button
-              type="button"
-              className={`hero-caption-btn ${!data.heroCaption ? 'active' : ''}`}
-              onClick={() => updateField('heroCaption', undefined)}
-            >
-              <strong>사용 안 함</strong>
-            </button>
-            {HERO_CAPTIONS.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                className={`hero-caption-btn ${data.heroCaption === c.id ? 'active' : ''}`}
-                onClick={() => updateField('heroCaption', c.id)}
-              >
-                <strong>{c.text}</strong>
-                <span>{CAPTION_STYLE_LABELS[c.style]}</span>
-              </button>
-            ))}
-          </div>
-          <span className="input-hint">라이브 프리뷰에서 바로 확인할 수 있어요. 사진 모형과 자유롭게 조합 가능합니다.</span>
-        </div>
-      )}
+        )}
+      </div>
       <div className="input-group">
         <label>메인화면 스타일</label>
         <div className="hero-style-grid">
