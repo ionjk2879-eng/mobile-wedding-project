@@ -598,25 +598,27 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
             <path d="M95,0 L237,65" />
             <path d="M379,0 L237,65" />
             <path d="M474,27.5 L379,0" />
-            <path d="M165,120 L237,65" />
-            <path d="M309,120 L237,65" />
+            <path d="M165,90 L237,65" />
+            <path d="M309,90 L237,65" />
             <path d="M0,656.5 L95,684" />
             <path d="M95,684 L237,619" />
             <path d="M379,684 L237,619" />
             <path d="M474,656.5 L379,684" />
-            <path d="M165,561 L237,619" />
-            <path d="M309,561 L237,619" />
+            <path d="M165,594 L237,619" />
+            <path d="M309,594 L237,619" />
             <path d="M0,200 L65,342" />
             <path d="M0,484 L65,342" />
-            <path d="M92.5,270 L65,342" />
-            <path d="M92.5,414 L65,342" />
+            <path d="M80,270 L65,342" />
+            <path d="M80,414 L65,342" />
             <path d="M474,200 L409,342" />
             <path d="M474,484 L409,342" />
-            <path d="M380,270 L409,342" />
-            <path d="M380,414 L409,342" />
+            <path d="M394,270 L409,342" />
+            <path d="M394,414 L409,342" />
           </g>
-          <path d="M117.5,129 L355.5,129 L371.5,145 L371.5,536 L355.5,552 L117.5,552 L101.5,536 L101.5,145 Z" fill="none" stroke={facetFrameColor || '#c9a24d'} strokeWidth={1.4} />
-          <path d="M108.5,120 L364,120 L380,136 L380,545 L364,561 L108.5,561 L92.5,545 L92.5,136 Z" fill="none" stroke={facetFrameColor || '#dcb96a'} strokeWidth={2.2} />
+          {/* 프레임 사각형(텍스트 담는 영역)을 원본보다 가로 +26.5/세로 +63 키움 — 코너 팩싯이
+              screen edge~apex 구간은 그대로 두고, 프레임과 맞물리는 지점만 넓어진 프레임 위치로 옮겼다 */}
+          <path d="M105,99 L369,99 L385,115 L385,569 L369,585 L105,585 L89,569 L89,115 Z" fill="none" stroke={facetFrameColor || '#c9a24d'} strokeWidth={1.4} />
+          <path d="M96,90 L378,90 L394,106 L394,578 L378,594 L96,594 L80,578 L80,106 Z" fill="none" stroke={facetFrameColor || '#dcb96a'} strokeWidth={2.2} />
         </svg>
       )}
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
