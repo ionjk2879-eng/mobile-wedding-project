@@ -1,5 +1,6 @@
 import React from 'react';
 import { InvitationData } from '../../types';
+import { findHeroCaption, HERO_CAPTION_DISABLED_STYLES } from '../../data/heroCaptions';
 
 interface PreviewProps {
   data: InvitationData;
@@ -50,18 +51,31 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const hasOwnFrame = style === 'glassframe' || style === 'magframe';
   const heroShape = hasOwnFrame ? 'basic' : (data.heroPhotoShape || 'basic');
 
+  // 캡션(heroCaption) 축도 heroPhotoShape와 완전히 독립적으로 선택 가능하다.
+  // 단, 이미 자체 텍스트/프레임 배치가 있는 스타일(HERO_CAPTION_DISABLED_STYLES)에서는 무시한다.
+  const hasOwnCaptionLayout = HERO_CAPTION_DISABLED_STYLES.includes(style);
+  const captionPreset = hasOwnCaptionLayout ? undefined : findHeroCaption(data.heroCaption);
+
+  // script/vertical은 사진 위/옆에 얹는 오버레이라 사진과 같은 박스 안(wrapWithShape)에 넣는다.
+  // large-number는 "사진 뒤에 배경처럼" 배치되는 섹션 전체의 은은한 배경 요소라 아래에서 별도로 렌더링한다.
+  const captionOverlay: React.ReactNode = captionPreset && captionPreset.style !== 'large-number' ? (
+    <div className={`hero-caption hero-caption-${captionPreset.style}`}><span>{captionPreset.text}</span></div>
+  ) : null;
+
   const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode): React.ReactNode => {
     const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={{ objectPosition: pos }} /> : fallback;
-    if (heroShape === 'basic') return img;
+    const shapeClass = heroShape !== 'basic' ? `hero-shape-${heroShape}` : '';
+    if (!shapeClass && !captionOverlay) return img;
     if (heroShape === 'polaroid') {
       return (
         <div className="hero-shape hero-shape-polaroid">
           {src && <img src={src} alt="" aria-hidden="true" className="hero-photo hero-photo-back" style={{ objectPosition: pos }} />}
           <div className="hero-photo-front">{img}</div>
+          {captionOverlay}
         </div>
       );
     }
-    return <div className={`hero-shape hero-shape-${heroShape}`}>{img}</div>;
+    return <div className={`hero-shape ${shapeClass}`}>{img}{captionOverlay}</div>;
   };
 
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
@@ -70,6 +84,20 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
   const photo2El = data.heroPhoto2 ? wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl) : photoEl;
+
+  // large-number 캡션: 실제 예식 날짜를 큰 숫자로 섹션 전체의 은은한 배경처럼 깐다(사진/텍스트 뒤).
+  const largeNumberCaption = (() => {
+    if (!captionPreset || captionPreset.style !== 'large-number') return null;
+    const d = data.weddingDateISO ? new Date(data.weddingDateISO) : null;
+    const valid = d && !isNaN(d.getTime());
+    const bigDate = valid ? `${String(d!.getMonth() + 1).padStart(2, '0')}.${String(d!.getDate()).padStart(2, '0')}` : '--.--';
+    return (
+      <div className="hero-caption-largenum" aria-hidden="true">
+        <span className="hero-caption-largenum-day">{bigDate}</span>
+        <span className="hero-caption-largenum-label">{captionPreset.text}</span>
+      </div>
+    );
+  })();
 
   const renderClassic = () => (
     <div className="hero-classic">
@@ -412,6 +440,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   return (
     <section className="hero" style={{ fontFamily: data.fontFamily }} aria-label="메인">
+      {largeNumberCaption}
       <div
         key={`${groomName}-${brideName}-${style}`}
         className="hero-entrance"
@@ -451,6 +480,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhoto2Y === next.data.heroPhoto2Y
   && prev.data.heroStyle === next.data.heroStyle
   && prev.data.heroPhotoShape === next.data.heroPhotoShape
+  && prev.data.heroCaption === next.data.heroCaption
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
