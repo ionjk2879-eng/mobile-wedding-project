@@ -319,10 +319,13 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
     if (!existing) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
     if (existing.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
+    // r2_key 목록은 gallery_photos 행이 지워지기 전에 미리 조회해둬야 한다(지운 뒤엔 조회 불가).
+    // 하지만 R2에서 실제로 지우는 건 되돌릴 수 없는 작업이라, DB batch가 확실히 성공한 뒤로
+    // 미룬다 — 순서를 반대로 하면(예전 코드처럼 R2 먼저) DB batch가 드물게 실패했을 때
+    // "청첩장 행은 그대로 남아있는데 사진들만 다 깨진" 상태가 될 수 있다. DB가 먼저 성공하면
+    // 최악의 경우에도 "이미 삭제된 청첩장의 R2 파일이 고아로 남는" 정도라 훨씬 안전하다.
     const photos = await env.DB.prepare('SELECT r2_key FROM gallery_photos WHERE invitation_slug = ?').bind(slug).all();
     const r2Keys = photos.results.map((p) => p.r2_key as string);
-    if (r2Keys.length > 0) await env.IMAGES.delete(r2Keys);
-    await deleteAnniversaryImages(env, slug);
 
     await env.DB.batch([
       env.DB.prepare('DELETE FROM guestbook WHERE invitation_slug = ?').bind(slug),
@@ -331,6 +334,9 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
       env.DB.prepare('DELETE FROM gallery_photos WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(slug),
     ]);
+
+    if (r2Keys.length > 0) await env.IMAGES.delete(r2Keys);
+    await deleteAnniversaryImages(env, slug);
     return json({ ok: true }, 200, origin);
   }
 
@@ -366,18 +372,20 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
 
   // anniversaryMode.heroPhoto/photos는 R2 키에 slug가 박혀 있어서(anniversary/{slug}/...),
   // 슬러그만 바꾸고 파일을 그대로 두면 나중에 이 청첩장이 삭제/만료될 때 새 슬러그 접두사로만
-  // 찾다가 옛 슬러그 파일들을 영영 못 찾아 R2에 고아로 남는다. 그래서 실제로 옮기고 URL도 갱신한다.
-  if (data.anniversaryMode) {
-    const keyMap = await moveAnniversaryImages(env, oldSlug, newSlug);
-    if (keyMap.size > 0) {
-      const remap = (url: string) => {
-        for (const [oldKey, newKey] of keyMap) {
-          if (url === `/images/${oldKey}`) return `/images/${newKey}`;
-        }
-        return url;
-      };
-      if (data.anniversaryMode.heroPhoto) data.anniversaryMode.heroPhoto = remap(data.anniversaryMode.heroPhoto);
-      if (Array.isArray(data.anniversaryMode.photos)) data.anniversaryMode.photos = data.anniversaryMode.photos.map(remap);
+  // 찾다가 옛 슬러그 파일들을 영영 못 찾아 R2에 고아로 남는다. URL 문자열 치환은 R2를 전혀
+  // 건드리지 않는 순수 계산이라 DB batch보다 먼저 해도 안전하다 — 실제 R2 이동(되돌릴 수
+  // 없는 삭제 포함)은 DB batch가 확실히 성공한 뒤로 미룬다(아래). 순서를 반대로 하면 DB
+  // batch가 드물게 실패했을 때 "슬러그 변경도 안 됐는데 옛 청첩장 사진은 이미 옮겨져서
+  // 다 깨진" 최악의 조합이 나올 수 있다.
+  const hasAnniversaryImages = !!data.anniversaryMode;
+  if (hasAnniversaryImages) {
+    const fromPrefix = `anniversary/${oldSlug}/`;
+    const toPrefix = `anniversary/${newSlug}/`;
+    if (typeof data.anniversaryMode.heroPhoto === 'string') {
+      data.anniversaryMode.heroPhoto = data.anniversaryMode.heroPhoto.replace(fromPrefix, toPrefix);
+    }
+    if (Array.isArray(data.anniversaryMode.photos)) {
+      data.anniversaryMode.photos = data.anniversaryMode.photos.map((url: string) => url.replace(fromPrefix, toPrefix));
     }
   }
 
@@ -393,6 +401,9 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
     env.DB.prepare('UPDATE gallery_photos SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(oldSlug),
   ]);
+
+  // DB batch가 성공적으로 커밋된 뒤에만 R2의 실제 이동(get→put→delete, 되돌릴 수 없음)을 실행한다.
+  if (hasAnniversaryImages) await moveAnniversaryImages(env, oldSlug, newSlug);
 
   return json({ ok: true }, 200, origin);
 }
@@ -925,22 +936,19 @@ async function deleteAnniversaryImages(env: Env, slug: string): Promise<void> {
 // 슬러그 변경 시에는 anniversary/{oldSlug}/... 키를 삭제해버리면 안 되고(아직 쓰는 파일),
 // anniversary/{newSlug}/...로 실제로 옮겨야 한다 — 안 옮기면 이후 그 청첩장이 삭제/만료될 때
 // deleteAnniversaryImages가 새 슬러그 접두사만 찾아서 옛 슬러그 파일들이 영영 고아로 남는다.
-// R2에는 rename이 없어 get→put→delete로 직접 복사한다. 반환값은 data.anniversaryMode의
-// heroPhoto/photos URL을 새 키로 바꿔 쓸 수 있도록 (oldKey → newKey) 매핑이다.
-async function moveAnniversaryImages(env: Env, oldSlug: string, newSlug: string): Promise<Map<string, string>> {
+// R2에는 rename이 없어 get→put→delete로 직접 복사한다. 호출부(handleChangeSlug)가 URL
+// 문자열은 이미 새 키 이름으로 앞서 치환해뒀으므로, 여기서는 실제 파일만 그 이름에 맞춰 옮긴다.
+async function moveAnniversaryImages(env: Env, oldSlug: string, newSlug: string): Promise<void> {
   const oldPrefix = `anniversary/${oldSlug}/`;
   const newPrefix = `anniversary/${newSlug}/`;
   const listed = await env.IMAGES.list({ prefix: oldPrefix });
-  const keyMap = new Map<string, string>();
   for (const obj of listed.objects) {
     const newKey = newPrefix + obj.key.slice(oldPrefix.length);
     const got = await env.IMAGES.get(obj.key);
     if (!got) continue;
     await env.IMAGES.put(newKey, got.body, { httpMetadata: got.httpMetadata });
-    keyMap.set(obj.key, newKey);
   }
   if (listed.objects.length > 0) await env.IMAGES.delete(listed.objects.map((o) => o.key));
-  return keyMap;
 }
 
 async function handleUpload(request: Request, env: Env): Promise<Response> {
@@ -1213,12 +1221,13 @@ async function deleteExpiredInvitations(env: Env): Promise<void> {
   ).bind(now).all();
   for (const row of expired.results) {
     const slug = row.slug as string;
-    // gallery_photos는 R2에 실제 이미지 파일이 딸려있어서, DB에서 지우기 전에
-    // r2_key를 먼저 조회해 R2 쪽도 함께 정리해야 R2에 고아 파일이 남지 않는다.
+    // gallery_photos는 R2에 실제 이미지 파일이 딸려있어서 r2_key를 먼저 조회해둬야 하지만
+    // (DB에서 행이 지워지면 조회 불가), 실제 R2 삭제는 되돌릴 수 없는 작업이라 DB batch가
+    // 확실히 성공한 뒤로 미룬다 — DB가 먼저 실패하면 아무것도 안 지워진 채 그대로 남아
+    // 다음 크론 실행 때 다시 시도되지만, R2를 먼저 지운 뒤 DB가 실패하면 "청첩장은 아직
+    // 만료 처리 안 됐는데 사진들은 다 깨진" 상태가 될 수 있다.
     const photos = await env.DB.prepare('SELECT r2_key FROM gallery_photos WHERE invitation_slug = ?').bind(slug).all();
     const r2Keys = photos.results.map((p) => p.r2_key as string);
-    if (r2Keys.length > 0) await env.IMAGES.delete(r2Keys);
-    await deleteAnniversaryImages(env, slug);
 
     await env.DB.batch([
       env.DB.prepare('DELETE FROM guestbook WHERE invitation_slug = ?').bind(slug),
@@ -1227,6 +1236,9 @@ async function deleteExpiredInvitations(env: Env): Promise<void> {
       env.DB.prepare('DELETE FROM gallery_photos WHERE invitation_slug = ?').bind(slug),
       env.DB.prepare('DELETE FROM invitations WHERE slug = ?').bind(slug),
     ]);
+
+    if (r2Keys.length > 0) await env.IMAGES.delete(r2Keys);
+    await deleteAnniversaryImages(env, slug);
   }
 }
 
