@@ -72,7 +72,7 @@ const ShareSection: React.FC = () => {
       <div className="input-group">
         <label>공유 제목</label>
         <input type="text" value={shareTitle} onChange={(e) => updateField('shareTitle', e.target.value)} className="modern-input" placeholder={defaultShareTitle} />
-        <span className="input-hint">비워두면 신랑/신부 이름으로 자동 생성됩니다.</span>
+        <span className="input-hint">비워두면 기본정보에서 등록한 신랑 신부의 이름으로 자동 생성됩니다.</span>
       </div>
       <div className="input-group">
         <label>공유 설명</label>
