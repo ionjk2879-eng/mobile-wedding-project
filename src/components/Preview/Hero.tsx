@@ -45,17 +45,31 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return `D-${diffDays}`;
   };
 
+  // 사진 모형(heroPhotoShape) 축은 이 컴포넌트(메인화면 대표 사진)에만 적용된다.
+  // glassframe/magframe은 이미 자체 액자 프레임을 갖고 있어 이 축을 무시(항상 basic 취급)한다.
+  const hasOwnFrame = style === 'glassframe' || style === 'magframe';
+  const heroShape = hasOwnFrame ? 'basic' : (data.heroPhotoShape || 'basic');
+
+  const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode): React.ReactNode => {
+    const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={{ objectPosition: pos }} /> : fallback;
+    if (heroShape === 'basic') return img;
+    if (heroShape === 'polaroid') {
+      return (
+        <div className="hero-shape hero-shape-polaroid">
+          {src && <img src={src} alt="" aria-hidden="true" className="hero-photo hero-photo-back" style={{ objectPosition: pos }} />}
+          <div className="hero-photo-front">{img}</div>
+        </div>
+      );
+    }
+    return <div className={`hero-shape hero-shape-${heroShape}`}>{img}</div>;
+  };
+
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
-  const photoEl = data.heroPhoto ? (
-    <img src={data.heroPhoto} alt="Wedding" className="hero-photo" style={{ objectPosition: photoPos }} />
-  ) : (
-    <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>
-  );
+  const emptyPhotoEl = <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>;
+  const photoEl = wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl);
 
   const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
-  const photo2El = data.heroPhoto2 ? (
-    <img src={data.heroPhoto2} alt="Wedding" className="hero-photo" style={{ objectPosition: photo2Pos }} />
-  ) : photoEl;
+  const photo2El = data.heroPhoto2 ? wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl) : photoEl;
 
   const renderClassic = () => (
     <div className="hero-classic">
@@ -436,6 +450,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhoto2X === next.data.heroPhoto2X
   && prev.data.heroPhoto2Y === next.data.heroPhoto2Y
   && prev.data.heroStyle === next.data.heroStyle
+  && prev.data.heroPhotoShape === next.data.heroPhotoShape
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily

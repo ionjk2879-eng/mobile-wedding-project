@@ -26,6 +26,7 @@ export const initialData: InvitationData = {
   galleryStyle: 'slide',
   heroPhoto: '',
   heroStyle: 'classic',
+  heroPhotoShape: 'basic',
   photos: [],
   fontFamily: "'Pretendard', sans-serif",
   fontSize: 'medium',

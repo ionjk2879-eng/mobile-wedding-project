@@ -6,12 +6,27 @@ import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
 import { getApiErrorMessage } from '../../../utils/apiError';
 
+const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; name: string; desc: string }[] = [
+  { key: 'basic', name: '기본', desc: '사각형 그대로' },
+  { key: 'fill', name: '라운드', desc: '모서리를 둥글게' },
+  { key: 'arch', name: '아치형', desc: '위쪽을 둥근 아치로' },
+  { key: 'oval', name: '오벌형', desc: '타원형으로' },
+  { key: 'frame', name: '액자형', desc: '흰 여백 액자를 두름' },
+  { key: 'blob', name: '물방울형', desc: '불규칙한 유기적 곡선' },
+  { key: 'polaroid', name: '폴라로이드형', desc: '하단 여백 + 살짝 기울임' },
+  { key: 'hexagon', name: '육각형', desc: '각진 다각형으로' },
+];
+
+// 자체 액자 프레임을 가진 스타일 — 사진 모형(heroPhotoShape) 축을 적용해도 무시되므로 선택 UI 자체를 숨긴다.
+const FRAMED_HERO_STYLES: InvitationData['heroStyle'][] = ['glassframe', 'magframe'];
+
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
   const updateFields = useInvitationStore((s) => s.updateFields);
   const [uploading, setUploading] = useState(false);
   const [uploading2, setUploading2] = useState(false);
+  const hasOwnFrame = FRAMED_HERO_STYLES.includes(data.heroStyle);
 
   const handleHeroPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -119,6 +134,25 @@ const HeroSection: React.FC = () => {
             </div>
           )}
         </>
+      )}
+      {!hasOwnFrame && (
+        <div className="input-group">
+          <label>사진 모형</label>
+          <div className="hero-shape-grid">
+            {HERO_PHOTO_SHAPES.map((s) => (
+              <button
+                key={s.key}
+                type="button"
+                className={`hero-shape-btn ${(data.heroPhotoShape || 'basic') === s.key ? 'active' : ''}`}
+                onClick={() => updateField('heroPhotoShape', s.key)}
+              >
+                <span className={`hero-shape-preview hero-shape-preview-${s.key}`} />
+                <strong>{s.name}</strong>
+                <span className="hero-shape-btn-desc">{s.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
       <div className="input-group">
         <label>메인화면 스타일</label>
