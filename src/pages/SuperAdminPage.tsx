@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { apiFetch } from '../services/api';
 import { activatePaidInvitation } from '../services/invitationService';
 import useAuthStore from '../stores/useAuthStore';
-import { signInWithGoogle, initiateKakaoLogin, initiateNaverLogin } from '../services/auth';
+import { signInWithGoogle, initiateKakaoLogin, initiateNaverLogin, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
 import ToastContainer from '../components/Toast';
 import { Search, RefreshCw, CheckCircle, ExternalLink, Plus, Pencil, Trash2, X, KeyRound, Download, Copy } from 'lucide-react';
@@ -160,6 +160,41 @@ const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
           </button>
         </div>
       </div>
+    </div>
+  );
+};
+
+// 로그인 3종 버튼. beforeLogin이 있으면(예: 이미 다른 계정으로 로그인된 상태에서 관리자
+// 계정으로 전환할 때) 로그인 진행 전에 먼저 실행한다(signOut). returnUrl은 항상 이 페이지로
+// 고정한다 — 안 그러면 각 로그인 함수의 기본값(/manage)으로 리디렉션되어 버린다.
+const LoginButtons: React.FC<{ beforeLogin?: () => void }> = ({ beforeLogin }) => {
+  const go = (initiate: (returnUrl?: string) => void) => {
+    beforeLogin?.();
+    initiate('/superadmin');
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '280px' }}>
+      <button
+        onClick={() => go(initiateKakaoLogin)}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#FEE500', color: '#191919', border: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2C5.03 2 1 5.13 1 8.97c0 2.48 1.65 4.66 4.13 5.88-.18.67-.66 2.42-.75 2.8-.12.47.17.46.36.34.15-.1 2.37-1.61 3.33-2.27.3.04.61.06.93.06 4.97 0 9-3.13 9-6.97C19 5.13 14.97 2 10 2Z" fill="#191919"/></svg>
+        카카오로 로그인
+      </button>
+      <button
+        onClick={() => go(initiateNaverLogin)}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#03C75A', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13.56 10.7 6.15 3H3v14h3.44V9.3L13.85 17H17V3h-3.44v7.7Z" fill="white"/></svg>
+        네이버로 로그인
+      </button>
+      <button
+        onClick={() => go(signInWithGoogle)}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#4285F4', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M19.6 10.23c0-.68-.06-1.36-.17-2.01H10v3.8h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.73 2.98-4.3 2.98-7.31Z" fill="white"/><path d="M10 20c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.04.95-3.38.95-2.6 0-4.8-1.76-5.58-4.12H1.08v2.58A9.99 9.99 0 0 0 10 20Z" fill="white"/><path d="M4.42 11.9a6.02 6.02 0 0 1 0-3.82V5.5H1.08a10 10 0 0 0 0 8.98l3.34-2.58Z" fill="white"/><path d="M10 3.96c1.47 0 2.78.5 3.82 1.5l2.86-2.87A10 10 0 0 0 1.08 5.5l3.34 2.58c.78-2.36 2.98-4.12 5.58-4.12Z" fill="white"/></svg>
+        Google로 로그인
+      </button>
     </div>
   );
 };
@@ -340,45 +375,34 @@ const SuperAdminPage: React.FC = () => {
   };
 
   if (authorized !== true) {
-    // 로그인 자체를 안 한 상태면 관리자 로그인 버튼을 보여준다. 로그인은 했지만
-    // 슈퍼관리자 이메일이 아닌 경우에만 "접근 권한이 없습니다"로 구분한다.
-    if (!user) {
+    if (authorized === null) {
       return (
-        <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", gap: '20px', textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: "'Pretendard', sans-serif", color: '#6B7280' }}>
           <ToastContainer />
-          <h1 style={{ color: '#D4A5C6', letterSpacing: '3px', margin: 0, fontSize: '2rem' }}>Sonett</h1>
-          <p style={{ color: '#6B7280', margin: 0 }}>관리자 로그인</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px', width: '280px' }}>
-            <button
-              onClick={() => initiateKakaoLogin()}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#FEE500', color: '#191919', border: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2C5.03 2 1 5.13 1 8.97c0 2.48 1.65 4.66 4.13 5.88-.18.67-.66 2.42-.75 2.8-.12.47.17.46.36.34.15-.1 2.37-1.61 3.33-2.27.3.04.61.06.93.06 4.97 0 9-3.13 9-6.97C19 5.13 14.97 2 10 2Z" fill="#191919"/></svg>
-              카카오로 로그인
-            </button>
-            <button
-              onClick={() => initiateNaverLogin()}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#03C75A', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13.56 10.7 6.15 3H3v14h3.44V9.3L13.85 17H17V3h-3.44v7.7Z" fill="white"/></svg>
-              네이버로 로그인
-            </button>
-            <button
-              onClick={() => signInWithGoogle()}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#4285F4', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M19.6 10.23c0-.68-.06-1.36-.17-2.01H10v3.8h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.73 2.98-4.3 2.98-7.31Z" fill="white"/><path d="M10 20c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.04.95-3.38.95-2.6 0-4.8-1.76-5.58-4.12H1.08v2.58A9.99 9.99 0 0 0 10 20Z" fill="white"/><path d="M4.42 11.9a6.02 6.02 0 0 1 0-3.82V5.5H1.08a10 10 0 0 0 0 8.98l3.34-2.58Z" fill="white"/><path d="M10 3.96c1.47 0 2.78.5 3.82 1.5l2.86-2.87A10 10 0 0 0 1.08 5.5l3.34 2.58c.78-2.36 2.98-4.12 5.58-4.12Z" fill="white"/></svg>
-              Google로 로그인
-            </button>
-          </div>
+          <p>확인 중...</p>
         </div>
       );
     }
 
+    // 로그인 자체를 안 한 상태면 관리자 로그인 버튼을 보여준다. 이미 다른 계정(슈퍼관리자가
+    // 아닌 본인 청첩장 계정 등)으로 로그인돼 있으면 AuthGate를 이미 통과해온 상태라 user가
+    // 채워져 있으므로, "접근 권한이 없습니다"와 함께 로그아웃 후 다른 계정으로 로그인할 수
+    // 있는 버튼도 같이 보여준다 — 안 그러면 이미 로그인된 사용자는 로그인 버튼 자체를
+    // 볼 방법이 없어서 계정을 못 바꾼다.
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: "'Pretendard', sans-serif", color: '#6B7280' }}>
+      <div style={{ width: '100vw', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", gap: '20px', textAlign: 'center', padding: '40px 20px', boxSizing: 'border-box' }}>
         <ToastContainer />
-        <p>{authorized === null ? '확인 중...' : '접근 권한이 없습니다.'}</p>
+        <h1 style={{ color: '#D4A5C6', letterSpacing: '3px', margin: 0, fontSize: '2rem' }}>Sonett</h1>
+        {user ? (
+          <>
+            <p style={{ color: '#DC2626', margin: 0, fontWeight: 700 }}>접근 권한이 없습니다.</p>
+            <p style={{ color: '#9CA3AF', margin: 0, fontSize: '0.85rem' }}>현재 {user.email} 계정으로 로그인되어 있습니다.</p>
+            <p style={{ color: '#6B7280', margin: '8px 0 0' }}>다른 계정으로 로그인</p>
+          </>
+        ) : (
+          <p style={{ color: '#6B7280', margin: 0 }}>관리자 로그인</p>
+        )}
+        <LoginButtons beforeLogin={user ? signOut : undefined} />
       </div>
     );
   }
