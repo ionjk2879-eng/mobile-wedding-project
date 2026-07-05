@@ -4,7 +4,7 @@ import {
   Image as ImageIcon, Milestone, MapPin, CalendarCheck, CreditCard,
   Info, BookOpen, Camera, Send,
 } from 'lucide-react';
-import { InvitationData, GuestRelation } from '../../types';
+import { InvitationData, GuestRelation, OpeningConfig } from '../../types';
 import useInvitationStore from '../../stores/useInvitationStore';
 import '../../styles/preview.css';
 import Hero from './Hero';
@@ -134,7 +134,6 @@ function buildSectionOrder(data: InvitationData): string[] {
 }
 
 const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex }) => {
-  const sectionOrder = buildSectionOrder(data);
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
 
   const daysAfterWedding = (() => {
@@ -144,6 +143,24 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   // 기념일 모드 여부는 호출자(ViewPage 등)가 URL 파라미터/예식일+24시간 경과/토글 상태를
   // 종합해 계산한 뒤 이 prop으로 넘겨준다 — 이 컴포넌트는 그 결과만 그대로 반영한다.
   const isAnniversaryMode = forceAnniversaryMode === true;
+
+  // 기념일 모드에서는 anniversaryMode에 등록된 대표사진/갤러리/오프닝 스타일을 우선 사용하고,
+  // 아직 등록 안 한 값(빈 문자열/빈 배열/undefined)은 청첩장 모드 값으로 그대로 폴백한다.
+  // 이 외의 모든 필드(테마/폰트/문구 등)는 그대로이므로, 기념일 모드가 아닐 때는 data와
+  // 완전히 동일한 참조를 그대로 쓴다 — 일반 청첩장 열람 동작에는 영향이 없다.
+  const am = data.anniversaryMode;
+  const effectiveData: InvitationData = isAnniversaryMode && am
+    ? {
+        ...data,
+        heroPhoto: am.heroPhoto || data.heroPhoto,
+        photos: am.photos && am.photos.length > 0 ? am.photos : data.photos,
+        opening: data.opening
+          ? { ...data.opening, openingStyle: (am.openingStyle as OpeningConfig['openingStyle']) || data.opening.openingStyle }
+          : data.opening,
+      }
+    : data;
+
+  const sectionOrder = buildSectionOrder(effectiveData);
   const [previewActive, setPreviewActive] = useState(false);
   // openingDone: 한 번 dismiss 되면 true → shouldShowOpening = false → 완전히 언마운트
   const [openingDone, setOpeningDone] = useState(false);
@@ -175,9 +192,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   const anniversaryOpeningText = `D+${effectiveDaysAfterWedding}`;
   const anniversaryOpeningSubText = '';
 
-  const anniversaryOpening = isAnniversaryMode && data.opening
-    ? { ...data.opening, openingEnabled: true, openingText: anniversaryOpeningText, openingSubText: anniversaryOpeningSubText }
-    : data.opening;
+  const anniversaryOpening = isAnniversaryMode && effectiveData.opening
+    ? { ...effectiveData.opening, openingEnabled: true, openingText: anniversaryOpeningText, openingSubText: anniversaryOpeningSubText }
+    : effectiveData.opening;
 
   // 예식 전 미리보기 중임을 알리는 상단 배너 문구 — 실제 기념일 모드(예식 후)에서는 표시하지 않는다.
   const previewBannerText = (() => {
@@ -246,10 +263,10 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
               <span className="preview-nav-label">메인화면</span>
             </button>
           )}
-          <Hero data={data} />
+          <Hero data={effectiveData} />
         </div>
       ) : (
-        <Hero data={data} />
+        <Hero data={effectiveData} />
       )}
       {effectiveSectionOrder.map((id, i) => {
         const eff = data.scrollEffect || 'none';
@@ -258,7 +275,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         const editorId = PREVIEW_TO_EDITOR[id] || id;
         return (
           <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={data} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} />
+            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} />
           </ScrollReveal>
         );
       })}
