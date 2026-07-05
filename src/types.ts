@@ -119,6 +119,7 @@ export interface OpeningConfig {
   openingFontStyle?: 'elegant' | 'simple' | 'clean';
   openingDecoEffect?: 'none' | 'dots' | 'ripple' | 'sparkle' | 'bokeh' | 'aurora' | 'firefly' | 'petal' | 'aurora-bokeh' | 'firefly-petal' | 'trace';
   openingBgPattern?: string | string[];
+  facetFrameColor?: string; // 'facet-frame' 패턴 전용. 미지정 시 기본 골드(#c9a24d/#dcb96a), 지정 시 얇은 선/굵은 테두리 모두 이 색 하나로 대체
 }
 
 export interface FeatureConfig {
