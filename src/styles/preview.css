@@ -902,6 +902,57 @@
   background-size: 180px 180px;
   mix-blend-mode: overlay;
 }
+/* 코너 플로럴 — 네 모서리에 얇은 넝쿨/잎사귀 라인아트. 색이 SVG 데이터 URI 안에
+   고정되면 테마색을 못 따라가므로, 실루엣만 SVG mask로 만들고 색은 mask 밖에서
+   background-color: var(--wedding-accent)로 입힌다(테마 바뀌면 자동으로 같이 바뀜). */
+.op-pattern-corner-vine {
+  inset: 0;
+  background-color: var(--wedding-accent, currentColor);
+  opacity: 0.55;
+  --op-vine-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 640'%3E%3Cdefs%3E%3Cg id='v'%3E%3Cpath d='M5 58C4 34 15 12 47 6' stroke='black' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M13 36C19 32 25 32 29 25' stroke='black' stroke-width='1.3' fill='none' stroke-linecap='round'/%3E%3Cellipse cx='30' cy='23' rx='7' ry='3' fill='black' transform='rotate(-35 30 23)'/%3E%3Cellipse cx='17' cy='41' rx='6' ry='2.5' fill='black' transform='rotate(-50 17 41)'/%3E%3C/g%3E%3C/defs%3E%3Cuse href='%23v'/%3E%3Cuse href='%23v' transform='translate(360,0) scale(-1,1)'/%3E%3Cuse href='%23v' transform='translate(0,640) scale(1,-1)'/%3E%3Cuse href='%23v' transform='translate(360,640) scale(-1,-1)'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--op-vine-svg);
+  mask-image: var(--op-vine-svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+/* 워터컬러 워시 — 흐릿하게 번진 블롭 4개를 배경/포인트 색으로 겹쳐 은은한 무드만 준다 */
+.op-pattern-wash {
+  inset: 0;
+  opacity: 0.4;
+  filter: blur(30px);
+  background-image:
+    radial-gradient(ellipse 55% 38% at 12% 18%, var(--wedding-accent, #C9A0A0), transparent 72%),
+    radial-gradient(ellipse 50% 42% at 88% 14%, var(--wedding-bg, #FBEFEA), transparent 70%),
+    radial-gradient(ellipse 60% 46% at 18% 88%, var(--wedding-bg, #FBEFEA), transparent 74%),
+    radial-gradient(ellipse 55% 42% at 90% 86%, var(--wedding-accent, #C9A0A0), transparent 72%);
+}
+/* 아르데코 라인 — 얇은 대각선들을 가장자리 쪽에만(중앙은 마스크로 비워) 배치해
+   액자처럼 테두리를 이루되, 화면 전체를 덮어 답답해지지 않게 한다.
+   타원형 마스크 하나로는 세로로 긴 화면에서 상/하만 두꺼워지고 좌/우 변엔 아예
+   선이 안 보이는 문제가 있어서(높이가 폭보다 훨씬 크니 타원도 세로로 길어짐),
+   4변 각각 고정 px 폭의 띠로 마스킹한 두 그라디언트(가로축/세로축)를 합쳐(add)
+   네 변 두께가 동일한 진짜 액자형 띠를 만든다. */
+.op-pattern-deco-lines {
+  inset: 0;
+  opacity: 0.5;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0,
+    transparent 10px,
+    var(--wedding-accent, rgba(0,0,0,0.32)) 10px,
+    var(--wedding-accent, rgba(0,0,0,0.32)) 11px,
+    transparent 11px,
+    transparent 22px
+  );
+  --op-deco-mask-x: linear-gradient(to right, black, black 56px, transparent 56px, transparent calc(100% - 56px), black calc(100% - 56px), black);
+  --op-deco-mask-y: linear-gradient(to bottom, black, black 56px, transparent 56px, transparent calc(100% - 56px), black calc(100% - 56px), black);
+  -webkit-mask-image: var(--op-deco-mask-x), var(--op-deco-mask-y);
+  -webkit-mask-composite: source-over, source-over;
+  mask-image: var(--op-deco-mask-x), var(--op-deco-mask-y);
+  mask-composite: add;
+}
 
 /* Preview overlay popup (portal to body) */
 .pv-overlay-root { animation: pv-overlay-in 0.2s ease; }

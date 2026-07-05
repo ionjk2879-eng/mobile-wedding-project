@@ -297,6 +297,9 @@ const OpeningSection: React.FC = () => {
                   { key: 'wave',  name: '웨이브',       desc: '사선 줄무늬, 세련된 다이내믹' },
                   { key: 'frame', name: '이중 테두리',  desc: '고급 초대장의 안쪽 액자 프레임' },
                   { key: 'grain', name: '그레인 노이즈', desc: '필름 입자 질감, 빈티지·아날로그 감성' },
+                  { key: 'corner-vine', name: '코너 플로럴', desc: '네 모서리의 얇은 넝쿨·잎사귀 라인아트' },
+                  { key: 'wash', name: '워터컬러 워시', desc: '번진 듯 은은하게 겹치는 색감 무드' },
+                  { key: 'deco-lines', name: '아르데코 라인', desc: '가장자리를 두르는 얇은 대각선 기하학 패턴' },
                 ] as const).map(p => (
                   <button key={p.key} type="button"
                     className={`account-style-btn ${p.key === 'none' ? (selected.length === 0 ? 'active' : '') : selected.includes(p.key) ? 'active' : ''}`}
