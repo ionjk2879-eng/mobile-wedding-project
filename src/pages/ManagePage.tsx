@@ -232,7 +232,15 @@ function formatCardDate(data: InvitationData): string {
 
 function getExpiryInfo(data: InvitationData, expiredLabel: string): { label: string; urgent: boolean } | null {
   if (data.isPaid || !data.expiresAt) return null;
-  const diff = Math.ceil((new Date(data.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  // 밀리초 단위 잔여시간을 그대로 Math.ceil하면, 생성 직후 기기 시계의 몇 초~몇 분 오차만으로도
+  // "실제로는 7일 남았는데 잠깐 D-8로 보였다가 금방 D-7로 바뀌는" 현상이 생길 수 있었다.
+  // 시:분:초를 버리고 달력 날짜 차이(자정 기준)로만 계산하면 같은 날 안에서는 값이 절대
+  // 바뀌지 않는다 — 자정을 넘어야만(실제로 하루가 지나야만) 숫자가 줄어든다.
+  const today = new Date();
+  const expiry = new Date(data.expiresAt);
+  const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const expiryUTC = Date.UTC(expiry.getFullYear(), expiry.getMonth(), expiry.getDate());
+  const diff = Math.round((expiryUTC - todayUTC) / (1000 * 60 * 60 * 24));
   if (diff < 0) return { label: expiredLabel, urgent: true };
   if (diff <= 30) return { label: `D-${diff}`, urgent: diff <= 3 };
   return null;
