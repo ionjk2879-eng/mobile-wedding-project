@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { OpeningConfig, GuestRelation } from '../../types';
-import { formatGuestOpeningText } from '../../utils/guestOpeningTemplates';
+import { resolveOpeningMessage } from '../../utils/guestOpeningTemplates';
 import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateTime';
 
 const OPENING_FONTS: Record<string, { family: string; url: string; weights: string }> = {
@@ -144,6 +144,8 @@ interface OpeningProps {
   guestRelation?: GuestRelation;
   guestMessageIndex?: number | null;
   weddingDateISO?: string;
+  slug?: string;
+  enableAnonymousOpening?: boolean;
 }
 
 function hexLuminance(hex: string): number {
@@ -157,7 +159,7 @@ function hexLuminance(hex: string): number {
   } catch { return 0; }
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO, slug, enableAnonymousOpening }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
 
@@ -279,8 +281,14 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const contentSwitchTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const phaseTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // 개인화 링크(guestName)로 들어온 경우 관계별 톤 템플릿을 우선 사용, 없으면 기존 문구로 폴백
-  const guestOpeningText = guestName ? formatGuestOpeningText(guestRelation || 'other', guestName, language, guestMessageIndex) : null;
+  // 개인화 링크(guestName)로 들어온 경우 관계별 톤 템플릿을, 범용 링크(/{slug} 직접 방문)로
+  // 들어온 실제 공개 열람 화면(enableAnonymousOpening)에서는 slug별로 고정된 익명 문구를 사용한다.
+  // 에디터/템플릿 미리보기 등에서는 enableAnonymousOpening을 넘기지 않아 항상 기존 문구가 보인다.
+  const guestOpeningText = useMemo(() => {
+    if (guestName) return resolveOpeningMessage({ slug: slug || '', language, guestName, guestRelation, guestMessageIndex }).text;
+    if (enableAnonymousOpening && slug) return resolveOpeningMessage({ slug, language }).text;
+    return null;
+  }, [guestName, guestRelation, guestMessageIndex, language, slug, enableAnonymousOpening]);
   const effectiveOpeningText = guestOpeningText || opening.openingText || 'We\'re getting married';
 
   const mainTextRef = useRef(effectiveOpeningText);

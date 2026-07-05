@@ -40,6 +40,7 @@ interface InvitationViewProps {
   guestRelation?: GuestRelation;
   guestCode?: string;
   guestMessageIndex?: number | null;
+  enableAnonymousOpening?: boolean;
 }
 
 // 미리보기 섹션 ID → 에디터 섹션 ID 매핑
@@ -133,7 +134,7 @@ function buildSectionOrder(data: InvitationData): string[] {
   return [...baseOrder.slice(0, insertAt), 'midphoto', ...baseOrder.slice(insertAt)];
 }
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex, enableAnonymousOpening }) => {
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
 
   const daysAfterWedding = (() => {
@@ -251,6 +252,8 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           guestRelation={guestRelation}
           guestMessageIndex={guestMessageIndex}
           weddingDateISO={data.weddingDateISO}
+          slug={data.slug}
+          enableAnonymousOpening={enableAnonymousOpening}
         />
       )}
       <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />

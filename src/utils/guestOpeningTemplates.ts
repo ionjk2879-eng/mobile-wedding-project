@@ -98,3 +98,77 @@ export function formatGuestOpeningText(
   const safeIndex = typeof variantIndex === 'number' && variantIndex >= 0 && variantIndex < variants.length ? variantIndex : 0;
   return variants[safeIndex].replace('{name}', name);
 }
+
+// 이름/관계를 알 수 없는 범용 링크(/{slug} 직접 방문) 방문자용 — 중립 톤, {name} 자리표시자 없음.
+// relation별 배열과 개수를 맞출 필요는 없지만, 톤은 family/friend 쪽 문구와 어울리게 맞춘다.
+const ANONYMOUS_TEMPLATES: Record<OpeningLang, string[]> = {
+  ko: [
+    '소중한 분들을 모시고 저희 두 사람 결혼합니다',
+    '두 사람이 하나가 되는 자리에 초대합니다',
+    '새로운 시작을 함께 축복해주세요',
+    '기쁜 마음으로 저희의 결혼 소식을 전합니다',
+  ],
+  en: [
+    "We're getting married and would love for you to join",
+    "You're invited to celebrate the beginning of our new life together",
+    'Please join us in celebrating our new beginning',
+    'We are happy to share our wedding news with you',
+  ],
+  ja: [
+    '大切な皆様にお集まりいただき、結婚することになりました',
+    '二人が一つになる日にご招待いたします',
+    '新しい門出をどうぞお祝いください',
+    '結婚のご報告を、喜びとともにお伝えいたします',
+  ],
+};
+
+// slug별로 한 번 뽑은 문구를 localStorage에 고정해, 같은 방문자가 다시 들어와도 문구가 바뀌지 않게 한다.
+// 서버/DB에는 저장하지 않는 순수 클라이언트 로직.
+function anonymousOpeningStorageKey(slug: string): string {
+  return `sonett_anon_opening_${slug}`;
+}
+
+function pickAnonymousVariantIndex(slug: string, variantCount: number): number {
+  const key = anonymousOpeningStorageKey(slug);
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored !== null) {
+      const idx = parseInt(stored, 10);
+      if (!isNaN(idx) && idx >= 0 && idx < variantCount) return idx;
+    }
+  } catch {
+    // localStorage 접근 불가(프라이빗 모드 등) — 매번 새로 뽑되 저장은 조용히 실패시킨다
+  }
+  const idx = Math.floor(Math.random() * variantCount);
+  try { localStorage.setItem(key, String(idx)); } catch { /* 무시 */ }
+  return idx;
+}
+
+export function getAnonymousOpeningText(slug: string, language: OpeningLang = 'ko'): string {
+  const variants = ANONYMOUS_TEMPLATES[language] || ANONYMOUS_TEMPLATES.ko;
+  const idx = pickAnonymousVariantIndex(slug, variants.length);
+  return variants[idx];
+}
+
+export type OpeningMessageSource = 'guest' | 'anonymous';
+
+export interface ResolvedOpeningMessage {
+  text: string;
+  source: OpeningMessageSource;
+}
+
+// 개인화 링크든 범용 링크든 "내가 받은 문구" 개념은 동일하게 존재하고, 출처(source)만 다르다.
+// 갤러리 이벤트 등 추후 기능에서 이 결과 하나만 참조하면 되도록 통합 지점으로 둔다.
+export function resolveOpeningMessage(params: {
+  slug: string;
+  language?: OpeningLang;
+  guestName?: string;
+  guestRelation?: GuestRelation;
+  guestMessageIndex?: number | null;
+}): ResolvedOpeningMessage {
+  const { slug, language = 'ko', guestName, guestRelation, guestMessageIndex } = params;
+  if (guestName) {
+    return { text: formatGuestOpeningText(guestRelation || 'other', guestName, language, guestMessageIndex), source: 'guest' };
+  }
+  return { text: getAnonymousOpeningText(slug, language), source: 'anonymous' };
+}
