@@ -9,16 +9,11 @@ type HeroStyle = InvitationData['heroStyle'];
 // 8개를 고정형으로 분류했었다 — 사진이 섹션 전체를 채우는 배경(position:absolute; inset:0 등)
 // 위에 이름/문구가 "사진이 빈틈없이 꽉 차 있다"는 전제로 배치돼 있어, oval 등을 적용하면
 // 클리핑된 모서리에 배경색이 드러나며 텍스트가 허공에 뜬 것처럼 보이는 문제가 실제로 있었다.
-// 이후 "bookcover만 빼고 나머지는 다 자유형으로 열어달라"는 요청에 따라, bookcover를 제외한
-// 나머지는 그 시각적 트레이드오프(모서리에 배경이 드러남 등)를 감수하고 자유형으로 전환했다.
-//
-// 고정형으로 남은 스타일과 이유:
-// - bookcover: 사진이 섹션 전체를 채우는 배경(.bc-bg position:absolute; inset:0)이고 그 위
-//   모서리 장식(⌐ ¬ 코너 브래킷)과 하단 텍스트가 "사진이 꽉 차 있다"는 전제로 배치돼 있어,
-//   oval 등을 적용하면 코너 장식이 허공에 뜬 것처럼 보이는 깨진 화면이 된다.
-export const FIXED_LOOK_HERO_STYLES: HeroStyle[] = [
-  'bookcover',
-];
+// 이후 "bookcover만 빼고 나머지는 다 자유형으로 열어달라"는 요청에 따라 나머지 7개를 먼저
+// 자유형으로 전환했고, 그 다음 "bookcover도 그냥 도형 적용되게 해달라"는 요청에 따라
+// bookcover도 자유형으로 전환 — 이제 17개 전부 자유형이라 이 배열은 비어 있다(향후 자체
+// 프레임을 가진 새 스타일이 추가되면 여기에 등록하면 된다).
+export const FIXED_LOOK_HERO_STYLES: HeroStyle[] = [];
 
 export function isFixedLookHeroStyle(style: HeroStyle): boolean {
   return FIXED_LOOK_HERO_STYLES.includes(style);

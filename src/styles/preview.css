@@ -328,15 +328,15 @@
 
 /* Date Split (데이트 스플릿) */
 .hero-datesplit { display: flex; width: 100%; min-height: 500px; aspect-ratio: 3/4; overflow: hidden; }
-.ds-photo { flex: 1.4; overflow: hidden; }
+.ds-photo { flex: 1; overflow: hidden; }
 .ds-photo .hero-photo { width: 100%; height: 100%; object-fit: cover; }
 .ds-photo .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; }
-.ds-panel { flex: 1; background: var(--wedding-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 26px 16px 22px; box-sizing: border-box; }
+.ds-panel { flex: 1.15; background: var(--wedding-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 26px 14px 22px; box-sizing: border-box; }
 .ds-date { display: flex; flex-direction: column; gap: 0; line-height: 0.92; }
-.ds-date span { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 2.1em; color: var(--wedding-text-main); }
-.ds-names { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
-.ds-names p { margin: 0; font-size: 0.8em; color: var(--wedding-text-body); letter-spacing: 0.5px; }
-.ds-names em { font-style: italic; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-size: 1.1em; margin-right: 4px; }
+.ds-date span { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 2.8em; color: var(--wedding-text-main); }
+.ds-names { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+.ds-names p { margin: 0; font-size: 1em; color: var(--wedding-text-body); letter-spacing: 0.5px; }
+.ds-names em { font-style: italic; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-size: 1.3em; margin-right: 4px; }
 .ds-venue { margin: 0; font-size: 0.7em; color: var(--wedding-text-sub); letter-spacing: 1px; }
 
 /* === Gallery === */
