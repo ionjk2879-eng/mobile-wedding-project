@@ -25,13 +25,6 @@ const EFFECTS: { key: NonNullable<InvitationData['bgEffect']>; name: string; ico
   { key: 'petals', name: '꽃잎', icon: '🌼' }, { key: 'autumn', name: '단풍잎', icon: '🍂' },
 ];
 
-const EFFECT_DIRS: { key: NonNullable<InvitationData['bgEffectDir']>; name: string; icon: string }[] = [
-  { key: 'down', name: '아래로', icon: '↓' },
-  { key: 'diagonal', name: '대각선', icon: '⬊' },
-];
-
-const FALLING_EFFECTS = new Set(['cherry-blossom', 'snow', 'leaves', 'confetti', 'petals', 'autumn']);
-
 const SCROLL_EFFECTS: { key: NonNullable<InvitationData['scrollEffect']>; name: string; icon: string }[] = [
   { key: 'none', name: '없음', icon: '—' }, { key: 'fade-up', name: '페이드 업', icon: '↑' },
   { key: 'fade-in', name: '페이드 인', icon: '◎' }, { key: 'slide-in', name: '슬라이드', icon: '→' },
@@ -142,15 +135,6 @@ const DesignSection: React.FC = () => {
             </button>
           ))}
         </div>
-        {FALLING_EFFECTS.has(data.bgEffect || '') && (
-          <div className="tab-group modern" style={{ marginTop: 10 }}>
-            {EFFECT_DIRS.map(d => (
-              <button key={d.key} type="button" className={`tab-btn ${(data.bgEffectDir || 'down') === d.key ? 'active' : ''}`} onClick={() => updateField('bgEffectDir', d.key)}>
-                {d.icon} {d.name}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
       <div className="input-group">
         <label>스크롤 등장 효과 <span className="label-hint">(전체화면으로 확인해보세요!)</span></label>

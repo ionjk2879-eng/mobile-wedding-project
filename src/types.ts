@@ -65,7 +65,6 @@ export interface DesignConfig {
   customAccentColor?: string;
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';
   bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti' | 'petals' | 'autumn';
-  bgEffectDir?: 'down' | 'diagonal';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype' | 'magframe' | 'boldtype' | 'datesplit';

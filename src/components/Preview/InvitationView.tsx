@@ -256,7 +256,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           enableAnonymousOpening={enableAnonymousOpening}
         />
       )}
-      <BackgroundEffects effect={data.bgEffect} effectDir={data.bgEffectDir} />
+      <BackgroundEffects effect={data.bgEffect} />
       <MusicPlayer url={data.bgMusicUrl} />
       {previewRefs?.hero ? (
         <div ref={previewRefs.hero} className={onSectionNav ? 'preview-nav-section' : undefined}>
