@@ -152,6 +152,7 @@ interface OpeningProps {
   weddingDateISO?: string;
   slug?: string;
   enableAnonymousOpening?: boolean;
+  venueName?: string;
 }
 
 function hexLuminance(hex: string): number {
@@ -165,7 +166,7 @@ function hexLuminance(hex: string): number {
   } catch { return 0; }
 }
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO, slug, enableAnonymousOpening }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO, slug, enableAnonymousOpening, venueName }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
   const [instaPercent, setInstaPercent] = useState(0);
@@ -682,6 +683,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
                 </>
               )}
               {dDayStr && <span style={{ display: 'block', marginTop: '0.45em', opacity: 0.95, fontSize: '1.6em', fontWeight: 600, letterSpacing: '1px' }}>{dDayStr}</span>}
+              {venueName && <span style={{ display: 'block', marginTop: '0.35em', opacity: 0.75, fontSize: '0.9em' }}>{venueName}</span>}
             </p>
             <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
           </div>
@@ -743,6 +745,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
                 </>
               )}
             {dDayStr && <span style={{ display: 'block', marginTop: '0.45em', opacity: 0.95, fontSize: '1.6em', fontWeight: 600, letterSpacing: '1px' }}>{dDayStr}</span>}
+            {venueName && <span style={{ display: 'block', marginTop: '0.35em', opacity: 0.75, fontSize: '0.9em' }}>{venueName}</span>}
           </p>
 
           <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />

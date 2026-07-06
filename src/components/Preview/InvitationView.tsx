@@ -254,6 +254,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           weddingDateISO={data.weddingDateISO}
           slug={data.slug}
           enableAnonymousOpening={enableAnonymousOpening}
+          venueName={data.venueName}
         />
       )}
       <BackgroundEffects effect={data.bgEffect} />

@@ -21,18 +21,6 @@ const GRADIENT_PRESETS = [
   { id: 'plum-rose',      from: '#8858A8', to: '#D898B8' },  // 플럼 → 로즈
 ];
 
-const OPENING_PRESETS = [
-  { label: "We're getting married", value: "We're getting married" },
-  { label: '결혼합니다', value: '결혼합니다' },
-  { label: '소중한 날에 초대합니다', value: '소중한 날에 초대합니다' },
-  { label: '함께해 주세요', value: '함께해 주세요' },
-  { label: '두 사람이 하나가 되는 날', value: '두 사람이 하나가 되는 날' },
-  { label: 'Forever begins today', value: 'Forever begins today' },
-  { label: 'Save the Date', value: 'Save the Date' },
-  { label: '사랑으로 하나 되는 날', value: '사랑으로 하나 되는 날' },
-  { label: 'Together Forever', value: 'Together Forever' },
-  { label: '평생 함께 하겠습니다', value: '평생 함께 하겠습니다' },
-];
 
 const defaultOpening: OpeningConfig = {
   openingEnabled: false, openingStyle: 'curtain', openingColorMode: 'theme',
@@ -329,21 +317,17 @@ const OpeningSection: React.FC = () => {
 
           <div className="input-group">
             <label>메인 멘트</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-              {OPENING_PRESETS.map((p) => (
-                <button key={p.value} type="button"
-                  style={{ padding: '6px 12px', borderRadius: 20, border: opening.openingText === p.value ? '1.5px solid #B07A8E' : '1px solid #E5E7EB', background: opening.openingText === p.value ? '#FDF2F4' : 'white', color: opening.openingText === p.value ? '#B07A8E' : '#6B7280', fontSize: '0.78rem', fontWeight: opening.openingText === p.value ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}
-                  onClick={() => update({ openingText: p.value })}
-                >{p.label}</button>
-              ))}
+            <div style={{ padding: '10px 14px', borderRadius: 10, background: '#F9F5FF', border: '1px solid #E8D8F0', fontSize: '0.8rem', color: '#7A5A8A', lineHeight: 1.6 }}>
+              <strong style={{ display: 'block', marginBottom: 4, color: '#6A4A7A' }}>방문자 유형에 따라 자동 설정됩니다</strong>
+              하객 링크로 방문 시 → 이름·관계에 맞는 개인화 문구<br />
+              일반 링크로 방문 시 → 랜덤 감성 문구 중 하나
             </div>
-            <input type="text" value={opening.openingText} onChange={(e) => update({ openingText: e.target.value })} className="modern-input" placeholder="직접 입력하거나 위에서 선택하세요" />
           </div>
 
           <div className="input-group">
             <label>서브 멘트</label>
             <input type="text" value={opening.openingSubText} onChange={(e) => update({ openingSubText: e.target.value })} className="modern-input" placeholder="2026. 10. 24" />
-            <span className="input-hint">비워두면 예식 날짜가 표시됩니다.</span>
+            <span className="input-hint">비워두면 예식 날짜가 자동으로 표시됩니다. 예식장 이름은 날짜 아래에 자동으로 추가됩니다.</span>
           </div>
         </>
       )}
