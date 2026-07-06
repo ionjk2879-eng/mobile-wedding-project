@@ -46,6 +46,23 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return `D-${diffDays}`;
   };
 
+  // heroOverlayText: outside-* 위치는 섹션(hero-entrance) 기준, 나머지(top/bottom/left/right)는
+  // photoEl의 경계(hero-photo-ow) 기준으로 배치한다.
+  const overlayPosition = data.heroOverlayTextPosition || 'bottom';
+  const overlayIsOutside = (overlayPosition as string).startsWith('outside-');
+  const overlayEl = (() => {
+    if (!data.heroOverlayText || style === 'boldtype') return null;
+    const size = data.heroOverlayTextSize || 'L';
+    const weight = data.heroOverlayTextWeight || 'bold';
+    const color = data.heroOverlayTextColor;
+    const cls = ['hero-overlay-text', `hero-overlay-text--${overlayPosition}`, `hero-overlay-text--size-${size}`, `hero-overlay-text--${weight}`].join(' ');
+    return (
+      <div className={cls} style={color ? { color } : undefined} aria-hidden="true">
+        <span>{data.heroOverlayText}</span>
+      </div>
+    );
+  })();
+
   // 사진 모형(heroPhotoShape) 축은 이 컴포넌트(메인화면 대표 사진)에만 적용된다.
   // 고정형 스타일(src/data/heroStyleConfig.ts 참고)은 이미 완성된 사진 배치/텍스트 구성을
   // 갖고 있어 이 축을 무시(항상 basic 취급)한다.
@@ -65,12 +82,20 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return <div className={`hero-shape hero-shape-${heroShape}`}>{img}</div>;
   };
 
+  // top/bottom/left/right 위치의 오버레이는 사진 요소(photoEl) 경계를 컨테이닝 블록으로 쓴다.
+  const wrapWithOverlay = (el: React.ReactNode): React.ReactNode => {
+    if (!overlayEl || overlayIsOutside) return el;
+    return <div className="hero-photo-ow">{el}{overlayEl}</div>;
+  };
+
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
   const emptyPhotoEl = <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>;
-  const photoEl = wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl);
+  const rawPhotoEl = wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl);
+  const photoEl = wrapWithOverlay(rawPhotoEl);
 
   const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
-  const photo2El = data.heroPhoto2 ? wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl) : photoEl;
+  // photo2El은 split에서만 사용 — 오버레이 중복을 피해 rawPhotoEl(overlay 미포함)로 폴백한다.
+  const photo2El = data.heroPhoto2 ? wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl) : rawPhotoEl;
 
   const renderClassic = () => (
     <div className="hero-classic">
@@ -374,34 +399,6 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     </div>
   );
 
-  // heroOverlayText 오버레이 — heroStyle·heroPhotoShape와 독립적인 장식 텍스트.
-  // boldtype은 자체 고정 문구("Our/Wedding.")가 있으므로 충돌을 피해 스킵한다.
-  const renderOverlayText = () => {
-    if (!data.heroOverlayText || style === 'boldtype') return null;
-
-    const position = data.heroOverlayTextPosition || 'bottom';
-    const size = data.heroOverlayTextSize || 'L';
-    const weight = data.heroOverlayTextWeight || 'bold';
-    const color = data.heroOverlayTextColor;
-
-    const cls = [
-      'hero-overlay-text',
-      `hero-overlay-text--${position}`,
-      `hero-overlay-text--size-${size}`,
-      `hero-overlay-text--${weight}`,
-    ].join(' ');
-
-    return (
-      <div
-        className={cls}
-        style={color ? { color } : undefined}
-        aria-hidden="true"
-      >
-        <span>{data.heroOverlayText}</span>
-      </div>
-    );
-  };
-
   const renderBoldtype = () => (
     <div className="hero-boldtype">
       <div className="bt-bg">{photoEl}</div>
@@ -462,7 +459,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'magframe' && renderMagframe()}
         {style === 'boldtype' && renderBoldtype()}
         {style === 'datesplit' && renderDatesplit()}
-        {renderOverlayText()}
+        {overlayIsOutside && overlayEl}
       </div>
 
     </section>

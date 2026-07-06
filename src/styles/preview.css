@@ -5,7 +5,7 @@
 
 /* === Hero === */
 .hero { text-align: center; background-color: transparent; position: relative; }
-.hero-entrance { animation: hero-fade-in 0.8s ease both; }
+.hero-entrance { animation: hero-fade-in 0.8s ease both; position: relative; }
 @keyframes hero-fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .hero-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hero-photo-empty { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; background: var(--wedding-card-bg); border: 2px dashed var(--wedding-border); text-align: center; }
@@ -332,8 +332,13 @@
 .bt-bottom { display: flex; justify-content: space-between; align-items: center; }
 .bt-name { font-size: 0.78em; font-weight: 700; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
 
+/* hero-photo-ow: top/bottom/left/right 오버레이의 컨테이닝 블록. photoEl(shape 포함)을 감싸는
+   투명한 래퍼로, 레이아웃에 영향을 주지 않으면서 position: relative 컨텍스트를 만든다. */
+.hero-photo-ow { position: relative; display: block; width: 100%; height: 100%; }
+
 /* Overlay Text (볼드 타이포 오버레이 장식) */
-/* heroStyle·heroPhotoShape와 독립적. hero-entrance(transform 컨테이닝 블록) 기준 absolute. */
+/* top/bottom/left/right: hero-photo-ow(사진 경계) 기준 absolute.
+   outside-left/right: hero-entrance(섹션 전체) 기준 absolute. */
 .hero-overlay-text {
   position: absolute;
   z-index: 10;

@@ -11,9 +11,11 @@ type HeroStyle = InvitationData['heroStyle'];
 // 클리핑된 모서리에 배경색이 드러나며 텍스트가 허공에 뜬 것처럼 보이는 문제가 실제로 있었다.
 // 이후 "bookcover만 빼고 나머지는 다 자유형으로 열어달라"는 요청에 따라 나머지 7개를 먼저
 // 자유형으로 전환했고, 그 다음 "bookcover도 그냥 도형 적용되게 해달라"는 요청에 따라
-// bookcover도 자유형으로 전환 — 이제 17개 전부 자유형이라 이 배열은 비어 있다(향후 자체
-// 프레임을 가진 새 스타일이 추가되면 여기에 등록하면 된다).
-export const FIXED_LOOK_HERO_STYLES: HeroStyle[] = [];
+// bookcover도 자유형으로 전환했다.
+// boldtype: 배경을 사진이 꽉 채우는 구조(position:absolute; inset:0)에 고정 문구("Our/Wedding.")를
+// 직접 레이아웃에 넣어둔 스타일이라, 사진 모형 클리핑이 의미가 없고 오히려 배경색이 드러나
+// 레이아웃이 깨진다. 별도 오버레이 텍스트도 내장 문구와 충돌하므로 함께 제외한다.
+export const FIXED_LOOK_HERO_STYLES: HeroStyle[] = ['boldtype'];
 
 export function isFixedLookHeroStyle(style: HeroStyle): boolean {
   return FIXED_LOOK_HERO_STYLES.includes(style);
