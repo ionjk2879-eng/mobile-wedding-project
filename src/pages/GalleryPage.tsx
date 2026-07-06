@@ -237,7 +237,6 @@ const GalleryPage: React.FC = () => {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           style={{ display: 'none' }}
           onChange={handleFileSelected}
         />
