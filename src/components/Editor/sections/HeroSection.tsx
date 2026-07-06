@@ -19,6 +19,15 @@ const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; n
   { key: 'hairline', name: '헤어라인', desc: '얇은 선 + 비대칭 여백' },
 ];
 
+const OVERLAY_POSITIONS: { key: NonNullable<InvitationData['heroOverlayTextPosition']>; name: string }[] = [
+  { key: 'top', name: '상단' },
+  { key: 'bottom', name: '하단' },
+  { key: 'left', name: '좌측' },
+  { key: 'right', name: '우측' },
+  { key: 'outside-left', name: '바깥 왼쪽' },
+  { key: 'outside-right', name: '바깥 오른쪽' },
+];
+
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
@@ -153,6 +162,81 @@ const HeroSection: React.FC = () => {
               </button>
             ))}
           </div>
+        )}
+      </div>
+      <div className="input-group">
+        <label>볼드 타이포 오버레이 (장식)</label>
+        {data.heroStyle === 'boldtype' ? (
+          <p className="hero-fixed-look-notice">이 스타일은 이미 볼드 타이포가 적용되어 있어요.</p>
+        ) : (
+          <>
+            <input
+              type="text"
+              className="text-input"
+              placeholder="예: Our Wedding."
+              value={data.heroOverlayText || ''}
+              onChange={(e) => updateField('heroOverlayText', e.target.value)}
+            />
+            <div className={`hero-overlay-suboptions${!data.heroOverlayText ? ' hero-overlay-suboptions--disabled' : ''}`}>
+              <span className="hero-overlay-sublabel">배치 위치</span>
+              <div className="hero-overlay-grid hero-overlay-grid--3">
+                {OVERLAY_POSITIONS.map((p) => (
+                  <button
+                    key={p.key}
+                    type="button"
+                    disabled={!data.heroOverlayText}
+                    className={`hero-overlay-btn${(data.heroOverlayTextPosition || 'bottom') === p.key ? ' active' : ''}`}
+                    onClick={() => updateField('heroOverlayTextPosition', p.key)}
+                  >{p.name}</button>
+                ))}
+              </div>
+              <span className="hero-overlay-sublabel">크기</span>
+              <div className="hero-overlay-grid hero-overlay-grid--4">
+                {(['S', 'M', 'L', 'XL'] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    disabled={!data.heroOverlayText}
+                    className={`hero-overlay-btn${(data.heroOverlayTextSize || 'L') === s ? ' active' : ''}`}
+                    onClick={() => updateField('heroOverlayTextSize', s)}
+                  >{s}</button>
+                ))}
+              </div>
+              <span className="hero-overlay-sublabel">굵기</span>
+              <div className="hero-overlay-grid hero-overlay-grid--2">
+                {([
+                  { key: 'bold' as const, name: '볼드' },
+                  { key: 'extrabold' as const, name: '엑스트라 볼드' },
+                ]).map((w) => (
+                  <button
+                    key={w.key}
+                    type="button"
+                    disabled={!data.heroOverlayText}
+                    className={`hero-overlay-btn${(data.heroOverlayTextWeight || 'bold') === w.key ? ' active' : ''}`}
+                    onClick={() => updateField('heroOverlayTextWeight', w.key)}
+                  >{w.name}</button>
+                ))}
+              </div>
+              <span className="hero-overlay-sublabel">색상</span>
+              <div className="hero-overlay-color-row">
+                <button
+                  type="button"
+                  disabled={!data.heroOverlayText}
+                  className={`hero-overlay-btn${!data.heroOverlayTextColor ? ' active' : ''}`}
+                  onClick={() => updateField('heroOverlayTextColor', '')}
+                >자동</button>
+                <label className={`hero-overlay-color-swatch${!data.heroOverlayText ? ' disabled' : ''}`}>
+                  <span style={{ background: data.heroOverlayTextColor || '#000000' }} />
+                  <input
+                    type="color"
+                    disabled={!data.heroOverlayText}
+                    value={data.heroOverlayTextColor || '#000000'}
+                    onChange={(e) => updateField('heroOverlayTextColor', e.target.value)}
+                  />
+                </label>
+              </div>
+            </div>
+          </>
         )}
       </div>
       <div className="input-group">

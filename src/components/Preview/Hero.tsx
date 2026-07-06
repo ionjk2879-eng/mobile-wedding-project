@@ -374,6 +374,34 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     </div>
   );
 
+  // heroOverlayText 오버레이 — heroStyle·heroPhotoShape와 독립적인 장식 텍스트.
+  // boldtype은 자체 고정 문구("Our/Wedding.")가 있으므로 충돌을 피해 스킵한다.
+  const renderOverlayText = () => {
+    if (!data.heroOverlayText || style === 'boldtype') return null;
+
+    const position = data.heroOverlayTextPosition || 'bottom';
+    const size = data.heroOverlayTextSize || 'L';
+    const weight = data.heroOverlayTextWeight || 'bold';
+    const color = data.heroOverlayTextColor;
+
+    const cls = [
+      'hero-overlay-text',
+      `hero-overlay-text--${position}`,
+      `hero-overlay-text--size-${size}`,
+      `hero-overlay-text--${weight}`,
+    ].join(' ');
+
+    return (
+      <div
+        className={cls}
+        style={color ? { color } : undefined}
+        aria-hidden="true"
+      >
+        <span>{data.heroOverlayText}</span>
+      </div>
+    );
+  };
+
   const renderBoldtype = () => (
     <div className="hero-boldtype">
       <div className="bt-bg">{photoEl}</div>
@@ -434,6 +462,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'magframe' && renderMagframe()}
         {style === 'boldtype' && renderBoldtype()}
         {style === 'datesplit' && renderDatesplit()}
+        {renderOverlayText()}
       </div>
 
     </section>
@@ -452,6 +481,11 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhoto2Y === next.data.heroPhoto2Y
   && prev.data.heroStyle === next.data.heroStyle
   && prev.data.heroPhotoShape === next.data.heroPhotoShape
+  && prev.data.heroOverlayText === next.data.heroOverlayText
+  && prev.data.heroOverlayTextPosition === next.data.heroOverlayTextPosition
+  && prev.data.heroOverlayTextSize === next.data.heroOverlayTextSize
+  && prev.data.heroOverlayTextWeight === next.data.heroOverlayTextWeight
+  && prev.data.heroOverlayTextColor === next.data.heroOverlayTextColor
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily

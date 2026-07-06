@@ -76,6 +76,15 @@ export interface DesignConfig {
   // 사진 모형(테두리 형태) 축. Hero.tsx(메인화면 대표 사진)에만 적용되며, src/data/heroStyleConfig.ts의
   // FIXED_LOOK_HERO_STYLES에 해당하는 heroStyle에서는 무시된다. 미지정 시 'basic'(기존과 동일한 사각형).
   heroPhotoShape?: 'basic' | 'fill' | 'arch' | 'oval' | 'frame' | 'blob' | 'polaroid' | 'hexagon' | 'hairline';
+  // 볼드 타이포 오버레이(장식) 축. heroStyle·heroPhotoShape와 완전히 독립적인 꾸미기 옵션이다.
+  // heroStyle 'boldtype'(완성형 레이아웃 프리셋, "Our/Wedding." 고정 문구)과 이름이 비슷하지만
+  // 전혀 다른 개념 — 어떤 heroStyle·heroPhotoShape 조합 위에도 자유 텍스트 한 줄을 장식으로 얹는다.
+  heroOverlayText?: string;
+  // top/bottom/left/right: 사진 안쪽 가장자리, outside-left/outside-right: 사진 바깥 좌우 여백
+  heroOverlayTextPosition?: 'top' | 'bottom' | 'left' | 'right' | 'outside-left' | 'outside-right';
+  heroOverlayTextSize?: 'S' | 'M' | 'L' | 'XL'; // 미지정 시 'L'
+  heroOverlayTextWeight?: 'bold' | 'extrabold'; // 미지정 시 'bold'
+  heroOverlayTextColor?: string; // hex 컬러, 미지정 시 배경과 대비되는 색 자동 적용
   fontFamily: string;
   fontSize: 'small' | 'medium' | 'large';
 }

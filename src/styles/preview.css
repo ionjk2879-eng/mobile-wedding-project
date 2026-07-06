@@ -332,6 +332,41 @@
 .bt-bottom { display: flex; justify-content: space-between; align-items: center; }
 .bt-name { font-size: 0.78em; font-weight: 700; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
 
+/* Overlay Text (볼드 타이포 오버레이 장식) */
+/* heroStyle·heroPhotoShape와 독립적. hero-entrance(transform 컨테이닝 블록) 기준 absolute. */
+.hero-overlay-text {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: var(--wedding-text-main);
+}
+.hero-overlay-text span { display: block; color: inherit; }
+
+/* 사진 안쪽 가장자리 */
+.hero-overlay-text--top    { top: 20px; left: 50%; transform: translateX(-50%); }
+.hero-overlay-text--bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
+/* 좌·우측: 세로쓰기 흉내 — 회전 원점을 텍스트 중심으로 잡아 position이 예측 가능하게 */
+.hero-overlay-text--left  { left: 20px; top: 50%; transform-origin: center; transform: translateY(-50%) rotate(-90deg); }
+.hero-overlay-text--right { right: 20px; top: 50%; transform-origin: center; transform: translateY(-50%) rotate(90deg); }
+
+/* 사진 바깥 좌·우 여백: 극단 엣지에 세로 라벨처럼 배치 */
+.hero-overlay-text--outside-left  { left: 6px; top: 50%; transform-origin: center; transform: translateY(-50%) rotate(-90deg); }
+.hero-overlay-text--outside-right { right: 6px; top: 50%; transform-origin: center; transform: translateY(-50%) rotate(90deg); }
+
+/* 크기 */
+.hero-overlay-text--size-S span  { font-size: 1.0em; }
+.hero-overlay-text--size-M span  { font-size: 1.6em; }
+.hero-overlay-text--size-L span  { font-size: 2.4em; }
+.hero-overlay-text--size-XL span { font-size: 3.4em; }
+
+/* 굵기 */
+.hero-overlay-text--bold      span { font-weight: 700; }
+.hero-overlay-text--extrabold span { font-weight: 900; }
+
 /* Date Split (데이트 스플릿) */
 .hero-datesplit { display: flex; width: 100%; min-height: 500px; aspect-ratio: 3/4; overflow: hidden; }
 .ds-photo { flex: 1; overflow: hidden; }
