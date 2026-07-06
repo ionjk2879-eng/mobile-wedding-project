@@ -14,7 +14,7 @@ type HeroStyle = InvitationData['heroStyle'];
 // bookcover도 자유형으로 전환했다.
 // boldtype: 배경을 사진이 꽉 채우는 구조(position:absolute; inset:0)에 고정 문구("Our/Wedding.")를
 // 직접 레이아웃에 넣어둔 스타일이라, 사진 모형 클리핑이 의미가 없고 오히려 배경색이 드러나
-// 레이아웃이 깨진다. 별도 오버레이 텍스트도 내장 문구와 충돌하므로 함께 제외한다.
+// 레이아웃이 깨진다.
 export const FIXED_LOOK_HERO_STYLES: HeroStyle[] = ['boldtype'];
 
 export function isFixedLookHeroStyle(style: HeroStyle): boolean {

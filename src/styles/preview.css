@@ -5,7 +5,7 @@
 
 /* === Hero === */
 .hero { text-align: center; background-color: transparent; position: relative; }
-.hero-entrance { animation: hero-fade-in 0.8s ease both; position: relative; }
+.hero-entrance { animation: hero-fade-in 0.8s ease both; }
 @keyframes hero-fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .hero-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hero-photo-empty { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; background: var(--wedding-card-bg); border: 2px dashed var(--wedding-border); text-align: center; }
@@ -331,46 +331,6 @@
 .bt-statement span { display: block; font-size: 2.3em; letter-spacing: -0.01em; }
 .bt-bottom { display: flex; justify-content: space-between; align-items: center; }
 .bt-name { font-size: 0.78em; font-weight: 700; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
-
-/* hero-photo-ow: top/bottom/left/right 오버레이의 컨테이닝 블록. photoEl(shape 포함)을 감싸는
-   투명한 래퍼로, 레이아웃에 영향을 주지 않으면서 position: relative 컨텍스트를 만든다. */
-.hero-photo-ow { position: relative; display: block; width: 100%; height: 100%; }
-
-/* Overlay Text (볼드 타이포 오버레이 장식) */
-/* top/bottom/left/right: hero-photo-ow(사진 경계) 기준 absolute.
-   outside-left/right: hero-entrance(섹션 전체) 기준 absolute. */
-.hero-overlay-text {
-  position: absolute;
-  z-index: 10;
-  pointer-events: none;
-  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  color: var(--wedding-text-main);
-}
-.hero-overlay-text span { display: block; color: inherit; }
-
-/* 사진 안쪽 가장자리 */
-.hero-overlay-text--top    { top: 20px; left: 50%; transform: translateX(-50%); }
-.hero-overlay-text--bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
-/* 좌·우측: 세로쓰기 흉내 — 회전 원점을 텍스트 중심으로 잡아 position이 예측 가능하게 */
-.hero-overlay-text--left  { left: 20px; top: 50%; transform-origin: center; transform: translateY(-50%) rotate(-90deg); }
-.hero-overlay-text--right { right: 20px; top: 50%; transform-origin: center; transform: translateY(-50%) rotate(90deg); }
-
-/* 사진 바깥 좌·우 여백: 극단 엣지에 세로 라벨처럼 배치 */
-.hero-overlay-text--outside-left  { left: 6px; top: 50%; transform-origin: center; transform: translateY(-50%) rotate(-90deg); }
-.hero-overlay-text--outside-right { right: 6px; top: 50%; transform-origin: center; transform: translateY(-50%) rotate(90deg); }
-
-/* 크기 */
-.hero-overlay-text--size-S span  { font-size: 1.0em; }
-.hero-overlay-text--size-M span  { font-size: 1.6em; }
-.hero-overlay-text--size-L span  { font-size: 2.4em; }
-.hero-overlay-text--size-XL span { font-size: 3.4em; }
-
-/* 굵기 */
-.hero-overlay-text--bold      span { font-weight: 700; }
-.hero-overlay-text--extrabold span { font-weight: 900; }
 
 /* Date Split (데이트 스플릿) */
 .hero-datesplit { display: flex; width: 100%; min-height: 500px; aspect-ratio: 3/4; overflow: hidden; }
