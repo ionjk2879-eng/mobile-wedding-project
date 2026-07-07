@@ -165,7 +165,7 @@ export interface RSVPResponse {
   guestName: string;
   isAttending: boolean;
   totalGuests: number;
-  wantsMeal: boolean;
+  wantsMeal: boolean | null;
   relation: 'groom' | 'bride';
   message: string;
   createdAt?: string;

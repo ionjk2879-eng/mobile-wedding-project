@@ -16,7 +16,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
   const [formData, setFormData] = useState<Omit<RSVPResponse, 'id' | 'createdAt'>>({
-    guestName: guestName || '', isAttending: true, totalGuests: 1, wantsMeal: true, relation: 'groom', message: '', guestCode: guestCode || null,
+    guestName: guestName || '', isAttending: true, totalGuests: 1, wantsMeal: null, relation: 'groom', message: '', guestCode: guestCode || null,
   });
   const [submitted, setSubmitted] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -90,7 +90,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
                 <select className="pf-input" value={formData.totalGuests} onChange={(e) => setFormData({...formData, totalGuests: parseInt(e.target.value)})}>{[1,2,3,4,5].map(n => <option key={n} value={n}>{n}{isEn ? '' : isJa ? '名' : '명'}</option>)}</select>
               </div>
               <div className="pf-group"><label className="pf-label"><Utensils size={14} /> {isEn ? 'Meal' : isJa ? 'お食事' : '식사'}</label>
-                <select className="pf-input" value={formData.wantsMeal ? 'yes' : 'no'} onChange={(e) => setFormData({...formData, wantsMeal: e.target.value === 'yes'})}><option value="yes">{isEn ? 'Yes' : isJa ? 'あり' : '식사 함'}</option><option value="no">{isEn ? 'No' : isJa ? 'なし' : '식사 안함'}</option></select>
+                <select className="pf-input" value={formData.wantsMeal === null ? 'undecided' : formData.wantsMeal ? 'yes' : 'no'} onChange={(e) => setFormData({...formData, wantsMeal: e.target.value === 'yes' ? true : e.target.value === 'no' ? false : null})}><option value="undecided">{isEn ? 'Undecided' : isJa ? '未定' : '미정'}</option><option value="yes">{isEn ? 'Yes' : isJa ? 'あり' : '식사 함'}</option><option value="no">{isEn ? 'No' : isJa ? 'なし' : '식사 안함'}</option></select>
               </div>
             </div>
           )}

@@ -455,7 +455,7 @@ const AdminPage: React.FC = () => {
                     {r.guestCode && <span className="badge verified" title="개인화 링크로 확인된 하객"><Check size={11} /> 확인된 하객</span>}
                   </td>
                   <td>{r.isAttending ? `${r.totalGuests}명` : '-'}</td>
-                  <td>{r.isAttending ? (r.wantsMeal ? 'O' : 'X') : '-'}</td>
+                  <td>{r.isAttending ? (r.wantsMeal === true ? 'O' : r.wantsMeal === false ? 'X' : '미정') : '-'}</td>
                   <td className="msg-cell">{r.message || '-'}</td>
                   <td className="date-cell">{r.createdAt ? new Date(r.createdAt).toLocaleString('ko') : ''}</td>
                 </tr>
