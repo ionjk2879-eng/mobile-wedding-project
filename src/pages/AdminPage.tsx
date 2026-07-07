@@ -548,6 +548,7 @@ const AdminPage: React.FC = () => {
 
       <section className="admin-guests-section">
         <h2 className="admin-section-title">하객 명단 · 개인화 링크</h2>
+        <p className="admin-section-desc">하객의 이름을 추가하고 공유하면 자동으로 하객 이름이 들어가는 청첩장이 만들어집니다.</p>
         <div className="guest-add-row">
           <input
             type="text"
@@ -802,7 +803,8 @@ const AdminPage: React.FC = () => {
         .admin-btn.primary:hover { background: #9B6A7E; border-color: #9B6A7E; color: white; }
         .admin-btn.primary:disabled { opacity: 0.5; cursor: not-allowed; }
         .admin-guests-section { margin-top: 40px; }
-        .admin-section-title { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: #1F2937; margin: 0 0 16px; }
+        .admin-section-title { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: #1F2937; margin: 0 0 8px; }
+        .admin-section-desc { font-size: 0.82rem; color: #9CA3AF; margin: 0 0 16px; line-height: 1.5; }
         .admin-privacy-section { margin-top: 40px; background: white; border: 1px solid #F3F4F6; border-radius: 16px; padding: 24px; }
         .privacy-date-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #F3F4F6; }
         .privacy-date-row label { font-size: 0.85rem; font-weight: 600; color: #4B5563; }
