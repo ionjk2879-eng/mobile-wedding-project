@@ -17,6 +17,9 @@ const ko = {
     loginWithKakao: '카카오로 로그인',
     loginWithNaver: '네이버로 로그인',
     loginWithGoogle: 'Google로 로그인',
+    reviews: '리뷰/후기',
+    guide: '가이드',
+    contact: '문의/건의',
   },
   landing: {
     heroTitle: '소중한 순간을\n영원히 간직하세요',
@@ -153,6 +156,9 @@ const en: Translations = {
     loginWithKakao: 'Sign in with Kakao',
     loginWithNaver: 'Sign in with Naver',
     loginWithGoogle: 'Sign in with Google',
+    reviews: 'Reviews',
+    guide: 'Guide',
+    contact: 'Contact',
   },
   landing: {
     heroTitle: 'Cherish Every\nPrecious Moment',
@@ -289,6 +295,9 @@ const ja: Translations = {
     loginWithKakao: 'Kakaoでログイン',
     loginWithNaver: 'Naverでログイン',
     loginWithGoogle: 'Googleでログイン',
+    reviews: 'レビュー',
+    guide: 'ガイド',
+    contact: 'お問い合わせ',
   },
   landing: {
     heroTitle: '大切な瞬間を\nいつまでも',

@@ -20,6 +20,9 @@ const EventsPage = React.lazy(() => import('./pages/EventsPage'))
 const InvitePage = React.lazy(() => import('./pages/InvitePage'))
 const GalleryPage = React.lazy(() => import('./pages/GalleryPage'))
 const AnniversaryEditPage = React.lazy(() => import('./pages/AnniversaryEditPage'))
+const ReviewsPage = React.lazy(() => import('./pages/ReviewsPage'))
+const GuidePage = React.lazy(() => import('./pages/GuidePage'))
+const ContactPage = React.lazy(() => import('./pages/ContactPage'))
 
 const Loading = () => (
   <div style={{ width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", color: '#9CA3AF' }}>
@@ -44,11 +47,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/invite" element={<InvitePage />} />
         <Route path="/invite/:code" element={<InvitePage />} />
         <Route path="/gallery/:slug" element={<GalleryPage />} />
-        <Route path="/:slug" element={<ViewPage />} />
-        <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
+        <Route path="/reviews" element={<ReviewsPage />} />
+        <Route path="/guide" element={<GuidePage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/superadmin" element={<AuthGate><SuperAdminPage /></AuthGate>} />
+        <Route path="/:slug" element={<ViewPage />} />
+        <Route path="/admin/:slug" element={<AuthGate><AdminPage /></AuthGate>} />
       </Routes>
     </Suspense>
   </BrowserRouter>

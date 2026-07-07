@@ -152,6 +152,9 @@ const SiteHeader: React.FC = () => {
           <Link to="/" className={`site-nav-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
           <Link to="/templates" className={`site-nav-link ${pathname === '/templates' ? 'active' : ''}`}>{t.site.templates}</Link>
           <Link to="/events" className={`site-nav-link ${pathname === '/events' ? 'active' : ''}`}>{t.site.events}</Link>
+          <Link to="/reviews" className={`site-nav-link ${pathname === '/reviews' ? 'active' : ''}`}>{t.site.reviews}</Link>
+          <Link to="/guide" className={`site-nav-link ${pathname === '/guide' ? 'active' : ''}`}>{t.site.guide}</Link>
+          <Link to="/contact" className={`site-nav-link ${pathname === '/contact' ? 'active' : ''}`}>{t.site.contact}</Link>
         </nav>
       </div>
       <div className="site-header-right">
@@ -217,6 +220,9 @@ const SiteHeader: React.FC = () => {
               <Link to="/" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/' ? 'active' : ''}`}>{t.site.mobileWedding}</Link>
               <Link to="/templates" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/templates' ? 'active' : ''}`}>{t.site.templates}</Link>
               <Link to="/events" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/events' ? 'active' : ''}`}>{t.site.events}</Link>
+              <Link to="/reviews" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/reviews' ? 'active' : ''}`}>{t.site.reviews}</Link>
+              <Link to="/guide" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/guide' ? 'active' : ''}`}>{t.site.guide}</Link>
+              <Link to="/contact" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/contact' ? 'active' : ''}`}>{t.site.contact}</Link>
               <div className="site-auth-menu-divider" />
               <Link to="/manage" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
               <div className="site-auth-menu-divider" />
@@ -602,7 +608,7 @@ const SiteHeader: React.FC = () => {
           color: #B07A8E;
           background: #FBF2F5;
         }
-        @media (max-width: 860px) {
+        @media (max-width: 1060px) {
           .site-nav-left { display: none; }
           .site-nav-link-desktop { display: none; }
           .site-lang-dropdown-desktop { display: none; }
