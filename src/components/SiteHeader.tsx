@@ -614,9 +614,12 @@ const SiteHeader: React.FC = () => {
           .site-lang-dropdown-desktop { display: none; }
           .site-auth-desktop { display: none; }
           .site-nav-mobile { display: flex; }
+          .site-header { justify-content: center; }
+          .site-header-right { position: absolute; right: 32px; top: 0; bottom: 0; display: flex; align-items: center; }
         }
         @media (max-width: 480px) {
           .site-header { padding: 12px 16px; }
+          .site-header-right { right: 16px; }
           .site-header-left { gap: 16px; }
           .site-logo-icon { height: 20px; }
           .site-logo-wordmark { font-size: 0.95rem; letter-spacing: 2.5px; }
