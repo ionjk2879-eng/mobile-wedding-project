@@ -227,7 +227,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
 
   const showRsvpNotice = () => {
     if (rsvpNoticeShownRef.current) return;
-    if (!showOpening || !data.isRSVPEnabled || isAnniversaryMode || !data.slug) return;
+    if (!showOpening || !data.isRSVPEnabled || !data.isRSVPNoticeEnabled || isAnniversaryMode || !data.slug) return;
     if (localStorage.getItem(`rsvp-notice-hidden-${data.slug}`) === new Date().toDateString()) return;
     rsvpNoticeShownRef.current = true;
     setTimeout(() => setRsvpNoticeVisible(true), 400);

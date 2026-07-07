@@ -123,6 +123,7 @@ export interface OpeningConfig {
 
 export interface FeatureConfig {
   isRSVPEnabled: boolean;
+  isRSVPNoticeEnabled: boolean;
   isGuestbookEnabled: boolean;
   isInterviewEnabled: boolean;
   isTimelineEnabled: boolean;

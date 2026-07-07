@@ -40,6 +40,7 @@ export const initialData: InvitationData = {
   midPhoto: '',
   midPhotoCaption: '',
   isRSVPEnabled: true,
+  isRSVPNoticeEnabled: true,
   isGuestbookEnabled: true,
   isInterviewEnabled: true,
   isTimelineEnabled: true,

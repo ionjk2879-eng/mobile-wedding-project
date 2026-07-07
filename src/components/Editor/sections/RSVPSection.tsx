@@ -3,6 +3,7 @@ import useInvitationStore from '../../../stores/useInvitationStore';
 
 const RSVPSection: React.FC = () => {
   const isRSVPEnabled = useInvitationStore((s) => s.data.isRSVPEnabled);
+  const isRSVPNoticeEnabled = useInvitationStore((s) => s.data.isRSVPNoticeEnabled);
   const updateField = useInvitationStore((s) => s.updateField);
 
   return (
@@ -14,10 +15,18 @@ const RSVPSection: React.FC = () => {
         </label>
       </div>
       {isRSVPEnabled && (
-        <div className="rsvp-info-box">
-          <p>참석 응답 폼이 미리보기에 표시됩니다.</p>
-          <p>하객이 참석 여부, 동반 인원, 식사 여부를 응답할 수 있습니다.</p>
-        </div>
+        <>
+          <div className="input-group">
+            <label className="modern-checkbox">
+              <input type="checkbox" checked={!!isRSVPNoticeEnabled} onChange={(e) => updateField('isRSVPNoticeEnabled', e.target.checked)} />
+              <span>참석 여부 안내 메시지 표시 (오프닝 후 팝업)</span>
+            </label>
+          </div>
+          <div className="rsvp-info-box">
+            <p>참석 응답 폼이 미리보기에 표시됩니다.</p>
+            <p>하객이 참석 여부, 동반 인원, 식사 여부를 응답할 수 있습니다.</p>
+          </div>
+        </>
       )}
     </>
   );
