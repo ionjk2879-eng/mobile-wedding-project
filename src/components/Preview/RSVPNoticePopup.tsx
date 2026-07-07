@@ -29,7 +29,7 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
   };
 
   return (
-    <div className="rsvp-notice-overlay" onClick={handleClose}>
+    <div className="rsvp-notice-overlay">
       <div
         className="rsvp-notice-popup"
         style={{ fontFamily: data.fontFamily || 'inherit' }}
