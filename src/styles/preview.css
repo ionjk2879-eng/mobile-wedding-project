@@ -956,6 +956,10 @@
 .pf-tab { flex: 1; padding: 11px; border-radius: 10px; border: 1px solid var(--wedding-border); background: var(--wedding-bg); font-size: 0.85em; color: var(--wedding-text-sub); cursor: pointer; transition: all 0.2s; font-weight: 600; }
 .pf-tab.active { background: var(--wedding-main); color: white; border-color: var(--wedding-main); }
 .pf-tab.refuse.active { background: #8c8581; color: white; border-color: #8c8581; }
+.pf-privacy { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 10px; cursor: pointer; }
+.pf-privacy input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; accent-color: var(--wedding-main); width: 15px; height: 15px; cursor: pointer; }
+.pf-privacy span { font-size: 0.75em; color: var(--wedding-text-sub); line-height: 1.55; }
+.pf-privacy a { color: var(--wedding-main); text-decoration: underline; }
 .pf-submit { width: 100%; padding: 14px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.9em; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
 .pf-submit:hover:not(:disabled) { filter: brightness(0.9); }
 .pf-submit:disabled { opacity: 0.6; cursor: not-allowed; }

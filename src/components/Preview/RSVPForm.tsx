@@ -20,6 +20,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
   });
   const [submitted, setSubmitted] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
   if (!data.isRSVPEnabled) return null;
@@ -98,7 +99,13 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
             <label className="pf-label">{isEn ? 'Message' : isJa ? 'メッセージ' : '메시지'}</label>
             <textarea className="pf-input" rows={3} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} placeholder={isEn ? 'Message (optional)' : isJa ? 'メッセージ（任意）' : '축하 메시지 (선택사항)'} />
           </div>
-          <button type="submit" className="pf-submit">{formData.isAttending ? (isEn ? 'Submit' : isJa ? '送信' : '참석 의사 전달하기') : (isEn ? 'Submit' : isJa ? '送信' : '답변 전달하기')}</button>
+          <label className="pf-privacy">
+            <input type="checkbox" checked={privacyAgreed} onChange={(e) => setPrivacyAgreed(e.target.checked)} />
+            <span>
+              {isEn ? <><a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> — I agree to the collection of my name and attendance information.</> : isJa ? <><a href="/privacy" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>に基づく個人情報（氏名・出欠等）の収集に同意します。</> : <><a href="/privacy" target="_blank" rel="noopener noreferrer">개인정보 처리방침</a>에 따라 성함·참석 여부 등이 수집됩니다. 이에 동의합니다.</>}
+            </span>
+          </label>
+          <button type="submit" className="pf-submit" disabled={!privacyAgreed}>{formData.isAttending ? (isEn ? 'Submit' : isJa ? '送信' : '참석 의사 전달하기') : (isEn ? 'Submit' : isJa ? '送信' : '답변 전달하기')}</button>
         </form>
       </PreviewOverlay>
 
