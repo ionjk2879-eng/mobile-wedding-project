@@ -27,6 +27,7 @@ import ScrollReveal from './ScrollReveal';
 import BackgroundEffects from './BackgroundEffects';
 import MusicPlayer from './MusicPlayer';
 import Opening from './Opening';
+import RSVPNoticePopup from './RSVPNoticePopup';
 
 interface InvitationViewProps {
   data: InvitationData;
@@ -165,6 +166,8 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   const [previewActive, setPreviewActive] = useState(false);
   // openingDone: 한 번 dismiss 되면 true → shouldShowOpening = false → 완전히 언마운트
   const [openingDone, setOpeningDone] = useState(false);
+  const [rsvpNoticeVisible, setRsvpNoticeVisible] = useState(false);
+  const rsvpNoticeShownRef = useRef(false);
   // 마운트 시점의 key를 기준으로 삼아, 리마운트 시 이전 key로 재트리거 방지
   const lastProcessedKeyRef = useRef(openingPreviewKey);
 
@@ -222,9 +225,24 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     (showOpening && !!data.opening?.openingEnabled) || previewActive
   );
 
+  const showRsvpNotice = () => {
+    if (rsvpNoticeShownRef.current) return;
+    if (!showOpening || !data.isRSVPEnabled || isAnniversaryMode || !data.slug) return;
+    if (localStorage.getItem(`rsvp-notice-hidden-${data.slug}`) === new Date().toDateString()) return;
+    rsvpNoticeShownRef.current = true;
+    setTimeout(() => setRsvpNoticeVisible(true), 400);
+  };
+
+  // 오프닝 애니메이션이 없을 때는 마운트 직후 팝업 표시
+  useEffect(() => {
+    if (!showOpening || data.opening?.openingEnabled) return;
+    showRsvpNotice();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleOpeningDismissed = () => {
     setPreviewActive(false);
     setOpeningDone(true);
+    showRsvpNotice();
   };
 
   return (
@@ -234,6 +252,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           <strong>{previewBannerText}</strong>
           {previewBannerSubText && <span>{previewBannerSubText}</span>}
         </div>
+      )}
+      {rsvpNoticeVisible && !isAnniversaryMode && (
+        <RSVPNoticePopup data={data} onClose={() => setRsvpNoticeVisible(false)} />
       )}
       {shouldShowOpening && data.opening && (
         <Opening

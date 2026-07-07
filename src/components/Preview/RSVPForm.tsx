@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { InvitationData, RSVPResponse } from '../../types';
 import { CheckCircle2, Users, Utensils } from 'lucide-react';
 import { submitRSVP } from '../../services/rsvpService';
@@ -21,6 +21,12 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
   const [submitted, setSubmitted] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setFormOpen(true);
+    document.addEventListener('sonett-open-rsvp', handler);
+    return () => document.removeEventListener('sonett-open-rsvp', handler);
+  }, []);
   const sectionRef = useRef<HTMLElement>(null);
 
   if (!data.isRSVPEnabled) return null;
