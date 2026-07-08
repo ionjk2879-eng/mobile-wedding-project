@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { fetchMyInvitations, deleteInvitation, changeSlug, redeemActivationCode } from '../services/invitationService';
+import { fetchMyInvitations, deleteInvitation, changeSlug, redeemActivationCode, extendExpiry } from '../services/invitationService';
 import { InvitationData } from '../types';
 import { toast } from '../stores/useToastStore';
-import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen, Heart, KeyRound } from 'lucide-react';
+import { Edit3, Share2, Link as LinkIcon, X, MoreVertical, ClipboardList, Trash2, Globe, ShoppingCart, BookOpen, Heart, KeyRound, CalendarPlus } from 'lucide-react';
 import { downloadGuestbookPdf } from '../utils/exportGuestbookPdf';
 import { formatShareDate, formatShareDateJa } from '../utils/formatShareDateTime';
 import { QRCodeSVG } from 'qrcode.react';
@@ -313,6 +313,21 @@ const ManagePage: React.FC = () => {
     }
   };
 
+  const [extendingSlug, setExtendingSlug] = useState<string | null>(null);
+  const handleExtend = async (slug: string) => {
+    setExtendingSlug(slug);
+    try {
+      await extendExpiry(slug);
+      toast.success('보관 기간이 7일 연장되었습니다.');
+      load();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : '연장 중 오류가 발생했습니다.';
+      toast.error(msg);
+    } finally {
+      setExtendingSlug(null);
+    }
+  };
+
   const shareTarget = shareSlug ? invitations.find((i) => i.slug === shareSlug) : null;
 
   const paidCount = invitations.filter(i => i.data.isPaid).length;
@@ -408,6 +423,26 @@ const ManagePage: React.FC = () => {
                     {data.date && <p className="mc-date">{formatCardDate(data)}</p>}
                     <p className="mc-slug">sonett.kr/{slug}</p>
                   </div>
+                  {!data.isPaid && data.expiresAt && (() => {
+                    const extCount = data.extensionCount ?? 0;
+                    const remaining = 2 - extCount;
+                    const canExtend = remaining > 0;
+                    return (
+                      <div className="mc-extend-row">
+                        <span className="mc-extend-info">
+                          {canExtend ? `${remaining}번 더 연장 가능` : '더 이상 연장 불가'}
+                        </span>
+                        <button
+                          className={`mc-extend-btn${canExtend ? '' : ' disabled'}`}
+                          disabled={!canExtend || extendingSlug === slug}
+                          onClick={() => handleExtend(slug)}
+                        >
+                          <CalendarPlus size={12} />
+                          {extendingSlug === slug ? '연장 중...' : '1주일 연장'}
+                        </button>
+                      </div>
+                    );
+                  })()}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
                       <Share2 size={12} /> {tm.share}
@@ -671,6 +706,42 @@ const ManagePage: React.FC = () => {
         }
         .mc-info {
           margin-bottom: 14px;
+        }
+        .mc-extend-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          margin-bottom: 10px;
+          padding: 8px 10px;
+          background: #F9FAFB;
+          border-radius: 8px;
+          border: 1px solid #E5E7EB;
+        }
+        .mc-extend-info {
+          font-size: 0.72rem;
+          color: #6B7280;
+        }
+        .mc-extend-btn {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 5px 10px;
+          border-radius: 6px;
+          border: none;
+          background: #1F2937;
+          color: white;
+          font-size: 0.72rem;
+          font-weight: 600;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: background 0.15s;
+        }
+        .mc-extend-btn:hover:not(.disabled) { background: #374151; }
+        .mc-extend-btn.disabled {
+          background: #E5E7EB;
+          color: #9CA3AF;
+          cursor: not-allowed;
         }
         .mc-name {
           font-size: 1rem;

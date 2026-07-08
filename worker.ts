@@ -234,12 +234,12 @@ async function handleInvitations(request: Request, env: Env): Promise<Response> 
   if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
 
   const rows = await env.DB.prepare(
-    'SELECT slug, owner_uid, data, is_paid, expires_at FROM invitations WHERE owner_uid = ? AND (is_template_sample IS NULL OR is_template_sample = 0) ORDER BY updated_at DESC'
+    'SELECT slug, owner_uid, data, is_paid, expires_at, extension_count FROM invitations WHERE owner_uid = ? AND (is_template_sample IS NULL OR is_template_sample = 0) ORDER BY updated_at DESC'
   ).bind(user.uid).all();
 
   return json(rows.results.map((r: Record<string, unknown>) => ({
     slug: r.slug,
-    data: { ...JSON.parse(r.data as string), slug: r.slug, ownerUid: r.owner_uid, expiresAt: r.expires_at ?? null, isPaid: !!r.is_paid },
+    data: { ...JSON.parse(r.data as string), slug: r.slug, ownerUid: r.owner_uid, expiresAt: r.expires_at ?? null, isPaid: !!r.is_paid, extensionCount: (r.extension_count as number) ?? 0 },
   })), 200, origin);
 }
 
@@ -461,6 +461,28 @@ function generateActivationCode(): string {
   const bytes = new Uint8Array(12);
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => ACTIVATION_CODE_ALPHABET[b % 32]).join('');
+}
+
+// 미결제 청첩장 만료일 자율 연장 — 최대 2회, 1회당 +7일.
+async function handleExtendExpiry(request: Request, env: Env, slug: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const auth = await requireInvitationOwner(request, env, slug);
+  if ('error' in auth) return auth.error;
+
+  const row = await env.DB.prepare(
+    'SELECT is_paid, expires_at, extension_count FROM invitations WHERE slug = ?'
+  ).bind(slug).first();
+
+  if (!row) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
+  if (row.is_paid) return json({ error: '결제 완료된 청첩장은 만료일이 없습니다.' }, 400, origin);
+  const count = (row.extension_count as number) ?? 0;
+  if (count >= 2) return json({ error: '더 이상 연장할 수 없습니다.' }, 400, origin);
+
+  await env.DB.prepare(
+    `UPDATE invitations SET expires_at = datetime(expires_at, '+7 days'), extension_count = extension_count + 1, updated_at = datetime('now') WHERE slug = ?`
+  ).bind(slug).run();
+
+  return json({ ok: true }, 200, origin);
 }
 
 // 청첩장 소유자가 구매 후 발급받은 활성화 코드를 직접 입력해 유료 전환하는 셀프서비스 경로.
@@ -1578,6 +1600,9 @@ export default {
 
       const redeemMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/redeem$/);
       if (redeemMatch && request.method === 'POST') return await handleRedeemCode(request, env, redeemMatch[1]);
+
+      const extendMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/extend$/);
+      if (extendMatch && request.method === 'POST') return await handleExtendExpiry(request, env, extendMatch[1]);
 
       // Posts (public)
       if (pathname === '/api/posts') return await handlePostsPublic(request, env);

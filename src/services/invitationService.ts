@@ -42,6 +42,11 @@ export const redeemActivationCode = async (slug: string, code: string): Promise<
   await apiFetch(`/api/invitations/${slug}/redeem`, { method: 'POST', body: JSON.stringify({ code }) });
 };
 
+// 미결제 청첩장 만료일 +7일 자율 연장 (최대 2회).
+export const extendExpiry = async (slug: string): Promise<void> => {
+  await apiFetch(`/api/invitations/${slug}/extend`, { method: 'POST' });
+};
+
 export interface PrivacySettings {
   privacyTransitionDate: string | null;
   isPastTransition: boolean;
