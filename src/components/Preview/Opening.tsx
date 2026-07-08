@@ -110,27 +110,21 @@ const PETAL_ITEMS = [
   { left: '85%', w: 10, h: 15, r0:  20, r1: -215, dx: -16, dur: 10.5, d: 5.5 },
 ];
 
-// 오프닝 애니메이션 색상 체계는 4색 테마 개편 작업에서 보류 중 — 임시로 ivorynavy
-// 하나만 채워 크래시를 막아둔 상태. bg는 강조색(emphasis, 어두운 톤), text는 보더색,
-// accent는 메인색을 그대로 가져왔다. 추후 오프닝 전용 색상 설계 시 다시 정리할 것.
+// ThemeSection.tsx의 THEMES와 반드시 키가 일치해야 한다. bg는 강조색(emphasis, colors[3]),
+// accent는 메인색(colors[2]), text는 보더색(colors[1]) — text는 현재 어디서도 쓰이지 않지만
+// 값은 채워둔다.
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
-  ivorynavy:  { bg: '#000000', text: '#D3C6BB', accent: '#163A5F' },
-  // sage:       { bg: '#2B3328', text: '#D6DED0', accent: '#8BA888' },
-  // mist:       { bg: '#1E2A33', text: '#D8DFE6', accent: '#6E8899' },
-  // pearl:      { bg: '#2E261A', text: '#EDE6D8', accent: '#B0946A' },
-  // walnut:     { bg: '#2C1E14', text: '#E0D0C0', accent: '#8A6248' },
-  // slate:      { bg: '#1E2830', text: '#D4D8DF', accent: '#5E6F80' },
-  // wisteria:   { bg: '#281C3C', text: '#E0D8F0', accent: '#8A70B0' },
-  // cedar:      { bg: '#2E1610', text: '#E4CEC4', accent: '#A06048' },
-  // stone:      { bg: '#282622', text: '#E0DDD8', accent: '#8C8880' },
-  // copper:     { bg: '#2C1E0A', text: '#E8D8C0', accent: '#B87A38' },
-  // sky:        { bg: '#1A2240', text: '#C8D6EC', accent: '#6070A8' },
-  // linen:      { bg: '#2C2218', text: '#E2D5C2', accent: '#9A8468' },
-  // olive:      { bg: '#1E2814', text: '#C8D2BE', accent: '#5A6C40' },
-  // noir:       { bg: '#1A1816', text: '#DCDAD6', accent: '#4E4C4A' },
-  // peach:      { bg: '#38201A', text: '#F0D8CC', accent: '#D4785C' },
-  // white:      { bg: '#1A1A1A', text: '#E5E5E5', accent: '#595959' },
-  // whitegold:  { bg: '#3A2E10', text: '#EDE0C8', accent: '#C9A227' },
+  ivorynavy:      { bg: '#000000', text: '#D3C6BB', accent: '#163A5F' },
+  mochaneutral:   { bg: '#4E220F', text: '#B0BA99', accent: '#9D6638' },
+  dustyblue:      { bg: '#293681', text: '#95CCDD', accent: '#4274D9' },
+  pastelblush:    { bg: '#3E5A4C', text: '#C0E1D2', accent: '#DC9B9B' },
+  sagenature:     { bg: '#0D530E', text: '#E7E1B1', accent: '#306D29' },
+  warmcharcoal:   { bg: '#33302C', text: '#DDD6CC', accent: '#B97A56' },
+  sunsetgold:     { bg: '#D92243', text: '#E0C375', accent: '#F69D39' },
+  deepteal:       { bg: '#0D2B29', text: '#D4B94E', accent: '#098389' },
+  deepplum:       { bg: '#2E0E30', text: '#DD9933', accent: '#5A175D' },
+  terracotta:     { bg: '#7A3418', text: '#E8B08C', accent: '#C1633B' },
+  ivorychampagne: { bg: '#6B4E1E', text: '#EDE0C8', accent: '#C9A227' },
 };
 
 interface OpeningProps {
