@@ -60,7 +60,7 @@ export interface BasicInfo {
 }
 
 export interface DesignConfig {
-  theme?: 'ivorynavy';
+  theme?: 'ivorynavy' | 'mochaneutral' | 'dustyblue' | 'pastelblush' | 'sagenature' | 'warmcharcoal' | 'sunsetgold' | 'deepteal' | 'deepplum' | 'terracotta' | 'ivorychampagne';
   customBgColor?: string;
   customAccentColor?: string;
   customLabelColor?: string;
