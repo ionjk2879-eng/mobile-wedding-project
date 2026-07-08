@@ -197,8 +197,8 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
         .promo-section {
           padding: 36px 24px 40px;
           text-align: center;
-          background: linear-gradient(180deg, #F9F3F6 0%, #FDF6F9 100%);
-          border-top: 1px solid rgba(176,122,142,0.15);
+          background: linear-gradient(180deg, var(--wedding-bg) 0%, var(--wedding-card-bg) 100%);
+          border-top: 1px solid var(--wedding-border);
           font-family: 'Pretendard', sans-serif;
         }
         .promo-brand {
