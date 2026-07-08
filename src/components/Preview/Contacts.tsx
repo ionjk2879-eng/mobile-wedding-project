@@ -21,11 +21,12 @@ interface Group {
 
 const buildList = (
   self: { name: string; phone: string } | undefined,
+  selfName: string,
   parents: { role: string; name: string; phone: string }[],
   label: string
 ): ContactEntry[] => {
   const list: ContactEntry[] = [];
-  if (self && (self.name || self.phone)) list.push({ role: label, name: self.name, phone: self.phone });
+  if (self && (selfName || self.phone)) list.push({ role: label, name: selfName, phone: self.phone });
   parents.forEach(p => {
     if (p.name || p.phone) list.push({ role: `${label} ${p.role}`, name: p.name, phone: p.phone });
   });
@@ -117,8 +118,8 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   const groomLabel = isEn ? 'Groom' : isJa ? '新郎' : '신랑';
   const brideLabel = isEn ? 'Bride' : isJa ? '新婦' : '신부';
 
-  const groomContacts = buildList(groomSelf, data.parents.groomParents, groomLabel);
-  const brideContacts = buildList(brideSelf, data.parents.brideParents, brideLabel);
+  const groomContacts = buildList(groomSelf, data.groomName, data.parents.groomParents, groomLabel);
+  const brideContacts = buildList(brideSelf, data.brideName, data.parents.brideParents, brideLabel);
 
   const allGroups: Group[] = [
     { label: isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측', contacts: groomContacts, side: 'groom' as const },
@@ -155,6 +156,8 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
 }, (prev, next) =>
   prev.data.contacts === next.data.contacts
   && prev.data.parents === next.data.parents
+  && prev.data.groomName === next.data.groomName
+  && prev.data.brideName === next.data.brideName
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
   && prev.data.contactDisplayMode === next.data.contactDisplayMode
