@@ -86,7 +86,7 @@ const NoteSlider: React.FC<{
   return (
     <div className="gb-note-section">
       <p className="gb-note-label">
-        {label}측 <span className="gb-tab-count">{messages.length}</span>
+        {label} <span className="gb-tab-count">{messages.length}</span>
       </p>
       {messages.length === 0 ? (
         <p className="gb-empty">{isEn ? 'No messages yet.' : isJa ? 'まだメッセージがありません。' : '아직 메시지가 없습니다.'}</p>
