@@ -26,6 +26,7 @@ export const initialData: InvitationData = {
   galleryStyle: 'slide',
   calendarStyle: 'card',
   locationStyle: 'card',
+  messageStyle: 'card',
   heroPhoto: '',
   heroStyle: 'classic',
   heroPhotoShape: 'basic',

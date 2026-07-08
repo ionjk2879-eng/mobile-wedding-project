@@ -41,6 +41,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
 
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
+  const calendarPlain = data.calendarStyle === 'plain';
 
   const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const monthNames = [
@@ -130,7 +131,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
         ) : (
           <>
             <p className="countdown-label">{isEn ? 'Until the Wedding' : isJa ? '式まであと' : '결혼식까지 남은 시간'}</p>
-            <div className="countdown-boxes">
+            <div className={`countdown-boxes ${calendarPlain ? 'countdown-plain' : ''}`}>
               <div className="countdown-box">
                 <span className="countdown-unit">DAYS</span>
                 <span className="countdown-num">{cDays}</span>

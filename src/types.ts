@@ -93,6 +93,7 @@ export interface ContentData {
   galleryStyle: 'slide' | 'style3';
   calendarStyle?: 'card' | 'plain';
   locationStyle?: 'card' | 'plain';
+  messageStyle?: 'card' | 'plain';
   timeline: TimelineEvent[];
   interview: InterviewQA[];
   accounts: Account[];
