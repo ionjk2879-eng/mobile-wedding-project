@@ -496,6 +496,20 @@
 .contact-dot { width: 8px; height: 8px; border-radius: 50%; border: none; background: var(--wedding-border); padding: 0; cursor: pointer; transition: all 0.25s; }
 .contact-dot.active { background: var(--wedding-main); width: 20px; border-radius: 4px; }
 
+/* Contacts popup list */
+.contact-popup-list { display: flex; flex-direction: column; gap: 28px; }
+.contact-popup-group { display: flex; flex-direction: column; }
+.contact-popup-group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.contact-popup-side-label { font-size: 0.9em; font-weight: 700; color: var(--wedding-text-main); }
+.contact-popup-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--wedding-border); }
+.contact-popup-row:last-child { border-bottom: none; }
+.contact-popup-info { display: flex; flex-direction: column; gap: 2px; }
+.contact-popup-role { font-size: 0.72em; font-weight: 600; color: var(--wedding-main); }
+.contact-popup-name { font-size: 1em; font-weight: 600; color: var(--wedding-text-main); }
+.contact-popup-actions { display: flex; gap: 10px; flex-shrink: 0; }
+.contact-popup-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--wedding-border); background: var(--wedding-bg); display: flex; align-items: center; justify-content: center; color: var(--wedding-main); transition: all 0.2s; text-decoration: none; }
+.contact-popup-btn:hover { background: var(--wedding-main); color: white; border-color: var(--wedding-main); }
+
 /* === Ending === */
 .ending { background: transparent; }
 .ending-frame { position: relative; width: 100%; aspect-ratio: 3/4; min-height: 480px; overflow: hidden; }

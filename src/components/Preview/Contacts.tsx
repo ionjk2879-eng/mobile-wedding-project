@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Phone, MessageSquare, ChevronDown } from 'lucide-react';
+import { Phone, MessageSquare, ChevronDown, Heart } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { PreviewOverlay } from '../../hooks/usePreviewPopup';
 
@@ -16,6 +16,7 @@ interface ContactEntry {
 interface Group {
   label: string;
   contacts: ContactEntry[];
+  side: 'groom' | 'bride';
 }
 
 const buildList = (
@@ -67,6 +68,41 @@ const GroupsAccordion: React.FC<{ groups: Group[] }> = ({ groups }) => {
   );
 };
 
+const PopupGroupsList: React.FC<{ groups: Group[] }> = ({ groups }) => (
+  <div className="contact-popup-list">
+    {groups.map((group, gi) => (
+      <div key={gi} className="contact-popup-group">
+        <div className="contact-popup-group-header">
+          <Heart
+            size={20}
+            fill={group.side === 'groom' ? '#3B82F6' : '#EF4444'}
+            color={group.side === 'groom' ? '#3B82F6' : '#EF4444'}
+          />
+          <span className="contact-popup-side-label">{group.label}</span>
+        </div>
+        {group.contacts.map((c, ci) => (
+          <div key={ci} className="contact-popup-row">
+            <div className="contact-popup-info">
+              <span className="contact-popup-role">{c.role}</span>
+              <span className="contact-popup-name">{c.name}</span>
+            </div>
+            {c.phone && (
+              <div className="contact-popup-actions">
+                <a href={`tel:${c.phone}`} className="contact-popup-btn" aria-label={`${c.name}에게 전화하기`}>
+                  <Phone size={17} />
+                </a>
+                <a href={`sms:${c.phone}`} className="contact-popup-btn" aria-label={`${c.name}에게 문자하기`}>
+                  <MessageSquare size={17} />
+                </a>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+);
+
 const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
@@ -85,8 +121,8 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   const brideContacts = buildList(brideSelf, data.parents.brideParents, brideLabel);
 
   const allGroups: Group[] = [
-    { label: isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측', contacts: groomContacts },
-    { label: isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측', contacts: brideContacts },
+    { label: isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측', contacts: groomContacts, side: 'groom' as const },
+    { label: isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측', contacts: brideContacts, side: 'bride' as const },
   ].filter(g => g.contacts.length > 0);
 
   if (allGroups.length === 0) return null;
@@ -108,7 +144,7 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
             {btnLabel}
           </button>
           <PreviewOverlay open={popupOpen} onClose={() => setPopupOpen(false)} anchorRef={sectionRef} title={popupTitle}>
-            <GroupsInline groups={allGroups} />
+            <PopupGroupsList groups={allGroups} />
           </PreviewOverlay>
         </>
       )}
