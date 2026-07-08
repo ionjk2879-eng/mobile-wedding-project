@@ -637,15 +637,15 @@
 .timeline-section { background-color: transparent; padding: 80px 24px; position: relative; z-index: 2; }
 .timeline-toggle { display: inline-block; padding: 12px 32px; background: var(--wedding-main); border: none; border-radius: 30px; font-size: 0.9em; font-weight: 700; color: white; cursor: pointer; transition: all 0.25s; margin-bottom: 4px; box-shadow: 0 4px 12px color-mix(in srgb, var(--wedding-main) 30%, transparent); }
 .timeline-toggle:hover { filter: brightness(0.9); transform: translateY(-1px); }
-.timeline-toggle.open { background: var(--wedding-bg); color: #000000; border: 1px solid var(--wedding-border); box-shadow: none; }
+.timeline-toggle.open { background: color-mix(in srgb, var(--wedding-main) 12%, white 88%); color: var(--wedding-main); border: 1px solid var(--wedding-main); box-shadow: none; }
 .timeline-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
 .timeline-body.open { max-height: none; }
 .tl-zigzag { padding: 30px 20px 20px; margin: 0 -24px; background: color-mix(in srgb, var(--wedding-main) 5%, var(--wedding-bg)); }
 .tl-block { position: relative; padding-bottom: 0; }
-.tl-line-v { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--wedding-border); }
+.tl-line-v { position: absolute; top: 0; bottom: 0; width: 2px; background: color-mix(in srgb, var(--wedding-main) 30%, transparent); }
 .tl-line-v.line-left { left: 16px; }
 .tl-line-v.line-right { right: 16px; }
-.tl-line-h { position: relative; height: 2px; background: var(--wedding-border); margin: 20px 0; }
+.tl-line-h { position: relative; height: 2px; background: color-mix(in srgb, var(--wedding-main) 30%, transparent); margin: 20px 0; }
 .tl-line-h.h-to-right { margin-left: 16px; margin-right: 16px; }
 .tl-line-h.h-to-left { margin-left: 16px; margin-right: 16px; }
 .tl-dot { width: 12px; height: 12px; background: var(--wedding-main); border: 3px solid var(--wedding-card-bg, #fff); border-radius: 50%; box-shadow: 0 0 0 3px var(--wedding-border); margin-bottom: 14px; }
