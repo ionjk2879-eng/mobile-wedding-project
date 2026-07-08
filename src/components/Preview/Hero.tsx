@@ -1,6 +1,7 @@
 import React from 'react';
 import { InvitationData } from '../../types';
 import { isFixedLookHeroStyle } from '../../data/heroStyleConfig';
+import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateTime';
 
 interface PreviewProps {
   data: InvitationData;
@@ -14,10 +15,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const venueName = isEn && data.en.venueName ? data.en.venueName : isJa && data.ja?.venueName ? data.ja.venueName : data.venueName;
   const dateStr = (() => {
     if (isEn && data.en.date) return data.en.date;
-    if (isJa && data.weddingDateISO) {
-      const d = new Date(data.weddingDateISO);
-      if (!isNaN(d.getTime())) return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-    }
+    if (isJa) return formatShareDateJa(data.weddingDateISO) || data.date;
+    if (!isEn) return formatShareDate(data.weddingDateISO) || data.date;
     return data.date;
   })();
   const timeStr = (() => {
@@ -27,6 +26,13 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
       if (parts) {
         const ampm = parts[1] === 'AM' ? '午前' : '午後';
         return `${ampm}${parts[2]}時${parts[3] === '00' ? '' : parts[3] + '分'}`;
+      }
+    }
+    if (!isEn && !isJa && data.time) {
+      const parts = data.time.match(/(AM|PM)\s(\d+):(\d+)/);
+      if (parts) {
+        const ampm = parts[1] === 'AM' ? '오전' : '오후';
+        return `${ampm} ${parts[2]}시${parts[3] === '00' ? '' : ` ${parts[3]}분`}`;
       }
     }
     return data.time;

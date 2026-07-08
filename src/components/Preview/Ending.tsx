@@ -1,5 +1,6 @@
 import React from 'react';
 import { InvitationData } from '../../types';
+import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateTime';
 
 interface PreviewProps {
   data: InvitationData;
@@ -15,11 +16,8 @@ const Ending: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const dateStr = (() => {
     if (isEn) return data.en?.date || data.date;
-    if (isJa && data.weddingDateISO) {
-      const d = new Date(data.weddingDateISO);
-      if (!isNaN(d.getTime())) return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-    }
-    return data.date;
+    if (isJa) return formatShareDateJa(data.weddingDateISO) || data.date;
+    return formatShareDate(data.weddingDateISO) || data.date;
   })();
 
   const defaultMessage = isEn
