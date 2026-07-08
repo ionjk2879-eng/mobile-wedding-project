@@ -3,11 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader';
 import { AI_PRESETS, AIPreset } from '../data/aiPresets';
 import { loadInvitationPublic } from '../services/publicLoad';
-import { InvitationData } from '../types';
 import '../styles/builder.css';
-
-// 모든 프리셋이 같은 sampleSlug를 쓰므로 한 번만 fetch
-const SAMPLE_SLUG = AI_PRESETS.find(p => p.sampleSlug)?.sampleSlug ?? '';
 
 // heroStyle → 라벨
 const HERO_STYLE_LABEL: Record<string, string> = {
@@ -93,7 +89,6 @@ const TemplateCard: React.FC<TemplateCardProps> = ({ preset, photo }) => {
               title={color}
             />
           ))}
-          {/* 액센트 컬러 추가 표시 */}
           {preset.settings.customAccentColor && preset.settings.customAccentColor !== accentColor && (
             <span
               className="tmpl-card-swatch"
@@ -108,22 +103,21 @@ const TemplateCard: React.FC<TemplateCardProps> = ({ preset, photo }) => {
 };
 
 const TemplatesPage: React.FC = () => {
-  const [sampleData, setSampleData] = useState<InvitationData | null>(null);
+  const [photos, setPhotos] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
-    if (!SAMPLE_SLUG) return;
-    loadInvitationPublic(SAMPLE_SLUG)
-      .then(d => { if (d) setSampleData(d); })
-      .catch(() => {});
+    // 각 프리셋의 전용 템플릿 샘플 슬러그에서 독립적으로 사진 fetch
+    AI_PRESETS.forEach(preset => {
+      if (!preset.sampleSlug) return;
+      loadInvitationPublic(preset.sampleSlug)
+        .then(d => {
+          if (d?.heroPhoto) {
+            setPhotos(prev => ({ ...prev, [preset.id]: d.heroPhoto! }));
+          }
+        })
+        .catch(() => {});
+    });
   }, []);
-
-  const getPhoto = (preset: AIPreset): string | null => {
-    if (!sampleData) return null;
-    if (preset.sampleHeroFromGallery !== undefined) {
-      return sampleData.photos?.[preset.sampleHeroFromGallery] ?? sampleData.heroPhoto ?? null;
-    }
-    return sampleData.heroPhoto ?? null;
-  };
 
   return (
     <div className="templates-page">
@@ -135,7 +129,7 @@ const TemplatesPage: React.FC = () => {
         </div>
         <div className="templates-grid-new">
           {AI_PRESETS.map(preset => (
-            <TemplateCard key={preset.id} preset={preset} photo={getPhoto(preset)} />
+            <TemplateCard key={preset.id} preset={preset} photo={photos[preset.id] ?? null} />
           ))}
         </div>
       </main>

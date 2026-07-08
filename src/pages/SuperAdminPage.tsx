@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { apiFetch } from '../services/api';
-import { activatePaidInvitation } from '../services/invitationService';
+import { activatePaidInvitation, loadInvitation, saveInvitation } from '../services/invitationService';
+import { loadInvitationPublic } from '../services/publicLoad';
 import useAuthStore from '../stores/useAuthStore';
+import useInvitationStore, { initialData } from '../stores/useInvitationStore';
 import { signInWithGoogle, initiateKakaoLogin, initiateNaverLogin, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
 import ToastContainer from '../components/Toast';
-import { Search, RefreshCw, CheckCircle, ExternalLink, Plus, Pencil, Trash2, X, KeyRound, Download, Copy } from 'lucide-react';
+import { AI_PRESETS, applyPreset } from '../data/aiPresets';
+import { InvitationData } from '../types';
+import HeroSection from '../components/Editor/sections/HeroSection';
+import PhotosSection from '../components/Editor/sections/PhotosSection';
+import { Search, RefreshCw, CheckCircle, ExternalLink, Plus, Pencil, Trash2, X, KeyRound, Download, Copy, Image as ImageIcon, Layers } from 'lucide-react';
 
 type Filter = 'all' | 'unpaid' | 'paid';
-type AdminTab = 'orders' | 'codes' | 'posts';
+type AdminTab = 'orders' | 'codes' | 'posts' | 'templates';
 type PostType = 'event' | 'notice';
 
 interface InvRow {
@@ -231,6 +237,15 @@ const SuperAdminPage: React.FC = () => {
   const [postsLoading, setPostsLoading] = useState(false);
   const [postForm, setPostForm] = useState<{ open: boolean; editing?: Post }>({ open: false });
 
+  // Templates
+  const [templateSamples, setTemplateSamples] = useState<Record<string, { heroPhoto: string; updatedAt: string }>>({});
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
+  const [templateSaving, setTemplateSaving] = useState(false);
+  const [seedingAll, setSeedingAll] = useState(false);
+  const [seedingStatus, setSeedingStatus] = useState<Record<string, 'idle' | 'seeding' | 'done' | 'error'>>({});
+  const setStoreData = useInvitationStore((s) => s.setData);
+
   const fetchList = useCallback(async () => {
     setLoading(true);
     try {
@@ -256,6 +271,128 @@ const SuperAdminPage: React.FC = () => {
     setPostsLoading(false);
   }, []);
 
+  const fetchTemplateSamples = useCallback(async () => {
+    setTemplatesLoading(true);
+    try {
+      const data = await apiFetch<{ slug: string; heroPhoto: string; updatedAt: string }[]>('/api/admin/template-samples');
+      const map: Record<string, { heroPhoto: string; updatedAt: string }> = {};
+      data.forEach(d => { map[d.slug] = { heroPhoto: d.heroPhoto, updatedAt: d.updatedAt }; });
+      setTemplateSamples(map);
+    } catch {
+      toast.error('템플릿 샘플 조회 실패');
+    }
+    setTemplatesLoading(false);
+  }, []);
+
+  const handleEditTemplate = async (slug: string) => {
+    setEditingTemplate(slug);
+    const data = await loadInvitation(slug);
+    if (data) {
+      setStoreData(data);
+    } else {
+      setStoreData({ ...initialData, slug });
+    }
+  };
+
+  const handleCloseEdit = () => {
+    setEditingTemplate(null);
+    setStoreData(initialData);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!editingTemplate) return;
+    setTemplateSaving(true);
+    try {
+      const storeData = useInvitationStore.getState().data;
+      await saveInvitation(editingTemplate, storeData);
+      toast.success('저장되었습니다.');
+      await fetchTemplateSamples();
+      handleCloseEdit();
+    } catch (e: unknown) {
+      toast.error((e as Error)?.message || '저장 실패');
+    }
+    setTemplateSaving(false);
+  };
+
+  const handleSeedAll = async () => {
+    if (!confirm('junho-seoyeon 사진/내용으로 6개 템플릿 샘플을 초기화합니다. 기존 사진은 덮어씌워집니다. 계속하시겠습니까?')) return;
+    setSeedingAll(true);
+    const initialStatus: Record<string, 'idle'> = {};
+    AI_PRESETS.forEach(p => { if (p.sampleSlug) initialStatus[p.sampleSlug] = 'idle'; });
+    setSeedingStatus(initialStatus);
+
+    let junhoData: InvitationData | null = null;
+    try {
+      junhoData = await loadInvitationPublic('junho-seoyeon');
+    } catch { /* ignore */ }
+    if (!junhoData) {
+      toast.error('junho-seoyeon 데이터를 불러올 수 없습니다.');
+      setSeedingAll(false);
+      return;
+    }
+
+    const HERO_PHOTOS: Record<string, string> = {
+      'natural-serene':    junhoData.heroPhoto || '',
+      'clear-insta':       junhoData.photos?.[2] || junhoData.heroPhoto || '',
+      'elegant-pearl':     junhoData.heroPhoto2 || junhoData.heroPhoto || '',
+      'romantic-wisteria': junhoData.photos?.[0] || junhoData.heroPhoto || '',
+      'modern-slate':      junhoData.photos?.[1] || junhoData.heroPhoto || '',
+      'warm-copper':       junhoData.photos?.[3] || junhoData.heroPhoto || '',
+    };
+
+    for (const preset of AI_PRESETS) {
+      const slug = preset.sampleSlug;
+      if (!slug) continue;
+      setSeedingStatus(prev => ({ ...prev, [slug]: 'seeding' }));
+      try {
+        const base = applyPreset(preset);
+        const heroPhoto = HERO_PHOTOS[preset.id] || junhoData.heroPhoto || '';
+        const templateData: InvitationData = {
+          ...base,
+          groomName: junhoData.groomName,
+          brideName: junhoData.brideName,
+          date: junhoData.date,
+          time: junhoData.time,
+          weddingDateISO: junhoData.weddingDateISO,
+          heroPhoto,
+          heroPhotoX: 50,
+          heroPhotoY: 50,
+          heroPhoto2: junhoData.heroPhoto2 || '',
+          heroPhoto2X: junhoData.heroPhoto2X,
+          heroPhoto2Y: junhoData.heroPhoto2Y,
+          photos: junhoData.photos || [],
+          groomPhoto: junhoData.groomPhoto || '',
+          bridePhoto: junhoData.bridePhoto || '',
+          timeline: (junhoData.timeline?.length ? junhoData.timeline : base.timeline) ?? [],
+          parents: {
+            groomParents: (junhoData.parents?.groomParents || []).map(p => ({ ...p, phone: '' })),
+            brideParents: (junhoData.parents?.brideParents || []).map(p => ({ ...p, phone: '' })),
+          },
+          venueName: '세레나 웨딩홀 그랜드볼룸',
+          venueAddress: '서울특별시 강남구 테헤란로 123',
+          transport: {
+            subway: '2호선 강남역 3번 출구 도보 5분',
+            bus: '간선 140, 402번 강남역 하차',
+            parking: '건물 지하 1~3층 (3시간 무료)',
+          },
+          slug,
+        };
+        await apiFetch('/api/admin/template-samples/seed', {
+          method: 'POST',
+          body: JSON.stringify({ slug, data: templateData }),
+        });
+        setSeedingStatus(prev => ({ ...prev, [slug]: 'done' }));
+      } catch (e: unknown) {
+        setSeedingStatus(prev => ({ ...prev, [slug]: 'error' }));
+        toast.error(`${preset.name} 시드 실패: ${(e as Error)?.message}`);
+      }
+    }
+
+    setSeedingAll(false);
+    await fetchTemplateSamples();
+    toast.success('전체 시드 완료!');
+  };
+
   useEffect(() => {
     // 로그인 세션 복원이 아직 안 끝났으면(authLoading) 잠깐 null(확인 중) 상태를 유지한다 —
     // 안 그러면 이미 로그인된 관리자한테도 새로고침마다 로그인 버튼이 잠깐 번쩍인다.
@@ -267,6 +404,10 @@ const SuperAdminPage: React.FC = () => {
   useEffect(() => {
     if (authorized && adminTab === 'posts') fetchPosts();
   }, [fetchPosts, authorized, adminTab]);
+
+  useEffect(() => {
+    if (authorized && adminTab === 'templates') fetchTemplateSamples();
+  }, [fetchTemplateSamples, authorized, adminTab]);
 
   const handleActivate = async (row: InvRow) => {
     if (!row.weddingDateISO) { toast.error('결혼 날짜 정보가 없어 활성화할 수 없습니다.'); return; }
@@ -416,7 +557,7 @@ const SuperAdminPage: React.FC = () => {
       {/* Header */}
       <div style={{ background: 'white', borderBottom: '1px solid #F0F0F0', padding: '0 24px', display: 'flex', alignItems: 'stretch', gap: 0 }}>
         <h1 style={{ margin: '0 24px 0 0', fontSize: '1.05rem', fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center' }}>관리자</h1>
-        {(['orders', 'codes', 'posts'] as AdminTab[]).map(t => (
+        {(['orders', 'codes', 'posts', 'templates'] as AdminTab[]).map(t => (
           <button
             key={t}
             onClick={() => setAdminTab(t)}
@@ -427,7 +568,7 @@ const SuperAdminPage: React.FC = () => {
               transition: 'all 0.15s',
             }}
           >
-            {t === 'orders' ? '주문 관리' : t === 'codes' ? '활성화 코드' : '게시글 관리'}
+            {t === 'orders' ? '주문 관리' : t === 'codes' ? '활성화 코드' : t === 'posts' ? '게시글 관리' : '템플릿 샘플'}
             {t === 'orders' && unpaidCount > 0 && (
               <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 20, background: '#FEF3C7', color: '#D97706', fontSize: '0.68rem', fontWeight: 700 }}>
                 {unpaidCount}
@@ -679,6 +820,94 @@ const SuperAdminPage: React.FC = () => {
             </div>
           </>
         )}
+
+        {/* ── Templates Tab ── */}
+        {adminTab === 'templates' && (
+          <>
+            {/* 전체 시드 복원 */}
+            <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '1px solid #F0F0F0', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+                <div>
+                  <h2 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Layers size={16} /> 템플릿 샘플 관리
+                  </h2>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#9CA3AF' }}>
+                    junho-seoyeon 사진·내용을 6개 템플릿 샘플에 복사합니다. "편집" 버튼으로 사진만 개별 교체 가능합니다.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={fetchTemplateSamples} disabled={templatesLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', border: '1px solid #E5E7EB', borderRadius: 10, background: 'white', fontSize: '0.82rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit', opacity: templatesLoading ? 0.5 : 1 }}>
+                    <RefreshCw size={13} style={{ animation: templatesLoading ? 'spin 0.8s linear infinite' : 'none' }} /> 새로고침
+                  </button>
+                  <button onClick={handleSeedAll} disabled={seedingAll} style={{ padding: '8px 18px', border: 'none', borderRadius: 10, background: '#1F2937', color: 'white', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit', opacity: seedingAll ? 0.5 : 1 }}>
+                    {seedingAll ? '초기화 중...' : '전체 시드 복원'}
+                  </button>
+                </div>
+              </div>
+
+              {/* 시딩 진행 상태 */}
+              {Object.keys(seedingStatus).length > 0 && (
+                <div style={{ marginTop: 16, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {AI_PRESETS.map(preset => {
+                    const slug = preset.sampleSlug || '';
+                    const status = seedingStatus[slug];
+                    if (!status) return null;
+                    return (
+                      <span key={preset.id} style={{ padding: '4px 10px', borderRadius: 8, fontSize: '0.75rem', fontWeight: 600,
+                        background: status === 'done' ? '#D1FAE5' : status === 'error' ? '#FEE2E2' : status === 'seeding' ? '#FEF3C7' : '#F3F4F6',
+                        color: status === 'done' ? '#059669' : status === 'error' ? '#DC2626' : status === 'seeding' ? '#D97706' : '#6B7280',
+                      }}>
+                        {preset.emoji} {preset.name}: {status === 'done' ? '완료' : status === 'error' ? '실패' : status === 'seeding' ? '진행중...' : '대기'}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* 템플릿 카드 그리드 */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+              {AI_PRESETS.map(preset => {
+                const slug = preset.sampleSlug || '';
+                const info = templateSamples[slug];
+                const accentColor = preset.previewColors[1];
+                const bgColor = preset.previewColors[0];
+                return (
+                  <div key={preset.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #F0F0F0', overflow: 'hidden' }}>
+                    {/* 썸네일 */}
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: `linear-gradient(160deg, ${bgColor}, ${accentColor}60)`, overflow: 'hidden' }}>
+                      {info?.heroPhoto ? (
+                        <img src={info.heroPhoto} alt={preset.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '2rem' }}>{preset.emoji}</div>
+                      )}
+                      <span style={{ position: 'absolute', top: 8, right: 8, padding: '2px 8px', borderRadius: 20, fontSize: '0.65rem', fontWeight: 700,
+                        background: info ? 'rgba(5,150,105,0.85)' : 'rgba(220,38,38,0.85)', color: 'white' }}>
+                        {info ? '✓ 세팅됨' : '⚠ 미세팅'}
+                      </span>
+                    </div>
+                    {/* 정보 + 버튼 */}
+                    <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                      <div>
+                        <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: '#1F2937' }}>{preset.emoji} {preset.name}</p>
+                        {info?.updatedAt && <p style={{ margin: '2px 0 0', fontSize: '0.68rem', color: '#9CA3AF' }}>{info.updatedAt.slice(0, 10)} 업데이트</p>}
+                      </div>
+                      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                        <button onClick={() => handleEditTemplate(slug)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.78rem', fontWeight: 600, color: '#1F2937', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          <ImageIcon size={12} /> 편집
+                        </button>
+                        <a href={`/template-preview/${preset.id}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', border: 'none', borderRadius: 8, background: '#B07A8E', fontSize: '0.78rem', fontWeight: 700, color: 'white', textDecoration: 'none', fontFamily: 'inherit' }}>
+                          <ExternalLink size={12} /> 미리보기
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
       </div>
 
       {postForm.open && (
@@ -689,6 +918,43 @@ const SuperAdminPage: React.FC = () => {
             : handleCreatePost}
           onClose={() => setPostForm({ open: false })}
         />
+      )}
+
+      {/* 템플릿 샘플 사진 편집 모달 — 기존 HeroSection·PhotosSection 재사용 */}
+      {editingTemplate && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '40px 20px' }}>
+          <div style={{ background: '#F9FAFB', borderRadius: 20, width: '100%', maxWidth: 640, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            {/* 헤더 */}
+            <div style={{ background: 'white', borderRadius: '20px 20px 0 0', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #F0F0F0' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#1F2937' }}>
+                  {AI_PRESETS.find(p => p.sampleSlug === editingTemplate)?.emoji}{' '}
+                  {AI_PRESETS.find(p => p.sampleSlug === editingTemplate)?.name} — 사진 편집
+                </h3>
+                <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#9CA3AF', fontFamily: 'monospace' }}>{editingTemplate}</p>
+              </div>
+              <button onClick={handleCloseEdit} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 4 }}>
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* 에디터 섹션 재사용 — useInvitationStore에 템플릿 데이터를 미리 로드한 뒤 렌더 */}
+            <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <HeroSection />
+              <PhotosSection />
+            </div>
+
+            {/* 저장 버튼 */}
+            <div style={{ padding: '16px 24px 24px', display: 'flex', gap: 10 }}>
+              <button onClick={handleCloseEdit} style={{ flex: 1, padding: '12px 0', border: '1.5px solid #E5E7EB', borderRadius: 12, background: 'white', color: '#6B7280', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+                취소
+              </button>
+              <button onClick={handleSaveTemplate} disabled={templateSaving} style={{ flex: 2, padding: '12px 0', border: 'none', borderRadius: 12, background: '#1F2937', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit', opacity: templateSaving ? 0.6 : 1 }}>
+                {templateSaving ? '저장 중...' : '저장'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <style>{`

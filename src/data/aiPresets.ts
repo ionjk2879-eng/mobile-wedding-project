@@ -10,7 +10,6 @@ export interface AIPreset {
   previewColors: string[];
   tags?: string[];
   sampleSlug?: string;
-  sampleHeroFromGallery?: number;
   accentOnText?: boolean;
   settings: Partial<InvitationData>;
 }
@@ -25,7 +24,7 @@ export const AI_PRESETS: AIPreset[] = [
     emoji: '🌿',
     previewColors: ['#F2F6EE', '#5F8E5A', '#1A2E18'],
     tags: ['나뭇잎 이펙트', '수채화 텍스처', '베일 오프닝', 'Gowun Batang'],
-    sampleSlug: 'junho-seoyeon',
+    sampleSlug: '_tmpl-natural-serene',
     accentOnText: false,
     settings: {
       theme: 'sage',
@@ -83,8 +82,7 @@ export const AI_PRESETS: AIPreset[] = [
     emoji: '🩵',
     previewColors: ['#F4F8FA', '#4E8FA8', '#1E3A4A'],
     tags: ['인스타카드 히어로', '블루 그라데이션 오프닝', '슬라이드 갤러리', 'Pretendard'],
-    sampleSlug: 'junho-seoyeon',
-    sampleHeroFromGallery: 2,
+    sampleSlug: '_tmpl-clear-insta',
     accentOnText: true,
     settings: {
       theme: 'mist',
@@ -142,7 +140,7 @@ export const AI_PRESETS: AIPreset[] = [
     emoji: '🤍',
     previewColors: ['#FDFAF5', '#B0946A', '#2E261A'],
     tags: ['실크 텍스처', '오로라 오프닝', '클래식 히어로', 'Gowun Batang'],
-    sampleSlug: 'junho-seoyeon',
+    sampleSlug: '_tmpl-elegant-pearl',
     accentOnText: false,
     settings: {
       theme: 'pearl',
@@ -200,7 +198,7 @@ export const AI_PRESETS: AIPreset[] = [
     emoji: '💜',
     previewColors: ['#F8F5FC', '#8A70B0', '#281C3C'],
     tags: ['벚꽃 이펙트', '수채화 텍스처', '원형 확산 오프닝', '꽃비 장식'],
-    sampleSlug: 'junho-seoyeon',
+    sampleSlug: '_tmpl-romantic-wisteria',
     accentOnText: false,
     settings: {
       theme: 'wisteria',
@@ -258,8 +256,7 @@ export const AI_PRESETS: AIPreset[] = [
     emoji: '🩶',
     previewColors: ['#F6F7F9', '#5E6F80', '#1E2830'],
     tags: ['블라인드 오프닝', '빛망울 장식', '인스타카드 히어로', 'Pretendard'],
-    sampleSlug: 'junho-seoyeon',
-    sampleHeroFromGallery: 1,
+    sampleSlug: '_tmpl-modern-slate',
     accentOnText: true,
     settings: {
       theme: 'slate',
@@ -317,7 +314,7 @@ export const AI_PRESETS: AIPreset[] = [
     emoji: '🍂',
     previewColors: ['#FCF8F2', '#B87A38', '#2C1E0A'],
     tags: ['단풍잎 이펙트', '한지 텍스처', '투명 액자 오프닝', '반딧불+꽃비 장식'],
-    sampleSlug: 'junho-seoyeon',
+    sampleSlug: '_tmpl-warm-copper',
     accentOnText: false,
     settings: {
       theme: 'copper',

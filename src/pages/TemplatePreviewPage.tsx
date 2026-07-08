@@ -48,11 +48,9 @@ const TemplatePreviewPage: React.FC = () => {
     date: s.date,
     time: s.time,
     weddingDateISO: s.weddingDateISO,
-    heroPhoto: (preset.sampleHeroFromGallery !== undefined && s.photos?.[preset.sampleHeroFromGallery])
-      ? s.photos[preset.sampleHeroFromGallery]
-      : s.heroPhoto || '',
-    heroPhotoX: preset.sampleHeroFromGallery !== undefined ? 50 : s.heroPhotoX,
-    heroPhotoY: preset.sampleHeroFromGallery !== undefined ? 50 : s.heroPhotoY,
+    heroPhoto: s.heroPhoto || '',
+    heroPhotoX: s.heroPhotoX,
+    heroPhotoY: s.heroPhotoY,
     heroPhoto2: s.heroPhoto2 || '',
     heroPhoto2X: s.heroPhoto2X,
     heroPhoto2Y: s.heroPhoto2Y,

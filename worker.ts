@@ -234,7 +234,7 @@ async function handleInvitations(request: Request, env: Env): Promise<Response> 
   if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
 
   const rows = await env.DB.prepare(
-    'SELECT slug, owner_uid, data, is_paid, expires_at FROM invitations WHERE owner_uid = ? ORDER BY updated_at DESC'
+    'SELECT slug, owner_uid, data, is_paid, expires_at FROM invitations WHERE owner_uid = ? AND (is_template_sample IS NULL OR is_template_sample = 0) ORDER BY updated_at DESC'
   ).bind(user.uid).all();
 
   return json(rows.results.map((r: Record<string, unknown>) => ({
@@ -281,7 +281,16 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
 
   if (method === 'PUT') {
     const body = await request.json() as Record<string, unknown>;
-    const existing = await env.DB.prepare('SELECT owner_uid, is_paid, expires_at, privacy_transition_date FROM invitations WHERE slug = ?').bind(slug).first();
+    const existing = await env.DB.prepare('SELECT owner_uid, is_paid, expires_at, privacy_transition_date, is_template_sample FROM invitations WHERE slug = ?').bind(slug).first();
+
+    if (existing?.is_template_sample) {
+      if (user.email !== env.SUPER_ADMIN_EMAIL) return json({ error: '권한이 없습니다.' }, 403, origin);
+      await env.DB.prepare(
+        `UPDATE invitations SET data = ?, updated_at = datetime('now') WHERE slug = ?`
+      ).bind(JSON.stringify(body), slug).run();
+      return json({ ok: true }, 200, origin);
+    }
+
     if (existing && existing.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
     // isPaid는 클라이언트 입력(body.isPaid)을 절대 신뢰하지 않고 DB에 이미 저장된 값만 유지한다.
@@ -315,9 +324,10 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
   }
 
   if (method === 'DELETE') {
-    const existing = await env.DB.prepare('SELECT owner_uid FROM invitations WHERE slug = ?').bind(slug).first();
+    const existing = await env.DB.prepare('SELECT owner_uid, is_template_sample FROM invitations WHERE slug = ?').bind(slug).first();
     if (!existing) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
-    if (existing.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
+    if (existing.is_template_sample && user.email !== env.SUPER_ADMIN_EMAIL) return json({ error: '템플릿 샘플은 슈퍼관리자만 삭제할 수 있습니다.' }, 403, origin);
+    if (!existing.is_template_sample && existing.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
     // r2_key 목록은 gallery_photos 행이 지워지기 전에 미리 조회해둬야 한다(지운 뒤엔 조회 불가).
     // 하지만 R2에서 실제로 지우는 건 되돌릴 수 없는 작업이라, DB batch가 확실히 성공한 뒤로
@@ -703,7 +713,7 @@ async function handleAdminInvitations(request: Request, env: Env): Promise<Respo
   const filter = url.searchParams.get('filter') || 'all';
   const q = url.searchParams.get('q') || '';
 
-  const conditions: string[] = [];
+  const conditions: string[] = ['(i.is_template_sample IS NULL OR i.is_template_sample = 0)'];
   const params: unknown[] = [];
 
   if (filter === 'unpaid') conditions.push('i.is_paid = 0');
@@ -741,6 +751,99 @@ async function handleAdminInvitations(request: Request, env: Env): Promise<Respo
       weddingDateISO: d.weddingDateISO || '',
     };
   }), 200, origin);
+}
+
+// --- Template Samples Admin API ---
+
+async function handleAdminTemplateSamples(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+
+  const rows = await env.DB.prepare(
+    `SELECT slug, data, updated_at FROM invitations WHERE is_template_sample = 1 ORDER BY slug`
+  ).all();
+
+  return json(rows.results.map((r: Record<string, unknown>) => {
+    const d = JSON.parse(r.data as string);
+    return { slug: r.slug, heroPhoto: d.heroPhoto || '', updatedAt: r.updated_at };
+  }), 200, origin);
+}
+
+async function handleAdminTemplateSampleSeed(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+
+  const body = await request.json() as { slug?: string; data?: Record<string, unknown> };
+  if (!body.slug || !body.data) return json({ error: 'slug and data are required' }, 400, origin);
+
+  const slug = body.slug;
+  const data = body.data;
+
+  // Collect all /images/{key} URLs from the data (skip those already in template-sample/ namespace)
+  const photoUrlMap: Record<string, string> = {};
+
+  function collectUrls(value: unknown): void {
+    if (typeof value === 'string' && value.startsWith('/images/')) {
+      const key = value.slice('/images/'.length);
+      if (!key.startsWith('template-sample/')) {
+        photoUrlMap[value] = `/images/template-sample/${slug}/${key}`;
+      }
+    } else if (Array.isArray(value)) {
+      value.forEach(collectUrls);
+    } else if (value && typeof value === 'object') {
+      Object.values(value as Record<string, unknown>).forEach(collectUrls);
+    }
+  }
+  collectUrls(data);
+
+  // Copy R2 objects to template-sample/{slug}/ namespace
+  let copied = 0;
+  for (const [originalUrl, newUrl] of Object.entries(photoUrlMap)) {
+    const srcKey = originalUrl.slice('/images/'.length);
+    const dstKey = newUrl.slice('/images/'.length);
+    try {
+      const obj = await env.IMAGES.get(srcKey);
+      if (obj) {
+        const bytes = await obj.arrayBuffer();
+        await env.IMAGES.put(dstKey, bytes, { httpMetadata: obj.httpMetadata });
+        copied++;
+      }
+    } catch { /* skip missing objects */ }
+  }
+
+  // Rewrite URLs in data
+  function rewriteUrls(value: unknown): unknown {
+    if (typeof value === 'string') return photoUrlMap[value] ?? value;
+    if (Array.isArray(value)) return value.map(rewriteUrls);
+    if (value && typeof value === 'object') {
+      const result: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+        result[k] = rewriteUrls(v);
+      }
+      return result;
+    }
+    return value;
+  }
+
+  const newData = rewriteUrls(data) as Record<string, unknown>;
+  newData.slug = slug;
+
+  await env.DB.prepare(
+    `INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at, is_template_sample, updated_at)
+     VALUES (?, 'system:template', ?, 1, NULL, 1, datetime('now'))
+     ON CONFLICT(slug) DO UPDATE SET
+       data = excluded.data,
+       is_paid = 1,
+       expires_at = NULL,
+       is_template_sample = 1,
+       updated_at = excluded.updated_at`
+  ).bind(slug, JSON.stringify(newData)).run();
+
+  return json({ ok: true, slug, photoCopied: copied }, 200, origin);
 }
 
 // --- Guestbook API ---
@@ -1313,7 +1416,7 @@ async function notifyExpiringInvitations(env: Env): Promise<void> {
 async function deleteExpiredInvitations(env: Env): Promise<void> {
   const now = new Date().toISOString();
   const expired = await env.DB.prepare(
-    'SELECT slug FROM invitations WHERE expires_at IS NOT NULL AND expires_at <= ?'
+    'SELECT slug FROM invitations WHERE expires_at IS NOT NULL AND expires_at <= ? AND (is_template_sample IS NULL OR is_template_sample = 0)'
   ).bind(now).all();
   for (const row of expired.results) {
     const slug = row.slug as string;
@@ -1493,6 +1596,12 @@ export default {
 
       if (pathname === '/api/admin/activation-codes/status' && request.method === 'GET')
         return await handleActivationCodesStatus(request, env);
+
+      if (pathname === '/api/admin/template-samples' && request.method === 'GET')
+        return await handleAdminTemplateSamples(request, env);
+
+      if (pathname === '/api/admin/template-samples/seed' && request.method === 'POST')
+        return await handleAdminTemplateSampleSeed(request, env);
 
       // Upload
       if (pathname === '/api/upload') return await handleUpload(request, env);
