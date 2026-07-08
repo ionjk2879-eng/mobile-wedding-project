@@ -423,6 +423,7 @@
 
 /* === Location === */
 .location-info { margin-bottom: 20px; background: var(--wedding-card-bg); border-left: 3px solid var(--wedding-emphasis); border-radius: 0 16px 16px 0; padding: 18px 20px; text-align: left; border-top: 1px solid var(--wedding-border); border-right: 1px solid var(--wedding-border); border-bottom: 1px solid var(--wedding-border); }
+.location-info.location-plain { background: var(--wedding-bg); border: none; border-radius: 0; padding: 0 4px 18px; }
 .venue-name { font-size: 1.15em; color: #000000; font-weight: 600; margin-bottom: 6px; }
 .address { color: #000000; font-size: 0.9em; margin: 0; }
 .map-container { width: 100%; height: 300px; background: #eee; border: 1px solid var(--wedding-border); border-radius: 16px; margin-bottom: 20px; overflow: hidden; position: relative; z-index: 0; }
@@ -430,6 +431,7 @@
 .nav-item { padding: 12px 10px; border: 1px solid; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.8em; font-weight: 700; transition: all 0.2s ease; }
 .nav-item:hover { filter: brightness(0.9); transform: translateY(-1px); }
 .transport-info { text-align: left; background: var(--wedding-card-bg); padding: 24px; border-radius: 20px; border: 1px solid var(--wedding-border); display: flex; flex-direction: column; gap: 20px; }
+.transport-info.location-plain { background: var(--wedding-bg); border: none; padding: 0 4px; }
 .transport-item { display: flex; flex-direction: column; gap: 8px; }
 .transport-label { display: flex; align-items: center; gap: 8px; font-size: 0.85em; font-weight: 700; color: var(--wedding-emphasis); }
 .transport-detail { font-size: 0.9em; color: #000000; line-height: 1.8; padding-left: 26px; white-space: pre-line; }

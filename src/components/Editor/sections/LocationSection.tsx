@@ -92,6 +92,17 @@ const LocationSection: React.FC = () => {
         <label>주차</label>
         <textarea value={data.transport.parking} onChange={(e) => updateTransport('parking', e.target.value)} rows={2} className="modern-input" />
       </div>
+      <div className="input-group">
+        <label>장소 표시 스타일</label>
+        <div className="account-style-grid">
+          <button type="button" className={`account-style-btn ${(data.locationStyle || 'card') === 'card' ? 'active' : ''}`} onClick={() => updateField('locationStyle', 'card')}>
+            <strong>카드형</strong><span>장소 정보와 교통편을 카드에 담아 표시</span>
+          </button>
+          <button type="button" className={`account-style-btn ${data.locationStyle === 'plain' ? 'active' : ''}`} onClick={() => updateField('locationStyle', 'plain')}>
+            <strong>배경 일체형</strong><span>테두리 없이 청첩장 배경색과 자연스럽게 이어짐 (상단·하단 함께 적용)</span>
+          </button>
+        </div>
+      </div>
     </>
   );
 };

@@ -76,12 +76,14 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
     },
   ];
 
+  const locationPlain = data.locationStyle === 'plain';
+
   return (
     <section className="location section" aria-label="오시는 길">
       <h2>LOCATION</h2>
       <p className="section-sub">{isEn ? 'Directions' : isJa ? 'アクセス' : '오시는 길'}</p>
       {(venueName || venueAddress) && (
-        <div className="location-info">
+        <div className={`location-info ${locationPlain ? 'location-plain' : ''}`}>
           {venueName && <h3 className="venue-name">{venueName}</h3>}
           {venueAddress && <p className="address">{venueAddress}</p>}
         </div>
@@ -98,7 +100,7 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
         ))}
       </div>}
 
-      <div className="transport-info">
+      <div className={`transport-info ${locationPlain ? 'location-plain' : ''}`}>
         <div className="transport-item">
           <div className="transport-label"><Train size={18} /> {isEn ? 'Subway' : isJa ? '地下鉄' : '지하철'}</div>
           <div className="transport-detail">{data.transport.subway}</div>
@@ -121,6 +123,7 @@ const Location: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.transport === next.data.transport
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
+  && prev.data.locationStyle === next.data.locationStyle
 );
 
 export default Location;
