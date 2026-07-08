@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Heart } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { PreviewOverlay } from '../../hooks/usePreviewPopup';
 
@@ -33,11 +34,17 @@ const Interview: React.FC<PreviewProps> = React.memo(({ data }) => {
                 <span className="q-text">{qa.question || '질문을 입력하세요'}</span>
               </div>
               <div className="interview-a-box groom-box">
-                <span className="a-name">{data.groomName || '신랑'}</span>
+                <span className="a-name side-heart-label">
+                  <Heart size={14} fill="#3B82F6" color="#3B82F6" />
+                  {data.groomName || '신랑'}
+                </span>
                 <p>{qa.groomAnswer || '-'}</p>
               </div>
               <div className="interview-a-box bride-box">
-                <span className="a-name">{data.brideName || '신부'}</span>
+                <span className="a-name side-heart-label">
+                  <Heart size={14} fill="#EF4444" color="#EF4444" />
+                  {data.brideName || '신부'}
+                </span>
                 <p>{qa.brideAnswer || '-'}</p>
               </div>
             </div>
