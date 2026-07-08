@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Phone, MessageSquare } from 'lucide-react';
+import { Phone, MessageSquare, ChevronDown } from 'lucide-react';
 import { InvitationData } from '../../types';
+import { PreviewOverlay } from '../../hooks/usePreviewPopup';
 
 interface PreviewProps {
   data: InvitationData;
@@ -12,43 +13,107 @@ interface ContactEntry {
   phone: string;
 }
 
+interface Group {
+  label: string;
+  contacts: ContactEntry[];
+}
+
+const buildList = (
+  self: { name: string; phone: string } | undefined,
+  parents: { role: string; name: string; phone: string }[],
+  label: string
+): ContactEntry[] => {
+  const list: ContactEntry[] = [];
+  if (self && (self.name || self.phone)) list.push({ role: label, name: self.name, phone: self.phone });
+  parents.forEach(p => {
+    if (p.name || p.phone) list.push({ role: `${label} ${p.role}`, name: p.name, phone: p.phone });
+  });
+  return list;
+};
+
+const GroupsInline: React.FC<{ groups: Group[] }> = ({ groups }) => (
+  <>
+    {groups.map((group, gi) => (
+      <div key={gi} className="contact-group">
+        <p className="contact-group-label">{group.label}</p>
+        <Carousel contacts={group.contacts} />
+      </div>
+    ))}
+  </>
+);
+
+const GroupsAccordion: React.FC<{ groups: Group[] }> = ({ groups }) => {
+  const [openIdx, setOpenIdx] = useState<Record<number, boolean>>({});
+  return (
+    <>
+      {groups.map((group, gi) => (
+        <div key={gi} className="accordion-group">
+          <button
+            className={`accordion-toggle ${openIdx[gi] ? 'open' : ''}`}
+            onClick={(e) => { e.currentTarget.blur(); setOpenIdx(prev => ({ ...prev, [gi]: !prev[gi] })); }}
+            aria-expanded={!!openIdx[gi]}
+          >
+            <span>{group.label}</span>
+            <ChevronDown size={16} className={`accordion-arrow ${openIdx[gi] ? 'open' : ''}`} aria-hidden="true" />
+          </button>
+          <div className={`accordion-body ${openIdx[gi] ? 'open' : ''}`}>
+            <div className="accordion-inner">
+              <Carousel contacts={group.contacts} />
+            </div>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+};
+
 const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
+  const mode = data.contactDisplayMode ?? 'inline';
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const [popupOpen, setPopupOpen] = useState(false);
 
   const groomSelf = data.contacts.find(c => c.role === '신랑');
   const brideSelf = data.contacts.find(c => c.role === '신부');
 
-  const buildList = (self: typeof groomSelf, parents: typeof data.parents.groomParents, label: string): ContactEntry[] => {
-    const list: ContactEntry[] = [];
-    if (self && (self.name || self.phone)) list.push({ role: label, name: self.name, phone: self.phone });
-    parents.forEach(p => {
-      if (p.name || p.phone) list.push({ role: `${label} ${p.role}`, name: p.name, phone: p.phone });
-    });
-    return list;
-  };
+  const groomLabel = isEn ? 'Groom' : isJa ? '新郎' : '신랑';
+  const brideLabel = isEn ? 'Bride' : isJa ? '新婦' : '신부';
 
-  const groomContacts = buildList(groomSelf, data.parents.groomParents, isEn ? 'Groom' : isJa ? '新郎' : '신랑');
-  const brideContacts = buildList(brideSelf, data.parents.brideParents, isEn ? 'Bride' : isJa ? '新婦' : '신부');
+  const groomContacts = buildList(groomSelf, data.parents.groomParents, groomLabel);
+  const brideContacts = buildList(brideSelf, data.parents.brideParents, brideLabel);
 
-  const allGroups = [
+  const allGroups: Group[] = [
     { label: isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측', contacts: groomContacts },
     { label: isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측', contacts: brideContacts },
   ].filter(g => g.contacts.length > 0);
 
   if (allGroups.length === 0) return null;
 
-  return (
-    <section className="contacts-section section" style={{ fontFamily: data.fontFamily }} aria-label="연락처">
-      <h2>CONTACT</h2>
-      <p className="section-sub">{isEn ? 'Share your congratulations directly' : isJa ? 'お祝いの気持ちを直接お伝えください' : '축하의 마음을 직접 전해보세요'}</p>
-      {allGroups.map((group, gi) => (
-        <div key={gi} className="contact-group">
-          <p className="contact-group-label">{group.label}</p>
-          <Carousel contacts={group.contacts} />
-        </div>
-      ))}
+  const sub = isEn ? 'Share your congratulations directly' : isJa ? 'お祝いの気持ちを直接お伝えください' : '축하의 마음을 직접 전해보세요';
+  const btnLabel = isEn ? 'View Contacts' : isJa ? '連絡先を見る' : '연락처 보기';
+  const popupTitle = isEn ? 'Contact' : isJa ? '連絡先' : '연락처';
 
+  return (
+    <section className="contacts-section section" style={{ fontFamily: data.fontFamily }} aria-label="연락처" ref={sectionRef}>
+      <h2>CONTACT</h2>
+      <p className="section-sub">{sub}</p>
+
+      {mode === 'inline' && <GroupsInline groups={allGroups} />}
+
+      {mode === 'popup' && (
+        <>
+          <button type="button" className="pf-open-btn" onClick={() => setPopupOpen(true)}>
+            {btnLabel}
+          </button>
+          <PreviewOverlay open={popupOpen} onClose={() => setPopupOpen(false)} anchorRef={sectionRef} title={popupTitle}>
+            <GroupsInline groups={allGroups} />
+          </PreviewOverlay>
+        </>
+      )}
+
+      {mode === 'accordion' && <GroupsAccordion groups={allGroups} />}
     </section>
   );
 }, (prev, next) =>
@@ -56,6 +121,7 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.parents === next.data.parents
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
+  && prev.data.contactDisplayMode === next.data.contactDisplayMode
 );
 
 interface CarouselProps {

@@ -93,6 +93,7 @@ export interface ContentData {
   interview: InterviewQA[];
   accounts: Account[];
   accountStyle: 'style1' | 'style2' | 'style3';
+  contactDisplayMode?: 'inline' | 'popup' | 'accordion';
   videoUrl: string;
   endingPhoto: string;
   endingPhotoX?: number;

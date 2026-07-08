@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen, Clock, Clapperboard, Menu, X, Camera } from 'lucide-react';
+import { Palette, Info, MessageSquare, Heart, MapPin, CreditCard, Image as ImageIcon, Sparkles, Music, Milestone, CalendarCheck, MessagesSquare, Send, ListOrdered, LayoutTemplate, BookOpen, Clock, Clapperboard, Menu, X, Camera, Phone } from 'lucide-react';
 import '../../styles/editor.css';
 import SectionCard from './SectionCard';
 import ShareSection from './sections/ShareSection';
@@ -23,6 +23,7 @@ import OpeningSection from './sections/OpeningSection';
 import EndingSection from './sections/EndingSection';
 import MidPhotoSection from './sections/MidPhotoSection';
 import LiveGallerySection from './sections/LiveGallerySection';
+import ContactsSection from './sections/ContactsSection';
 
 export interface EditorContainerHandle {
   navigateTo: (id: string) => void;
@@ -119,6 +120,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
     { id: 'theme', name: '테마', icon: <Sparkles size={18} />, ref: sectionRefs.theme },
     { id: 'design', name: '디자인', icon: <Palette size={18} />, ref: sectionRefs.design },
     { id: 'basic', name: '기본정보', icon: <Info size={18} />, ref: sectionRefs.basic },
+    { id: 'contacts', name: '연락처', icon: <Phone size={18} />, ref: sectionRefs.contacts },
     { id: 'datetime', name: '예식일시', icon: <Clock size={18} />, ref: sectionRefs.datetime },
     { id: 'greeting', name: '인사말', icon: <MessageSquare size={18} />, ref: sectionRefs.greeting },
     { id: 'message', name: '한마디', icon: <Heart size={18} />, ref: sectionRefs.message },
@@ -150,6 +152,7 @@ const EditorContainer = React.forwardRef<EditorContainerHandle, EditorProps>(({ 
     { id: 'theme', title: '청첩장 테마', icon: <Sparkles size={20} />, content: <ThemeSection /> },
     { id: 'design', title: '디자인 및 스타일', icon: <Palette size={20} />, content: <DesignSection /> },
     { id: 'basic', title: '기본 정보', icon: <Info size={20} />, content: <BasicInfoSection /> },
+    { id: 'contacts', title: '연락처 표시 방식', icon: <Phone size={20} />, content: <ContactsSection /> },
     { id: 'datetime', title: '예식 일시', icon: <Clock size={20} />, content: <DateTimeSection /> },
     { id: 'greeting', title: '인사말', icon: <MessageSquare size={20} />, content: <GreetingSection /> },
     { id: 'message', title: '신랑/신부 한마디', icon: <Heart size={20} />, content: <MessageSection /> },
