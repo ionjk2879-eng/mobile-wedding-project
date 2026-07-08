@@ -91,6 +91,7 @@ export interface ContentData {
   bridePhoto: string;
   photos: string[];
   galleryStyle: 'slide' | 'style3';
+  calendarStyle?: 'card' | 'plain';
   timeline: TimelineEvent[];
   interview: InterviewQA[];
   accounts: Account[];
@@ -110,7 +111,7 @@ export interface ContentData {
 export interface OpeningConfig {
   openingEnabled: boolean;
   openingStyle: 'curtain' | 'circle' | 'veil' | 'blind' | 'frame' | 'insta' | 'typing'; // 'typing' kept for backwards compat
-  openingContentStyle?: 'sequential' | 'typing';
+  openingContentStyle?: 'sequential' | 'typing' | 'lines';
   openingColorMode: 'theme' | 'custom' | 'gradient';
   openingGradientMode?: 'theme' | 'preset' | 'custom';
   openingTextColor?: 'white' | 'dark';

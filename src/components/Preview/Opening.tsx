@@ -499,16 +499,21 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
 
-  // 동적 타이밍: 이름과 본문 마지막 글자 애니메이션 종료 시간 계산
-  const namesLastDelay = 0.6 + (groom.length + bride.length) * 0.08;
+  // 줄 단위 등장(lines): 이름/멘트가 글자 단위가 아니라 한 덩어리로 페이드업되므로 고정 딜레이를 쓴다.
+  const isLineReveal = opening.openingContentStyle === 'lines';
+
+  // 동적 타이밍: 이름과 본문 마지막 글자(또는 줄 단위 등장에서는 각 블록) 애니메이션 종료 시간 계산
+  const namesLastDelay = isLineReveal ? 0.6 : 0.6 + (groom.length + bride.length) * 0.08;
   const mainWords = mainText.split(' ');
   const mainNonSpaceLen = mainText.replace(/ /g, '').length;
   const mainLastCharIdx = Math.max(0, mainNonSpaceLen + mainWords.length - 2);
-  const mainLastDelay = 1.2 + mainLastCharIdx * 0.04;
-  const contentEndTime = Math.max(namesLastDelay, mainLastDelay) + 0.5;
+  const mainLastDelay = isLineReveal ? 1.3 : 1.2 + mainLastCharIdx * 0.04;
+  const contentEndTime = isLineReveal ? mainLastDelay + 0.6 + 0.3 : Math.max(namesLastDelay, mainLastDelay) + 0.5;
   const seqSubDelay = `${(contentEndTime + 0.15).toFixed(2)}s`;
   const seqLineBottomDelay = `${contentEndTime.toFixed(2)}s`;
   const seqEnterDelay = `${(contentEndTime + 0.5).toFixed(2)}s`;
+  const linesNamesDelay = `${namesLastDelay.toFixed(2)}s`;
+  const linesMainDelay = `${mainLastDelay.toFixed(2)}s`;
 
   const isCurtain = effectiveStyle === 'curtain';
   const isInsta = effectiveStyle === 'insta';
@@ -706,14 +711,20 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           </div>
           <div className="op-line op-line-top" />
 
-          <p className="op-names">
-            {groom.split('').map((ch, i) => <span key={`g${i}`} className="op-char" style={{ animationDelay: `${0.6 + i * 0.08}s` }}>{ch}</span>)}
-            <span className="op-char op-amp" style={{ animationDelay: `${0.6 + groom.length * 0.08}s` }}>&nbsp;&&nbsp;</span>
-            {bride.split('').map((ch, i) => <span key={`b${i}`} className="op-char" style={{ animationDelay: `${0.6 + (groom.length + 1 + i) * 0.08}s` }}>{ch}</span>)}
+          <p className="op-names" style={isLineReveal ? { opacity: 0, animation: `op-fade-up 0.6s ease ${linesNamesDelay} both` } : undefined}>
+            {isLineReveal ? (
+              <>{groom}<span className="op-amp">&nbsp;&&nbsp;</span>{bride}</>
+            ) : (
+              <>
+                {groom.split('').map((ch, i) => <span key={`g${i}`} className="op-char" style={{ animationDelay: `${0.6 + i * 0.08}s` }}>{ch}</span>)}
+                <span className="op-char op-amp" style={{ animationDelay: `${0.6 + groom.length * 0.08}s` }}>&nbsp;&&nbsp;</span>
+                {bride.split('').map((ch, i) => <span key={`b${i}`} className="op-char" style={{ animationDelay: `${0.6 + (groom.length + 1 + i) * 0.08}s` }}>{ch}</span>)}
+              </>
+            )}
           </p>
 
-          <h2 className="op-main">
-            {mainText.split(' ').map((word, wIdx, arr) => {
+          <h2 className="op-main" style={isLineReveal ? { opacity: 0, animation: `op-fade-up 0.6s ease ${linesMainDelay} both` } : undefined}>
+            {isLineReveal ? mainText : mainText.split(' ').map((word, wIdx, arr) => {
               const prevLen = arr.slice(0, wIdx).reduce((s, w) => s + w.length + 1, 0);
               return (
                 <React.Fragment key={wIdx}>

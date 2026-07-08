@@ -74,6 +74,7 @@ const OpeningSection: React.FC = () => {
               {([
                 { key: 'sequential' as const, name: '순차 등장', desc: '이름·멘트·날짜가 순서대로 서서히 나타남' },
                 { key: 'typing' as const, name: '타이핑', desc: '글자가 한 자씩 타이핑되는 감성 연출' },
+                { key: 'lines' as const, name: '줄 단위 등장', desc: '이름과 멘트가 한 번에, 나머지는 순서대로 나타남' },
               ]).map(s => (
                 <button key={s.key} type="button"
                   className={`account-style-btn ${(opening.openingContentStyle || 'sequential') === s.key ? 'active' : ''}`}
