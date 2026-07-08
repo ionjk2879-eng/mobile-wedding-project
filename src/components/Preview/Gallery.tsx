@@ -173,7 +173,9 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
   const lightboxThemeStyle: React.CSSProperties = {
     fontFamily: data.fontFamily,
     ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}),
-    ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor, '--wedding-accent': data.customAccentColor } as React.CSSProperties : {}),
+    ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor } as React.CSSProperties : {}),
+    ...(data.customLabelColor ? { '--wedding-label': data.customLabelColor } as React.CSSProperties : {}),
+    ...(data.customTextColor ? { '--wedding-emphasis': data.customTextColor } as React.CSSProperties : {}),
   };
 
   return (

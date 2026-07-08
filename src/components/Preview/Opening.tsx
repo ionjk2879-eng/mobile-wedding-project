@@ -110,29 +110,27 @@ const PETAL_ITEMS = [
   { left: '85%', w: 10, h: 15, r0:  20, r1: -215, dx: -16, dur: 10.5, d: 5.5 },
 ];
 
-// ThemeSection.tsx의 THEMES와 반드시 키가 일치해야 한다 — 여기 없는 키로 조회하면
-// THEME_COLORS.sage로 조용히 폴백되어 여러 테마가 같은 색으로 보이는 버그가 난다
-// (과거 테마 이름 체계가 바뀌면서 여기만 갱신이 안 돼 실제로 발생했던 문제).
-// bg/text/accent는 ThemeSection.tsx 각 테마의 colors 배열([연한배경, 밝은톤, 포인트,
-// 중간톤, 어두운톤])에서 각각 인덱스 4/1/2를 그대로 가져온 값 — noir/white만 포인트색이
-// 배경색과 거의 구분이 안 돼(둘 다 거의 검정) 인덱스 3(중간 회색)을 accent로 대신 썼다.
+// 오프닝 애니메이션 색상 체계는 4색 테마 개편 작업에서 보류 중 — 임시로 ivorynavy
+// 하나만 채워 크래시를 막아둔 상태. bg는 강조색(emphasis, 어두운 톤), text는 보더색,
+// accent는 메인색을 그대로 가져왔다. 추후 오프닝 전용 색상 설계 시 다시 정리할 것.
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
-  sage:       { bg: '#2B3328', text: '#D6DED0', accent: '#8BA888' },
-  mist:       { bg: '#1E2A33', text: '#D8DFE6', accent: '#6E8899' },
-  pearl:      { bg: '#2E261A', text: '#EDE6D8', accent: '#B0946A' },
-  walnut:     { bg: '#2C1E14', text: '#E0D0C0', accent: '#8A6248' },
-  slate:      { bg: '#1E2830', text: '#D4D8DF', accent: '#5E6F80' },
-  wisteria:   { bg: '#281C3C', text: '#E0D8F0', accent: '#8A70B0' },
-  cedar:      { bg: '#2E1610', text: '#E4CEC4', accent: '#A06048' },
-  stone:      { bg: '#282622', text: '#E0DDD8', accent: '#8C8880' },
-  copper:     { bg: '#2C1E0A', text: '#E8D8C0', accent: '#B87A38' },
-  sky:        { bg: '#1A2240', text: '#C8D6EC', accent: '#6070A8' },
-  linen:      { bg: '#2C2218', text: '#E2D5C2', accent: '#9A8468' },
-  olive:      { bg: '#1E2814', text: '#C8D2BE', accent: '#5A6C40' },
-  noir:       { bg: '#1A1816', text: '#DCDAD6', accent: '#4E4C4A' },
-  peach:      { bg: '#38201A', text: '#F0D8CC', accent: '#D4785C' },
-  white:      { bg: '#1A1A1A', text: '#E5E5E5', accent: '#595959' },
-  whitegold:  { bg: '#3A2E10', text: '#EDE0C8', accent: '#C9A227' },
+  ivorynavy:  { bg: '#000000', text: '#D3C6BB', accent: '#163A5F' },
+  // sage:       { bg: '#2B3328', text: '#D6DED0', accent: '#8BA888' },
+  // mist:       { bg: '#1E2A33', text: '#D8DFE6', accent: '#6E8899' },
+  // pearl:      { bg: '#2E261A', text: '#EDE6D8', accent: '#B0946A' },
+  // walnut:     { bg: '#2C1E14', text: '#E0D0C0', accent: '#8A6248' },
+  // slate:      { bg: '#1E2830', text: '#D4D8DF', accent: '#5E6F80' },
+  // wisteria:   { bg: '#281C3C', text: '#E0D8F0', accent: '#8A70B0' },
+  // cedar:      { bg: '#2E1610', text: '#E4CEC4', accent: '#A06048' },
+  // stone:      { bg: '#282622', text: '#E0DDD8', accent: '#8C8880' },
+  // copper:     { bg: '#2C1E0A', text: '#E8D8C0', accent: '#B87A38' },
+  // sky:        { bg: '#1A2240', text: '#C8D6EC', accent: '#6070A8' },
+  // linen:      { bg: '#2C2218', text: '#E2D5C2', accent: '#9A8468' },
+  // olive:      { bg: '#1E2814', text: '#C8D2BE', accent: '#5A6C40' },
+  // noir:       { bg: '#1A1816', text: '#DCDAD6', accent: '#4E4C4A' },
+  // peach:      { bg: '#38201A', text: '#F0D8CC', accent: '#D4785C' },
+  // white:      { bg: '#1A1A1A', text: '#E5E5E5', accent: '#595959' },
+  // whitegold:  { bg: '#3A2E10', text: '#EDE0C8', accent: '#C9A227' },
 };
 
 interface OpeningProps {
@@ -479,8 +477,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const colorMode = opening.openingColorMode || 'theme';
   const gradientMode = opening.openingGradientMode || 'theme';
   const isThemeGradient = colorMode === 'gradient' && gradientMode === 'theme';
-  const themeKey = theme || 'pearl';
-  const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.pearl;
+  const themeKey = theme || 'ivorynavy';
+  const themeColor = THEME_COLORS[themeKey] || THEME_COLORS.ivorynavy;
   const bgColor = (colorMode === 'theme' || isThemeGradient) ? themeColor.bg : (opening.openingBgColor || '#1F2937');
 
   // 단색·그라데이션 모두 배경색 밝기로 자동 감지

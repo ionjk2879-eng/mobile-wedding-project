@@ -94,7 +94,9 @@ const TemplatePreviewPage: React.FC = () => {
             className={`invitation-page ${themeClass} tmpl-preview-invitation${preset.accentOnText ? ' tmpl-accent-text' : ''}`}
             style={{
               ...(previewData.customBgColor ? { '--wedding-bg': previewData.customBgColor } as React.CSSProperties : {}),
-              ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor, '--wedding-accent': previewData.customAccentColor } as React.CSSProperties : {}),
+              ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor } as React.CSSProperties : {}),
+              ...(previewData.customLabelColor ? { '--wedding-label': previewData.customLabelColor } as React.CSSProperties : {}),
+              ...(previewData.customTextColor ? { '--wedding-emphasis': previewData.customTextColor } as React.CSSProperties : {}),
               fontFamily: previewData.fontFamily || undefined,
             }}
           >

@@ -122,6 +122,14 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
     return result;
   };
 
+  const SideHeart: React.FC<{ side: 'groom' | 'bride'; size: number }> = ({ side, size }) => (
+    <Heart
+      size={size}
+      fill={side === 'groom' ? '#3B82F6' : '#EF4444'}
+      color={side === 'groom' ? '#3B82F6' : '#EF4444'}
+    />
+  );
+
   const hasContent = (acc: typeof data.accounts[0]) => acc.bank || acc.number || acc.owner;
   const hasAnyAccount = data.accounts.some(hasContent);
 
@@ -160,10 +168,16 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="account-list style2">
           <div className="side-tabs">
             <button className={`side-tab ${activeSide === 'groom' ? 'active' : ''}`} onClick={() => handleSideChange('groom')}>
-              {isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}
+              <span className="side-heart-label">
+                <SideHeart side="groom" size={14} />
+                {isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}
+              </span>
             </button>
             <button className={`side-tab ${activeSide === 'bride' ? 'active' : ''}`} onClick={() => handleSideChange('bride')}>
-              {isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}
+              <span className="side-heart-label">
+                <SideHeart side="bride" size={14} />
+                {isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}
+              </span>
             </button>
           </div>
           <div
@@ -213,13 +227,19 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
         <div className="account-list style1">
           {groomAccounts.length > 0 && (
             <div className="account-group">
-              <p className="account-group-label">{isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}</p>
+              <p className="account-group-label">
+                <SideHeart side="groom" size={14} />
+                {isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}
+              </p>
               {groomAccounts.map((acc, i) => renderAccountItem(acc, i))}
             </div>
           )}
           {brideAccounts.length > 0 && (
             <div className="account-group">
-              <p className="account-group-label">{isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}</p>
+              <p className="account-group-label">
+                <SideHeart side="bride" size={14} />
+                {isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}
+              </p>
               {brideAccounts.map((acc, i) => renderAccountItem(acc, i + 100))}
             </div>
           )}
@@ -254,7 +274,10 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
           {groomAccounts.length > 0 && (
             <div className="accordion-group">
               <button className={`accordion-toggle ${groomOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setGroomOpen(v => !v); }} aria-expanded={groomOpen}>
-                <span>{isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}</span>
+                <span className="side-heart-label">
+                  <SideHeart side="groom" size={16} />
+                  {isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측'}
+                </span>
                 <ChevronDown size={16} className={`accordion-arrow ${groomOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
               <div className={`accordion-body ${groomOpen ? 'open' : ''}`} ref={groomBodyRef}>
@@ -267,7 +290,10 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
           {brideAccounts.length > 0 && (
             <div className="accordion-group">
               <button className={`accordion-toggle ${brideOpen ? 'open' : ''}`} onClick={(e) => { e.currentTarget.blur(); setBrideOpen(v => !v); }} aria-expanded={brideOpen}>
-                <span>{isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}</span>
+                <span className="side-heart-label">
+                  <SideHeart side="bride" size={16} />
+                  {isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측'}
+                </span>
                 <ChevronDown size={16} className={`accordion-arrow ${brideOpen ? 'open' : ''}`} aria-hidden="true" />
               </button>
               <div className={`accordion-body ${brideOpen ? 'open' : ''}`} ref={brideBodyRef}>

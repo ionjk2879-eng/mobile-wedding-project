@@ -60,9 +60,11 @@ export interface BasicInfo {
 }
 
 export interface DesignConfig {
-  theme?: 'sage' | 'mist' | 'pearl' | 'walnut' | 'slate' | 'wisteria' | 'cedar' | 'stone' | 'copper' | 'sky' | 'linen' | 'olive' | 'noir' | 'peach' | 'white' | 'whitegold';
+  theme?: 'ivorynavy';
   customBgColor?: string;
   customAccentColor?: string;
+  customLabelColor?: string;
+  customTextColor?: string;
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';
   bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti' | 'petals' | 'autumn';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';

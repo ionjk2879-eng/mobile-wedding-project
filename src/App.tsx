@@ -245,10 +245,9 @@ const App: React.FC = () => {
   const getCustomColorVars = (): React.CSSProperties => {
     const vars: Record<string, string> = {};
     if (data.customBgColor) vars['--wedding-bg'] = data.customBgColor;
-    if (data.customAccentColor) {
-      vars['--wedding-main'] = data.customAccentColor;
-      vars['--wedding-accent'] = data.customAccentColor;
-    }
+    if (data.customAccentColor) vars['--wedding-main'] = data.customAccentColor;
+    if (data.customLabelColor) vars['--wedding-label'] = data.customLabelColor;
+    if (data.customTextColor) vars['--wedding-emphasis'] = data.customTextColor;
     return vars as React.CSSProperties;
   };
 

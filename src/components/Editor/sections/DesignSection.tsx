@@ -117,6 +117,40 @@ const DesignSection: React.FC = () => {
         <span className="input-hint">프리셋 선택 또는 팔레트/코드로 자유롭게 지정하세요.</span>
       </div>
       <div className="input-group">
+        <label>섹션 라벨 색상</label>
+        <div className="color-pick-grid">
+          {ACCENT_COLORS.map(c => (
+            <button key={c.name} type="button" className={`color-pick-btn ${(data.customLabelColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customLabelColor', c.value)} title={c.name}>
+              <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
+              <span className="color-pick-name">{c.name}</span>
+            </button>
+          ))}
+        </div>
+        <div className="color-custom-row">
+          <input type="color" value={data.customLabelColor || '#163A5F'} onChange={(e) => updateField('customLabelColor', e.target.value)} className="color-picker-input" />
+          <input type="text" value={data.customLabelColor || ''} onChange={(e) => updateField('customLabelColor', e.target.value)} placeholder="#163A5F" className="modern-input color-hex-input" />
+          {data.customLabelColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customLabelColor', '')}>초기화</button>}
+        </div>
+        <span className="input-hint">MESSAGE, LOCATION처럼 섹션을 표시하는 영문 라벨의 색상입니다. 지정하지 않으면 강조 색상을 따릅니다.</span>
+      </div>
+      <div className="input-group">
+        <label>텍스트 색상</label>
+        <div className="color-pick-grid">
+          {ACCENT_COLORS.map(c => (
+            <button key={c.name} type="button" className={`color-pick-btn ${(data.customTextColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customTextColor', c.value)} title={c.name}>
+              <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
+              <span className="color-pick-name">{c.name}</span>
+            </button>
+          ))}
+        </div>
+        <div className="color-custom-row">
+          <input type="color" value={data.customTextColor || '#000000'} onChange={(e) => updateField('customTextColor', e.target.value)} className="color-picker-input" />
+          <input type="text" value={data.customTextColor || ''} onChange={(e) => updateField('customTextColor', e.target.value)} placeholder="#000000" className="modern-input color-hex-input" />
+          {data.customTextColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customTextColor', '')}>초기화</button>}
+        </div>
+        <span className="input-hint">이름, 날짜, 본문 등 일반 텍스트의 색상입니다.</span>
+      </div>
+      <div className="input-group">
         <label>배경 재질</label>
         <div className="theme-select-grid modern">
           {TEXTURES.map(t => (
