@@ -510,6 +510,20 @@
 .contact-popup-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--wedding-border); background: var(--wedding-bg); display: flex; align-items: center; justify-content: center; color: var(--wedding-main); transition: all 0.2s; text-decoration: none; }
 .contact-popup-btn:hover { background: var(--wedding-main); color: white; border-color: var(--wedding-main); }
 
+/* Account popup list */
+.account-popup-list { display: flex; flex-direction: column; gap: 28px; }
+.account-popup-group { display: flex; flex-direction: column; }
+.account-popup-group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.account-popup-side-label { font-size: 0.9em; font-weight: 700; color: var(--wedding-text-main); }
+.account-popup-item { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--wedding-border); }
+.account-popup-item:last-child { border-bottom: none; }
+.account-popup-person { display: flex; align-items: center; gap: 6px; }
+.account-popup-role { font-size: 0.72em; font-weight: 600; color: var(--wedding-main); }
+.account-popup-owner-name { font-size: 0.95em; font-weight: 600; color: var(--wedding-text-main); }
+.account-popup-account-row { display: flex; align-items: center; gap: 8px; }
+.account-popup-number { flex: 1; font-size: 0.85em; color: var(--wedding-text-body); letter-spacing: 0.4px; }
+.account-popup-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
 /* === Ending === */
 .ending { background: transparent; }
 .ending-frame { position: relative; width: 100%; aspect-ratio: 3/4; min-height: 480px; overflow: hidden; }

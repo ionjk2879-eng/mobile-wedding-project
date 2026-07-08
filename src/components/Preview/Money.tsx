@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Copy, Check, ChevronDown } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Copy, Check, ChevronDown, Heart } from 'lucide-react';
 import { InvitationData } from '../../types';
+import { PreviewOverlay } from '../../hooks/usePreviewPopup';
 
 interface PreviewProps {
   data: InvitationData;
@@ -14,6 +15,8 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
   const [cardIndex, setCardIndex] = useState(0);
   const [groomOpen, setGroomOpen] = useState(false);
   const [brideOpen, setBrideOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const dragStartX = React.useRef(0);
   const dragDelta = React.useRef(0);
   const isDragging = React.useRef(false);
@@ -227,6 +230,25 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
     if (data.accountStyle === 'style3') {
       const groomAccounts = filled.filter(a => a.side.startsWith('신랑'));
       const brideAccounts = filled.filter(a => a.side.startsWith('신부'));
+      const renderAccRow = (acc: typeof filled[0], i: number) => (
+        <div key={i} className="account-popup-item">
+          <div className="account-popup-person">
+            <span className="account-popup-role">{acc.side}</span>
+            {acc.owner && <span className="account-popup-owner-name">{acc.owner}</span>}
+          </div>
+          <div className="account-popup-account-row">
+            {acc.number && <span className="account-popup-number">{formatAccountNumber(acc.bank, acc.number)}</span>}
+            <div className="account-popup-right">
+              {acc.bank && <span className="bank-badge">{acc.bank}</span>}
+              {acc.number && (
+                <button className={`copy-icon-btn ${copiedAccount === acc.number ? 'copied' : ''}`} onClick={() => handleCopy(acc.number)}>
+                  {copiedAccount === acc.number ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      );
       return (
         <div className="account-list style3">
           {groomAccounts.length > 0 && (
@@ -237,7 +259,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
               </button>
               <div className={`accordion-body ${groomOpen ? 'open' : ''}`} ref={groomBodyRef}>
                 <div className="accordion-inner">
-                  {groomAccounts.map((acc, i) => renderAccountItem(acc, i))}
+                  {groomAccounts.map((acc, i) => renderAccRow(acc, i))}
                 </div>
               </div>
             </div>
@@ -250,12 +272,70 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
               </button>
               <div className={`accordion-body ${brideOpen ? 'open' : ''}`} ref={brideBodyRef}>
                 <div className="accordion-inner">
-                  {brideAccounts.map((acc, i) => renderAccountItem(acc, i + 100))}
+                  {brideAccounts.map((acc, i) => renderAccRow(acc, i + 100))}
                 </div>
               </div>
             </div>
           )}
         </div>
+      );
+    }
+
+    if (data.accountStyle === 'style4') {
+      const groomAccounts = filled.filter(a => a.side.startsWith('신랑'));
+      const brideAccounts = filled.filter(a => a.side.startsWith('신부'));
+      const groomSideLabel = isEn ? "Groom's Side" : isJa ? '新郎側' : '신랑측';
+      const brideSideLabel = isEn ? "Bride's Side" : isJa ? '新婦側' : '신부측';
+      const btnLabel = isEn ? 'View Account Info' : isJa ? '口座情報を見る' : '계좌 정보 보기';
+      const popupTitle = isEn ? 'Account Info' : isJa ? '口座情報' : '계좌 정보';
+
+      const renderPopupGroup = (accounts: typeof filled, heartColor: string, sideLabel: string) =>
+        accounts.length === 0 ? null : (
+          <div className="account-popup-group">
+            <div className="account-popup-group-header">
+              <Heart size={20} fill={heartColor} color={heartColor} />
+              <span className="account-popup-side-label">{sideLabel}</span>
+            </div>
+            {accounts.map((acc, i) => (
+              <div key={i} className="account-popup-item">
+                <div className="account-popup-person">
+                  <span className="account-popup-role">{acc.side}</span>
+                  {acc.owner && <span className="account-popup-owner-name">{acc.owner}</span>}
+                </div>
+                <div className="account-popup-account-row">
+                  {acc.number && (
+                    <span className="account-popup-number">{formatAccountNumber(acc.bank, acc.number)}</span>
+                  )}
+                  <div className="account-popup-right">
+                    {acc.bank && <span className="bank-badge">{acc.bank}</span>}
+                    {acc.number && (
+                      <button
+                        className={`copy-icon-btn ${copiedAccount === acc.number ? 'copied' : ''}`}
+                        onClick={() => handleCopy(acc.number)}
+                        aria-label="계좌번호 복사"
+                      >
+                        {copiedAccount === acc.number ? <Check size={14} /> : <Copy size={14} />}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+
+      return (
+        <>
+          <button type="button" className="pf-open-btn" onClick={() => setPopupOpen(true)}>
+            {btnLabel}
+          </button>
+          <PreviewOverlay open={popupOpen} onClose={() => setPopupOpen(false)} anchorRef={sectionRef} title={popupTitle}>
+            <div className="account-popup-list">
+              {renderPopupGroup(groomAccounts, '#3B82F6', groomSideLabel)}
+              {renderPopupGroup(brideAccounts, '#EF4444', brideSideLabel)}
+            </div>
+          </PreviewOverlay>
+        </>
       );
     }
 
@@ -267,7 +347,7 @@ const Money: React.FC<PreviewProps> = React.memo(({ data }) => {
   };
 
   return (
-    <section className="money section" style={{ fontFamily: data.fontFamily }} aria-label="축의금">
+    <section className="money section" style={{ fontFamily: data.fontFamily }} aria-label="축의금" ref={sectionRef}>
       <h2>GIFT</h2>
       <p className="section-sub">{isEn ? 'You may share your congratulatory gift here' : isJa ? 'お祝いのお気持ちをお伝えいただけます' : '축하의 마음을 전하실 수 있습니다'}</p>
       <p className="money-desc">

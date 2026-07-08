@@ -92,7 +92,7 @@ export interface ContentData {
   timeline: TimelineEvent[];
   interview: InterviewQA[];
   accounts: Account[];
-  accountStyle: 'style1' | 'style2' | 'style3';
+  accountStyle: 'style1' | 'style2' | 'style3' | 'style4';
   contactDisplayMode?: 'inline' | 'popup' | 'accordion';
   videoUrl: string;
   endingPhoto: string;
