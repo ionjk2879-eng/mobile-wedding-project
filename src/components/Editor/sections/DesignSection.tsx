@@ -31,7 +31,7 @@ const SCROLL_EFFECTS: { key: NonNullable<InvitationData['scrollEffect']>; name: 
 ];
 
 const BG_COLORS = [
-  { name: '없음', value: '' },
+  { name: '화이트', value: '#FFFFFF' },
   { name: '아이보리', value: '#FFFDF5' },
   { name: '연분홍', value: '#FFF5F6' },
   { name: '라벤더', value: '#F7F5FA' },
@@ -42,7 +42,7 @@ const BG_COLORS = [
 ];
 
 const ACCENT_COLORS = [
-  { name: '없음', value: '' },
+  { name: '블랙', value: '#000000' },
   { name: '로즈', value: '#D4918E' },
   { name: '골드', value: '#C8A97E' },
   { name: '세이지', value: '#8BA888' },
