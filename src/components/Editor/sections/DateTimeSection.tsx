@@ -41,26 +41,40 @@ const DateTimeSection: React.FC = () => {
   };
 
   return (
-    <div className="date-time-row">
-      <div className="basic-field date-field">
-        <label>예식일</label>
-        <input type="date" value={data.weddingDateISO} onChange={(e) => handleDateChange(e.target.value)} className={`modern-input ${isPastDate ? 'input-warning' : ''}`} />
-        {isPastDate && <span className="input-hint hint-warning">과거 날짜가 선택되었습니다.</span>}
-      </div>
-      <div className="basic-field date-field">
-        <label>표시 날짜</label>
-        <input type="text" value={data.date} readOnly className="modern-input readonly" />
-      </div>
-      <div className="basic-field time-field">
-        <label>예식 시간</label>
-        <div className="time-picker-flat">
-          <button type="button" className="time-adj" onClick={() => adjustTime('ampm', 0)}>{timeParts.ampm}</button>
-          <button type="button" className="time-adj" onClick={() => adjustTime('hours', 1)}>{timeParts.hours.toString().padStart(2, '0')}</button>
-          <span className="time-colon">:</span>
-          <button type="button" className="time-adj" onClick={() => adjustTime('minutes', 5)}>{timeParts.minutes.toString().padStart(2, '0')}</button>
+    <>
+      <div className="date-time-row">
+        <div className="basic-field date-field">
+          <label>예식일</label>
+          <input type="date" value={data.weddingDateISO} onChange={(e) => handleDateChange(e.target.value)} className={`modern-input ${isPastDate ? 'input-warning' : ''}`} />
+          {isPastDate && <span className="input-hint hint-warning">과거 날짜가 선택되었습니다.</span>}
+        </div>
+        <div className="basic-field date-field">
+          <label>표시 날짜</label>
+          <input type="text" value={data.date} readOnly className="modern-input readonly" />
+        </div>
+        <div className="basic-field time-field">
+          <label>예식 시간</label>
+          <div className="time-picker-flat">
+            <button type="button" className="time-adj" onClick={() => adjustTime('ampm', 0)}>{timeParts.ampm}</button>
+            <button type="button" className="time-adj" onClick={() => adjustTime('hours', 1)}>{timeParts.hours.toString().padStart(2, '0')}</button>
+            <span className="time-colon">:</span>
+            <button type="button" className="time-adj" onClick={() => adjustTime('minutes', 5)}>{timeParts.minutes.toString().padStart(2, '0')}</button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <div className="input-group">
+        <label>달력 스타일</label>
+        <div className="account-style-grid">
+          <button type="button" className={`account-style-btn ${(data.calendarStyle || 'card') === 'card' ? 'active' : ''}`} onClick={() => updateField('calendarStyle', 'card')}>
+            <strong>카드형</strong><span>흰 배경 카드에 테두리·그림자로 감싸 표시</span>
+          </button>
+          <button type="button" className={`account-style-btn ${data.calendarStyle === 'plain' ? 'active' : ''}`} onClick={() => updateField('calendarStyle', 'plain')}>
+            <strong>배경 일체형</strong><span>테두리 없이 청첩장 배경색과 자연스럽게 이어짐</span>
+          </button>
+        </div>
+      </div>
+    </>
   );
 };
 

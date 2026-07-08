@@ -98,7 +98,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
 
   return (
     <section className="calendar-section" aria-label="캘린더">
-      <div className="calendar-container">
+      <div className={`calendar-container ${data.calendarStyle === 'plain' ? 'calendar-plain' : ''}`}>
         <div className="calendar-header">
           <p className="month-name">{monthNames[month]}</p>
           <p className="year-name">{year}</p>
