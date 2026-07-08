@@ -171,7 +171,7 @@ const ActivateCodeModal: React.FC<{ slug: string; onDone: () => void; onClose: (
   );
 };
 
-const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void; onActivate: () => void }> = ({ slug, isPaid, data, onDelete, onChangeSlug, onActivate }) => {
+const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationData; onDelete: () => void; onChangeSlug: () => void; onActivate: () => void; onExtend: () => void; extending: boolean }> = ({ slug, isPaid, data, onDelete, onChangeSlug, onActivate, onExtend, extending }) => {
   const { t } = useSiteLang();
   const tm = t.manage;
   const navigate = useNavigate();
@@ -203,6 +203,20 @@ const CardDropdown: React.FC<{ slug: string; isPaid?: boolean; data: InvitationD
               <KeyRound size={14} /> {tm.activateInvitation}
             </button>
           )}
+          {!isPaid && data.expiresAt && (() => {
+            const extCount = data.extensionCount ?? 0;
+            const canExtend = extCount < 2;
+            return (
+              <button
+                className={`mc-dropdown-item${canExtend ? '' : ' disabled'}`}
+                disabled={!canExtend || extending}
+                onClick={() => { if (canExtend) { setOpen(false); onExtend(); } }}
+              >
+                <CalendarPlus size={14} />
+                {extending ? '연장 중...' : `1주일 연장${canExtend ? ` (${2 - extCount}회 남음)` : ' (불가)'}`}
+              </button>
+            );
+          })()}
           {isPaid && (
             <button className="mc-dropdown-item highlight" onClick={() => {
               setOpen(false);
@@ -423,26 +437,6 @@ const ManagePage: React.FC = () => {
                     {data.date && <p className="mc-date">{formatCardDate(data)}</p>}
                     <p className="mc-slug">sonett.kr/{slug}</p>
                   </div>
-                  {!data.isPaid && data.expiresAt && (() => {
-                    const extCount = data.extensionCount ?? 0;
-                    const remaining = 2 - extCount;
-                    const canExtend = remaining > 0;
-                    return (
-                      <div className="mc-extend-row">
-                        <span className="mc-extend-info">
-                          {canExtend ? `${remaining}번 더 연장 가능` : '더 이상 연장 불가'}
-                        </span>
-                        <button
-                          className={`mc-extend-btn${canExtend ? '' : ' disabled'}`}
-                          disabled={!canExtend || extendingSlug === slug}
-                          onClick={() => handleExtend(slug)}
-                        >
-                          <CalendarPlus size={12} />
-                          {extendingSlug === slug ? '연장 중...' : '1주일 연장'}
-                        </button>
-                      </div>
-                    );
-                  })()}
                   <div className="mc-actions">
                     <button className="mc-action-btn mc-share-btn" onClick={() => setShareSlug(slug)}>
                       <Share2 size={12} /> {tm.share}
@@ -457,6 +451,8 @@ const ManagePage: React.FC = () => {
                       onDelete={() => handleDelete(slug)}
                       onChangeSlug={() => setChangeSlugTarget(slug)}
                       onActivate={() => setActivateTarget(slug)}
+                      onExtend={() => handleExtend(slug)}
+                      extending={extendingSlug === slug}
                     />
                   </div>
                 </div>
@@ -707,42 +703,6 @@ const ManagePage: React.FC = () => {
         .mc-info {
           margin-bottom: 14px;
         }
-        .mc-extend-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 8px;
-          margin-bottom: 10px;
-          padding: 8px 10px;
-          background: #F9FAFB;
-          border-radius: 8px;
-          border: 1px solid #E5E7EB;
-        }
-        .mc-extend-info {
-          font-size: 0.72rem;
-          color: #6B7280;
-        }
-        .mc-extend-btn {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          padding: 5px 10px;
-          border-radius: 6px;
-          border: none;
-          background: #1F2937;
-          color: white;
-          font-size: 0.72rem;
-          font-weight: 600;
-          cursor: pointer;
-          white-space: nowrap;
-          transition: background 0.15s;
-        }
-        .mc-extend-btn:hover:not(.disabled) { background: #374151; }
-        .mc-extend-btn.disabled {
-          background: #E5E7EB;
-          color: #9CA3AF;
-          cursor: not-allowed;
-        }
         .mc-name {
           font-size: 1rem;
           font-weight: 700;
@@ -870,6 +830,14 @@ const ManagePage: React.FC = () => {
         .mc-dropdown-item.highlight:hover {
           background: #FDF6F9;
           color: #9B6A7E;
+        }
+        .mc-dropdown-item.disabled {
+          color: #9CA3AF;
+          cursor: not-allowed;
+        }
+        .mc-dropdown-item.disabled:hover {
+          background: transparent;
+          color: #9CA3AF;
         }
 
         /* Share Modal */
