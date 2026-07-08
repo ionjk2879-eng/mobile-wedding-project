@@ -77,7 +77,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ open, onClose, a
     ) as HTMLElement | null;
     if (!varsSource) return;
     const div = overlayRef.current;
-    ['--wedding-main', '--wedding-accent', '--wedding-bg'].forEach(v => {
+    ['--wedding-main', '--wedding-emphasis', '--wedding-bg'].forEach(v => {
       const val = varsSource.style.getPropertyValue(v);
       if (val) div.style.setProperty(v, val);
       else div.style.removeProperty(v);

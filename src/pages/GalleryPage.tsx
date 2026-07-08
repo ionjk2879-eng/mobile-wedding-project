@@ -54,7 +54,7 @@ const GalleryPage: React.FC = () => {
 
   const lightboxThemeStyle: React.CSSProperties = {
     ...(themeVars.customBgColor ? { '--wedding-bg': themeVars.customBgColor } as React.CSSProperties : {}),
-    ...(themeVars.customAccentColor ? { '--wedding-main': themeVars.customAccentColor, '--wedding-accent': themeVars.customAccentColor } as React.CSSProperties : {}),
+    ...(themeVars.customAccentColor ? { '--wedding-main': themeVars.customAccentColor } as React.CSSProperties : {}),
   };
 
   // 개인화 링크(?code=)로 들어온 경우, 서버에 재검증해 실제 하객 이름/코드를 확보
@@ -381,9 +381,9 @@ const GalleryPage: React.FC = () => {
 
         .gallery-lightbox {
           position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
-          /* theme-* 클래스가 이 엘리먼트 자신에 붙으므로, 여기서 --wedding-accent를 읽으면
+          /* theme-* 클래스가 이 엘리먼트 자신에 붙으므로, 여기서 --wedding-main을 읽으면
              그 테마(또는 커스텀 컬러)로 이미 오버라이드된 값이 반영된다. */
-          --wedding-lightbox-bg: color-mix(in srgb, var(--wedding-accent, #E8A0A0) 45%, black 55%);
+          --wedding-lightbox-bg: color-mix(in srgb, var(--wedding-main, #D4918E) 45%, black 55%);
         }
         .gallery-lightbox-backdrop { position: absolute; inset: 0; background: var(--wedding-lightbox-bg, rgba(0,0,0,0.9)); }
 

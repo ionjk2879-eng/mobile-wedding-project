@@ -33,11 +33,22 @@ const buildList = (
   return list;
 };
 
+const GroupHeart: React.FC<{ side: 'groom' | 'bride'; size: number }> = ({ side, size }) => (
+  <Heart
+    size={size}
+    fill={side === 'groom' ? '#3B82F6' : '#EF4444'}
+    color={side === 'groom' ? '#3B82F6' : '#EF4444'}
+  />
+);
+
 const GroupsInline: React.FC<{ groups: Group[] }> = ({ groups }) => (
   <>
     {groups.map((group, gi) => (
       <div key={gi} className="contact-group">
-        <p className="contact-group-label">{group.label}</p>
+        <p className="contact-group-label">
+          <GroupHeart side={group.side} size={14} />
+          {group.label}
+        </p>
         <Carousel contacts={group.contacts} />
       </div>
     ))}
@@ -55,7 +66,10 @@ const GroupsAccordion: React.FC<{ groups: Group[] }> = ({ groups }) => {
             onClick={(e) => { e.currentTarget.blur(); setOpenIdx(prev => ({ ...prev, [gi]: !prev[gi] })); }}
             aria-expanded={!!openIdx[gi]}
           >
-            <span>{group.label}</span>
+            <span className="side-heart-label">
+              <GroupHeart side={group.side} size={16} />
+              {group.label}
+            </span>
             <ChevronDown size={16} className={`accordion-arrow ${openIdx[gi] ? 'open' : ''}`} aria-hidden="true" />
           </button>
           <div className={`accordion-body ${openIdx[gi] ? 'open' : ''}`}>

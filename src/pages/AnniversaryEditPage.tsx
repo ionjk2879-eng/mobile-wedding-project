@@ -251,7 +251,9 @@ const AnniversaryEditPage: React.FC = () => {
               style={{
                 fontFamily: previewData.fontFamily,
                 ...(previewData.customBgColor ? { '--wedding-bg': previewData.customBgColor } as React.CSSProperties : {}),
-                ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor, '--wedding-accent': previewData.customAccentColor } as React.CSSProperties : {}),
+                ...(previewData.customAccentColor ? { '--wedding-main': previewData.customAccentColor } as React.CSSProperties : {}),
+                ...(previewData.customLabelColor ? { '--wedding-label': previewData.customLabelColor } as React.CSSProperties : {}),
+                ...(previewData.customTextColor ? { '--wedding-emphasis': previewData.customTextColor } as React.CSSProperties : {}),
               }}
             >
               <ScrollRootContext.Provider value={null}>

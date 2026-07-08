@@ -58,7 +58,7 @@ export const initialData: InvitationData = {
     openingText: '',
     openingSubText: '',
   },
-  theme: 'pearl',
+  theme: 'ivorynavy',
   bgTexture: 'none',
   bgEffect: 'none',
   scrollEffect: 'none',

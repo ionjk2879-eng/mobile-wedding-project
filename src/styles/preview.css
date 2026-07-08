@@ -1,6 +1,6 @@
 /* === Section common === */
 .section { padding: 60px 24px; }
-.section h2 { font-size: 0.78em; letter-spacing: 6px; color: var(--wedding-main); opacity: 0.8; margin: 0 0 8px; font-weight: 400; text-align: center; text-transform: uppercase; }
+.section h2 { font-size: 0.78em; letter-spacing: 6px; color: var(--wedding-label); opacity: 0.8; margin: 0 0 8px; font-weight: 400; text-align: center; text-transform: uppercase; }
 .section-sub { font-size: 0.82em; color: var(--wedding-text-sub); text-align: center; margin: 0 0 32px; line-height: 1.6; }
 
 /* === Hero === */
@@ -60,11 +60,11 @@
 .hero-classic { padding: 40px 20px 60px; }
 .hero-classic .hero-img-wrap { aspect-ratio: 3/4; margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 .hero-info { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.hero-quote { font-size: 0.85em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 12px; opacity: 0.8; }
-.hero-dday { display: inline-block; padding: 4px 12px; background: color-mix(in srgb, var(--wedding-accent) 10%, transparent); color: var(--wedding-accent); border: 1px solid var(--wedding-accent); border-radius: 4px; font-size: 0.75em; font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; }
-.hero-label { font-size: 0.7em; letter-spacing: 3px; color: var(--wedding-main); opacity: 0.7; margin: 0; font-weight: 600; }
+.hero-quote { font-size: 0.85em; color: var(--wedding-emphasis); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 12px; opacity: 0.8; }
+.hero-dday { display: inline-block; padding: 4px 12px; background: color-mix(in srgb, var(--wedding-emphasis) 10%, transparent); color: var(--wedding-emphasis); border: 1px solid var(--wedding-emphasis); border-radius: 4px; font-size: 0.75em; font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; }
+.hero-label { font-size: 0.7em; letter-spacing: 3px; color: var(--wedding-emphasis); opacity: 0.7; margin: 0; font-weight: 600; }
 .hero-names { font-size: 1.8em; font-weight: 400; color: var(--wedding-text-main); margin: 10px 0; letter-spacing: 0.05em; }
-.hero-names .amp { font-size: 0.7em; color: var(--wedding-accent); opacity: 0.6; font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; }
+.hero-names .amp { font-size: 0.7em; color: var(--wedding-emphasis); opacity: 0.6; font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; }
 .hero-date { font-size: 1em; font-weight: 500; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; }
 .hero-time { font-size: 0.9em; color: var(--wedding-text-sub); margin: 0; }
 .hero-venue { font-size: 0.9em; color: var(--wedding-text-sub); margin: 5px 0 0; padding-top: 10px; border-top: 1px solid var(--wedding-border); display: inline-block; }
@@ -84,26 +84,26 @@
 
 /* Minimal */
 .hero-minimal { padding: 80px 24px 40px; }
-.minimal-quote { font-size: 1em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 20px; opacity: 0.7; }
+.minimal-quote { font-size: 1em; color: var(--wedding-emphasis); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 20px; opacity: 0.7; }
 .minimal-label { font-size: 0.7em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0 0 30px; }
 .minimal-names { font-size: 2.4em; font-weight: 300; color: var(--wedding-text-main); margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; }
-.minimal-amp { font-size: 1.5em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 10px 0; opacity: 0.5; }
+.minimal-amp { font-size: 1.5em; color: var(--wedding-emphasis); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 10px 0; opacity: 0.5; }
 .minimal-divider { width: 30px; height: 1px; background: var(--wedding-border); margin: 25px auto; }
 .minimal-date { font-size: 1em; color: var(--wedding-text-main); margin: 0; letter-spacing: 2px; font-weight: 500; }
 .minimal-time { font-size: 0.85em; color: var(--wedding-text-sub); margin: 8px 0 0; }
-.minimal-dday { display: inline-block; margin-top: 20px; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
+.minimal-dday { display: inline-block; margin-top: 20px; padding: 4px 12px; border: 1px solid var(--wedding-emphasis); color: var(--wedding-emphasis); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
 .minimal-img { aspect-ratio: 3/4; margin-top: 40px; border-radius: 16px; }
 
 /* Editorial */
 .hero-editorial { padding: 50px 24px 60px; }
 .editorial-top { margin-bottom: 24px; }
 .editorial-dday { display: inline-block; padding: 4px 12px; background: var(--wedding-main); color: white; border-radius: 4px; font-size: 0.7em; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; }
-.editorial-quote { font-size: 0.9em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 8px; }
+.editorial-quote { font-size: 0.9em; color: var(--wedding-emphasis); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0 0 8px; }
 .editorial-label { font-size: 0.7em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0; }
 .editorial-img { margin-bottom: 30px; border-radius: 8px; aspect-ratio: 4/5; }
 .editorial-bottom { display: flex; flex-direction: column; align-items: center; }
 .editorial-groom, .editorial-bride { font-size: 2em; font-weight: 300; color: var(--wedding-text-main); margin: 0; font-family: 'Playfair Display', serif; letter-spacing: 3px; }
-.editorial-amp { font-size: 1.2em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 5px 0; opacity: 0.5; }
+.editorial-amp { font-size: 1.2em; color: var(--wedding-emphasis); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 5px 0; opacity: 0.5; }
 .editorial-sub { font-size: 0.8em; color: var(--wedding-text-sub); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 12px 0 0; letter-spacing: 1px; }
 .editorial-details { display: flex; flex-direction: column; gap: 4px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--wedding-border); }
 .editorial-details span { font-size: 0.85em; color: var(--wedding-text-sub); letter-spacing: 1px; }
@@ -130,14 +130,14 @@
 .split-photo { flex: 1; overflow: hidden; }
 .split-photo .hero-photo { width: 100%; height: 100%; object-fit: cover; }
 .split-photo .hero-photo-empty { width: 100%; height: 100%; aspect-ratio: auto; border: none; border-radius: 0; }
-.split-quote { font-size: 0.8em; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0; opacity: 0.7; line-height: 1.5; text-align: center; }
+.split-quote { font-size: 0.8em; color: var(--wedding-emphasis); font-family: 'Dancing Script', cursive; font-style: italic; margin: 0; opacity: 0.7; line-height: 1.5; text-align: center; }
 .split-label { font-size: 0.6em; letter-spacing: 5px; color: var(--wedding-text-sub); margin: 0; }
 .split-divider { width: 24px; height: 1px; background: var(--wedding-border); margin: 8px 0; }
 .split-name { font-size: 1.5em; font-weight: 300; color: var(--wedding-text-main); margin: 0; font-family: 'Cormorant Garamond', serif; letter-spacing: 3px; }
 .split-date { font-size: 0.85em; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; }
 .split-time { font-size: 0.8em; color: var(--wedding-text-sub); margin: 0; }
 .split-venue { font-size: 0.8em; color: var(--wedding-text-sub); margin: 0; }
-.split-dday { display: inline-block; margin-top: 6px; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.7em; letter-spacing: 1px; }
+.split-dday { display: inline-block; margin-top: 6px; padding: 4px 12px; border: 1px solid var(--wedding-emphasis); color: var(--wedding-emphasis); border-radius: 4px; font-size: 0.7em; letter-spacing: 1px; }
 
 /* Center Card */
 .hero-centercard { padding: 50px 24px 60px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -145,12 +145,12 @@
 .cc-card { width: 75%; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
 .cc-img { aspect-ratio: 3/4; }
 .cc-names { font-size: 1.6em; font-weight: 400; color: var(--wedding-text-main); margin: 8px 0 0; letter-spacing: 2px; }
-.cc-names span { font-size: 0.7em; color: var(--wedding-accent); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; opacity: 0.6; }
+.cc-names span { font-size: 0.7em; color: var(--wedding-emphasis); font-family: 'Cormorant Garamond', serif; font-style: italic; margin: 0 8px; opacity: 0.6; }
 .cc-divider { width: 30px; height: 1px; background: var(--wedding-border); }
 .cc-date { font-size: 0.95em; color: var(--wedding-text-main); margin: 0; letter-spacing: 1px; font-weight: 500; }
 .cc-time { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
 .cc-venue { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0; }
-.cc-dday { display: inline-block; padding: 4px 12px; border: 1px solid var(--wedding-accent); color: var(--wedding-accent); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
+.cc-dday { display: inline-block; padding: 4px 12px; border: 1px solid var(--wedding-emphasis); color: var(--wedding-emphasis); border-radius: 4px; font-size: 0.75em; letter-spacing: 1px; }
 
 /* Gradation */
 .hero-gradation { position: relative; width: 100%; aspect-ratio: 9/16; min-height: 500px; overflow: hidden; }
@@ -262,13 +262,13 @@
 .vt-amp { font-style: italic; opacity: 0.45; font-size: 0.68em; display: block; margin: 2px 0; }
 .vt-date { font-size: 0.65em; margin: 0 0 2px; color: var(--wedding-text-sub, #8F7D7D); letter-spacing: 2px; }
 .vt-venue { font-size: 0.6em; margin: 0 0 10px; color: var(--wedding-text-sub, #8F7D7D); letter-spacing: 1px; }
-.vt-dday { display: inline-block; font-size: 0.58em; color: var(--wedding-main, #D4918E); letter-spacing: 3px; border-bottom: 1px solid var(--wedding-border, #F3CDCC); padding-bottom: 1px; }
+.vt-dday { display: inline-block; font-size: 0.58em; color: var(--wedding-emphasis, #D4918E); letter-spacing: 3px; border-bottom: 1px solid var(--wedding-border, #F3CDCC); padding-bottom: 1px; }
 
 /* Book Page (책 한 페이지) */
 .hero-bookpage { padding: 32px 28px 44px; display: flex; flex-direction: column; align-items: center; }
 .bp-running-head { display: flex; align-items: center; gap: 8px; font-size: 0.6em; letter-spacing: 4px; color: var(--wedding-text-sub); text-transform: uppercase; width: 100%; justify-content: center; margin-bottom: 8px; }
 .bp-rule { width: 100%; height: 1px; background: var(--wedding-border); }
-.bp-ornament { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 14px 0 16px; color: var(--wedding-main); font-size: 1em; opacity: 0.7; }
+.bp-ornament { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 14px 0 16px; color: var(--wedding-emphasis); font-size: 1em; opacity: 0.7; }
 .bp-ornament::before, .bp-ornament::after { content: ''; flex: 0 0 36px; height: 1px; background: var(--wedding-main); opacity: 0.5; }
 .bp-photo { width: 70%; aspect-ratio: 3/4; overflow: hidden; line-height: 0; margin-bottom: 22px; box-shadow: 3px 5px 20px rgba(0,0,0,0.1), -1px -1px 0 var(--wedding-border), 1px 1px 0 rgba(255,255,255,0.6); }
 .bp-photo .hero-photo { width: 100%; height: 100%; object-fit: cover; }
@@ -287,7 +287,7 @@
 .hero-instacard { display: flex; flex-direction: column; padding-bottom: 24px; }
 .ic-header { display: flex; align-items: center; gap: 10px; padding: 10px 12px 8px; }
 .ic-avatar-ring { width: 44px; height: 44px; border-radius: 50%; padding: 2.5px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); flex-shrink: 0; }
-.ic-avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--wedding-bg); border: 2.5px solid var(--wedding-bg); display: flex; align-items: center; justify-content: center; font-size: 0.78em; font-weight: 700; color: var(--wedding-main); box-sizing: border-box; letter-spacing: 0.5px; }
+.ic-avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--wedding-bg); border: 2.5px solid var(--wedding-bg); display: flex; align-items: center; justify-content: center; font-size: 0.78em; font-weight: 700; color: var(--wedding-emphasis); box-sizing: border-box; letter-spacing: 0.5px; }
 .ic-handle { flex: 1; min-width: 0; }
 .ic-username { display: block; font-size: 0.83em; font-weight: 700; color: var(--wedding-text-main); }
 .ic-location { display: block; font-size: 0.68em; color: var(--wedding-text-sub); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -300,7 +300,7 @@
 .ic-action { color: var(--wedding-text-main); cursor: default; display: flex; align-items: center; line-height: 1; }
 .ic-action-heart { font-size: 1.6em; }
 .ic-likes { padding: 2px 14px 4px; font-size: 0.82em; font-weight: 700; color: var(--wedding-text-main); }
-.ic-likes-heart { color: var(--wedding-main); }
+.ic-likes-heart { color: var(--wedding-emphasis); }
 .ic-caption { padding: 0 14px 3px; font-size: 0.82em; color: var(--wedding-text-body); line-height: 1.5; }
 .ic-caption-user { font-weight: 700; color: var(--wedding-text-main); }
 .ic-timestamp { margin: 0; padding: 0 14px; font-size: 0.67em; color: var(--wedding-text-sub); letter-spacing: 2px; text-transform: uppercase; }
@@ -315,7 +315,7 @@
 .mf-photo { aspect-ratio: 3/4; width: 100%; }
 .mf-info { margin-top: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 .mf-names { font-size: 1.5em; font-weight: 400; letter-spacing: 3px; color: var(--wedding-text-main); font-family: 'Cormorant Garamond', serif; margin: 0; text-transform: uppercase; }
-.mf-amp { font-size: 0.5em; font-style: italic; color: var(--wedding-accent); margin: 0 10px; opacity: 0.75; text-transform: lowercase; letter-spacing: 0; }
+.mf-amp { font-size: 0.5em; font-style: italic; color: var(--wedding-emphasis); margin: 0 10px; opacity: 0.75; text-transform: lowercase; letter-spacing: 0; }
 .mf-divider { width: 26px; height: 1px; background: var(--wedding-border); }
 .mf-date { font-size: 0.85em; color: var(--wedding-text-main); letter-spacing: 1px; margin: 0; }
 .mf-venue { font-size: 0.78em; color: var(--wedding-text-sub); margin: 0; }
@@ -342,7 +342,7 @@
 .ds-date span { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 4.4em; color: var(--wedding-text-main); }
 .ds-names { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
 .ds-names p { margin: 0; font-size: 1em; color: var(--wedding-text-body); letter-spacing: 0.5px; }
-.ds-names em { font-style: italic; color: var(--wedding-accent); font-family: 'Dancing Script', cursive; font-size: 1.3em; margin-right: 4px; }
+.ds-names em { font-style: italic; color: var(--wedding-emphasis); font-family: 'Dancing Script', cursive; font-size: 1.3em; margin-right: 4px; }
 .ds-venue { margin: 0; font-size: 0.7em; color: var(--wedding-text-sub); letter-spacing: 1px; }
 
 /* === Gallery === */
@@ -360,7 +360,7 @@
 .masonry-balanced { display: flex; gap: 8px; }
 .masonry-col { flex: 1; display: flex; flex-direction: column; gap: 8px; }
 .masonry-item { border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s ease; border: 2px solid transparent; }
-.masonry-item.selected { border-color: var(--wedding-main); }
+.masonry-item.selected { border-color: var(--wedding-emphasis); }
 .masonry-item img { width: 100%; display: block; }
 .gallery-slide { text-align: center; }
 .gallery-slide-vp { overflow: hidden; border-radius: 12px; cursor: grab; user-select: none; }
@@ -396,7 +396,7 @@
 /* === Greeting === */
 .greeting { padding: 60px 24px; text-align: center; }
 .greeting-text { text-align: center; }
-.greeting-text h2 { font-size: 0.8em; letter-spacing: 6px; color: var(--wedding-main); opacity: 0.8; margin: 0 0 20px; font-weight: 400; }
+.greeting-text h2 { font-size: 0.8em; letter-spacing: 6px; color: var(--wedding-label); opacity: 0.8; margin: 0 0 20px; font-weight: 400; }
 .greeting-title { font-size: 1.35em; font-weight: 600; color: var(--wedding-text-main); margin: 8px 0 24px; letter-spacing: 1px; line-height: 1.5; }
 .greeting-text p { line-height: 2; color: var(--wedding-text-body); font-size: 0.95em; margin-bottom: 0; }
 .family-info { margin-top: 50px; display: flex; flex-direction: column; gap: 30px; }
@@ -410,19 +410,19 @@
 .personal-message { background-color: transparent; padding: 80px 24px; }
 .message-container { display: flex; flex-direction: column; gap: 24px; }
 .message-box { padding: 14px 16px; background: var(--wedding-card-bg); border-radius: 20px; border: 1px solid var(--wedding-border); box-shadow: 0 10px 30px rgba(74, 69, 67, 0.05); }
-.message-box.groom { border-left: 4px solid var(--wedding-accent); border-right: none; }
-.message-box.bride { border-right: 4px solid var(--wedding-main); border-left: none; }
+.message-box.groom { border-left: 4px solid var(--wedding-main); border-right: none; }
+.message-box.bride { border-right: 4px solid var(--wedding-border); border-left: none; }
 .msg-profile-row.reverse { flex-direction: row; }
 .msg-profile-row.reverse .msg-content { text-align: center; }
 .msg-profile-row { display: flex; align-items: center; gap: 14px; }
 .msg-profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--wedding-border); }
 .msg-profile-empty { width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0; background: var(--wedding-border); opacity: 0.5; }
 .msg-content { flex: 1; min-width: 0; }
-.message-name { font-size: 0.8em; font-weight: 700; color: var(--wedding-main); letter-spacing: 1px; display: block; margin-bottom: 8px; }
+.message-name { font-size: 0.8em; font-weight: 700; color: var(--wedding-emphasis); letter-spacing: 1px; display: block; margin-bottom: 8px; }
 .msg-content p { font-size: 0.95em; line-height: 1.8; color: var(--wedding-text-body); margin: 0; word-break: keep-all; }
 
 /* === Location === */
-.location-info { margin-bottom: 20px; background: var(--wedding-card-bg); border-left: 3px solid var(--wedding-main); border-radius: 0 16px 16px 0; padding: 18px 20px; text-align: left; border-top: 1px solid var(--wedding-border); border-right: 1px solid var(--wedding-border); border-bottom: 1px solid var(--wedding-border); }
+.location-info { margin-bottom: 20px; background: var(--wedding-card-bg); border-left: 3px solid var(--wedding-emphasis); border-radius: 0 16px 16px 0; padding: 18px 20px; text-align: left; border-top: 1px solid var(--wedding-border); border-right: 1px solid var(--wedding-border); border-bottom: 1px solid var(--wedding-border); }
 .venue-name { font-size: 1.15em; color: var(--wedding-text-main); font-weight: 600; margin-bottom: 6px; }
 .address { color: var(--wedding-text-body); font-size: 0.9em; margin: 0; }
 .map-container { width: 100%; height: 300px; background: #eee; border: 1px solid var(--wedding-border); border-radius: 16px; margin-bottom: 20px; overflow: hidden; position: relative; z-index: 0; }
@@ -431,7 +431,7 @@
 .nav-item:hover { filter: brightness(0.9); transform: translateY(-1px); }
 .transport-info { text-align: left; background: var(--wedding-card-bg); padding: 24px; border-radius: 20px; border: 1px solid var(--wedding-border); display: flex; flex-direction: column; gap: 20px; }
 .transport-item { display: flex; flex-direction: column; gap: 8px; }
-.transport-label { display: flex; align-items: center; gap: 8px; font-size: 0.85em; font-weight: 700; color: var(--wedding-main); }
+.transport-label { display: flex; align-items: center; gap: 8px; font-size: 0.85em; font-weight: 700; color: var(--wedding-emphasis); }
 .transport-detail { font-size: 0.9em; color: var(--wedding-text-body); line-height: 1.8; padding-left: 26px; white-space: pre-line; }
 
 /* === Money === */
@@ -439,23 +439,23 @@
 .account-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 50px; }
 .account-item { background: var(--wedding-card-bg); padding: 20px; border-radius: 14px; text-align: left; border: 1px solid var(--wedding-border); }
 .side-label { font-size: 0.72em; display: inline-block; margin-bottom: 8px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.03em; }
-.side-label.groom { background: var(--wedding-card-bg); color: var(--wedding-main); border: 1px solid var(--wedding-border); }
+.side-label.groom { background: var(--wedding-card-bg); color: var(--wedding-emphasis); border: 1px solid var(--wedding-border); }
 .side-label.bride { background: var(--wedding-main); color: #fff; }
 .account-owner { font-size: 1.05em; font-weight: 700; color: var(--wedding-text-main); margin-bottom: 8px; }
 .account-number-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .account-number { font-size: 0.9em; color: var(--wedding-text-body); letter-spacing: 0.3px; }
-.copy-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--wedding-border); background: var(--wedding-bg); color: var(--wedding-main); cursor: pointer; transition: all 0.2s; flex-shrink: 0; padding: 0; }
+.copy-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--wedding-border); background: var(--wedding-bg); color: var(--wedding-emphasis); cursor: pointer; transition: all 0.2s; flex-shrink: 0; padding: 0; }
 .copy-icon-btn:hover { background: var(--wedding-border); }
 .copy-icon-btn.copied { background: var(--wedding-main); border-color: var(--wedding-main); color: white; }
-.bank-badge { display: inline-block; font-size: 0.75em; font-weight: 700; color: var(--wedding-main); background: var(--wedding-bg); border: 1px solid var(--wedding-border); padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px; }
+.bank-badge { display: inline-block; font-size: 0.75em; font-weight: 700; color: var(--wedding-emphasis); background: var(--wedding-bg); border: 1px solid var(--wedding-border); padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px; }
 .account-group { margin-bottom: 28px; }
 .account-group:last-child { margin-bottom: 0; }
-.account-group-label { font-size: 0.8em; font-weight: 700; color: var(--wedding-main); letter-spacing: 1px; margin: 0 0 12px 0; }
+.account-group-label { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8em; font-weight: 700; color: var(--wedding-emphasis); letter-spacing: 1px; margin: 0 0 12px 0; }
 .account-group .account-item { margin-bottom: 10px; }
 .account-group .account-item:last-child { margin-bottom: 0; }
 .side-tabs { display: flex; background: var(--wedding-bg); border-radius: 14px; padding: 4px; margin-bottom: 20px; }
 .side-tab { flex: 1; padding: 12px; border: none; background: none; border-radius: 10px; font-size: 0.85em; font-weight: 700; color: var(--wedding-text-sub); cursor: pointer; transition: all 0.25s; }
-.side-tab.active { background: var(--wedding-card-bg); color: var(--wedding-main); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.side-tab.active { background: var(--wedding-card-bg); color: var(--wedding-emphasis); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .carousel-viewport { overflow: hidden; position: relative; touch-action: pan-x; cursor: grab; user-select: none; }
 .carousel-viewport:active { cursor: grabbing; }
 .carousel-track { display: flex; transition: transform 0.35s ease; }
@@ -470,8 +470,8 @@
 .accordion-group { margin-bottom: 14px; }
 .accordion-group:last-child { margin-bottom: 0; }
 .accordion-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 14px; font-size: 0.9em; font-weight: 700; color: var(--wedding-text-main); cursor: pointer; transition: all 0.25s; }
-.accordion-toggle.open { border-radius: 14px 14px 0 0; border-bottom-color: transparent; color: var(--wedding-main); }
-.accordion-arrow { color: var(--wedding-main); transition: transform 0.25s ease; flex-shrink: 0; }
+.accordion-toggle.open { border-radius: 14px 14px 0 0; border-bottom-color: transparent; color: var(--wedding-emphasis); }
+.accordion-arrow { color: var(--wedding-emphasis); transition: transform 0.25s ease; flex-shrink: 0; }
 .accordion-arrow.open { transform: rotate(180deg); }
 .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
 .accordion-body.open { max-height: 600px; }
@@ -481,16 +481,17 @@
 .contacts-section { background-color: transparent; }
 .contact-group { margin-bottom: 28px; }
 .contact-group:last-child { margin-bottom: 0; }
-.contact-group-label { font-size: 0.8em; font-weight: 700; color: var(--wedding-main); letter-spacing: 1px; margin: 0 0 14px 0; }
+.contact-group-label { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8em; font-weight: 700; color: var(--wedding-emphasis); letter-spacing: 1px; margin: 0 0 14px 0; }
+.side-heart-label { display: inline-flex; align-items: center; gap: 6px; }
 .contact-carousel-vp { overflow: hidden; position: relative; cursor: grab; user-select: none; }
 .contact-carousel-vp:active { cursor: grabbing; }
 .contact-carousel-track { display: flex; transition: transform 0.35s ease; }
 .contact-card { width: 100%; flex-shrink: 0; box-sizing: border-box; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 18px; padding: 24px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.contact-card-role { font-size: 0.75em; font-weight: 600; color: var(--wedding-main); }
+.contact-card-role { font-size: 0.75em; font-weight: 600; color: var(--wedding-emphasis); }
 .contact-card-name { font-size: 1.1em; font-weight: 700; color: var(--wedding-text-main); }
 .contact-card-phone { font-size: 0.88em; color: var(--wedding-text-body); letter-spacing: 0.5px; }
 .contact-card-btns { display: flex; gap: 12px; margin-top: 6px; }
-.contact-action-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--wedding-border); background: var(--wedding-bg); display: flex; align-items: center; justify-content: center; color: var(--wedding-main); transition: all 0.2s; text-decoration: none; }
+.contact-action-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--wedding-border); background: var(--wedding-bg); display: flex; align-items: center; justify-content: center; color: var(--wedding-emphasis); transition: all 0.2s; text-decoration: none; }
 .contact-action-btn:hover { background: var(--wedding-main); color: white; border-color: var(--wedding-main); }
 .contact-dots { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
 .contact-dot { width: 8px; height: 8px; border-radius: 50%; border: none; background: var(--wedding-border); padding: 0; cursor: pointer; transition: all 0.25s; }
@@ -504,10 +505,10 @@
 .contact-popup-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--wedding-border); }
 .contact-popup-row:last-child { border-bottom: none; }
 .contact-popup-info { display: flex; flex-direction: column; gap: 2px; }
-.contact-popup-role { font-size: 0.72em; font-weight: 600; color: var(--wedding-main); }
+.contact-popup-role { font-size: 0.72em; font-weight: 600; color: var(--wedding-emphasis); }
 .contact-popup-name { font-size: 1em; font-weight: 600; color: var(--wedding-text-main); }
 .contact-popup-actions { display: flex; gap: 10px; flex-shrink: 0; }
-.contact-popup-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--wedding-border); background: var(--wedding-bg); display: flex; align-items: center; justify-content: center; color: var(--wedding-main); transition: all 0.2s; text-decoration: none; }
+.contact-popup-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--wedding-border); background: var(--wedding-bg); display: flex; align-items: center; justify-content: center; color: var(--wedding-emphasis); transition: all 0.2s; text-decoration: none; }
 .contact-popup-btn:hover { background: var(--wedding-main); color: white; border-color: var(--wedding-main); }
 
 /* Account popup list */
@@ -518,7 +519,7 @@
 .account-popup-item { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--wedding-border); }
 .account-popup-item:last-child { border-bottom: none; }
 .account-popup-person { display: flex; align-items: center; gap: 6px; }
-.account-popup-role { font-size: 0.72em; font-weight: 600; color: var(--wedding-main); }
+.account-popup-role { font-size: 0.72em; font-weight: 600; color: var(--wedding-emphasis); }
 .account-popup-owner-name { font-size: 0.95em; font-weight: 600; color: var(--wedding-text-main); }
 .account-popup-account-row { display: flex; align-items: center; gap: 8px; }
 .account-popup-number { flex: 1; font-size: 0.85em; color: var(--wedding-text-body); letter-spacing: 0.4px; }
@@ -551,7 +552,7 @@
 .share-btn { width: 100%; padding: 15px; border-radius: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 500; font-size: 0.95em; transition: all 0.2s ease; }
 .share-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
 .kakao { background: #fee500; color: #3c1e1e; }
-.link { background: transparent; border: 1px solid var(--wedding-main); color: var(--wedding-main); }
+.link { background: transparent; border: 1px solid var(--wedding-emphasis); color: var(--wedding-emphasis); }
 .share-locked { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 30px 20px; background: var(--wedding-card-bg); border: 1px dashed var(--wedding-border); border-radius: 20px; color: var(--wedding-text-sub); margin-bottom: 40px; }
 .share-locked svg { opacity: 0.4; }
 .share-locked-title { font-size: 0.9em; font-weight: 600; color: var(--wedding-text-main); margin: 4px 0 0; }
@@ -566,7 +567,7 @@
 
 /* === Live Gallery === */
 .livegallery-section { background-color: transparent; text-align: center; }
-.livegallery-count { font-size: 0.82em; color: var(--wedding-main); font-weight: 600; margin: 0 0 20px; }
+.livegallery-count { font-size: 0.82em; color: var(--wedding-emphasis); font-weight: 600; margin: 0 0 20px; }
 .livegallery-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.9em; font-weight: 700; text-decoration: none; transition: all 0.25s; }
 .livegallery-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
 
@@ -575,7 +576,7 @@
 .pf-open-btn { width: 100%; padding: 16px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: all 0.25s; }
 .pf-open-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
 .rsvp-success { padding: 40px 20px; background: var(--wedding-card-bg); border-radius: 24px; border: 1px solid var(--wedding-border); display: flex; flex-direction: column; align-items: center; gap: 15px; }
-.rsvp-success h3 { color: var(--wedding-main); margin: 0; }
+.rsvp-success h3 { color: var(--wedding-emphasis); margin: 0; }
 .rsvp-success p { color: var(--wedding-text-sub); margin: 0; }
 .rsvp-reset { font-size: 0.8em; color: var(--wedding-text-sub); text-decoration: underline; background: none; border: none; cursor: pointer; }
 
@@ -586,7 +587,7 @@
 
 /* Note slider */
 .gb-note-section { margin-top: 24px; }
-.gb-note-label { font-size: 0.78em; font-weight: 700; color: var(--wedding-main); letter-spacing: 0.06em; text-transform: uppercase; padding: 0 20px; margin: 0 0 14px; display: flex; align-items: center; gap: 6px; }
+.gb-note-label { font-size: 0.78em; font-weight: 700; color: var(--wedding-emphasis); letter-spacing: 0.06em; text-transform: uppercase; padding: 0 20px; margin: 0 0 14px; display: flex; align-items: center; gap: 6px; }
 .gb-tab-count { font-size: 0.9em; opacity: 0.6; font-weight: 400; }
 .gb-note-scroll { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 20px; gap: 14px; padding: 8px 20px 20px; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-behavior: smooth; }
 .gb-note-scroll::-webkit-scrollbar { display: none; }
@@ -600,7 +601,7 @@
 .gb-note-content { margin: 0; font-size: 0.85em; line-height: 1.65; color: #4B5563; white-space: pre-wrap; word-break: keep-all; }
 .gb-delete-form { display: flex; gap: 6px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.08); }
 .gb-del-input { flex: 1; padding: 8px 10px; border: 1px solid #E5E7EB; border-radius: 8px; background: white; font-size: 0.8em; box-sizing: border-box; outline: none; }
-.gb-del-input:focus { border-color: var(--wedding-main); }
+.gb-del-input:focus { border-color: var(--wedding-emphasis); }
 .gb-del-confirm { padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 8px; font-size: 0.78em; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .gb-del-cancel { padding: 8px 12px; background: #F3F4F6; color: #6B7280; border: none; border-radius: 8px; font-size: 0.78em; font-weight: 700; cursor: pointer; white-space: nowrap; }
 
@@ -622,14 +623,14 @@
 .itv-content { display: flex; flex-direction: column; gap: 24px; }
 .interview-qa { display: flex; flex-direction: column; gap: 10px; }
 .interview-q { display: flex; align-items: center; gap: 12px; }
-.q-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--wedding-accent); color: white; font-size: 0.75em; font-weight: 800; flex-shrink: 0; }
+.q-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--wedding-main); color: white; font-size: 0.75em; font-weight: 800; flex-shrink: 0; }
 .q-text { font-size: 0.95em; font-weight: 700; color: var(--wedding-text-main); text-align: left; }
 .interview-a-box { border-radius: 14px; padding: 16px 18px; }
 .groom-box { background: color-mix(in srgb, var(--wedding-main) 12%, var(--wedding-card-bg)); border: 1px solid color-mix(in srgb, var(--wedding-main) 30%, transparent); border-left: 4px solid var(--wedding-main); box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-.bride-box { background: color-mix(in srgb, var(--wedding-accent) 24%, var(--wedding-card-bg)); border: 1px solid color-mix(in srgb, var(--wedding-accent) 30%, transparent); border-left: 4px solid var(--wedding-accent); box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+.bride-box { background: color-mix(in srgb, var(--wedding-border) 24%, var(--wedding-card-bg)); border: 1px solid color-mix(in srgb, var(--wedding-border) 30%, transparent); border-left: 4px solid var(--wedding-border); box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
 .a-name { display: block; font-size: 0.75em; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
 .groom-box .a-name { color: var(--wedding-main); }
-.bride-box .a-name { color: var(--wedding-accent); }
+.bride-box .a-name { color: var(--wedding-border); }
 .interview-a-box p { font-size: 0.9em; line-height: 1.7; color: var(--wedding-text-body); margin: 0; word-break: keep-all; }
 
 /* === Timeline === */
@@ -664,14 +665,14 @@
 .calendar-section { padding: 80px 20px; background: transparent; text-align: center; }
 .calendar-container { max-width: 320px; margin: 0 auto; background: white; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 30px color-mix(in srgb, var(--wedding-main) 10%, transparent); border: 1px solid var(--wedding-border); }
 .calendar-header { margin-bottom: 25px; }
-.month-name { font-size: 1.2em; font-weight: 700; color: var(--wedding-accent); margin: 0; letter-spacing: 2px; }
+.month-name { font-size: 1.2em; font-weight: 700; color: var(--wedding-emphasis); margin: 0; letter-spacing: 2px; }
 .year-name { font-size: 0.9em; color: var(--wedding-text-sub); margin: 5px 0 0; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 30px; }
-.weekday-label { font-size: 0.7em; font-weight: 700; color: var(--wedding-accent); padding: 10px 0; }
+.weekday-label { font-size: 0.7em; font-weight: 700; color: var(--wedding-emphasis); padding: 10px 0; }
 .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; color: var(--wedding-text-main); position: relative; border-radius: 50%; }
-.calendar-day.sunday { color: var(--wedding-main); }
-.calendar-day.selected { background: var(--wedding-accent); color: white; font-weight: 700; }
-.heart-marker { position: absolute; bottom: -2px; font-size: 0.6em; color: var(--wedding-accent); display: none; }
+.calendar-day.sunday { color: var(--wedding-emphasis); }
+.calendar-day.selected { background: var(--wedding-main); color: white; font-weight: 700; }
+.heart-marker { position: absolute; bottom: -2px; font-size: 0.6em; color: var(--wedding-emphasis); display: none; }
 .calendar-day.selected .heart-marker { display: block; color: white; bottom: 2px; }
 .wedding-detail-info { margin-top: 40px; display: flex; flex-direction: column; gap: 10px; }
 .wedding-date-text { font-size: 1.2em; font-weight: 700; color: var(--wedding-text-main); margin: 0; letter-spacing: -0.5px; }
@@ -680,14 +681,14 @@
 .countdown-label { font-size: 0.85em; color: var(--wedding-text-sub); margin: 0 0 18px 0; letter-spacing: 1px; font-weight: 600; }
 .countdown-boxes { display: flex; justify-content: center; gap: 12px; }
 .countdown-box { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 58px; padding: 14px 10px; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-.countdown-num { font-size: 1.5em; font-weight: 800; color: var(--wedding-main); line-height: 1; }
+.countdown-num { font-size: 1.5em; font-weight: 800; color: var(--wedding-emphasis); line-height: 1; }
 .countdown-unit { font-size: 0.55em; color: var(--wedding-text-sub); font-weight: 600; letter-spacing: 0.5px; }
 
 /* === ParentsContact === */
 .parents-contact { background-color: transparent; }
 .parents-container { display: flex; flex-direction: column; gap: 20px; }
 .parent-card { background: var(--wedding-card-bg); padding: 30px 20px; border-radius: 28px; border: 1px solid var(--wedding-border); box-shadow: 0 10px 40px rgba(74, 69, 67, 0.05); text-align: left; }
-.parent-side-title { font-size: 0.85em; font-weight: 700; color: var(--wedding-main); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--wedding-border); padding-bottom: 10px; }
+.parent-side-title { font-size: 0.85em; font-weight: 700; color: var(--wedding-emphasis); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--wedding-border); padding-bottom: 10px; }
 .parent-list { display: flex; flex-direction: column; gap: 15px; }
 .parent-row { display: flex; align-items: center; justify-content: space-between; }
 .parent-info { display: flex; align-items: center; gap: 12px; }
@@ -950,8 +951,8 @@
     45deg,
     transparent 0,
     transparent 10px,
-    var(--wedding-accent, rgba(0,0,0,0.32)) 10px,
-    var(--wedding-accent, rgba(0,0,0,0.32)) 11px,
+    var(--wedding-emphasis, rgba(0,0,0,0.32)) 10px,
+    var(--wedding-emphasis, rgba(0,0,0,0.32)) 11px,
     transparent 11px,
     transparent 22px
   );
@@ -972,12 +973,12 @@
 }
 .pv-overlay-header span { font-size: 1em; font-weight: 700; color: var(--wedding-text-main, #1F2937); }
 .pv-overlay-header button { background: none; border: none; color: var(--wedding-text-sub, #6B7280); cursor: pointer; padding: 4px; font-size: 1.1em; display: flex; align-items: center; transition: color 0.2s; }
-.pv-overlay-header button:hover { color: var(--wedding-main, #D4A5C6); }
+.pv-overlay-header button:hover { color: var(--wedding-emphasis, #D4A5C6); }
 .pv-overlay-body { padding: 24px; flex: 1; overflow-y: auto; min-height: 0; }
 .pf-group { margin-bottom: 14px; }
-.pf-label { display: flex; align-items: center; gap: 5px; font-size: 0.72em; font-weight: 700; color: var(--wedding-main); margin-bottom: 6px; }
+.pf-label { display: flex; align-items: center; gap: 5px; font-size: 0.72em; font-weight: 700; color: var(--wedding-emphasis); margin-bottom: 6px; }
 .pf-input { width: 100%; padding: 12px; border: 1px solid var(--wedding-border); border-radius: 10px; background: var(--wedding-card-bg, #fff); color: var(--wedding-text-body); font-size: 0.88em; box-sizing: border-box; font-family: inherit; }
-.pf-input:focus { outline: none; border-color: var(--wedding-main); }
+.pf-input:focus { outline: none; border-color: var(--wedding-emphasis); }
 .pf-row { display: flex; gap: 10px; }
 .pf-row .pf-group { flex: 1; }
 .pf-tabs { display: flex; gap: 8px; }
@@ -987,7 +988,7 @@
 .pf-privacy { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 10px; cursor: pointer; }
 .pf-privacy input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; accent-color: var(--wedding-main); width: 15px; height: 15px; cursor: pointer; }
 .pf-privacy span { font-size: 0.75em; color: var(--wedding-text-sub); line-height: 1.55; }
-.pf-privacy a { color: var(--wedding-main); text-decoration: underline; }
+.pf-privacy a { color: var(--wedding-emphasis); text-decoration: underline; }
 .pf-submit { width: 100%; padding: 14px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.9em; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
 .pf-submit:hover:not(:disabled) { filter: brightness(0.9); }
 .pf-submit:disabled { opacity: 0.6; cursor: not-allowed; }
