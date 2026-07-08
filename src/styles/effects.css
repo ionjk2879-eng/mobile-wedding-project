@@ -30,18 +30,25 @@
 .effect-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; perspective: 800px; }
 .particle { position: absolute; top: -20px; transform-style: preserve-3d; }
 
-/* 3D 입체감: --depth-scale/--rotate-x/--rotate-y는 BackgroundEffects.tsx에서 파티클마다
-   랜덤으로 지정한다. rotateX/rotateY 중 실제 선택되지 않은 축은 0deg 고정이라 회전하지 않는다.
-   fall-sway의 25/50/75%는 최종 회전값에 진행률을 곱해 중간 단계에서도 부드럽게 이어지게 한다. */
+/* 3D 입체감: --depth-scale/--rotate-x/--rotate-y/--sway-x는 BackgroundEffects.tsx에서
+   파티클마다 랜덤으로 지정한다. rotateX/rotateY 중 실제 선택되지 않은 축은 0deg 고정이라
+   회전하지 않는다. 각 중간 지점은 최종 회전값에 진행률(0.2/0.4/0.6/0.8)을 곱해 부드럽게
+   이어지게 한다. translateX는 --sway-x(좌우 흔들림 폭)를 좌→우→좌로 반복하며 감쇠시켜
+   일직선 낙하가 아니라 살랑이는 궤적을 만든다. */
 @keyframes fall {
   0%   { top: -20px; transform: scale(var(--depth-scale, 1)) translateX(0) rotateX(0deg) rotateY(0deg); }
-  100% { top: 100%;  transform: scale(var(--depth-scale, 1)) translateX(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)); }
+  20%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * -1)) rotateX(calc(var(--rotate-x, 0deg) * 0.2)) rotateY(calc(var(--rotate-y, 0deg) * 0.2)); }
+  40%  { transform: scale(var(--depth-scale, 1)) translateX(var(--sway-x, 30px)) rotateX(calc(var(--rotate-x, 0deg) * 0.4)) rotateY(calc(var(--rotate-y, 0deg) * 0.4)); }
+  60%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * -0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.6)) rotateY(calc(var(--rotate-y, 0deg) * 0.6)); }
+  80%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * 0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.8)) rotateY(calc(var(--rotate-y, 0deg) * 0.8)); }
+  100% { top: 100%; transform: scale(var(--depth-scale, 1)) translateX(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)); }
 }
 @keyframes fall-sway {
   0%   { top: -20px; transform: scale(var(--depth-scale, 1)) rotate(0deg) translateX(0) rotateX(0deg) rotateY(0deg); }
-  25%  { transform: scale(var(--depth-scale, 1)) rotate(90deg) translateX(20px) rotateX(calc(var(--rotate-x, 0deg) * 0.25)) rotateY(calc(var(--rotate-y, 0deg) * 0.25)); }
-  50%  { transform: scale(var(--depth-scale, 1)) rotate(180deg) translateX(-20px) rotateX(calc(var(--rotate-x, 0deg) * 0.5)) rotateY(calc(var(--rotate-y, 0deg) * 0.5)); }
-  75%  { transform: scale(var(--depth-scale, 1)) rotate(270deg) translateX(15px) rotateX(calc(var(--rotate-x, 0deg) * 0.75)) rotateY(calc(var(--rotate-y, 0deg) * 0.75)); }
+  20%  { transform: scale(var(--depth-scale, 1)) rotate(72deg) translateX(calc(var(--sway-x, 30px) * -1)) rotateX(calc(var(--rotate-x, 0deg) * 0.2)) rotateY(calc(var(--rotate-y, 0deg) * 0.2)); }
+  40%  { transform: scale(var(--depth-scale, 1)) rotate(144deg) translateX(var(--sway-x, 30px)) rotateX(calc(var(--rotate-x, 0deg) * 0.4)) rotateY(calc(var(--rotate-y, 0deg) * 0.4)); }
+  60%  { transform: scale(var(--depth-scale, 1)) rotate(216deg) translateX(calc(var(--sway-x, 30px) * -0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.6)) rotateY(calc(var(--rotate-y, 0deg) * 0.6)); }
+  80%  { transform: scale(var(--depth-scale, 1)) rotate(288deg) translateX(calc(var(--sway-x, 30px) * 0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.8)) rotateY(calc(var(--rotate-y, 0deg) * 0.8)); }
   100% { top: 100%; transform: scale(var(--depth-scale, 1)) rotate(360deg) translateX(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)); }
 }
 /* confetti-fall/float-up은 이번 3D 회전(rotateX/Y) 대상이 아니라 기존 Z축 회전만 유지하고,
