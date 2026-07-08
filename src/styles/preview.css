@@ -422,7 +422,7 @@
 .msg-content p { font-size: 0.95em; line-height: 1.8; color: color-mix(in srgb, var(--wedding-label) 55%, black 45%); margin: 0; word-break: keep-all; }
 
 /* === Location === */
-.location-info { margin-bottom: 20px; background: var(--wedding-card-bg); border-left: 3px solid var(--wedding-emphasis); border-radius: 0 16px 16px 0; padding: 18px 20px; text-align: left; border-top: 1px solid var(--wedding-border); border-right: 1px solid var(--wedding-border); border-bottom: 1px solid var(--wedding-border); }
+.location-info { margin-bottom: 20px; background: var(--wedding-card-bg); border-left: 3px solid var(--wedding-main); border-radius: 0 16px 16px 0; padding: 18px 20px; text-align: left; border-top: 1px solid var(--wedding-border); border-right: 1px solid var(--wedding-border); border-bottom: 1px solid var(--wedding-border); }
 .location-info.location-plain { background: var(--wedding-bg); border: none; border-radius: 0; padding: 0 4px 18px; }
 .venue-name { font-size: 1.15em; color: #000000; font-weight: 600; margin-bottom: 6px; }
 .address { color: #000000; font-size: 0.9em; margin: 0; }
@@ -430,8 +430,8 @@
 .nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
 .nav-item { padding: 12px 10px; border: 1px solid; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.8em; font-weight: 700; transition: all 0.2s ease; }
 .nav-item:hover { filter: brightness(0.9); transform: translateY(-1px); }
-.transport-info { text-align: left; background: var(--wedding-card-bg); padding: 24px; border-radius: 20px; border: 1px solid var(--wedding-border); display: flex; flex-direction: column; gap: 20px; }
-.transport-info.location-plain { background: var(--wedding-bg); border: none; padding: 0 4px; }
+.transport-info { text-align: left; background: var(--wedding-card-bg); padding: 24px; border-radius: 20px; border: 1px solid var(--wedding-main); display: flex; flex-direction: column; gap: 20px; }
+.transport-info.location-plain { background: var(--wedding-bg); border: none; padding: 0 4px; gap: 44px; }
 .transport-item { display: flex; flex-direction: column; gap: 8px; }
 .transport-label { display: flex; align-items: center; gap: 8px; font-size: 0.85em; font-weight: 700; color: var(--wedding-emphasis); }
 .transport-detail { font-size: 0.9em; color: #000000; line-height: 1.8; padding-left: 26px; white-space: pre-line; }
@@ -642,10 +642,10 @@
 .timeline-body.open { max-height: none; }
 .tl-zigzag { padding: 30px 20px 20px; margin: 0 -24px; background: color-mix(in srgb, var(--wedding-main) 5%, var(--wedding-bg)); }
 .tl-block { position: relative; padding-bottom: 0; }
-.tl-line-v { position: absolute; top: 0; bottom: 0; width: 2px; background: color-mix(in srgb, var(--wedding-main) 30%, transparent); }
+.tl-line-v { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--wedding-main); }
 .tl-line-v.line-left { left: 16px; }
 .tl-line-v.line-right { right: 16px; }
-.tl-line-h { position: relative; height: 2px; background: color-mix(in srgb, var(--wedding-main) 30%, transparent); margin: 20px 0; }
+.tl-line-h { position: relative; height: 2px; background: var(--wedding-main); margin: 20px 0; }
 .tl-line-h.h-to-right { margin-left: 16px; margin-right: 16px; }
 .tl-line-h.h-to-left { margin-left: 16px; margin-right: 16px; }
 .tl-dot { width: 12px; height: 12px; background: var(--wedding-main); border: 3px solid var(--wedding-card-bg, #fff); border-radius: 50%; box-shadow: 0 0 0 3px var(--wedding-border); margin-bottom: 14px; }
