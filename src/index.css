@@ -11,19 +11,19 @@ html, body {
   line-height: 1.5;
   font-weight: 400;
 
-  /* Default: Ivory Navy Theme (4색 원색 + 자동 계산 파생값) */
-  --wedding-bg: #EFEDE7;
-  --wedding-border: #D3C6BB;
-  --wedding-main: #163A5F;
-  --wedding-emphasis: #000000;
+  /* Default: Blush Pink (테마 미지정 시 폴백 — 4원색 + 파생값 전부 고정 헥스코드.
+     파생값은 bg 75%+흰색(card-bg), emphasis 75%+main(text-body), emphasis 45%+bg(text-sub),
+     main 80%+bg 20%(label) 공식으로 계산한 값을 그대로 박아넣었다. */
+  --wedding-bg: #FFF5F6;
+  --wedding-border: #F3CDCC;
+  --wedding-main: #D4918E;
+  --wedding-emphasis: #3C2B2B;
 
-  --wedding-card-bg: color-mix(in srgb, var(--wedding-bg) 92%, white);
-  --wedding-text-main: var(--wedding-emphasis);
-  --wedding-text-body: color-mix(in srgb, var(--wedding-emphasis) 75%, var(--wedding-main));
-  --wedding-text-sub: color-mix(in srgb, var(--wedding-emphasis) 45%, var(--wedding-bg));
-  /* 섹션 이름표(MESSAGE, LOCATION 등) 전용 색상 — 기본값은 메인색을 그대로 따르고,
-     커스텀 컬러 피커에서 별도로 지정하면 그 값으로 덮어써진다. */
-  --wedding-label: var(--wedding-main);
+  --wedding-card-bg: #FFF8F8;
+  --wedding-text-main: #3C2B2B;
+  --wedding-text-body: #624544;
+  --wedding-text-sub: #A79A9B;
+  --wedding-label: #DDA5A3;
 
   color-scheme: light;
   color: var(--wedding-text-body);
@@ -45,11 +45,141 @@ html, body {
   background-color: var(--wedding-bg);
 }
 
+/* 각 테마 블록은 4원색 + 파생값(card-bg/text-main/text-body/text-sub/label) 전부 고정
+   헥스코드로 직접 선언한다 — color-mix()를 :root에만 두면 안쪽 var()가 :root 자신의
+   원색으로 고정되어(브라우저가 상속받은 커스텀 프로퍼티의 color-mix() 인자를 선언
+   시점 스코프로 굳혀버림) 다른 테마를 선택해도 파생색이 안 바뀌는 문제가 있었다.
+   그래서 계산을 아예 없애고 디자인 확정값을 그대로 박아넣는다. */
 .theme-ivorynavy {
   --wedding-bg: #EFEDE7;
   --wedding-border: #D3C6BB;
   --wedding-main: #163A5F;
   --wedding-emphasis: #000000;
+  --wedding-card-bg: #F3F2ED;
+  --wedding-text-main: #000000;
+  --wedding-text-body: #060F18;
+  --wedding-text-sub: #83827F;
+  --wedding-label: #415E7A;
+}
+
+.theme-mochaneutral {
+  --wedding-bg: #F7F1DE;
+  --wedding-border: #B0BA99;
+  --wedding-main: #9D6638;
+  --wedding-emphasis: #4E220F;
+  --wedding-card-bg: #F9F5E6;
+  --wedding-text-main: #4E220F;
+  --wedding-text-body: #623319;
+  --wedding-text-sub: #AB9481;
+  --wedding-label: #AF8259;
+}
+
+.theme-dustyblue {
+  --wedding-bg: #D0E7E6;
+  --wedding-border: #95CCDD;
+  --wedding-main: #4274D9;
+  --wedding-emphasis: #293681;
+  --wedding-card-bg: #DCEDEC;
+  --wedding-text-main: #293681;
+  --wedding-text-body: #2F4697;
+  --wedding-text-sub: #8597B9;
+  --wedding-label: #5E8BDC;
+}
+
+.theme-pastelblush {
+  --wedding-bg: #F6F4E8;
+  --wedding-border: #C0E1D2;
+  --wedding-main: #DC9B9B;
+  --wedding-emphasis: #3E5A4C;
+  --wedding-card-bg: #F8F7EE;
+  --wedding-text-main: #3E5A4C;
+  --wedding-text-body: #666A60;
+  --wedding-text-sub: #A3AFA2;
+  --wedding-label: #E1ADAA;
+}
+
+.theme-sagenature {
+  --wedding-bg: #FBF5DD;
+  --wedding-border: #E7E1B1;
+  --wedding-main: #306D29;
+  --wedding-emphasis: #0D530E;
+  --wedding-card-bg: #FCF8E6;
+  --wedding-text-main: #0D530E;
+  --wedding-text-body: #165A15;
+  --wedding-text-sub: #90AC80;
+  --wedding-label: #59884D;
+}
+
+.theme-warmcharcoal {
+  --wedding-bg: #F5F1EA;
+  --wedding-border: #DDD6CC;
+  --wedding-main: #B97A56;
+  --wedding-emphasis: #33302C;
+  --wedding-card-bg: #F8F5EF;
+  --wedding-text-main: #33302C;
+  --wedding-text-body: #554337;
+  --wedding-text-sub: #9E9A95;
+  --wedding-label: #C59274;
+}
+
+.theme-sunsetgold {
+  --wedding-bg: #FFF5E5;
+  --wedding-border: #E0C375;
+  --wedding-main: #F69D39;
+  --wedding-emphasis: #D92243;
+  --wedding-card-bg: #FFF8EC;
+  --wedding-text-main: #D92243;
+  --wedding-text-body: #E04141;
+  --wedding-text-sub: #EE969C;
+  --wedding-label: #F8AF5B;
+}
+
+.theme-deepteal {
+  --wedding-bg: #FBF8F2;
+  --wedding-border: #D4B94E;
+  --wedding-main: #098389;
+  --wedding-emphasis: #0D2B29;
+  --wedding-card-bg: #FCFAF5;
+  --wedding-text-main: #0D2B29;
+  --wedding-text-body: #0C4141;
+  --wedding-text-sub: #909C98;
+  --wedding-label: #399A9E;
+}
+
+.theme-deepplum {
+  --wedding-bg: #F4E9E6;
+  --wedding-border: #DD9933;
+  --wedding-main: #5A175D;
+  --wedding-emphasis: #2E0E30;
+  --wedding-card-bg: #F7EFEC;
+  --wedding-text-main: #2E0E30;
+  --wedding-text-body: #39103B;
+  --wedding-text-sub: #9B8694;
+  --wedding-label: #794178;
+}
+
+.theme-terracotta {
+  --wedding-bg: #F3E4D3;
+  --wedding-border: #E8B08C;
+  --wedding-main: #C1633B;
+  --wedding-emphasis: #7A3418;
+  --wedding-card-bg: #F6EBDE;
+  --wedding-text-main: #7A3418;
+  --wedding-text-body: #8C4021;
+  --wedding-text-sub: #BD957F;
+  --wedding-label: #CB7D59;
+}
+
+.theme-ivorychampagne {
+  --wedding-bg: #FDF8F0;
+  --wedding-border: #EDE0C8;
+  --wedding-main: #C9A227;
+  --wedding-emphasis: #6B4E1E;
+  --wedding-card-bg: #FEFAF4;
+  --wedding-text-main: #6B4E1E;
+  --wedding-text-body: #836320;
+  --wedding-text-sub: #BBAC92;
+  --wedding-label: #D3B34F;
 }
 
 body {
