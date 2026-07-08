@@ -411,7 +411,7 @@
 .message-container { display: flex; flex-direction: column; gap: 24px; }
 .message-box { padding: 14px 16px; background: var(--wedding-card-bg); border-radius: 20px; border: 1px solid var(--wedding-border); box-shadow: 0 10px 30px rgba(74, 69, 67, 0.05); }
 .message-box.groom { border-left: 4px solid var(--wedding-main); border-right: none; }
-.message-box.bride { border-right: 4px solid var(--wedding-border); border-left: none; }
+.message-box.bride { border-right: 4px solid var(--wedding-main); border-left: none; }
 .msg-profile-row.reverse { flex-direction: row; }
 .msg-profile-row.reverse .msg-content { text-align: center; }
 .msg-profile-row { display: flex; align-items: center; gap: 14px; }
@@ -682,7 +682,7 @@
 .countdown-label { font-size: 0.85em; color: #000000; margin: 0 0 18px 0; letter-spacing: 1px; font-weight: 600; }
 .countdown-boxes { display: flex; justify-content: center; gap: 12px; }
 .countdown-box { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 58px; padding: 14px 10px; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-.countdown-num { font-size: 1.5em; font-weight: 800; color: var(--wedding-emphasis); line-height: 1; }
+.countdown-num { font-size: 1.5em; font-weight: 800; color: var(--wedding-main); line-height: 1; }
 .countdown-unit { font-size: 0.55em; color: #000000; font-weight: 600; letter-spacing: 0.5px; }
 
 /* === ParentsContact === */
