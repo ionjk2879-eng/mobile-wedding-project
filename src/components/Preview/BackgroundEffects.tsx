@@ -10,6 +10,23 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
   const fa = (base: string, dur: number, delay: number) =>
     `${base} ${dur.toFixed(1)}s linear ${delay.toFixed(1)}s infinite`;
 
+  // 3D 입체감: depth(0~1, 멀리~가까이)에 비례해 크기/불투명도/블러를 계산하고,
+  // 기존 Z축 회전(rotate)과는 별개로 X 또는 Y축 중 하나를 랜덤으로 골라 낙하하며
+  // 뒤집히는 듯한 입체 회전을 준다. --rotate-x/--rotate-y 중 실제 선택된 축만
+  // 0deg→360deg로 애니메이션되고, 나머지는 0deg로 고정돼 사실상 회전하지 않는다.
+  const depthStyle = (): React.CSSProperties => {
+    const depth = Math.random();
+    const axis = Math.random() < 0.5 ? 'X' : 'Y';
+    return {
+      '--depth': depth.toFixed(2),
+      '--depth-scale': (0.5 + depth * 0.8).toFixed(2),
+      '--depth-opacity': (0.35 + depth * 0.65).toFixed(2),
+      '--depth-blur': `${(2 - depth * 2).toFixed(2)}px`,
+      '--rotate-x': axis === 'X' ? '360deg' : '0deg',
+      '--rotate-y': axis === 'Y' ? '360deg' : '0deg',
+    } as React.CSSProperties;
+  };
+
   switch (effect) {
     case 'cherry-blossom':
       return (
@@ -18,6 +35,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             <div key={i} className="particle blossom" style={{
               left: `${Math.random() * 100}%`,
               animation: fa('fall', 16 + Math.random() * 14, Math.random() * 14),
+              ...depthStyle(),
             }} />
           ))}
         </div>
@@ -29,6 +47,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             <div key={i} className="particle snowflake" style={{
               left: `${Math.random() * 100}%`,
               animation: fa('fall', 10 + Math.random() * 8, Math.random() * 12),
+              ...depthStyle(),
             }} />
           ))}
         </div>
@@ -52,6 +71,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             <div key={i} className="particle leaf" style={{
               left: `${Math.random() * 100}%`,
               animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
+              ...depthStyle(),
             }} />
           ))}
         </div>
@@ -65,6 +85,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
               animationDelay: `${Math.random() * 12}s`,
               animationDuration: `${12 + Math.random() * 10}s`,
               fontSize: `${8 + Math.random() * 10}px`,
+              ...depthStyle(),
             }}>♥</div>
           ))}
         </div>
@@ -89,6 +110,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
               left: `${Math.random() * 100}%`,
               animation: fa('confetti-fall', 10 + Math.random() * 8, Math.random() * 12),
+              ...depthStyle(),
             }} />
           ))}
         </div>
@@ -100,6 +122,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
               left: `${Math.random() * 100}%`,
               animation: fa('fall', 15 + Math.random() * 12, Math.random() * 14),
+              ...depthStyle(),
             }} />
           ))}
         </div>
@@ -111,6 +134,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
               left: `${Math.random() * 100}%`,
               animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
+              ...depthStyle(),
             }} />
           ))}
         </div>
