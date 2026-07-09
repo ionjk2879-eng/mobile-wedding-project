@@ -101,7 +101,7 @@ const TemplatePreviewPage: React.FC = () => {
             }}
           >
             <ScrollRootContext.Provider value={null}>
-              <InvitationView data={previewData} showOpening={true} shareEnabled={false} />
+              <InvitationView data={previewData} showOpening={true} shareEnabled={false} isOwnerPreview />
             </ScrollRootContext.Provider>
             <a
               href="https://sonett.kr"

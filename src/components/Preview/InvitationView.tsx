@@ -46,6 +46,11 @@ interface InvitationViewProps {
   // 오프닝 위에 겹쳐 보이지 않게 숨길 수 있도록 알려준다. 오프닝을 아예 안 쓰는 청첩장이면
   // shouldShowOpening이 처음부터 false라 곧바로 false로 호출된다.
   onOpeningActiveChange?: (active: boolean) => void;
+  // 라이브 갤러리의 예식일 기준 잠금 등, 날짜 기반 게이팅을 소유자 미리보기에서는 우회하기
+  // 위한 플래그. 에디터/전체화면 미리보기/기념일 편집 미리보기 등 소유자만 접근 가능한
+  // 내부 미리보기 경로는 모두 true로 넘기고, 실제 공개 페이지(ViewPage)는 로그인한
+  // 사용자가 청첩장 소유자일 때만 true를 넘긴다.
+  isOwnerPreview?: boolean;
 }
 
 // 미리보기 섹션 ID → 에디터 섹션 ID 매핑
@@ -74,7 +79,7 @@ export const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: st
   share:     { icon: <Send size={13} />,           label: '주소',          labelEn: 'Address',      labelJa: '住所' },
 };
 
-const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode }) => {
+const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string; isOwnerPreview?: boolean }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode, isOwnerPreview }) => {
   const navInfo = SECTION_NAV_INFO[id];
   const wrap = (children: React.ReactNode) => (
     <div ref={refEl} className={onNav ? 'preview-nav-section' : undefined}>
@@ -101,7 +106,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
     case 'accounts': return wrap(<Money data={data} />);
     case 'contacts': return wrap(<Contacts data={data} />);
     case 'guestbook': return wrap(<Guestbook data={data} />);
-    case 'livegallery': return wrap(<LiveGallery data={data} guestCode={guestCode} />);
+    case 'livegallery': return wrap(<LiveGallery data={data} guestCode={guestCode} isOwnerPreview={isOwnerPreview} />);
     case 'ending': return wrap(<Ending data={data} />);
     case 'share': return wrap(<Share data={data} shareEnabled={shareEnabled} />);
     default: return null;
@@ -139,7 +144,7 @@ export function buildSectionOrder(data: InvitationData): string[] {
   return [...baseOrder.slice(0, insertAt), 'midphoto', ...baseOrder.slice(insertAt)];
 }
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex, enableAnonymousOpening, onOpeningActiveChange }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex, enableAnonymousOpening, onOpeningActiveChange, isOwnerPreview }) => {
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
 
   const daysAfterWedding = (() => {
@@ -318,7 +323,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         const editorId = PREVIEW_TO_EDITOR[id] || id;
         return (
           <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} />
+            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} isOwnerPreview={isOwnerPreview} />
           </ScrollReveal>
         );
       })}

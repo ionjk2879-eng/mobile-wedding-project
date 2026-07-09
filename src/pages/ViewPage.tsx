@@ -194,7 +194,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor } as React.CSSProperties : {}), ...(data.customLabelColor ? { '--wedding-label': data.customLabelColor } as React.CSSProperties : {}), ...(data.customTextColor ? { '--wedding-emphasis': data.customTextColor } as React.CSSProperties : {}) }}>
         <ScrollRootContext.Provider value={null}>
-          <InvitationView data={data} previewRefs={sectionRefs} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} guestName={guestName} guestRelation={guestRelation} guestCode={guestCode} guestMessageIndex={guestMessageIndex} enableAnonymousOpening onOpeningActiveChange={setOpeningActive} />
+          <InvitationView data={data} previewRefs={sectionRefs} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} guestName={guestName} guestRelation={guestRelation} guestCode={guestCode} guestMessageIndex={guestMessageIndex} enableAnonymousOpening onOpeningActiveChange={setOpeningActive} isOwnerPreview={isOwner} />
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
         {showWatermark && <PromoSection />}

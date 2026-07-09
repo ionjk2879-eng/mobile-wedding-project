@@ -257,7 +257,7 @@ const AnniversaryEditPage: React.FC = () => {
               }}
             >
               <ScrollRootContext.Provider value={null}>
-                <InvitationView data={previewData} forceAnniversaryMode />
+                <InvitationView data={previewData} forceAnniversaryMode isOwnerPreview />
               </ScrollRootContext.Provider>
             </div>
           </div>
