@@ -74,10 +74,10 @@ export const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: st
   share:     { icon: <Send size={13} />,           label: '주소',          labelEn: 'Address',      labelJa: '住所' },
 };
 
-const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode }) => {
+const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string; isLast?: boolean }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode, isLast }) => {
   const navInfo = SECTION_NAV_INFO[id];
   const wrap = (children: React.ReactNode) => (
-    <div ref={refEl} className={onNav ? 'preview-nav-section' : undefined}>
+    <div ref={refEl} className={[onNav ? 'preview-nav-section' : '', isLast ? 'is-last-section' : ''].filter(Boolean).join(' ') || undefined}>
       {onNav && navInfo && (
         <button className="preview-section-nav-btn" onClick={onNav} title={`${navInfo.label} 편집`} aria-label={`${navInfo.label} 편집`}>
           {navInfo.icon}
@@ -316,9 +316,14 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         const delay = i % 2 === 0 ? 0 : 100;
         const ref = previewRefs?.[id];
         const editorId = PREVIEW_TO_EDITOR[id] || id;
+        // 사용자가 섹션 순서를 자유롭게 바꿀 수 있어(OrderSection.tsx) share가 아닌 다른 섹션이
+        // 실제 마지막일 수 있다 — 어떤 섹션이든 마지막으로 렌더링되는 것에 공통 클래스를 붙여,
+        // 뒤이어 형제로 렌더링되는 SonettBadge(유료)/Watermark(무료)와의 간격을 CSS 한 곳에서
+        // 일관되게 처리한다 (preview.css의 .is-last-section 참고).
+        const isLast = i === effectiveSectionOrder.length - 1;
         return (
           <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} />
+            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} isLast={isLast} />
           </ScrollReveal>
         );
       })}
