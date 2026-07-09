@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { X, Heart } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { formatShareDateTime, formatShareDateTimeJa } from '../../utils/formatShareDateTime';
@@ -45,8 +46,14 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
     }, 150);
   };
 
-  return (
-    <div className="rsvp-notice-overlay">
+  const customVars: React.CSSProperties = {};
+  if (data.customAccentColor) (customVars as Record<string, string>)['--wedding-main'] = data.customAccentColor;
+
+  const popup = (
+    <div
+      className={`rsvp-notice-overlay theme-${data.theme || 'blush'}`}
+      style={customVars}
+    >
       <div
         className="rsvp-notice-popup"
         style={{ fontFamily: data.fontFamily || 'inherit' }}
@@ -111,6 +118,8 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(popup, document.body);
 };
 
 export default RSVPNoticePopup;
