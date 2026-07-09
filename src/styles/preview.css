@@ -565,12 +565,16 @@
 /* 마지막일 때의 padding-bottom 조정은 .is-last-section(위 섹션 공통 규칙)이 전담한다 —
    share가 마지막이 아닐 때는 다른 섹션과 동일하게 기본 .section 패딩을 그대로 따른다. */
 .share { background-color: transparent; }
-.share-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+/* margin-bottom(공유 버튼/잠금 안내박스 → footer)과 .footer의 margin-top은 인접 형제
+   마진 상쇄(collapse)로 둘 중 큰 값만 적용된다 — footer의 margin-top만 줄여선 이 값이
+   더 컸던 40px에 가려 실제로는 안 줄어들었다. 양쪽을 비슷한 수준으로 함께 낮춰야
+   공유 버튼/안내박스 → 저작권 문구 사이 여백이 실제로 좁아진다. */
+.share-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 .share-btn { width: 100%; padding: 15px; border-radius: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 500; font-size: 0.95em; transition: all 0.2s ease; }
 .share-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
 .kakao { background: #fee500; color: #3c1e1e; }
 .link { background: transparent; border: 1px solid var(--wedding-emphasis); color: var(--wedding-emphasis); }
-.share-locked { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 30px 20px; background: var(--wedding-card-bg); border: 1px dashed var(--wedding-border); border-radius: 20px; color: #000000; margin-bottom: 40px; }
+.share-locked { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 30px 20px; background: var(--wedding-card-bg); border: 1px dashed var(--wedding-border); border-radius: 20px; color: #000000; margin-bottom: 20px; }
 .share-locked svg { opacity: 0.4; }
 .share-locked-title { font-size: 0.9em; font-weight: 600; color: #000000; margin: 4px 0 0; }
 .share-locked-desc { font-size: 0.78em; line-height: 1.6; text-align: center; margin: 0; color: #000000; }
@@ -580,7 +584,8 @@
 @media (max-width: 480px) {
   .share-btn { padding: 12px; font-size: 0.82em; gap: 7px; }
   .share-btn svg { width: 16px; height: 16px; }
-  .share-buttons { gap: 8px; margin-bottom: 30px; }
+  .share-buttons { gap: 8px; margin-bottom: 16px; }
+  .share-locked { margin-bottom: 16px; }
   .footer { font-size: 0.65em; margin-top: 14px; }
 }
 
