@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Heart, FileHeart, List } from 'lucide-react';
+import { Heart, FileHeart, List, Menu, ChevronDown, ChevronUp } from 'lucide-react';
 import { InvitationData, GuestRelation } from '../types';
 import InvitationView, { buildSectionOrder, SECTION_NAV_INFO, DEFAULT_ORDER } from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
@@ -50,8 +50,10 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   // 서버가 계산한 예식일+24시간 경과 여부)으로 되돌아간다.
   const [modeOverride, setModeOverride] = useState<'invitation' | 'anniversary' | null>(null);
   const authUser = useAuthStore((s) => s.user);
-  const [showSectionSheet, setShowSectionSheet] = useState(false);
-  const sectionSheetRef = useRef<HTMLDivElement>(null);
+  // 우측 하단 메뉴 FAB: 아이콘만 노출되고, 안에 섹션 이동 / 기념일 모드 미리보기를 담는다.
+  const [showMenu, setShowMenu] = useState(false);
+  const [sectionListOpen, setSectionListOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   // 섹션 이동 기능이 스크롤할 대상 ref들 — InvitationView에 previewRefs로 그대로 넘겨
   // 편집용 미리보기와 동일한 방식으로 각 섹션 DOM에 ref를 붙인다(onSectionNav를 안 넘기므로
   // 에디터용 오버레이 버튼은 렌더링되지 않는다).
@@ -64,15 +66,16 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   const sectionRefs = sectionRefsHolder.current;
 
   useEffect(() => {
-    if (!showSectionSheet) return;
+    if (!showMenu) return;
     const handler = (e: MouseEvent) => {
-      if (sectionSheetRef.current && !sectionSheetRef.current.contains(e.target as Node)) {
-        setShowSectionSheet(false);
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+        setSectionListOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [showSectionSheet]);
+  }, [showMenu]);
 
   useEffect(() => {
     if (!slug) return;
@@ -151,6 +154,11 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
     ? (currentMode === 'invitation' ? '기념일 모드 미리보기' : '미리보기 종료')
     : (currentMode === 'anniversary' ? '청첩장 모드로 보기' : '기념일 모드로 보기');
   const handleToggleMode = () => setModeOverride(currentMode === 'anniversary' ? 'invitation' : 'anniversary');
+  const handleModeToggleClick = () => {
+    handleToggleMode();
+    setShowMenu(false);
+    setSectionListOpen(false);
+  };
 
   // 청첩장을 이루는 섹션 중 실제로 렌더링되는 것만(데이터의 on/off 토글·순서 반영), 에디터와
   // 동일한 buildSectionOrder 로직으로 계산 — 렌더링 목록과 항상 일치한다.
@@ -162,7 +170,8 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   };
   const handleSectionNavClick = (id: string) => {
     sectionRefs[id]?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setShowSectionSheet(false);
+    setShowMenu(false);
+    setSectionListOpen(false);
   };
 
   return (
@@ -176,51 +185,67 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
         {showWatermark && <PromoSection />}
       </div>
 
-      {showModeToggle && (
-        <button type="button" className="view-mode-toggle-fab" onClick={handleToggleMode}>
-          {currentMode === 'anniversary' ? <FileHeart size={16} /> : <Heart size={16} />}
-          {modeToggleLabel}
-        </button>
-      )}
-
-      {navSectionIds.length > 0 && (
-        <div className="view-section-fab-wrap" ref={sectionSheetRef}>
-          {showSectionSheet && (
-            <div className="view-section-sheet">
-              {navSectionIds.map((id) => (
-                <button key={id} className="view-section-option" onClick={() => handleSectionNavClick(id)}>
-                  {SECTION_NAV_INFO[id].icon}
-                  {sectionLabel(id)}
+      {(navSectionIds.length > 0 || showModeToggle) && (
+        <div className="view-menu-fab-wrap" ref={menuRef}>
+          {showMenu && (
+            <div className="view-menu-sheet">
+              {navSectionIds.length > 0 && (
+                <>
+                  <button type="button" className="view-menu-option" onClick={() => setSectionListOpen((v) => !v)}>
+                    <List size={14} />
+                    <span className="view-menu-option-label">{isEn ? 'Sections' : isJa ? 'セクション' : '섹션 이동'}</span>
+                    {sectionListOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </button>
+                  {sectionListOpen && (
+                    <div className="view-menu-section-list">
+                      {navSectionIds.map((id) => (
+                        <button key={id} className="view-menu-option view-menu-option-nested" onClick={() => handleSectionNavClick(id)}>
+                          {SECTION_NAV_INFO[id].icon}
+                          <span className="view-menu-option-label">{sectionLabel(id)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+              {showModeToggle && (
+                <button type="button" className="view-menu-option" onClick={handleModeToggleClick}>
+                  {currentMode === 'anniversary' ? <FileHeart size={14} /> : <Heart size={14} />}
+                  <span className="view-menu-option-label">{modeToggleLabel}</span>
                 </button>
-              ))}
+              )}
             </div>
           )}
-          <button type="button" className="view-section-fab" onClick={() => setShowSectionSheet(v => !v)}>
-            <List size={14} />
-            {isEn ? 'Sections' : isJa ? 'セクション' : '섹션 이동'}
+          <button type="button" className="view-menu-fab" onClick={() => setShowMenu((v) => !v)} aria-label={isEn ? 'Menu' : isJa ? 'メニュー' : '메뉴'}>
+            <Menu size={18} />
           </button>
         </div>
       )}
 
       <style>{`
         .view-container { width: 100%; min-height: 100svh; background: #EBEBEB; display: flex; justify-content: center; overflow-anchor: none; }
-        .view-mode-toggle-fab {
-          /* 오프닝 화면(.op-root)의 z-index가 99999라 그보다 낮으면 오프닝 중에 가려져 클릭이 안 된다.
-             오프닝 미리보기를 위한 토글이므로 오프닝보다 항상 위에 떠 있어야 한다. */
-          position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 100000;
-          display: flex; align-items: center; gap: 6px;
-          padding: 10px 18px; border: none; border-radius: 30px;
+        /* .invitation-page는 기본 max-width:430px로 뷰포트 중앙에 놓인다 — PC처럼 뷰포트가
+           넓을 때도 이 메뉴 FAB가 청첩장 카드 기준 우측 하단에 붙도록, 뷰포트 우측 끝이 아니라
+           카드 우측 끝에서부터 16px 떨어지게 계산한다. 480px 이하에서는 카드가 뷰포트 전체 폭을
+           채우므로(.invitation-page 미디어쿼리와 동일 기준) 그냥 뷰포트 기준 16px로 되돌아간다. */
+        .view-menu-fab-wrap {
+          position: fixed; bottom: 20px; z-index: 100000;
+          right: calc((100vw - min(100vw, 430px)) / 2 + 16px);
+          display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+        }
+        .view-menu-fab {
+          display: flex; align-items: center; justify-content: center;
+          width: 44px; height: 44px; border: none; border-radius: 50%;
           background: rgba(31,41,55,0.88); color: white; backdrop-filter: blur(6px);
-          font-family: 'Pretendard', sans-serif; font-size: 0.82rem; font-weight: 600;
           box-shadow: 0 4px 16px rgba(0,0,0,0.18); cursor: pointer; transition: opacity 0.2s;
         }
-        .view-mode-toggle-fab:hover { opacity: 0.85; }
-        .view-section-fab-wrap { position: fixed; bottom: 20px; right: 16px; z-index: 100000; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-        .view-section-fab { display: flex; align-items: center; gap: 6px; padding: 10px 18px; border: none; border-radius: 30px; background: rgba(31,41,55,0.88); color: white; backdrop-filter: blur(6px); font-family: 'Pretendard', sans-serif; font-size: 0.82rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.18); cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
-        .view-section-fab:hover { opacity: 0.85; }
-        .view-section-sheet { background: white; border-radius: 14px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); min-width: 180px; max-height: 60vh; overflow-y: auto; }
-        .view-section-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: none; background: none; cursor: pointer; font-family: 'Pretendard', sans-serif; font-size: 0.88rem; color: #1F2937; border-radius: 10px; transition: background 0.15s; box-sizing: border-box; white-space: nowrap; }
-        .view-section-option:hover { background: #F3F4F6; }
+        .view-menu-fab:hover { opacity: 0.85; }
+        .view-menu-sheet { background: white; border-radius: 14px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); min-width: 190px; max-height: 60vh; overflow-y: auto; }
+        .view-menu-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: none; background: none; cursor: pointer; font-family: 'Pretendard', sans-serif; font-size: 0.88rem; color: #1F2937; border-radius: 10px; transition: background 0.15s; box-sizing: border-box; white-space: nowrap; }
+        .view-menu-option:hover { background: #F3F4F6; }
+        .view-menu-option-label { flex: 1; text-align: left; }
+        .view-menu-section-list { display: flex; flex-direction: column; padding-left: 10px; border-left: 2px solid #F3F4F6; margin: 2px 0 2px 20px; }
+        .view-menu-option-nested { font-size: 0.85rem; padding: 10px 12px; }
         .view-container .invitation-page { width: 100%; max-width: 430px; background-color: var(--wedding-bg); min-height: 100svh; overflow-anchor: none; }
         .view-loading, .view-error { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pretendard', sans-serif; color: #6B7280; text-align: center; padding: 20px; box-sizing: border-box; }
         .view-error h2 { color: #1F2937; margin-bottom: 8px; }
@@ -298,6 +323,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
         @media (max-width: 480px) {
           .view-container { background: var(--wedding-bg); }
           .view-container .invitation-page { max-width: 100%; }
+          .view-menu-fab-wrap { right: 16px; }
           .wm-banner { padding: 12px 16px; gap: 6px; }
           .wm-logo { font-size: 0.82em; }
           .wm-text { font-size: 0.7em; }
