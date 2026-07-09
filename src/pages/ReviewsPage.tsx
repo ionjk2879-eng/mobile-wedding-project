@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader';
 
 const reviews = [
-  { name: '김지은', date: '2026.05', text: '친구들이 청첩장 너무 예쁘다고 칭찬했어요! 만드는 과정도 간단해서 좋았습니다.', rating: 5 },
-  { name: '이준호', date: '2026.04', text: '다른 서비스 여러 개 써봤는데 Sonett이 가장 깔끔하고 사용하기 편했어요.', rating: 5 },
-  { name: '박수진', date: '2026.04', text: '카카오톡 공유가 바로 되니까 하객분들한테 전달하기 정말 편리했어요.', rating: 5 },
-  { name: '정민수', date: '2026.03', text: '결혼 준비하느라 바빴는데 5분 만에 완성해서 시간 절약 많이 됐습니다.', rating: 4 },
-  { name: '최하나', date: '2026.03', text: 'AI 추천 디자인이 감각적이에요. 색상 조합이 예뻐서 그대로 사용했어요.', rating: 5 },
-  { name: '한승우', date: '2026.02', text: '방명록 기능이 특히 좋았어요. 하객분들 축하 메시지를 모아볼 수 있어서 감동이었습니다.', rating: 5 },
+  { name: '김지은', date: '2026.05', text: '친구들이 청첩장 너무 예쁘다고 칭찬했어요! 만드는 과정도 간단해서 좋았습니다.' },
+  { name: '이준호', date: '2026.04', text: '다른 서비스 여러 개 써봤는데 Sonett이 가장 깔끔하고 사용하기 편했어요.' },
+  { name: '박수진', date: '2026.04', text: '카카오톡 공유가 바로 되니까 하객분들한테 전달하기 정말 편리했어요.' },
+  { name: '정민수', date: '2026.03', text: '결혼 준비하느라 바빴는데 5분 만에 완성해서 시간 절약 많이 됐습니다.' },
+  { name: '최하나', date: '2026.03', text: 'AI 추천 디자인이 감각적이에요. 색상 조합이 예뻐서 그대로 사용했어요.' },
+  { name: '한승우', date: '2026.02', text: '방명록 기능이 특히 좋았어요. 하객분들 축하 메시지를 모아볼 수 있어서 감동이었습니다.' },
 ];
 
 const ReviewsPage: React.FC = () => {
@@ -25,7 +25,6 @@ const ReviewsPage: React.FC = () => {
       <section className="reviews-list">
         {reviews.map((r, i) => (
           <div key={i} className="review-card">
-            <div className="review-stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
             <p className="review-text">"{r.text}"</p>
             <div className="review-meta">
               <span className="review-name">{r.name}</span>
@@ -90,12 +89,6 @@ const ReviewsPage: React.FC = () => {
         .review-card:hover {
           box-shadow: 0 8px 24px rgba(0,0,0,0.06);
           transform: translateY(-2px);
-        }
-        .review-stars {
-          color: #F59E0B;
-          font-size: 0.9rem;
-          margin-bottom: 12px;
-          letter-spacing: 2px;
         }
         .review-text {
           font-size: 0.92rem;
