@@ -43,7 +43,11 @@ const OrderSection: React.FC = () => {
   const templateSectionOrder = useInvitationStore((s) => s.data.templateSectionOrder);
   const updateField = useInvitationStore((s) => s.updateField);
   const savedOrder = (sectionOrder?.length ? sectionOrder : DEFAULT_ORDER).filter((id) => id !== 'midphoto');
-  const order = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
+  const missing = DEFAULT_ORDER.filter((id) => !savedOrder.includes(id));
+  const shareIdx = savedOrder.indexOf('share');
+  const order = (shareIdx !== -1 && missing.length > 0)
+    ? [...savedOrder.slice(0, shareIdx), ...missing, ...savedOrder.slice(shareIdx)]
+    : [...savedOrder, ...missing];
   const resetTarget = (templateSectionOrder ?? DEFAULT_ORDER).filter((id) => id !== 'midphoto');
 
   const sensors = useSensors(

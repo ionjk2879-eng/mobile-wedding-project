@@ -222,8 +222,8 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
               )}
             </div>
           )}
-          <button type="button" className="view-menu-fab view-top-fab" onClick={handleScrollToTop} aria-label={isEn ? 'Scroll to top' : isJa ? '上部へ' : '맨 위로'}>
-            <ArrowUp size={16} />
+          <button type="button" className="view-menu-fab" onClick={handleScrollToTop} aria-label={isEn ? 'Scroll to top' : isJa ? '上部へ' : '맨 위로'}>
+            <ArrowUp size={18} />
           </button>
           <button type="button" className="view-menu-fab" onClick={() => setShowMenu((v) => !v)} aria-label={isEn ? 'Menu' : isJa ? 'メニュー' : '메뉴'}>
             <Menu size={18} />
@@ -253,7 +253,6 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
           box-shadow: 0 2px 10px rgba(0,0,0,0.08); cursor: pointer; transition: opacity 0.2s, background 0.2s;
         }
         .view-menu-fab:hover { opacity: 0.85; background: rgba(255,255,255,0.9); }
-        .view-top-fab { width: 36px; height: 36px; }
         .view-menu-sheet { background: rgba(255,255,255,0.92); backdrop-filter: blur(6px); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); min-width: 190px; max-height: 60vh; overflow-y: auto; }
         .view-menu-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: none; background: none; cursor: pointer; font-family: 'Pretendard', sans-serif; font-size: 0.88rem; color: #6B7280; border-radius: 10px; transition: background 0.15s; box-sizing: border-box; white-space: nowrap; }
         .view-menu-option:hover { background: rgba(0,0,0,0.045); }

@@ -133,7 +133,12 @@ function isSectionActive(id: string, data: InvitationData): boolean {
 // midphoto를 '현재 활성화된 섹션들' 중 중간 위치에 동적으로 삽입
 export function buildSectionOrder(data: InvitationData): string[] {
   const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
-  const baseOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))].filter((id) => id !== 'midphoto');
+  const savedNoMid = savedOrder.filter((id) => id !== 'midphoto');
+  const missing = DEFAULT_ORDER.filter((id) => !savedNoMid.includes(id) && id !== 'midphoto');
+  const shareIdx = savedNoMid.indexOf('share');
+  const baseOrder = (shareIdx !== -1 && missing.length > 0)
+    ? [...savedNoMid.slice(0, shareIdx), ...missing, ...savedNoMid.slice(shareIdx)]
+    : [...savedNoMid, ...missing];
   if (data.isMidPhotoEnabled === false) return baseOrder;
 
   const activeIndices = baseOrder.reduce<number[]>((acc, id, i) => {
