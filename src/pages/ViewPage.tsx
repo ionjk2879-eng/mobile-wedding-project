@@ -239,7 +239,11 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
       )}
 
       <style>{`
-        .view-container { width: 100%; min-height: 100svh; background: #EBEBEB; display: flex; justify-content: center; overflow-anchor: none; }
+        /* align-items 기본값(stretch)에서는 .invitation-page의 min-height:100svh와 겹쳐
+           .view-container/.invitation-page의 페인트 영역이 카드 마지막 자식(워터마크/인증마크)
+           앞에서 끊기고, 그 아래는 :root의 기본 배경색이 전체 폭으로 드러나 보였다.
+           flex-start로 stretch를 끄면 카드가 실제 콘텐츠 높이만큼 정상적으로 끝까지 포함된다. */
+        .view-container { width: 100%; min-height: 100svh; background: #EBEBEB; display: flex; justify-content: center; align-items: flex-start; overflow-anchor: none; }
         /* .invitation-page는 기본 max-width:430px로 뷰포트 중앙에 놓인다 — PC처럼 뷰포트가
            넓을 때도 이 메뉴 FAB가 청첩장 카드 기준 우측 하단에 붙도록, 뷰포트 우측 끝이 아니라
            카드 우측 끝에서부터 16px 떨어지게 계산한다. 480px 이하에서는 카드가 뷰포트 전체 폭을
