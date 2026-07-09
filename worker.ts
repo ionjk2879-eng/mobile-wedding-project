@@ -1482,6 +1482,47 @@ function formatWeddingDateTimeKo(weddingDateISO: string, time: string): string {
   return `${dateText} ${ampm} ${parts[2]}시${minuteText}`;
 }
 
+// --- Calendar (.ics) ---
+
+// RFC 5545 TEXT 값 이스케이프 (쉼표/세미콜론/백슬래시/개행)
+function escapeICSText(str: string): string {
+  return str.replace(/\\/g, '\\\\').replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\n/g, '\\n');
+}
+
+function buildICS(data: any): string | null {
+  const dt = new Date(data.weddingDateISO);
+  if (isNaN(dt.getTime())) return null;
+  let h = 12, m = 0;
+  const parts = (data.time as string | undefined)?.match(/(AM|PM)\s(\d+):(\d+)/);
+  if (parts) {
+    h = parseInt(parts[2]);
+    if (parts[1] === 'PM' && h !== 12) h += 12;
+    if (parts[1] === 'AM' && h === 12) h = 0;
+    m = parseInt(parts[3]);
+  }
+  const y = dt.getFullYear(), mo = dt.getMonth(), d = dt.getDate();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const startStr = `${y}${pad(mo + 1)}${pad(d)}T${pad(h)}${pad(m)}00`;
+  const end = new Date(y, mo, d, h + 1, m, 0);
+  const endStr = `${end.getFullYear()}${pad(end.getMonth() + 1)}${pad(end.getDate())}T${pad(end.getHours())}${pad(end.getMinutes())}00`;
+  const isEn = data.language === 'en', isJa = data.language === 'ja';
+  const title = isEn ? `${data.groomName} & ${data.brideName}'s Wedding` : isJa ? `${data.groomName}・${data.brideName} 結婚式` : `${data.groomName} ♥ ${data.brideName} 결혼식`;
+  const location = [data.venueName, data.venueAddress].filter(Boolean).join(', ');
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Sonett//Wedding//KO',
+    'BEGIN:VTIMEZONE', 'TZID:Asia/Seoul', 'BEGIN:STANDARD',
+    'TZOFFSETFROM:+0900', 'TZOFFSETTO:+0900', 'TZNAME:KST',
+    'DTSTART:19700101T000000', 'END:STANDARD', 'END:VTIMEZONE',
+    'BEGIN:VEVENT',
+    `DTSTART;TZID=Asia/Seoul:${startStr}`,
+    `DTEND;TZID=Asia/Seoul:${endStr}`,
+    `SUMMARY:${escapeICSText(title)}`,
+    ...(location ? [`LOCATION:${escapeICSText(location)}`] : []),
+    'END:VEVENT', 'END:VCALENDAR',
+  ];
+  return lines.join('\r\n');
+}
+
 // --- Notification emails (유료 청첩장 전용) ---
 
 async function sendGuestbookNotification(env: Env, slug: string, guestName: string, content: string, side: string): Promise<void> {
@@ -1693,6 +1734,23 @@ export default {
           }
         }
         return Response.redirect(`${url.origin}/og-image.png`, 302);
+      }
+
+      // Calendar (.ics) — 카카오톡 공유 메시지의 "일정등록" 버튼이 여는 링크
+      const icsMatch = pathname.match(/^\/calendar\/([a-z0-9]+(?:-[a-z0-9]+)*)\.ics$/);
+      if (icsMatch) {
+        const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(icsMatch[1]).first();
+        if (!row) return new Response('Not found', { status: 404 });
+        const data = JSON.parse(row.data as string);
+        const ics = buildICS(data);
+        if (!ics) return new Response('Not found', { status: 404 });
+        return new Response(ics, {
+          headers: {
+            'Content-Type': 'text/calendar; charset=utf-8',
+            'Content-Disposition': 'attachment; filename="wedding.ics"',
+            'Cache-Control': 'public, max-age=600',
+          },
+        });
       }
 
       // SPA routing with OG tag injection

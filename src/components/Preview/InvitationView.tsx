@@ -50,24 +50,24 @@ const PREVIEW_TO_EDITOR: Record<string, string> = {
   contacts: 'basic',
 };
 
-// 미리보기 섹션 ID → { 아이콘, 레이블 }
-const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: string }> = {
-  hero:      { icon: <LayoutTemplate size={13} />, label: '메인화면' },
-  greeting:  { icon: <MessageSquare size={13} />,  label: '인사말' },
-  calendar:  { icon: <Clock size={13} />,          label: '예식일시' },
-  message:   { icon: <Heart size={13} />,          label: '한마디' },
-  interview: { icon: <MessagesSquare size={13} />, label: '인터뷰' },
-  photos:    { icon: <ImageIcon size={13} />,      label: '갤러리' },
-  timeline:  { icon: <Milestone size={13} />,      label: '타임라인' },
-  location:  { icon: <MapPin size={13} />,         label: '장소' },
-  midphoto:  { icon: <Camera size={13} />,         label: '중간사진' },
-  rsvp:      { icon: <CalendarCheck size={13} />,  label: '참석의사' },
-  accounts:  { icon: <CreditCard size={13} />,     label: '계좌정보' },
-  contacts:  { icon: <Info size={13} />,           label: '기본정보' },
-  guestbook: { icon: <BookOpen size={13} />,       label: '방명록' },
-  livegallery: { icon: <Camera size={13} />,       label: '라이브 갤러리' },
-  ending:    { icon: <Camera size={13} />,         label: '엔딩' },
-  share:     { icon: <Send size={13} />,           label: '주소' },
+// 미리보기 섹션 ID → { 아이콘, 레이블(에디터=한국어 고정 / 청첩장 뷰어용 영어·일본어) }
+export const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: string; labelEn: string; labelJa: string }> = {
+  hero:      { icon: <LayoutTemplate size={13} />, label: '메인화면',      labelEn: 'Home',        labelJa: 'ホーム' },
+  greeting:  { icon: <MessageSquare size={13} />,  label: '인사말',        labelEn: 'Greeting',     labelJa: '挨拶' },
+  calendar:  { icon: <Clock size={13} />,          label: '예식일시',      labelEn: 'Date & Time',  labelJa: '日時' },
+  message:   { icon: <Heart size={13} />,          label: '한마디',        labelEn: 'A Word',       labelJa: 'ひとこと' },
+  interview: { icon: <MessagesSquare size={13} />, label: '인터뷰',        labelEn: 'Interview',    labelJa: 'インタビュー' },
+  photos:    { icon: <ImageIcon size={13} />,      label: '갤러리',        labelEn: 'Gallery',      labelJa: 'ギャラリー' },
+  timeline:  { icon: <Milestone size={13} />,      label: '타임라인',      labelEn: 'Timeline',     labelJa: 'タイムライン' },
+  location:  { icon: <MapPin size={13} />,         label: '장소',          labelEn: 'Location',     labelJa: '場所' },
+  midphoto:  { icon: <Camera size={13} />,         label: '중간사진',      labelEn: 'Photo',        labelJa: '写真' },
+  rsvp:      { icon: <CalendarCheck size={13} />,  label: '참석의사',      labelEn: 'RSVP',         labelJa: '出欠確認' },
+  accounts:  { icon: <CreditCard size={13} />,     label: '계좌정보',      labelEn: 'Gift Account', labelJa: 'ご祝儀口座' },
+  contacts:  { icon: <Info size={13} />,           label: '기본정보',      labelEn: 'Contact',      labelJa: '連絡先' },
+  guestbook: { icon: <BookOpen size={13} />,       label: '방명록',        labelEn: 'Guestbook',    labelJa: '芳名録' },
+  livegallery: { icon: <Camera size={13} />,       label: '라이브 갤러리', labelEn: 'Live Gallery', labelJa: 'ライブギャラリー' },
+  ending:    { icon: <Camera size={13} />,         label: '엔딩',          labelJa: 'エンディング', labelEn: 'Ending' },
+  share:     { icon: <Send size={13} />,           label: '주소',          labelEn: 'Address',      labelJa: '住所' },
 };
 
 const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode }) => {
@@ -105,7 +105,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 };
 
 // midphoto는 순서 관리 대상이 아니라 활성 섹션 중간에 자동 배치되는 고정 섹션이라 여기서 제외
-const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
+export const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
 
 // 각 섹션의 on/off 토글 여부 (없는 섹션은 항상 활성)
 function isSectionActive(id: string, data: InvitationData): boolean {
@@ -122,7 +122,7 @@ function isSectionActive(id: string, data: InvitationData): boolean {
 }
 
 // midphoto를 '현재 활성화된 섹션들' 중 중간 위치에 동적으로 삽입
-function buildSectionOrder(data: InvitationData): string[] {
+export function buildSectionOrder(data: InvitationData): string[] {
   const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
   const baseOrder = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))].filter((id) => id !== 'midphoto');
   if (data.isMidPhotoEnabled === false) return baseOrder;

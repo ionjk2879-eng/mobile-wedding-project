@@ -46,6 +46,10 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
     const description = data.shareDescription || getDefaultShareDescription(data);
     const slug = data.slug || '';
     const kakaoButtonLabel = isEn ? 'View Invitation' : isJa ? '招待状を見る' : '청첩장 보기';
+    const calendarButtonLabel = isEn ? 'Add to Calendar' : isJa ? 'カレンダーに追加' : '일정 등록';
+    // 청첩장 안이 아니라 카카오톡 공유 메시지 자체에 일정등록 버튼을 넣는다 — 눌렀을 때 서버가
+    // 생성해주는 .ics 파일 링크로 이동해, 스마트폰의 기본 캘린더 앱에 바로 등록되도록 한다.
+    const calendarLink = slug ? `${SITE_ORIGIN}/calendar/${slug}.ics` : '';
     try {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
@@ -55,7 +59,10 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
           imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
           link: { mobileWebUrl: shareLink, webUrl: shareLink },
         },
-        buttons: [{ title: kakaoButtonLabel, link: { mobileWebUrl: shareLink, webUrl: shareLink } }],
+        buttons: [
+          { title: kakaoButtonLabel, link: { mobileWebUrl: shareLink, webUrl: shareLink } },
+          ...(calendarLink ? [{ title: calendarButtonLabel, link: { mobileWebUrl: calendarLink, webUrl: calendarLink } }] : []),
+        ],
       });
     } catch (e: any) {
       toast.error(`${isEn ? 'KakaoTalk share error' : isJa ? 'カカオ共有エラー' : '카카오 공유 오류'}: ${e?.message || (isEn ? 'Unknown error' : isJa ? '不明なエラー' : '알 수 없는 오류')}`);
