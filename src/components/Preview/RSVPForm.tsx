@@ -61,7 +61,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
       <h2>RSVP</h2>
       <p className="section-sub">{isEn ? 'Please let us know' : isJa ? '出欠をお知らせください' : '참석 여부를 알려주세요'}</p>
       <p style={{ fontSize: '0.9em', color: 'var(--wedding-text-sub)', lineHeight: 1.6, marginBottom: 24, whiteSpace: 'pre-line', textAlign: 'center' }}>
-        {isEn ? 'Please let us know if you can join us\nby providing your name below.' : isJa ? 'ご出席いただける方は\nお名前をご記入ください。' : '참석해주시는 모든 분들을 위해\n정성껏 자리를 준비하겠습니다. 성함을 남겨주세요.'}
+        {isEn ? 'We will carefully prepare a seat\nfor every guest who attends. Please leave your name below.' : isJa ? 'ご出席いただく皆様のために\n心を込めて席をご用意いたします。お名前をご記入ください。' : '참석해주시는 모든 분들을 위해\n정성껏 자리를 준비하겠습니다. 성함을 남겨주세요.'}
       </p>
       {data.slug ? (
         <button type="button" className="pf-open-btn pf-open-btn-long" onClick={() => setFormOpen(true)}>

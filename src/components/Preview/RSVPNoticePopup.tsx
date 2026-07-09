@@ -75,9 +75,9 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
 
         <p className="rsvp-notice-msg">
           {isEn
-            ? 'We provide assigned seating\nfor all attendees.\nPlease let us know in advance\nif you will be joining us.'
+            ? 'For smooth wedding preparations\nand seating arrangements,\nwe kindly ask that you let us know\nyour attendance in advance.'
             : isJa
-            ? '参列者へのご着席案内のため、\n出欠についてお早めに\nお知らせいただけますと幸いです。'
+            ? '円滑な式の準備と\n座席のご案内のため、\nご出欠を事前にお知らせいただけますと\n大変助かります。'
             : '원활한 예식 준비와 좌석 안내를 위해,\n참석 여부를 미리 알려주시면\n큰 도움이 됩니다.'}
         </p>
 
