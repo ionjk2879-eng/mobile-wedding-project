@@ -1,8 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { X, Heart } from 'lucide-react';
 import { InvitationData } from '../../types';
 import { formatShareDateTime, formatShareDateTimeJa } from '../../utils/formatShareDateTime';
-import { usePreviewRect } from '../../hooks/usePreviewPopup';
 
 interface Props {
   data: InvitationData;
@@ -11,8 +10,6 @@ interface Props {
 
 const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
   const [hideToday, setHideToday] = useState(false);
-  const anchorRef = useRef<HTMLDivElement>(null);
-  const rect = usePreviewRect(anchorRef, true);
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
 
@@ -48,14 +45,9 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
     }, 150);
   };
 
-  const overlayStyle: React.CSSProperties = rect
-    ? { position: 'fixed', top: rect.top, left: rect.left, width: rect.width, height: rect.height }
-    : { position: 'fixed', inset: 0 };
-
   return (
     <>
-      <div ref={anchorRef} style={{ position: 'absolute', width: 0, height: 0, pointerEvents: 'none' }} />
-      <div className="rsvp-notice-overlay" style={overlayStyle}>
+      <div className="rsvp-notice-overlay">
       <div
         className="rsvp-notice-popup"
         style={{ fontFamily: data.fontFamily || 'inherit' }}
@@ -119,7 +111,7 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
         </label>
       </div>
     </div>
-    </>
+</>
   );
 };
 
