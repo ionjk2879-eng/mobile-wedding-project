@@ -3,15 +3,6 @@
 .section h2 { font-size: 0.78em; letter-spacing: 6px; color: var(--wedding-label); margin: 0 0 8px; font-weight: 400; text-align: center; text-transform: uppercase; }
 .section-sub { font-size: 0.82em; color: color-mix(in srgb, var(--wedding-label) 75%, black 25%); text-align: center; margin: 0 0 32px; line-height: 1.6; }
 
-/* 실제로 렌더링되는 마지막 섹션에 InvitationView.tsx가 동적으로 붙이는 클래스 — 사용자가
-   섹션 순서를 자유롭게 바꿀 수 있어(OrderSection.tsx) share가 아닌 다른 섹션(라이브 갤러리
-   등)이 마지막일 수 있다. 어떤 섹션이 마지막이든, 뒤이어 형제로 렌더링되는
-   SonettBadge(유료)/Watermark(무료)와의 간격이 과하게 벌어지지 않도록 여기 한 곳에서만
-   처리한다. section 태그를 descendant로 선택해 ScrollReveal의 래핑 여부와 무관하게 항상
-   맞는 대상을 찾는다. .section보다 뒤에 선언 + 더 높은 특이도라 개별 섹션 스타일과 충돌
-   없이 항상 우선 적용된다.*/
-.is-last-section section { padding-bottom: 14px; }
-
 /* === Hero === */
 .hero { text-align: center; background-color: transparent; position: relative; }
 .hero-entrance { animation: hero-fade-in 0.8s ease both; }
@@ -562,9 +553,10 @@
 .midphoto-caption { margin: 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 1.15em; line-height: 1.7; letter-spacing: 0.5px; display: flex; flex-direction: column; gap: 2px; }
 
 /* === Share === */
-/* 마지막일 때의 padding-bottom 조정은 .is-last-section(위 섹션 공통 규칙)이 전담한다 —
-   share가 마지막이 아닐 때는 다른 섹션과 동일하게 기본 .section 패딩을 그대로 따른다. */
-.share { background-color: transparent; }
+/* share는 청첩장의 마지막 섹션으로 렌더링되는 경우가 많고, 바로 뒤에 형제 요소로
+   SonettBadge(유료)/Watermark(무료)가 이어지므로 padding-bottom을 다른 섹션보다 좁게
+   잡아 그 사이 여백이 과하게 벌어지지 않도록 한다. */
+.share { background-color: transparent; padding-bottom: 14px; }
 .share-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
 .share-btn { width: 100%; padding: 15px; border-radius: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 500; font-size: 0.95em; transition: all 0.2s ease; }
 .share-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
