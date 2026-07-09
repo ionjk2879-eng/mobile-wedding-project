@@ -553,7 +553,10 @@
 .midphoto-caption { margin: 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 1.15em; line-height: 1.7; letter-spacing: 0.5px; display: flex; flex-direction: column; gap: 2px; }
 
 /* === Share === */
-.share { background-color: transparent; padding-bottom: 40px; }
+/* share는 청첩장의 마지막 섹션으로 렌더링되는 경우가 많고, 바로 뒤에 형제 요소로
+   SonettBadge(유료)/Watermark(무료)가 이어지므로 padding-bottom을 다른 섹션보다 좁게
+   잡아 그 사이 여백이 과하게 벌어지지 않도록 한다. */
+.share { background-color: transparent; padding-bottom: 14px; }
 .share-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
 .share-btn { width: 100%; padding: 15px; border-radius: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 500; font-size: 0.95em; transition: all 0.2s ease; }
 .share-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
