@@ -250,8 +250,16 @@
 .preview-label { font-size: 0.75rem; font-weight: 800; color: #B2A4B0; text-transform: uppercase; letter-spacing: 1.5px; }
 .full-preview-btn-mini { background: #F3F4F6; border: none; color: #4B5563; padding: 8px 18px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
 .full-preview-btn-mini:hover { background: #E5E7EB; color: #111827; }
-.preview-content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; overflow-anchor: none; transform: translateZ(0); }
+/* 비활성/빈 섹션(라이브 갤러리 끄기 등)은 SectionComponent의 wrap div가 높이 0으로 접히고,
+   그 안의 편집 버튼(.preview-section-nav-btn)만 position:absolute(top:8px, height:26px)로
+   34px만큼 아래로 삐져나온다 — 그 섹션이 맨 마지막 순서일 때 이 여백이 스크롤 가능 영역에
+   포함되면서, 배경이 없던 .preview-content-scroll 뒤로 .preview-container-box의 흰 배경이
+   비쳐 보였다. article.preview-wrapper(테마 배경색을 가진 실제 청첩장 박스)가 아니라 이
+   스크롤 컨테이너 자체에도 같은 테마 배경색을 깔아 두면, 원인이 되는 여백이 정확히 얼마든
+   그 뒤로는 항상 올바른 색이 비치게 된다. */
+.preview-content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; overflow-anchor: none; transform: translateZ(0); background-color: var(--wedding-bg); }
 .preview-content-scroll::-webkit-scrollbar { display: none; }
+.preview-content-scroll .preview-wrapper { min-height: 100%; }
 
 /* Preview section edit button */
 .preview-section-wrap { position: relative; }
