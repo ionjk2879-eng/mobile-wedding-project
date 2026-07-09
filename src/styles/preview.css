@@ -722,7 +722,7 @@
 /* exit 중 클릭 방지 */
 .op-root.op-phase-exit { pointer-events: none !important; }
 /* 커튼 패널: 단색 (var(--op-bg)보다 약간 밝게), 기본 숨김 상태 */
-.op-curtain .op-curtain-deco { position: absolute; left: 0; width: 100%; height: 50%; background: color-mix(in srgb, var(--op-bg) 88%, white 12%); transition: transform 0.22s cubic-bezier(0.76, 0, 0.24, 1); z-index: 2; }
+.op-curtain .op-curtain-deco { position: absolute; left: 0; width: 100%; height: 50%; background: var(--op-curtain-bg); transition: transform 0.22s cubic-bezier(0.76, 0, 0.24, 1); z-index: 2; }
 .op-deco-top { top: 0; transform-origin: top; transform: scaleY(0); }
 .op-deco-bottom { bottom: 0; transform-origin: bottom; transform: scaleY(0); }
 /* Enter/Ready: 패널 숨김 유지, 그라데이션 배경이 전체 화면에 노출 */
@@ -754,7 +754,7 @@
 .op-veil.op-phase-exit .op-body { animation: none !important; }
 
 /* Blind - 슬라이스가 scaleY(0)에서 시작(단색 선노출 없음), 빠르게 닫혔다가 열리는 파형 효과 */
-.op-blind-slice { position: absolute; left: 0; width: 100%; height: 12.5%; top: calc(var(--slice-i) * 12.5%); background: color-mix(in srgb, var(--op-bg) 88%, white 12%); transform-origin: top; transform: scaleY(0); z-index: 3; animation: op-blind-open 0.7s ease calc(var(--slice-i) * 0.06s) forwards; }
+.op-blind-slice { position: absolute; left: 0; width: 100%; height: 12.5%; top: calc(var(--slice-i) * 12.5%); background: var(--op-curtain-bg); transform-origin: top; transform: scaleY(0); z-index: 3; animation: op-blind-open 0.7s ease calc(var(--slice-i) * 0.06s) forwards; }
 @keyframes op-blind-open {
   0%  { transform: scaleY(0); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
   20% { transform: scaleY(1); animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
@@ -790,16 +790,16 @@
 .op-enter:hover { background: var(--op-hover-bg, rgba(255,255,255,0.1)); border-color: var(--op-hover-bd, rgba(255,255,255,0.7)); }
 
 /* Frame (투명 액자) style */
-.op-frame .op-body { background: rgba(255,255,255,0.07); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 0 0 8px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.1); padding: 48px 36px; animation: op-frame-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
-.op-frame .op-body::before { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid rgba(255,255,255,0.12); pointer-events: none; }
+.op-frame .op-body { background: var(--op-frame-bg, rgba(255,255,255,0.07)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--op-frame-color, rgba(255,255,255,0.30)); box-shadow: 0 0 0 8px var(--op-frame-shadow, rgba(255,255,255,0.04)), inset 0 1px 0 var(--op-frame-inset, rgba(255,255,255,0.10)); padding: 48px 36px; animation: op-frame-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
+.op-frame .op-body::before { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid var(--op-frame-color2, rgba(255,255,255,0.12)); pointer-events: none; }
 @keyframes op-frame-in { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
 .op-frame.op-phase-exit { transition: opacity 0.4s ease; opacity: 0 !important; }
 .op-frame.op-phase-exit .op-body { animation: op-frame-out 0.3s ease forwards; }
 .op-frame.op-phase-exit .op-typing-inner { animation: op-frame-out 0.3s ease forwards; }
 @keyframes op-frame-out { to { opacity: 0; transform: scale(1.05); } }
 /* Frame in typing mode: apply glass effect to inner content box */
-.op-frame .op-typing-inner { background: rgba(255,255,255,0.07); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 0 0 8px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.1); padding: 48px 36px; animation: op-frame-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
-.op-frame .op-typing-inner::before { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid rgba(255,255,255,0.12); pointer-events: none; }
+.op-frame .op-typing-inner { background: var(--op-frame-bg, rgba(255,255,255,0.07)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--op-frame-color, rgba(255,255,255,0.30)); box-shadow: 0 0 0 8px var(--op-frame-shadow, rgba(255,255,255,0.04)), inset 0 1px 0 var(--op-frame-inset, rgba(255,255,255,0.10)); padding: 48px 36px; animation: op-frame-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
+.op-frame .op-typing-inner::before { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid var(--op-frame-color2, rgba(255,255,255,0.12)); pointer-events: none; }
 
 /* Instagram (인스타그램) style */
 .op-insta { opacity: var(--op-opacity); }
@@ -807,10 +807,10 @@
 @keyframes op-insta-in { from { opacity: 0; transform: scale(1.06); } to { opacity: var(--op-opacity); transform: scale(1); } }
 /* 하트 바로 위에 오도록 화면 최상단 고정이 아니라 op-body/op-typing-inner의 flex 흐름
    안에 넣었다(heart 위치가 콘텐츠 길이에 따라 달라져도 항상 그 바로 위에 붙는다). */
-.op-insta-progress { position: relative; width: 70%; max-width: 200px; height: 2px; background: rgba(255,255,255,0.22); border-radius: 2px; overflow: visible; }
-.op-insta-bar { height: 100%; width: 0; background: rgba(255,255,255,0.95); border-radius: 2px; animation: op-insta-fill 3s linear 0.5s forwards; }
+.op-insta-progress { position: relative; width: 70%; max-width: 200px; height: 2px; background: var(--op-insta-track, rgba(255,255,255,0.22)); border-radius: 2px; overflow: visible; }
+.op-insta-bar { height: 100%; width: 0; background: var(--op-insta-fill, rgba(255,255,255,0.95)); border-radius: 2px; animation: op-insta-fill 3s linear 0.5s forwards; }
 @keyframes op-insta-fill { from { width: 0%; } to { width: 100%; } }
-.op-insta-percent { position: absolute; top: 7px; right: 0; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.5px; color: rgba(255,255,255,0.85); font-variant-numeric: tabular-nums; }
+.op-insta-percent { position: absolute; top: 7px; right: 0; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.5px; color: var(--op-insta-pct, rgba(255,255,255,0.85)); font-variant-numeric: tabular-nums; }
 .op-insta.op-phase-exit { animation: op-insta-exit 0.4s ease forwards !important; }
 .op-insta.op-phase-exit .op-body { animation: none !important; }
 @keyframes op-insta-exit { from { opacity: var(--op-opacity, 0.95); } to { opacity: 0; } }
