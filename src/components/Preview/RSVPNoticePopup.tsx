@@ -39,11 +39,11 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
 
   const handleRSVP = () => {
     handleClose();
+    // RSVP 입력은 전체화면 오버레이(PreviewOverlay)로 뜨므로 배경 스크롤을 옮길 필요가 없다 —
+    // 예전엔 .rsvp-section으로 스크롤시켜서, 제출 후 오버레이를 닫으면 그 섹션(응답 감사합니다
+    // 카드)에 그대로 고정되어 메인화면부터 다시 볼 수 없었다. 이제는 배경 스크롤 위치를
+    // 건드리지 않아 오버레이를 닫아도 원래 보고 있던 위치(주로 메인화면 근처)가 유지된다.
     document.dispatchEvent(new CustomEvent('sonett-open-rsvp'));
-    setTimeout(() => {
-      const el = document.querySelector('.rsvp-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 150);
   };
 
   const customVars: React.CSSProperties = {};
@@ -78,7 +78,7 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
             ? 'We provide assigned seating\nfor all attendees.\nPlease let us know in advance\nif you will be joining us.'
             : isJa
             ? '参列者へのご着席案内のため、\n出欠についてお早めに\nお知らせいただけますと幸いです。'
-            : '예식 참석자분들께는\n지정 좌석이 안내되오니,\n참석 여부를 미리\n알려주시면 감사하겠습니다.'}
+            : '원활한 예식 준비와 좌석 안내를 위해,\n참석 여부를 미리 알려주시면\n큰 도움이 됩니다.'}
         </p>
 
         <div className="rsvp-notice-divider" />

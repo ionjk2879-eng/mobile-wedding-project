@@ -228,6 +228,8 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   const showRsvpNotice = () => {
     if (rsvpNoticeShownRef.current) return;
     if (!showOpening || !data.isRSVPEnabled || !data.isRSVPNoticeEnabled || isAnniversaryMode || !data.slug) return;
+    // 이미 참석 여부를 제출한 적이 있으면(RSVPForm.tsx에서 제출 시 저장) 다시 안내하지 않는다.
+    if (localStorage.getItem(`rsvp-submitted-${data.slug}`)) return;
     if (localStorage.getItem(`rsvp-notice-hidden-${data.slug}`) === new Date().toDateString()) return;
     rsvpNoticeShownRef.current = true;
     setTimeout(() => setRsvpNoticeVisible(true), 400);

@@ -36,6 +36,8 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
     if (!data.slug) return;
     try {
       await submitRSVP(data.slug, formData);
+      // 다음 방문 때 RSVP 안내 팝업이 다시 뜨지 않도록(InvitationView.tsx의 showRsvpNotice 참고)
+      localStorage.setItem(`rsvp-submitted-${data.slug}`, '1');
       setSubmitted(true);
       setFormOpen(false);
     } catch (err) { toast.error(getApiErrorMessage(err)); }
@@ -59,7 +61,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
       <h2>RSVP</h2>
       <p className="section-sub">{isEn ? 'Please let us know' : isJa ? '出欠をお知らせください' : '참석 여부를 알려주세요'}</p>
       <p style={{ fontSize: '0.9em', color: 'var(--wedding-text-sub)', lineHeight: 1.6, marginBottom: 24, whiteSpace: 'pre-line', textAlign: 'center' }}>
-        {isEn ? 'Please let us know if you can join us\nby providing your name below.' : isJa ? 'ご出席いただける方は\nお名前をご記入ください。' : '축하의 마음으로 참석해주시는\n모든 분들의 성함을 남겨주세요.'}
+        {isEn ? 'Please let us know if you can join us\nby providing your name below.' : isJa ? 'ご出席いただける方は\nお名前をご記入ください。' : '참석해주시는 모든 분들을 위해\n정성껏 자리를 준비하겠습니다. 성함을 남겨주세요.'}
       </p>
       {data.slug ? (
         <button type="button" className="pf-open-btn pf-open-btn-long" onClick={() => setFormOpen(true)}>
