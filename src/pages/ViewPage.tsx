@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Heart, FileHeart, List, Menu, ChevronDown, ChevronUp } from 'lucide-react';
+import { Heart, FileHeart, List, Menu, ChevronDown, ChevronUp, ArrowUp } from 'lucide-react';
 import { InvitationData, GuestRelation } from '../types';
 import InvitationView, { buildSectionOrder, SECTION_NAV_INFO, DEFAULT_ORDER } from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
@@ -173,6 +173,9 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
     setShowMenu(false);
     setSectionListOpen(false);
   };
+  // window.scrollTo는 실제 스크롤 컨테이너가 아닐 수 있어 동작하지 않을 때가 있다 — 다른 섹션
+  // 이동 버튼들과 동일하게 hero ref로의 scrollIntoView를 사용해 항상 같은 방식으로 동작시킨다.
+  const handleScrollToTop = () => handleSectionNavClick('hero');
 
   return (
     <div className="view-container" style={{ fontFamily: data.fontFamily }}>
@@ -216,6 +219,9 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
               )}
             </div>
           )}
+          <button type="button" className="view-menu-fab view-top-fab" onClick={handleScrollToTop} aria-label={isEn ? 'Scroll to top' : isJa ? '上部へ' : '맨 위로'}>
+            <ArrowUp size={16} />
+          </button>
           <button type="button" className="view-menu-fab" onClick={() => setShowMenu((v) => !v)} aria-label={isEn ? 'Menu' : isJa ? 'メニュー' : '메뉴'}>
             <Menu size={18} />
           </button>
@@ -235,16 +241,17 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
         }
         .view-menu-fab {
           display: flex; align-items: center; justify-content: center;
-          width: 44px; height: 44px; border: none; border-radius: 50%;
-          background: rgba(31,41,55,0.88); color: white; backdrop-filter: blur(6px);
-          box-shadow: 0 4px 16px rgba(0,0,0,0.18); cursor: pointer; transition: opacity 0.2s;
+          width: 40px; height: 40px; border: 1px solid rgba(0,0,0,0.06); border-radius: 50%;
+          background: rgba(255,255,255,0.72); color: #8B95A1; backdrop-filter: blur(6px);
+          box-shadow: 0 2px 10px rgba(0,0,0,0.08); cursor: pointer; transition: opacity 0.2s, background 0.2s;
         }
-        .view-menu-fab:hover { opacity: 0.85; }
-        .view-menu-sheet { background: white; border-radius: 14px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); min-width: 190px; max-height: 60vh; overflow-y: auto; }
-        .view-menu-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: none; background: none; cursor: pointer; font-family: 'Pretendard', sans-serif; font-size: 0.88rem; color: #1F2937; border-radius: 10px; transition: background 0.15s; box-sizing: border-box; white-space: nowrap; }
-        .view-menu-option:hover { background: #F3F4F6; }
+        .view-menu-fab:hover { opacity: 0.85; background: rgba(255,255,255,0.9); }
+        .view-top-fab { width: 36px; height: 36px; }
+        .view-menu-sheet { background: rgba(255,255,255,0.92); backdrop-filter: blur(6px); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); min-width: 190px; max-height: 60vh; overflow-y: auto; }
+        .view-menu-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: none; background: none; cursor: pointer; font-family: 'Pretendard', sans-serif; font-size: 0.88rem; color: #6B7280; border-radius: 10px; transition: background 0.15s; box-sizing: border-box; white-space: nowrap; }
+        .view-menu-option:hover { background: rgba(0,0,0,0.045); }
         .view-menu-option-label { flex: 1; text-align: left; }
-        .view-menu-section-list { display: flex; flex-direction: column; padding-left: 10px; border-left: 2px solid #F3F4F6; margin: 2px 0 2px 20px; }
+        .view-menu-section-list { display: flex; flex-direction: column; padding-left: 10px; border-left: 2px solid rgba(0,0,0,0.06); margin: 2px 0 2px 20px; }
         .view-menu-option-nested { font-size: 0.85rem; padding: 10px 12px; }
         .view-container .invitation-page { width: 100%; max-width: 430px; background-color: var(--wedding-bg); min-height: 100svh; overflow-anchor: none; }
         .view-loading, .view-error { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pretendard', sans-serif; color: #6B7280; text-align: center; padding: 20px; box-sizing: border-box; }
