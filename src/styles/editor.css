@@ -252,8 +252,6 @@
 .order-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #E5E7EB; background: white; color: #6B7280; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; padding: 0; }
 .order-btn:hover:not(:disabled) { background: #F3F4F6; color: #D4A5C6; border-color: #D4A5C6; }
 .order-btn:disabled { opacity: 0.3; cursor: default; }
-.order-item-fixed { margin-top: 6px; background: #F3F4F6; border-style: dashed; cursor: default; }
-.order-fixed-badge { font-size: 0.68rem; font-weight: 800; color: #9CA3AF; background: white; border: 1px solid #E5E7EB; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
 
 /* Music */
 .music-select-list { display: flex; flex-direction: column; gap: 6px; }
