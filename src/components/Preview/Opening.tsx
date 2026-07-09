@@ -561,7 +561,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const t = setTimeout(() => {
       setPhase('exit');
       const style = effectiveStyle;
-      const exitDelay = style === 'curtain' ? 400 : style === 'circle' ? 480 : style === 'veil' ? 460 : style === 'blind' ? 520 : style === 'insta' ? 450 : style === 'frame' ? 430 : 380;
+      const exitDelay = style === 'curtain' ? 650 : style === 'circle' ? 750 : style === 'veil' ? 700 : style === 'blind' ? 800 : style === 'insta' ? 700 : style === 'frame' ? 680 : 600;
       setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
     }, 2500);
     return () => clearTimeout(t);
@@ -573,9 +573,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     clearTimeout(phaseTimerRef.current); // 지연된 'ready' 전환이 exit 이후에 발화하지 않도록
     phaseRef.current = 'exit'; // editorBounds 갱신 즉시 차단
     setPhase('exit');
-    // 모든 exit 애니메이션을 ~400ms로 단축 (CSS와 맞춤)
     const style = effectiveStyle;
-    const delay = style === 'curtain' ? 400 : style === 'circle' ? 480 : style === 'veil' ? 460 : style === 'blind' ? 520 : style === 'insta' ? 450 : style === 'frame' ? 430 : 380;
+    const delay = style === 'curtain' ? 650 : style === 'circle' ? 750 : style === 'veil' ? 700 : style === 'blind' ? 800 : style === 'insta' ? 700 : style === 'frame' ? 680 : 600;
     setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 

@@ -722,7 +722,7 @@
 /* exit 중 클릭 방지 */
 .op-root.op-phase-exit { pointer-events: none !important; }
 /* 커튼 패널: 단색 (var(--op-bg)보다 약간 밝게), 기본 숨김 상태 */
-.op-curtain .op-curtain-deco { position: absolute; left: 0; width: 100%; height: 50%; background: var(--op-curtain-bg); transition: transform 0.22s cubic-bezier(0.76, 0, 0.24, 1); z-index: 2; }
+.op-curtain .op-curtain-deco { position: absolute; left: 0; width: 100%; height: 50%; background: var(--op-curtain-bg); transition: transform 0.38s cubic-bezier(0.76, 0, 0.24, 1); z-index: 2; }
 .op-deco-top { top: 0; transform-origin: top; transform: scaleY(0); }
 .op-deco-bottom { bottom: 0; transform-origin: bottom; transform: scaleY(0); }
 /* Enter/Ready: 패널 숨김 유지, 그라데이션 배경이 전체 화면에 노출 */
@@ -730,10 +730,10 @@
 .op-curtain.op-phase-enter .op-deco-bottom,
 .op-curtain.op-phase-ready .op-deco-top,
 .op-curtain.op-phase-ready .op-deco-bottom { transform: scaleY(0); }
-/* Exit: 빠른 페이드아웃 (커튼 닫힘 0.22s → 페이드 0.12s delay + 0.25s = 0.37s 완료) */
+/* Exit: 커튼 닫힘 0.38s → 페이드 0.2s delay + 0.42s = 0.62s 완료 */
 .op-curtain.op-phase-exit .op-deco-top { transform: scaleY(1) !important; transition-delay: 0s !important; }
-.op-curtain.op-phase-exit .op-deco-bottom { transform: scaleY(1) !important; transition-delay: 0.05s !important; }
-.op-curtain.op-phase-exit { opacity: 0 !important; transition: opacity 0.25s ease 0.12s !important; }
+.op-curtain.op-phase-exit .op-deco-bottom { transform: scaleY(1) !important; transition-delay: 0.08s !important; }
+.op-curtain.op-phase-exit { opacity: 0 !important; transition: opacity 0.42s ease 0.2s !important; }
 .op-curtain.op-phase-exit .op-body { animation: none !important; }
 .op-curtain.op-phase-exit .op-typing-body { animation: none !important; }
 /* 커튼 스타일 body 입장: opacity fade-in (순차↔타이핑 전환 시 급격한 전환 방지) */
@@ -742,14 +742,13 @@
 .op-curtain .op-typing-body { animation: op-curtain-in 0.5s ease 0s both; }
 .op-circle { clip-path: circle(0% at 50% 50%); animation: op-circle-open 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
 @keyframes op-circle-open { from { clip-path: circle(0% at 50% 50%); } to { clip-path: circle(150% at 50% 50%); } }
-/* exit: 빠른 닫힘 */
-.op-circle.op-phase-exit { animation: op-circle-close 0.45s cubic-bezier(0.76, 0, 0.24, 1) 0s both !important; }
+.op-circle.op-phase-exit { animation: op-circle-close 0.72s cubic-bezier(0.76, 0, 0.24, 1) 0s both !important; }
 @keyframes op-circle-close { from { clip-path: circle(150% at 50% 50%); } to { clip-path: circle(0% at 50% 50%); } }
 .op-circle.op-phase-exit .op-body { animation: none !important; }
 /* Veil Drop - body가 슬라이드 중 자연스럽게 등장하므로 별도 reveal 불필요 */
 .op-veil { animation: op-veil-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
 @keyframes op-veil-in { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-.op-veil.op-phase-exit { animation: op-veil-out 0.42s cubic-bezier(0.76, 0, 0.24, 1) forwards !important; }
+.op-veil.op-phase-exit { animation: op-veil-out 0.65s cubic-bezier(0.76, 0, 0.24, 1) forwards !important; }
 @keyframes op-veil-out { to { transform: translateY(-110%); } }
 .op-veil.op-phase-exit .op-body { animation: none !important; }
 
@@ -760,9 +759,9 @@
   20% { transform: scaleY(1); animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   100%{ transform: scaleY(0); }
 }
-.op-blind.op-phase-exit .op-blind-slice { animation: op-blind-close 0.2s cubic-bezier(0.76, 0, 0.24, 1) calc(0.2s - var(--slice-i) * 0.025s) both !important; }
+.op-blind.op-phase-exit .op-blind-slice { animation: op-blind-close 0.32s cubic-bezier(0.76, 0, 0.24, 1) calc(0.32s - var(--slice-i) * 0.04s) both !important; }
 @keyframes op-blind-close { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-.op-blind.op-phase-exit { opacity: 0 !important; transition: opacity 0.2s ease 0.3s !important; }
+.op-blind.op-phase-exit { opacity: 0 !important; transition: opacity 0.32s ease 0.48s !important; }
 .op-blind.op-phase-exit .op-body { animation: none !important; opacity: 1 !important; }
 
 .op-body { position: relative; z-index: 2; text-align: center; color: var(--op-text); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 40px; max-width: 360px; }
@@ -793,9 +792,9 @@
 .op-frame .op-body { background: var(--op-frame-bg, rgba(255,255,255,0.07)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--op-frame-color, rgba(255,255,255,0.30)); box-shadow: 0 0 0 8px var(--op-frame-shadow, rgba(255,255,255,0.04)), inset 0 1px 0 var(--op-frame-inset, rgba(255,255,255,0.10)); padding: 48px 36px; animation: op-frame-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
 .op-frame .op-body::before { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid var(--op-frame-color2, rgba(255,255,255,0.12)); pointer-events: none; }
 @keyframes op-frame-in { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
-.op-frame.op-phase-exit { transition: opacity 0.4s ease; opacity: 0 !important; }
-.op-frame.op-phase-exit .op-body { animation: op-frame-out 0.3s ease forwards; }
-.op-frame.op-phase-exit .op-typing-inner { animation: op-frame-out 0.3s ease forwards; }
+.op-frame.op-phase-exit { transition: opacity 0.65s ease; opacity: 0 !important; }
+.op-frame.op-phase-exit .op-body { animation: op-frame-out 0.5s ease forwards; }
+.op-frame.op-phase-exit .op-typing-inner { animation: op-frame-out 0.5s ease forwards; }
 @keyframes op-frame-out { to { opacity: 0; transform: scale(1.05); } }
 /* Frame in typing mode: apply glass effect to inner content box */
 .op-frame .op-typing-inner { background: var(--op-frame-bg, rgba(255,255,255,0.07)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--op-frame-color, rgba(255,255,255,0.30)); box-shadow: 0 0 0 8px var(--op-frame-shadow, rgba(255,255,255,0.04)), inset 0 1px 0 var(--op-frame-inset, rgba(255,255,255,0.10)); padding: 48px 36px; animation: op-frame-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
@@ -811,7 +810,7 @@
 .op-insta-bar { height: 100%; width: 0; background: var(--op-insta-fill, rgba(255,255,255,0.95)); border-radius: 2px; animation: op-insta-fill 3s linear 0.5s forwards; }
 @keyframes op-insta-fill { from { width: 0%; } to { width: 100%; } }
 .op-insta-percent { position: absolute; top: 7px; right: 0; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.5px; color: var(--op-insta-pct, rgba(255,255,255,0.85)); font-variant-numeric: tabular-nums; }
-.op-insta.op-phase-exit { animation: op-insta-exit 0.4s ease forwards !important; }
+.op-insta.op-phase-exit { animation: op-insta-exit 0.65s ease forwards !important; }
 .op-insta.op-phase-exit .op-body { animation: none !important; }
 @keyframes op-insta-exit { from { opacity: var(--op-opacity, 0.95); } to { opacity: 0; } }
 .op-insta .op-enter { border-radius: 30px; letter-spacing: 3px; }
