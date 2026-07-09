@@ -579,7 +579,8 @@
 
 /* === RSVP === */
 .rsvp-section { background-color: transparent; }
-.pf-open-btn { width: 100%; padding: 16px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: all 0.25s; }
+.pf-open-btn { display: block; width: fit-content; margin: 0 auto; padding: 12px 32px; background: var(--wedding-main); color: white; border: none; border-radius: 30px; font-size: 0.9em; font-weight: 700; cursor: pointer; transition: all 0.25s; box-shadow: 0 4px 12px color-mix(in srgb, var(--wedding-main) 30%, transparent); }
+.pf-open-btn-long { font-size: 0.8em; }
 .pf-open-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
 .rsvp-success { padding: 40px 20px; background: var(--wedding-card-bg); border-radius: 24px; border: 1px solid var(--wedding-border); display: flex; flex-direction: column; align-items: center; gap: 15px; }
 .rsvp-success h3 { color: var(--wedding-emphasis); margin: 0; }

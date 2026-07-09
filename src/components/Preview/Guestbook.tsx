@@ -239,7 +239,7 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
       <p className="section-sub">{isEn ? 'Leave a message for the couple' : isJa ? 'メッセージを残してください' : '방명록'}</p>
 
       {data.slug ? (
-        <button type="button" className="pf-open-btn" onClick={() => setFormOpen(true)}>
+        <button type="button" className="pf-open-btn pf-open-btn-long" onClick={() => setFormOpen(true)}>
           {isEn ? 'Write a Message' : isJa ? 'メッセージを書く' : '방명록 작성하기'}
         </button>
       ) : (
