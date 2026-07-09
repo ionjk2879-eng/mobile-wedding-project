@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Heart, FileHeart, List, Menu, ChevronDown, ChevronUp, ArrowUp } from 'lucide-react';
+import { Heart, FileHeart, List, Menu, ChevronDown, ChevronUp, ArrowUp, BadgeCheck } from 'lucide-react';
 import { InvitationData, GuestRelation } from '../types';
 import InvitationView, { buildSectionOrder, SECTION_NAV_INFO, DEFAULT_ORDER } from '../components/Preview/InvitationView';
 import ToastContainer from '../components/Toast';
@@ -29,6 +29,15 @@ const PromoSection: React.FC = () => (
       워터마크 제거하기 &rsaquo;
     </a>
   </div>
+);
+
+// 유료 청첩장 전용 — 워터마크/프로모션 박스 대신, 청첩장 배경색에 자연스럽게 어우러지는
+// 인증마크. 판매 유도 문구 없이 "Sonett에서 제작되었다"는 사실만 조용히 남긴다.
+const SonettBadge: React.FC = () => (
+  <a href={SITE_ORIGIN} target="_blank" rel="noopener noreferrer" className="sonett-badge">
+    <BadgeCheck size={14} />
+    <span>Sonett에서 제작된 청첩장입니다</span>
+  </a>
 );
 
 interface ViewPageProps {
@@ -186,6 +195,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
         {showWatermark && <PromoSection />}
+        {data.isPaid && <SonettBadge />}
       </div>
 
       {(navSectionIds.length > 0 || showModeToggle) && (
@@ -326,6 +336,24 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
           transition: opacity 0.2s;
         }
         .promo-cta:hover { opacity: 0.85; }
+
+        .sonett-badge {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 18px 20px;
+          background: var(--wedding-bg);
+          border-top: 1px solid var(--wedding-border);
+          color: var(--wedding-main);
+          text-decoration: none;
+          font-family: 'Pretendard', sans-serif;
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.01em;
+          transition: opacity 0.2s;
+        }
+        .sonett-badge:hover { opacity: 0.7; }
 
         @media (max-width: 480px) {
           .view-container { background: var(--wedding-bg); }
