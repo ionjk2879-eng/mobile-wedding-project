@@ -77,6 +77,39 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Differentiators */}
+      <section className="land-section land-diff">
+        <p className="land-section-sub reveal">{tl.diffLabel}</p>
+        <h2 className="land-section-title reveal">{tl.diffTitle}</h2>
+
+        <div className="land-diff-grid">
+          <div className="land-diff-card reveal">
+            <h4>{tl.diff1Title}</h4>
+            <p>{tl.diff1Desc}</p>
+          </div>
+          <div className="land-diff-card reveal" style={{ transitionDelay: '0.1s' }}>
+            <h4>{tl.diff2Title}</h4>
+            <p>{tl.diff2Desc}</p>
+          </div>
+          <div className="land-diff-card reveal" style={{ transitionDelay: '0.2s' }}>
+            <h4>{tl.diff3Title}</h4>
+            <p>{tl.diff3Desc}</p>
+          </div>
+          <div className="land-diff-card reveal" style={{ transitionDelay: '0.1s' }}>
+            <h4>{tl.diff4Title}</h4>
+            <p>{tl.diff4Desc}</p>
+          </div>
+          <div className="land-diff-card reveal" style={{ transitionDelay: '0.2s' }}>
+            <h4>{tl.diff5Title}</h4>
+            <p>{tl.diff5Desc}</p>
+          </div>
+          <div className="land-diff-card reveal" style={{ transitionDelay: '0.3s' }}>
+            <h4>{tl.diff6Title}</h4>
+            <p>{tl.diff6Desc}</p>
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
       <section className="land-section land-steps">
         <p className="land-section-sub reveal">{tl.howItWorksLabel}</p>
@@ -133,6 +166,30 @@ const LandingPage: React.FC = () => {
             <h4>{tl.feat6Title}</h4>
             <p>{tl.feat6Desc}</p>
           </div>
+          <div className="land-feature reveal">
+            <h4>{tl.feat7Title}</h4>
+            <p>{tl.feat7Desc}</p>
+          </div>
+          <div className="land-feature reveal" style={{ transitionDelay: '0.1s' }}>
+            <h4>{tl.feat8Title}</h4>
+            <p>{tl.feat8Desc}</p>
+          </div>
+          <div className="land-feature reveal" style={{ transitionDelay: '0.2s' }}>
+            <h4>{tl.feat9Title}</h4>
+            <p>{tl.feat9Desc}</p>
+          </div>
+          <div className="land-feature reveal" style={{ transitionDelay: '0.1s' }}>
+            <h4>{tl.feat10Title}</h4>
+            <p>{tl.feat10Desc}</p>
+          </div>
+          <div className="land-feature reveal" style={{ transitionDelay: '0.2s' }}>
+            <h4>{tl.feat11Title}</h4>
+            <p>{tl.feat11Desc}</p>
+          </div>
+          <div className="land-feature reveal" style={{ transitionDelay: '0.3s' }}>
+            <h4>{tl.feat12Title}</h4>
+            <p>{tl.feat12Desc}</p>
+          </div>
         </div>
       </section>
 
@@ -159,6 +216,7 @@ const LandingPage: React.FC = () => {
           background: #fff;
           font-family: 'Pretendard', sans-serif;
           overflow-x: hidden;
+          word-break: keep-all;
         }
 
         /* Scroll Reveal */
@@ -412,6 +470,39 @@ const LandingPage: React.FC = () => {
           margin: 0;
         }
 
+        /* Differentiators */
+        .land-diff-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 24px;
+          max-width: 960px;
+          margin: 0 auto;
+        }
+        .land-diff-card {
+          padding: 28px 26px;
+          border-left: 3px solid #B07A8E;
+          background: linear-gradient(135deg, #FDF6F9 0%, #FFFFFF 60%);
+          border-radius: 4px 16px 16px 4px;
+          transition: box-shadow 0.25s, transform 0.25s;
+        }
+        .land-diff-card:hover {
+          box-shadow: 0 8px 24px rgba(176, 122, 142, 0.12);
+          transform: translateY(-2px);
+        }
+        .land-diff-card h4 {
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: #1F2937;
+          margin: 0 0 10px;
+          line-height: 1.4;
+        }
+        .land-diff-card p {
+          font-size: 0.88rem;
+          color: #6B7280;
+          line-height: 1.75;
+          margin: 0;
+        }
+
         /* Bottom CTA */
         .land-bottom-cta {
           text-align: center;
@@ -462,6 +553,7 @@ const LandingPage: React.FC = () => {
           .land-steps-list { flex-direction: column; align-items: center; gap: 32px; }
           .land-step-divider { width: 1px; height: 40px; margin: 0; }
           .land-features-grid { grid-template-columns: 1fr; }
+          .land-diff-grid { grid-template-columns: 1fr; }
           .land-section { padding: 60px 20px; }
           .land-section-title { font-size: 1.5rem; margin-bottom: 36px; }
         }
