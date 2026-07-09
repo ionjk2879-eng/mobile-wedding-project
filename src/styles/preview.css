@@ -574,12 +574,14 @@
 .share-locked svg { opacity: 0.4; }
 .share-locked-title { font-size: 0.9em; font-weight: 600; color: #000000; margin: 4px 0 0; }
 .share-locked-desc { font-size: 0.78em; line-height: 1.6; text-align: center; margin: 0; color: #000000; }
-.footer { margin-top: 40px; font-size: 0.75em; color: #000000; }
+/* 공유 버튼과 저작권 문구 사이 간격 — 예전엔 40px이라, share 뒤에 형제로 이어지는
+   SonettBadge(유료)/Watermark(무료)까지 합쳐지면 여백이 과하게 벌어져 보였다. */
+.footer { margin-top: 18px; font-size: 0.75em; color: #000000; }
 @media (max-width: 480px) {
   .share-btn { padding: 12px; font-size: 0.82em; gap: 7px; }
   .share-btn svg { width: 16px; height: 16px; }
   .share-buttons { gap: 8px; margin-bottom: 30px; }
-  .footer { font-size: 0.65em; margin-top: 30px; }
+  .footer { font-size: 0.65em; margin-top: 14px; }
 }
 
 /* === Live Gallery === */
