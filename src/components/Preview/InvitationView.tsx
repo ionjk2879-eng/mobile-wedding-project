@@ -212,15 +212,17 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
 
   // 매 커밋 이후 실행 — 어떤 데이터 필드가 각 섹션의 "빈 상태"를 결정하는지 일일이 의존성
   // 배열에 나열하는 대신, 렌더링될 때마다 실제 DOM을 다시 재서 항상 정확한 값을 유지한다.
-  // 계산 결과(lastVisibleId)가 이전과 같으면 React가 setState를 무시해 리렌더가 반복되지
-  // 않는다.
+  // React의 자동 bailout(같은 값으로 setState 시 리렌더 생략)에만 기대지 않고, 함수형
+  // updater로 값이 실제로 달라졌을 때만 새 값을 반환해 명시적으로 무한 루프를 차단한다 —
+  // 값이 같으면 이전 state 참조를 그대로 반환하므로 Object.is가 항상 true가 되어 확실히
+  // 리렌더가 발생하지 않는다.
   useLayoutEffect(() => {
     let last: string | null = null;
     for (const id of effectiveSectionOrder) {
       const el = sectionElsRef.current[id];
       if (el && el.offsetHeight > 0) last = id;
     }
-    setLastVisibleId(last);
+    setLastVisibleId((prev) => (prev === last ? prev : last));
   });
 
   // 예식 전(소유자 미리보기 등으로 daysAfterWedding이 음수)에도 실제 기념일 모드와 동일한
