@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Heart } from 'lucide-react';
 import { InvitationData } from '../../types';
+import { formatShareDateTime, formatShareDateTimeJa } from '../../utils/formatShareDateTime';
 
 interface Props {
   data: InvitationData;
@@ -17,6 +18,22 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
       localStorage.setItem(`rsvp-notice-hidden-${data.slug}`, new Date().toDateString());
     }
     onClose();
+  };
+
+  const formatDateTime = () => {
+    if (isEn) {
+      const d = new Date(data.weddingDateISO);
+      if (!isNaN(d.getTime())) {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        let str = `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} (${days[d.getDay()]})`;
+        const p = data.time?.match(/(AM|PM)\s(\d+):(\d+)/);
+        if (p) str += ` ${p[2]}${p[3] !== '00' ? `:${p[3]}` : ''} ${p[1]}`;
+        return str;
+      }
+    }
+    if (isJa) return formatShareDateTimeJa(data.weddingDateISO, data.time) || [data.date, data.time].filter(Boolean).join(' ');
+    return formatShareDateTime(data.weddingDateISO, data.time) || [data.date, data.time].filter(Boolean).join(' ');
   };
 
   const handleRSVP = () => {
@@ -52,15 +69,23 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
         <div className="rsvp-notice-info">
           {(data.groomName || data.brideName) && (
             <p className="rsvp-notice-names">
-              {data.groomName}
-              {data.groomName && data.brideName ? ' & ' : ''}
-              {data.brideName}
+              {data.groomName && (
+                <span className="rsvp-notice-name-item">
+                  <Heart size={11} fill="#3B82F6" color="#3B82F6" style={{ display: 'inline', verticalAlign: 'middle', marginBottom: 1 }} />
+                  {' '}{isEn ? 'Groom ' : isJa ? '新郎 ' : '신랑 '}{data.groomName}
+                </span>
+              )}
+              {data.groomName && data.brideName && <span className="rsvp-notice-name-sep">, </span>}
+              {data.brideName && (
+                <span className="rsvp-notice-name-item">
+                  <Heart size={11} fill="#EF4444" color="#EF4444" style={{ display: 'inline', verticalAlign: 'middle', marginBottom: 1 }} />
+                  {' '}{isEn ? 'Bride ' : isJa ? '新婦 ' : '신부 '}{data.brideName}
+                </span>
+              )}
             </p>
           )}
-          {(data.date || data.time) && (
-            <p className="rsvp-notice-detail">
-              {[data.date, data.time].filter(Boolean).join('  ')}
-            </p>
+          {(data.weddingDateISO || data.date || data.time) && (
+            <p className="rsvp-notice-detail">{formatDateTime()}</p>
           )}
           {data.venueName && (
             <p className="rsvp-notice-detail">{data.venueName}</p>
