@@ -74,16 +74,10 @@ export const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: st
   share:     { icon: <Send size={13} />,           label: '주소',          labelEn: 'Address',      labelJa: '住所' },
 };
 
-const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string; isLast?: boolean; registerEl?: (id: string, el: HTMLDivElement | null) => void }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode, isLast, registerEl }) => {
+const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string; isLast?: boolean }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode, isLast }) => {
   const navInfo = SECTION_NAV_INFO[id];
   const wrap = (children: React.ReactNode) => (
-    <div
-      ref={(el) => {
-        if (refEl) (refEl as React.MutableRefObject<HTMLDivElement | null>).current = el;
-        registerEl?.(id, el);
-      }}
-      className={[onNav ? 'preview-nav-section' : '', isLast ? 'is-last-section' : ''].filter(Boolean).join(' ') || undefined}
-    >
+    <div ref={refEl} className={[onNav ? 'preview-nav-section' : '', isLast ? 'is-last-section' : ''].filter(Boolean).join(' ') || undefined}>
       {onNav && navInfo && (
         <button className="preview-section-nav-btn" onClick={onNav} title={`${navInfo.label} 편집`} aria-label={`${navInfo.label} 편집`}>
           {navInfo.icon}
@@ -181,18 +175,6 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   // 마운트 시점의 key를 기준으로 삼아, 리마운트 시 이전 key로 재트리거 방지
   const lastProcessedKeyRef = useRef(openingPreviewKey);
 
-  // 실제 화면에 보이는 마지막 섹션 판별 — Contacts/LiveGallery/Gallery/Money 등 여러 섹션이
-  // 데이터/토글에 따라 null을 반환할 수 있어, "설정상(sectionOrder) 마지막"과 "실제로 렌더링돼
-  // 보이는 마지막"이 다른 경우가 흔하다. 배열 인덱스로 미리 정하는 대신, 커밋된 DOM에서 각
-  // 섹션 wrapper의 실제 높이를 재서 판단한다 — 내용이 없는 섹션은 wrap()의 편집 버튼만
-  // position:absolute로 떠 있어 offsetHeight가 0이 된다(값이 없을 때도 항상 이렇지는 않지만,
-  // 이 프로젝트 전반에서 반복적으로 확인된 패턴).
-  const sectionElsRef = useRef<Record<string, HTMLDivElement | null>>({});
-  const [lastVisibleId, setLastVisibleId] = useState<string | null>(null);
-  const registerSectionEl = (id: string, el: HTMLDivElement | null) => {
-    sectionElsRef.current[id] = el;
-  };
-
   // 전체화면 진입 시마다 Opening 상태 초기화
   useEffect(() => {
     if (showOpening) setOpeningDone(false);
@@ -209,19 +191,6 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   }, [openingPreviewKey, showOpening]);
 
   const effectiveSectionOrder = sectionOrder;
-
-  // 매 커밋 이후 실행 — 어떤 데이터 필드가 각 섹션의 "빈 상태"를 결정하는지 일일이 의존성
-  // 배열에 나열하는 대신, 렌더링될 때마다 실제 DOM을 다시 재서 항상 정확한 값을 유지한다.
-  // 계산 결과(lastVisibleId)가 이전과 같으면 React가 setState를 무시해 리렌더가 반복되지
-  // 않는다.
-  useLayoutEffect(() => {
-    let last: string | null = null;
-    for (const id of effectiveSectionOrder) {
-      const el = sectionElsRef.current[id];
-      if (el && el.offsetHeight > 0) last = id;
-    }
-    setLastVisibleId(last);
-  });
 
   // 예식 전(소유자 미리보기 등으로 daysAfterWedding이 음수)에도 실제 기념일 모드와 동일한
   // 구성(D+n)을 그대로 보여주기 위해, 예식일+364일이 지난 것으로 가정한다 — 예식 전 미리보기가
@@ -347,12 +316,14 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         const delay = i % 2 === 0 ? 0 : 100;
         const ref = previewRefs?.[id];
         const editorId = PREVIEW_TO_EDITOR[id] || id;
-        // 설정상(sectionOrder) 마지막이 아니라, 위 useLayoutEffect가 실제 DOM을 재서 판별한
-        // "화면에 보이는" 마지막 섹션에만 is-last-section을 붙인다 (preview.css 참고).
-        const isLast = id === lastVisibleId;
+        // 사용자가 섹션 순서를 자유롭게 바꿀 수 있어(OrderSection.tsx) share가 아닌 다른 섹션이
+        // 실제 마지막일 수 있다 — 어떤 섹션이든 마지막으로 렌더링되는 것에 공통 클래스를 붙여,
+        // 뒤이어 형제로 렌더링되는 SonettBadge(유료)/Watermark(무료)와의 간격을 CSS 한 곳에서
+        // 일관되게 처리한다 (preview.css의 .is-last-section 참고).
+        const isLast = i === effectiveSectionOrder.length - 1;
         return (
           <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} isLast={isLast} registerEl={registerSectionEl} />
+            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} isLast={isLast} />
           </ScrollReveal>
         );
       })}
