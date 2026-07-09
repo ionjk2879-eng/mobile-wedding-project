@@ -42,9 +42,11 @@ const OrderSection: React.FC = () => {
   const sectionOrder = useInvitationStore((s) => s.data.sectionOrder);
   const templateSectionOrder = useInvitationStore((s) => s.data.templateSectionOrder);
   const updateField = useInvitationStore((s) => s.updateField);
-  const savedOrder = (sectionOrder?.length ? sectionOrder : DEFAULT_ORDER).filter((id) => id !== 'midphoto');
-  const order = [...savedOrder, ...DEFAULT_ORDER.filter((id) => !savedOrder.includes(id))];
-  const resetTarget = (templateSectionOrder ?? DEFAULT_ORDER).filter((id) => id !== 'midphoto');
+  // share(공유)는 항상 맨 마지막에 고정되는 예외 섹션이라 드래그 목록에서 제외하고,
+  // 아래에 순서 변경 불가 항목으로 따로 보여준다.
+  const savedOrder = (sectionOrder?.length ? sectionOrder : DEFAULT_ORDER).filter((id) => id !== 'midphoto' && id !== 'share');
+  const order = [...savedOrder, ...DEFAULT_ORDER.filter((id) => id !== 'share' && !savedOrder.includes(id))];
+  const resetTarget = (templateSectionOrder ?? DEFAULT_ORDER).filter((id) => id !== 'midphoto' && id !== 'share');
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -57,7 +59,7 @@ const OrderSection: React.FC = () => {
     if (over && active.id !== over.id) {
       const oldIndex = order.indexOf(active.id as string);
       const newIndex = order.indexOf(over.id as string);
-      updateField('sectionOrder', arrayMove([...order], oldIndex, newIndex));
+      updateField('sectionOrder', [...arrayMove([...order], oldIndex, newIndex), 'share']);
     }
   };
 
@@ -67,7 +69,7 @@ const OrderSection: React.FC = () => {
     <>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <p className="section-desc" style={{ margin: 0 }}>드래그하여 섹션 순서를 변경하세요.</p>
-        <button type="button" className="order-reset-btn" disabled={isReset} onClick={() => updateField('sectionOrder', [...resetTarget])}>
+        <button type="button" className="order-reset-btn" disabled={isReset} onClick={() => updateField('sectionOrder', [...resetTarget, 'share'])}>
           {templateSectionOrder ? '템플릿 기본값' : '초기화'}
         </button>
       </div>
@@ -80,6 +82,11 @@ const OrderSection: React.FC = () => {
           </div>
         </SortableContext>
       </DndContext>
+      <div className="order-item order-item-fixed" aria-label={`${order.length + 1}. 공유 (항상 마지막, 순서 변경 불가)`}>
+        <span className="order-num">{order.length + 1}</span>
+        <span className="order-label">{SECTION_LABELS.share}</span>
+        <span className="order-fixed-badge">항상 마지막</span>
+      </div>
     </>
   );
 };
