@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { X, Heart } from 'lucide-react';
 import { InvitationData } from '../../types';
@@ -11,21 +11,8 @@ interface Props {
 
 const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
   const [hideToday, setHideToday] = useState(false);
-  const [overlayBounds, setOverlayBounds] = useState<React.CSSProperties>({ position: 'fixed', inset: 0 });
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
-
-  useEffect(() => {
-    const update = () => {
-      const el = document.querySelector('.invitation-page');
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      setOverlayBounds({ position: 'fixed', left: r.left, top: 0, width: r.width, bottom: 0 });
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
 
   const handleClose = () => {
     if (hideToday && data.slug) {
@@ -62,10 +49,16 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
   const customVars: React.CSSProperties = {};
   if (data.customAccentColor) (customVars as Record<string, string>)['--wedding-main'] = data.customAccentColor;
 
+  // 에디터 미리보기 컨테이너가 있으면 그 안에 포털 — transform: translateZ(0)이 있어
+  // position: fixed가 자동으로 해당 컨테이너 기준이 되므로 오버레이가 청첩장 패널에만 한정됨.
+  // ViewPage에서는 document.body로 fallback.
+  const portalTarget =
+    document.querySelector<HTMLElement>('.preview-content-scroll') ?? document.body;
+
   const popup = (
     <div
       className={`rsvp-notice-overlay theme-${data.theme || 'blush'}`}
-      style={{ ...overlayBounds, ...customVars }}
+      style={customVars}
     >
       <div
         className="rsvp-notice-popup"
@@ -132,7 +125,7 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
     </div>
   );
 
-  return ReactDOM.createPortal(popup, document.body);
+  return ReactDOM.createPortal(popup, portalTarget);
 };
 
 export default RSVPNoticePopup;
