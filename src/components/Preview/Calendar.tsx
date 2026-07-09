@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { CalendarPlus, Chrome, Apple } from 'lucide-react';
 import { InvitationData } from '../../types';
 
 interface CalendarProps {
@@ -7,6 +8,8 @@ interface CalendarProps {
 
 const Calendar: React.FC<CalendarProps> = ({ data }) => {
   const [now, setNow] = React.useState(Date.now());
+  const [showSheet, setShowSheet] = React.useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -87,6 +90,86 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
     return d;
   };
 
+  const buildCalendarEvent = () => {
+    const dt = new Date(data.weddingDateISO);
+    let h = 12, m = 0;
+    if (data.time) {
+      const parts = data.time.match(/(AM|PM)\s(\d+):(\d+)/);
+      if (parts) {
+        h = parseInt(parts[2]);
+        if (parts[1] === 'PM' && h !== 12) h += 12;
+        if (parts[1] === 'AM' && h === 12) h = 0;
+        m = parseInt(parts[3]);
+      }
+    }
+    const y = dt.getFullYear(), mo = dt.getMonth(), d = dt.getDate();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const startStr = `${y}${pad(mo + 1)}${pad(d)}T${pad(h)}${pad(m)}00`;
+    const end = new Date(y, mo, d, h + 1, m, 0);
+    const endStr = `${end.getFullYear()}${pad(end.getMonth() + 1)}${pad(end.getDate())}T${pad(end.getHours())}${pad(end.getMinutes())}00`;
+    const title = isEn
+      ? `${data.groomName} & ${data.brideName}'s Wedding`
+      : isJa
+      ? `${data.groomName}・${data.brideName} 結婚式`
+      : `${data.groomName} ♥ ${data.brideName} 결혼식`;
+    const location = [data.venueName, data.venueAddress].filter(Boolean).join(', ');
+    return { startStr, endStr, title, location };
+  };
+
+  const handleGoogleCalendar = () => {
+    const { startStr, endStr, title, location } = buildCalendarEvent();
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&ctz=Asia%2FSeoul${location ? `&location=${encodeURIComponent(location)}` : ''}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setShowSheet(false);
+  };
+
+  const handleICSDownload = () => {
+    const { startStr, endStr, title, location } = buildCalendarEvent();
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Sonett//Wedding//KO',
+      'BEGIN:VTIMEZONE',
+      'TZID:Asia/Seoul',
+      'BEGIN:STANDARD',
+      'TZOFFSETFROM:+0900',
+      'TZOFFSETTO:+0900',
+      'TZNAME:KST',
+      'DTSTART:19700101T000000',
+      'END:STANDARD',
+      'END:VTIMEZONE',
+      'BEGIN:VEVENT',
+      `DTSTART;TZID=Asia/Seoul:${startStr}`,
+      `DTEND;TZID=Asia/Seoul:${endStr}`,
+      `SUMMARY:${title}`,
+      ...(location ? [`LOCATION:${location}`] : []),
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ];
+    const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'wedding.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+    setShowSheet(false);
+  };
+
+  // 시트 외부 클릭 시 닫기
+  React.useEffect(() => {
+    if (!showSheet) return;
+    const handler = (e: MouseEvent) => {
+      if (sheetRef.current && !sheetRef.current.contains(e.target as Node)) {
+        setShowSheet(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showSheet]);
+
   const weddingDateTime = getWeddingDateTime();
   const diff = weddingDateTime.getTime() - now;
   const isPast = diff <= 0;
@@ -152,6 +235,27 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           </>
         )}
       </div>
+
+      {!isPast && (
+        <div className="cal-add-wrap" ref={sheetRef}>
+          <button className="cal-add-btn" onClick={() => setShowSheet(v => !v)}>
+            <CalendarPlus size={14} />
+            {isEn ? 'Add to Calendar' : isJa ? 'カレンダーに追加' : '일정 등록'}
+          </button>
+          {showSheet && (
+            <div className="cal-add-sheet">
+              <button className="cal-add-option" onClick={handleGoogleCalendar}>
+                <Chrome size={16} color="#4285F4" />
+                {isEn ? 'Google Calendar' : isJa ? 'Googleカレンダー' : '구글 캘린더'}
+              </button>
+              <button className="cal-add-option" onClick={handleICSDownload}>
+                <Apple size={16} color="#555" />
+                {isEn ? 'Apple Calendar' : isJa ? 'Appleカレンダー' : '아이폰 캘린더'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
     </section>
   );

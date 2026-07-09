@@ -691,6 +691,17 @@
 .countdown-num { font-size: 1.5em; font-weight: 800; color: var(--wedding-main); line-height: 1; }
 .countdown-unit { font-size: 0.55em; color: #000000; font-weight: 600; letter-spacing: 0.5px; }
 
+/* Add-to-calendar */
+.cal-add-wrap { position: relative; margin-top: 28px; display: flex; flex-direction: column; align-items: center; }
+.cal-add-btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 22px; border-radius: 24px; border: 1px solid var(--wedding-border); background: var(--wedding-card-bg); color: var(--wedding-text); font-size: 0.82em; font-weight: 600; cursor: pointer; transition: all 0.18s; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.cal-add-btn:hover { background: var(--wedding-main); color: white; border-color: var(--wedding-main); }
+.cal-add-sheet { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: white; border: 1px solid #E5E7EB; border-radius: 16px; box-shadow: 0 8px 28px rgba(0,0,0,0.13); overflow: hidden; z-index: 50; min-width: 180px; animation: cal-sheet-in 0.18s ease; }
+@keyframes cal-sheet-in { from { opacity: 0; transform: translateX(-50%) translateY(-6px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+.cal-add-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 14px 20px; border: none; background: none; cursor: pointer; font-size: 0.88em; font-weight: 500; color: #1F2937; text-align: left; transition: background 0.12s; }
+.cal-add-option:not(:last-child) { border-bottom: 1px solid #F3F4F6; }
+.cal-add-option:hover { background: #F9FAFB; }
+.cal-add-option svg { flex-shrink: 0; }
+
 /* === ParentsContact === */
 .parents-contact { background-color: transparent; }
 .parents-container { display: flex; flex-direction: column; gap: 20px; }
