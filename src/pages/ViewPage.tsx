@@ -62,6 +62,9 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   // 우측 하단 메뉴 FAB: 아이콘만 노출되고, 안에 섹션 이동 / 기념일 모드 미리보기를 담는다.
   const [showMenu, setShowMenu] = useState(false);
   const [sectionListOpen, setSectionListOpen] = useState(false);
+  // 오프닝 애니메이션이 떠 있는 동안(z-index 99999)에는 이 FAB(z-index 100000)가 그 위에
+  // 겹쳐 보이지 않도록 InvitationView가 useLayoutEffect로 알려주는 값을 그대로 따른다.
+  const [openingActive, setOpeningActive] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   // 섹션 이동 기능이 스크롤할 대상 ref들 — InvitationView에 previewRefs로 그대로 넘겨
   // 편집용 미리보기와 동일한 방식으로 각 섹션 DOM에 ref를 붙인다(onSectionNav를 안 넘기므로
@@ -191,14 +194,14 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
       <ToastContainer />
       <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor } as React.CSSProperties : {}), ...(data.customLabelColor ? { '--wedding-label': data.customLabelColor } as React.CSSProperties : {}), ...(data.customTextColor ? { '--wedding-emphasis': data.customTextColor } as React.CSSProperties : {}) }}>
         <ScrollRootContext.Provider value={null}>
-          <InvitationView data={data} previewRefs={sectionRefs} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} guestName={guestName} guestRelation={guestRelation} guestCode={guestCode} guestMessageIndex={guestMessageIndex} enableAnonymousOpening />
+          <InvitationView data={data} previewRefs={sectionRefs} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} guestName={guestName} guestRelation={guestRelation} guestCode={guestCode} guestMessageIndex={guestMessageIndex} enableAnonymousOpening onOpeningActiveChange={setOpeningActive} />
         </ScrollRootContext.Provider>
         {showWatermark && <Watermark />}
         {showWatermark && <PromoSection />}
         {data.isPaid && <SonettBadge />}
       </div>
 
-      {(navSectionIds.length > 0 || showModeToggle) && (
+      {!openingActive && (navSectionIds.length > 0 || showModeToggle) && (
         <div className="view-menu-fab-wrap" ref={menuRef}>
           {showMenu && (
             <div className="view-menu-sheet">

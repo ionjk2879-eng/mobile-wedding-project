@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   LayoutTemplate, MessageSquare, Clock, Heart, MessagesSquare,
   Image as ImageIcon, Milestone, MapPin, CalendarCheck, CreditCard,
@@ -42,6 +42,10 @@ interface InvitationViewProps {
   guestCode?: string;
   guestMessageIndex?: number | null;
   enableAnonymousOpening?: boolean;
+  // 오프닝 애니메이션이 화면에 떠 있는 동안(true) 호출자가 자체 플로팅 UI(섹션 이동 메뉴 등)를
+  // 오프닝 위에 겹쳐 보이지 않게 숨길 수 있도록 알려준다. 오프닝을 아예 안 쓰는 청첩장이면
+  // shouldShowOpening이 처음부터 false라 곧바로 false로 호출된다.
+  onOpeningActiveChange?: (active: boolean) => void;
 }
 
 // 미리보기 섹션 ID → 에디터 섹션 ID 매핑
@@ -135,7 +139,7 @@ export function buildSectionOrder(data: InvitationData): string[] {
   return [...baseOrder.slice(0, insertAt), 'midphoto', ...baseOrder.slice(insertAt)];
 }
 
-const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex, enableAnonymousOpening }) => {
+const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex, enableAnonymousOpening, onOpeningActiveChange }) => {
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
 
   const daysAfterWedding = (() => {
@@ -224,6 +228,12 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   const shouldShowOpening = !openingDone && (
     (showOpening && !!data.opening?.openingEnabled) || previewActive
   );
+
+  // useLayoutEffect로 페인트 전에 호출자 상태를 동기화해, 오프닝을 안 쓰는 청첩장에서도
+  // "잠깐 보였다가 사라지는" 깜빡임 없이 처음부터 올바른 값으로 반영되게 한다.
+  useLayoutEffect(() => {
+    onOpeningActiveChange?.(shouldShowOpening);
+  }, [shouldShowOpening]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const showRsvpNotice = () => {
     if (rsvpNoticeShownRef.current) return;
