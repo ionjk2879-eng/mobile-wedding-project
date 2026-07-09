@@ -106,6 +106,11 @@
 .color-hex-input { flex: 1; font-family: monospace; font-size: 0.85rem; text-transform: uppercase; }
 .color-reset-btn { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 10px; background: white; color: #9CA3AF; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
 .color-reset-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
+.color-hex-field { flex: 1; display: flex; align-items: center; border: 1px solid #E5E7EB; border-radius: 12px; background: #FFFFFF; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
+.color-hex-field:focus-within { border-color: #D4A5C6; box-shadow: 0 0 0 4px rgba(212,165,198,0.1); }
+.color-hex-prefix { padding: 0 2px 0 12px; color: #6B7280; font-family: monospace; font-size: 0.85rem; font-weight: 600; flex-shrink: 0; user-select: none; }
+.color-hex-field .color-hex-input { border: none !important; box-shadow: none !important; border-radius: 0 !important; background: transparent !important; padding-left: 2px !important; min-width: 0; }
+.color-hex-field .color-hex-input:focus { outline: none; }
 
 /* Theme & design chips */
 .theme-select-grid.modern { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }

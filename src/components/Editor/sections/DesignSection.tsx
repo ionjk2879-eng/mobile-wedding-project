@@ -52,6 +52,21 @@ const ACCENT_COLORS = [
   { name: '코럴', value: '#E08B7A' },
 ];
 
+const THEME_LABEL_DEFAULTS: Record<string, string> = {
+  blush: '#DDA5A3',
+  ivorynavy: '#415E7A',
+  mochaneutral: '#AF8259',
+  dustyblue: '#5E8BDC',
+  pastelblush: '#E1ADAA',
+  sagenature: '#59884D',
+  warmcharcoal: '#C59274',
+  sunsetgold: '#F8AF5B',
+  deepteal: '#399A9E',
+  deepplum: '#794178',
+  terracotta: '#CB7D59',
+  ivorychampagne: '#D3B34F',
+};
+
 const DesignSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
@@ -94,7 +109,10 @@ const DesignSection: React.FC = () => {
         </div>
         <div className="color-custom-row">
           <input type="color" value={data.customBgColor || '#FFFFFF'} onChange={(e) => updateField('customBgColor', e.target.value)} className="color-picker-input" />
-          <input type="text" value={data.customBgColor || ''} onChange={(e) => updateField('customBgColor', e.target.value)} placeholder="#FFFFFF" className="modern-input color-hex-input" />
+          <div className="color-hex-field">
+            <span className="color-hex-prefix">#</span>
+            <input type="text" value={(data.customBgColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customBgColor', v ? '#' + v : ''); }} placeholder="FFFFFF" maxLength={6} className="modern-input color-hex-input" />
+          </div>
           {data.customBgColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customBgColor', '')}>초기화</button>}
         </div>
         <span className="input-hint">프리셋 선택 또는 팔레트/코드로 자유롭게 지정하세요.</span>
@@ -111,7 +129,10 @@ const DesignSection: React.FC = () => {
         </div>
         <div className="color-custom-row">
           <input type="color" value={data.customAccentColor || '#D4A5C6'} onChange={(e) => updateField('customAccentColor', e.target.value)} className="color-picker-input" />
-          <input type="text" value={data.customAccentColor || ''} onChange={(e) => updateField('customAccentColor', e.target.value)} placeholder="#D4A5C6" className="modern-input color-hex-input" />
+          <div className="color-hex-field">
+            <span className="color-hex-prefix">#</span>
+            <input type="text" value={(data.customAccentColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customAccentColor', v ? '#' + v : ''); }} placeholder="D4A5C6" maxLength={6} className="modern-input color-hex-input" />
+          </div>
           {data.customAccentColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customAccentColor', '')}>초기화</button>}
         </div>
         <span className="input-hint">프리셋 선택 또는 팔레트/코드로 자유롭게 지정하세요.</span>
@@ -127,8 +148,11 @@ const DesignSection: React.FC = () => {
           ))}
         </div>
         <div className="color-custom-row">
-          <input type="color" value={data.customLabelColor || '#163A5F'} onChange={(e) => updateField('customLabelColor', e.target.value)} className="color-picker-input" />
-          <input type="text" value={data.customLabelColor || ''} onChange={(e) => updateField('customLabelColor', e.target.value)} placeholder="#163A5F" className="modern-input color-hex-input" />
+          <input type="color" value={data.customLabelColor || THEME_LABEL_DEFAULTS[data.theme || 'blush'] || '#DDA5A3'} onChange={(e) => updateField('customLabelColor', e.target.value)} className="color-picker-input" />
+          <div className="color-hex-field">
+            <span className="color-hex-prefix">#</span>
+            <input type="text" value={(data.customLabelColor || THEME_LABEL_DEFAULTS[data.theme || 'blush'] || '#DDA5A3').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customLabelColor', v ? '#' + v : ''); }} placeholder="DDA5A3" maxLength={6} className="modern-input color-hex-input" />
+          </div>
           {data.customLabelColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customLabelColor', '')}>초기화</button>}
         </div>
         <span className="input-hint">MESSAGE, LOCATION처럼 섹션을 표시하는 영문 라벨의 색상입니다. 지정하지 않으면 강조 색상을 따릅니다.</span>
@@ -145,7 +169,10 @@ const DesignSection: React.FC = () => {
         </div>
         <div className="color-custom-row">
           <input type="color" value={data.customTextColor || '#000000'} onChange={(e) => updateField('customTextColor', e.target.value)} className="color-picker-input" />
-          <input type="text" value={data.customTextColor || ''} onChange={(e) => updateField('customTextColor', e.target.value)} placeholder="#000000" className="modern-input color-hex-input" />
+          <div className="color-hex-field">
+            <span className="color-hex-prefix">#</span>
+            <input type="text" value={(data.customTextColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customTextColor', v ? '#' + v : ''); }} placeholder="000000" maxLength={6} className="modern-input color-hex-input" />
+          </div>
           {data.customTextColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customTextColor', '')}>초기화</button>}
         </div>
         <span className="input-hint">이름, 날짜, 본문 등 일반 텍스트의 색상입니다.</span>
