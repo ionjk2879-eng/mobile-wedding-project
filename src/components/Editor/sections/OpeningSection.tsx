@@ -286,13 +286,11 @@ const OpeningSection: React.FC = () => {
                 };
                 return ([
                   { key: 'none',  name: '없음',        desc: '패턴 없이 깔끔한 배경' },
-                  { key: 'grid',  name: '기하학 격자',  desc: '격자 라인의 정제되고 모던한 느낌' },
                   { key: 'dots',  name: '미세 도트',    desc: '촘촘한 점 패턴, 고급스러운 질감' },
                   { key: 'wave',  name: '웨이브',       desc: '사선 줄무늬, 세련된 다이내믹' },
                   { key: 'frame', name: '이중 테두리',  desc: '고급 초대장의 안쪽 액자 프레임' },
                   { key: 'grain', name: '그레인 노이즈', desc: '필름 입자 질감, 빈티지·아날로그 감성' },
-                  { key: 'deco-lines', name: '아르데코 라인', desc: '가장자리를 두르는 얇은 대각선 기하학 패턴' },
-                  { key: 'letter', name: '편지 봉투', desc: '하단 개봉선으로 봉투에서 편지를 꺼낸 듯한 느낌' },
+                  { key: 'letter', name: '편지 봉투', desc: '하단 봉투색과 개봉선으로 편지를 꺼낸 듯한 느낌' },
                 ] as const).map(p => (
                   <button key={p.key} type="button"
                     className={`account-style-btn ${p.key === 'none' ? (selected.length === 0 ? 'active' : '') : selected.includes(p.key) ? 'active' : ''}`}

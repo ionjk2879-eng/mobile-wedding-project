@@ -918,14 +918,6 @@
 
 /* Opening Patterns — purely decorative overlays, no animation, pointer-events:none */
 .op-pattern { position: absolute; pointer-events: none; z-index: 0; }
-/* 기하학 격자 */
-.op-pattern-grid {
-  inset: 0;
-  background-image:
-    linear-gradient(var(--op-pattern-color, rgba(255,255,255,0.08)) 1px, transparent 1px),
-    linear-gradient(90deg, var(--op-pattern-color, rgba(255,255,255,0.08)) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
 /* 미세 도트 */
 .op-pattern-dots {
   inset: 0;
@@ -961,42 +953,27 @@
   background-size: 180px 180px;
   mix-blend-mode: overlay;
 }
-/* 아르데코 라인 — 얇은 대각선들을 가장자리 쪽에만(중앙은 마스크로 비워) 배치해
-   액자처럼 테두리를 이루되, 화면 전체를 덮어 답답해지지 않게 한다.
-   타원형 마스크 하나로는 세로로 긴 화면에서 상/하만 두꺼워지고 좌/우 변엔 아예
-   선이 안 보이는 문제가 있어서(높이가 폭보다 훨씬 크니 타원도 세로로 길어짐),
-   4변 각각 고정 px 폭의 띠로 마스킹한 두 그라디언트(가로축/세로축)를 합쳐(add)
-   네 변 두께가 동일한 진짜 액자형 띠를 만든다. */
-.op-pattern-deco-lines {
-  inset: 0;
-  opacity: 0.5;
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent 0,
-    transparent 10px,
-    var(--wedding-emphasis, rgba(0,0,0,0.32)) 10px,
-    var(--wedding-emphasis, rgba(0,0,0,0.32)) 11px,
-    transparent 11px,
-    transparent 22px
-  );
-  --op-deco-mask-x: linear-gradient(to right, black, black 56px, transparent 56px, transparent calc(100% - 56px), black calc(100% - 56px), black);
-  --op-deco-mask-y: linear-gradient(to bottom, black, black 56px, transparent 56px, transparent calc(100% - 56px), black calc(100% - 56px), black);
-  -webkit-mask-image: var(--op-deco-mask-x), var(--op-deco-mask-y);
-  -webkit-mask-composite: source-over, source-over;
-  mask-image: var(--op-deco-mask-x), var(--op-deco-mask-y);
-  mask-composite: add;
-}
-/* 편지 봉투 — 화면 하단에 봉투 개봉선(V자)을 두어, 그 위 내용이 봉투에서 편지를 꺼낸 듯한 느낌 */
+/* 편지 봉투 — 화면 하단을 봉투 색(다른 톤 채움)으로 구분하고, 그 위로 봉투
+   개봉선(V자)이 편지가 담긴 안쪽(패턴 없는 영역)을 가른다. ::before는 봉투
+   영역 채움(상단 중앙에 V자 노치를 낸 사각형), ::after는 그 경계의 개봉선. */
 .op-pattern-letter { inset: 0; }
 .op-pattern-letter::before {
   content: '';
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 46%;
-  background: var(--op-pattern-color, rgba(255,255,255,0.35));
+  background: var(--op-envelope-tint, rgba(255,255,255,0.16));
+  clip-path: polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%, 50% 90%);
+}
+.op-pattern-letter::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 46%;
+  background: var(--op-accent, rgba(255,255,255,0.6));
   clip-path: polygon(
     0% 0px, 50% 90%, 100% 0px,
-    100% 2px, 50% calc(90% + 2px), 0% 2px
+    100% 2.5px, 50% calc(90% + 2.5px), 0% 2.5px
   );
 }
 
