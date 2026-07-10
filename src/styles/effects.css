@@ -66,17 +66,17 @@
 
 /* === 파티클 스타일 === */
 .particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: var(--depth-opacity, 0.7); filter: blur(var(--depth-blur, 0px)); animation: fall linear infinite; }
-.particle.snowflake { width: 6px; height: 6px; background: #C8D8E8; border-radius: 50%; opacity: var(--depth-opacity, 0.7); filter: blur(var(--depth-blur, 0px)); box-shadow: 0 0 4px rgba(200,216,232,0.5); animation: fall linear infinite; }
+.particle.snowflake { width: 6px; height: 6px; background: #C8D8E8; border-radius: 50%; filter: blur(var(--bbl, 0px)); box-shadow: 0 0 4px rgba(200,216,232,0.5); }
 .particle.star { width: 4px; height: 4px; background: #D4B896; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(212,184,150,0.5); animation: twinkle 2s infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-.particle.leaf { width: 12px; height: 16px; background: #A8C686; border-radius: 2px 50% 50% 50%; opacity: var(--depth-opacity, 0.6); filter: blur(var(--depth-blur, 0px)); animation: fall-sway linear infinite; transform-origin: center; }
+.particle.leaf { width: 12px; height: 16px; background: #A8C686; border-radius: 2px 50% 50% 50%; filter: blur(var(--bbl, 0px)); transform-origin: center; }
 .particle.heart { color: #F4A0B0; opacity: var(--depth-opacity, 0.5); filter: blur(var(--depth-blur, 0px)); animation: float-up linear infinite; line-height: 1; }
 /* float-up도 자체 scale(0.5→1→0.8)/opacity(0→0.5→0.5→0) 팝 연출이 이미 키프레임 안에 있어,
    depth-scale/depth-opacity를 곱하는 형태로 얹는다(정적 규칙으로는 덮어써져 무시된다). */
 @keyframes float-up { 0% { top: 100%; opacity: 0; transform: scale(calc(var(--depth-scale, 1) * 0.5)) translateX(0); } 10% { opacity: var(--depth-opacity, 0.5); } 50% { transform: scale(var(--depth-scale, 1)) translateX(15px); } 90% { opacity: var(--depth-opacity, 0.5); } 100% { top: -20px; opacity: 0; transform: scale(calc(var(--depth-scale, 1) * 0.8)) translateX(-10px); } }
 .particle.firefly { width: 5px; height: 5px; background: #F5E6A3; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(245,230,163,0.6); animation: firefly-glow ease-in-out infinite; }
 @keyframes firefly-glow { 0%, 100% { opacity: 0.1; transform: translate(0, 0); } 25% { opacity: 0.8; transform: translate(10px, -15px); } 50% { opacity: 0.3; transform: translate(-8px, 10px); } 75% { opacity: 0.9; transform: translate(12px, 5px); } }
-.particle.confetti { width: 6px; height: 10px; opacity: var(--depth-opacity, 0.7); filter: blur(var(--depth-blur, 0px)); animation: confetti-fall linear infinite; }
+.particle.confetti { width: 6px; height: 10px; filter: blur(var(--bbl, 0px)); }
 .confetti.c1 { background: #FFB3BA; border-radius: 1px; }
 .confetti.c2 { background: #BAFFC9; border-radius: 50%; width: 7px; height: 7px; }
 .confetti.c3 { background: #BAE1FF; border-radius: 1px; transform: rotate(45deg); }
@@ -84,10 +84,10 @@
 .confetti.c5 { background: #E8BAFF; border-radius: 1px; }
 
 /* 해바라기 꽃잎 - SVG(그라데이션 타원)만 보이도록 배경/모양 초기화 */
-.particle.petal { width: auto; height: auto; background: none; border-radius: 0; opacity: var(--depth-opacity, 0.65); filter: blur(var(--depth-blur, 0px)); animation: fall linear infinite; transform-origin: center; }
+.particle.petal { width: auto; height: auto; background: none; border-radius: 0; filter: blur(var(--bbl, 0px)); transform-origin: center; }
 
 /* 단풍잎 - 주황/빨강/갈색 계열 */
-.particle.autumn-leaf { opacity: var(--depth-opacity, 0.65); filter: blur(var(--depth-blur, 0px)); animation: fall-sway linear infinite; transform-origin: center; }
+.particle.autumn-leaf { filter: blur(var(--bbl, 0px)); transform-origin: center; }
 .autumn-leaf.al1 { width: 14px; height: 14px; background: #D4724A; clip-path: polygon(50% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
 .autumn-leaf.al2 { width: 12px; height: 16px; background: #C45A30; border-radius: 2px 50% 50% 50%; }
 .autumn-leaf.al3 { width: 13px; height: 13px; background: #E8904A; clip-path: polygon(50% 0%, 85% 30%, 100% 70%, 50% 100%, 0% 70%, 15% 30%); }

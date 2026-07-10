@@ -24,11 +24,6 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
 
   if (!effect || effect === 'none') return null;
 
-  // 음수 delay: 애니메이션이 이미 진행 중인 것처럼 시작해, 로드 시점에 파티클이
-  // 화면 위쪽 가장자리가 아니라 낙하 경로 전반에 걸쳐 자연스럽게 흩어져 보이게 한다.
-  const fa = (base: string, dur: number) =>
-    `${base} ${dur.toFixed(1)}s cubic-bezier(0.45, 0, 0.55, 1) ${(-(Math.random() * dur)).toFixed(1)}s infinite`;
-
   const depthStyle = (): React.CSSProperties => {
     const depth = Math.random();
     const axis = Math.random() < 0.5 ? 'X' : 'Y';
@@ -47,6 +42,24 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
   // 낙하 파티클 시작 x: 왼쪽 편향(-5%~70%). --wind 바람 편류로 낙하하면서 우측으로 흘러 대각선 연출
   const lx = () => `${(Math.random() * 75 - 5).toFixed(1)}%`;
 
+  // 벚꽃과 동일하게: 화면 전반(좌측 편향)에 흩어진 위치에서 시작해 바람에 좌→우로
+  // 흐르듯 대각선으로 흘러가는(blossom-wind-sweep) 모션을 공유한다. 위에서 아래로
+  // "떨어지는" 게 아니라 옆에서 "흘러오는" 느낌을 내기 위함.
+  const scatterTop = () => `${(-5 + Math.random() * 80).toFixed(1)}%`;
+  const scatterLeft = () => `${(-20 + Math.random() * 75).toFixed(1)}%`;
+  const sweepVars = (depth: number): React.CSSProperties => ({
+    '--bsc': (0.5 + depth * 0.65).toFixed(2),
+    '--bop': (0.35 + depth * 0.5).toFixed(2),
+    '--bbl': `${((1 - depth) * 1.5).toFixed(1)}px`,
+    '--bsx': `${Math.round(3 + Math.random() * 8)}px`,
+    '--wind': `${Math.round(200 + Math.random() * 180)}px`,
+    '--drop': `${Math.round(60 + Math.random() * 160)}px`,
+    '--r0': `${Math.round(Math.random() * 360)}deg`,
+    '--dr': `${Math.round(80 + Math.random() * 200) * (Math.random() < 0.5 ? 1 : -1)}deg`,
+  } as React.CSSProperties);
+  const sweepAnim = (dur: number, delay: number) =>
+    `blossom-wind-sweep ${dur.toFixed(1)}s linear ${delay.toFixed(1)}s infinite backwards`;
+
   let layer: React.ReactElement | null = null;
 
   switch (effect) {
@@ -61,22 +74,14 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const isLarge = Math.random() < 0.2;
             const w = isLarge ? Math.round(12 + Math.random() * 5) : Math.round(5 + Math.random() * 4);
             const h = Math.round(w * 1.35);
-            const dur = (4 + Math.random() * 4).toFixed(1);
-            const delay = (Math.random() * 7).toFixed(1);
+            const dur = 4 + Math.random() * 4;
+            const delay = Math.random() * 7;
             return (
               <div key={i} className="particle blossom" style={{
-                // 시작점: 화면 전체에 분산(좌측 편향), top도 화면 전반에 걸쳐 랜덤
-                top: `${(-5 + Math.random() * 80).toFixed(1)}%`,
-                left: `${(-20 + Math.random() * 75).toFixed(1)}%`,
-                animation: `blossom-wind-sweep ${dur}s linear ${delay}s infinite backwards`,
-                '--bsc': (0.5 + depth * 0.65).toFixed(2),
-                '--bop': (0.35 + depth * 0.5).toFixed(2),
-                '--bbl': `${((1 - depth) * 1.5).toFixed(1)}px`,
-                '--bsx': `${Math.round(3 + Math.random() * 8)}px`,
-                '--wind': `${Math.round(200 + Math.random() * 180)}px`,  // 수평(우측) 이동 200-380px
-                '--drop': `${Math.round(60 + Math.random() * 160)}px`,   // 수직(하향) 이동 60-220px
-                '--r0': `${Math.round(Math.random() * 360)}deg`,
-                '--dr': `${Math.round(80 + Math.random() * 200) * (Math.random() < 0.5 ? 1 : -1)}deg`,
+                top: scatterTop(),
+                left: scatterLeft(),
+                animation: sweepAnim(dur, delay),
+                ...sweepVars(depth),
               } as React.CSSProperties}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 26" width={w} height={h} style={{ display: 'block' }}>
                   <defs>
@@ -101,9 +106,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer snow">
           {[...Array(85)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
-              left: lx(),
-              animation: fa('fall', 5 + Math.random() * 4),
-              ...depthStyle(),
+              top: scatterTop(),
+              left: scatterLeft(),
+              animation: sweepAnim(5 + Math.random() * 4, Math.random() * 7),
+              ...sweepVars(Math.random()),
             }} />
           ))}
         </div>
@@ -129,9 +135,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer leaves">
           {[...Array(36)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
-              left: lx(),
-              animation: fa('fall-sway', 6 + Math.random() * 5),
-              ...depthStyle(),
+              top: scatterTop(),
+              left: scatterLeft(),
+              animation: sweepAnim(6 + Math.random() * 5, Math.random() * 7),
+              ...sweepVars(Math.random()),
             }} />
           ))}
         </div>
@@ -174,9 +181,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer confetti-layer">
           {[...Array(70)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
-              left: lx(),
-              animation: fa('confetti-fall', 5 + Math.random() * 4),
-              ...depthStyle(),
+              top: scatterTop(),
+              left: scatterLeft(),
+              animation: sweepAnim(5 + Math.random() * 4, Math.random() * 7),
+              ...sweepVars(Math.random()),
             }} />
           ))}
         </div>
@@ -194,12 +202,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const h = Math.round(w * 2.3);
             return (
               <div key={i} className="particle petal" style={{
-                left: lx(),
-                animation: fa('fall', 6 + Math.random() * 5),
-                ...depthStyle(),
-                // 해바라기 꽃잎은 3D 회전 없이 2D 낙하만: X/Y축 회전 성분을 0으로 무효화
-                '--rotate-x': '0deg',
-                '--rotate-y': '0deg',
+                top: scatterTop(),
+                left: scatterLeft(),
+                animation: sweepAnim(6 + Math.random() * 5, Math.random() * 7),
+                ...sweepVars(Math.random()),
               } as React.CSSProperties}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 30" width={w} height={h} style={{ display: 'block' }}>
                   <defs>
@@ -224,9 +230,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer autumn-layer">
           {[...Array(32)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
-              left: lx(),
-              animation: fa('fall-sway', 6 + Math.random() * 5),
-              ...depthStyle(),
+              top: scatterTop(),
+              left: scatterLeft(),
+              animation: sweepAnim(6 + Math.random() * 5, Math.random() * 7),
+              ...sweepVars(Math.random()),
             }} />
           ))}
         </div>
