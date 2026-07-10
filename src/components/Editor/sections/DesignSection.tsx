@@ -19,10 +19,10 @@ const TEXTURES: { key: NonNullable<InvitationData['bgTexture']>; name: string }[
 
 const EFFECTS: { key: NonNullable<InvitationData['bgEffect']>; name: string; icon: string }[] = [
   { key: 'none', name: '없음', icon: '—' }, { key: 'cherry-blossom', name: '벚꽃', icon: '🌸' },
-  { key: 'snow', name: '함박눈', icon: '❄️' }, { key: 'stars', name: '별빛', icon: '✨' },
-  { key: 'leaves', name: '나뭇잎', icon: '🍃' }, { key: 'hearts', name: '하트', icon: '💕' },
-  { key: 'firefly', name: '반딧불', icon: '🔅' }, { key: 'confetti', name: '꽃가루', icon: '🎊' },
-  { key: 'petals', name: '꽃잎', icon: '🌼' }, { key: 'autumn', name: '단풍잎', icon: '🍂' },
+  { key: 'snow', name: '함박눈', icon: '❄️' }, { key: 'stars', name: '별빛', icon: '✦' },
+  { key: 'leaves', name: '장미꽃잎', icon: '🌹' }, { key: 'hearts', name: '보케', icon: '🔆' },
+  { key: 'firefly', name: '반딧불', icon: '🔅' }, { key: 'confetti', name: '샴페인', icon: '🥂' },
+  { key: 'petals', name: '목련', icon: '🤍' }, { key: 'autumn', name: '단풍잎', icon: '🍂' },
 ];
 
 const SCROLL_EFFECTS: { key: NonNullable<InvitationData['scrollEffect']>; name: string; icon: string }[] = [

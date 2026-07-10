@@ -88,49 +88,59 @@
   100% { top: -8%; opacity: 0; transform: scale(calc(var(--ds,1)*.7)) translateX(var(--wd,0px)); }
 }
 
-/* === 파티클 스타일 — 그라디언트로 입체 음영 표현 === */
+/* === 파티클 스타일 === */
 
-/* 벚꽃잎/눈송이: SVG 파티클 — 형태는 SVG가 담당, opacity/blur만 CSS로 제어 */
-.particle.blossom { opacity: var(--do,.75); filter: blur(var(--db,0px)); }
-.particle.snowflake { opacity: var(--do,.75); filter: blur(var(--db,0px)); }
-/* 별: 정적 깜빡임 */
-.particle.star { width: 4px; height: 4px; background: #D4B896; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(212,184,150,.5); animation: twinkle 2s infinite; }
-@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-/* 잎: 선형 그라디언트로 잎맥 입체감 */
-.particle.leaf {
-  width: 12px; height: 18px;
-  background: linear-gradient(148deg, #D4EDB0 0%, #8FC25A 38%, #5A9E2F 65%, #3D7A1C 100%);
-  border-radius: 4px 55% 55% 55% / 4px 55% 55% 55%;
-  box-shadow: inset -1px -2px 4px rgba(30,80,10,.25);
-  opacity: var(--do,.65); filter: blur(var(--db,0px));
+/* SVG 파티클 공통 — 형태는 SVG 담당, opacity/blur만 CSS */
+.particle.blossom    { opacity: var(--do,.75); filter: blur(var(--db,0px)); }
+.particle.snowflake  { opacity: var(--do,.75); filter: blur(var(--db,0px)); }
+.particle.rose-petal { opacity: var(--do,.75); filter: blur(var(--db,0px)); }
+.particle.magnolia   { opacity: var(--do,.72); filter: blur(var(--db,0px)); }
+.particle.shimmer    { opacity: var(--do,.90); filter: blur(var(--db,0px)); }
+
+/* 별빛: 4포인트 글린트 SVG, 애니메이션은 인라인 스타일로 */
+.particle.star { /* SVG handles shape */ }
+@keyframes twinkle { 0%, 100% { opacity: 0.12; } 50% { opacity: 0.92; } }
+
+/* 보케 광원: 소프트 글로우 원 SVG + 상승 */
+.particle.bokeh { opacity: var(--do,.65); filter: blur(calc(0.8px + var(--db,0px))); }
+
+/* 반딧불: 따뜻한 금빛 글로우 */
+.particle.firefly {
+  width: 5px; height: 5px;
+  background: radial-gradient(circle at 42% 40%, #FFFBE0 0%, #F0D060 55%, #C8A020 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 7px 2px rgba(240,210,60,.55), 0 0 14px 4px rgba(240,200,20,.18);
+  animation: firefly-glow ease-in-out infinite;
 }
-/* 하트: 위로 떠오름 */
-.particle.heart {
-  color: #F4A0B0; line-height: 1;
-  text-shadow: 0 1px 4px rgba(220,100,130,.28);
-  opacity: var(--do,.5); filter: blur(var(--db,0px));
+@keyframes firefly-glow {
+  0%,100% { opacity:.08; transform:translate(0,0); }
+  25%      { opacity:.85; transform:translate(10px,-14px); }
+  50%      { opacity:.25; transform:translate(-9px,11px); }
+  75%      { opacity:.92; transform:translate(13px,4px); }
 }
-/* 반딧불: 정적 이동 */
-.particle.firefly { width: 5px; height: 5px; background: #F5E6A3; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(245,230,163,.6); animation: firefly-glow ease-in-out infinite; }
-@keyframes firefly-glow { 0%,100%{opacity:.1;transform:translate(0,0)} 25%{opacity:.8;transform:translate(10px,-15px)} 50%{opacity:.3;transform:translate(-8px,10px)} 75%{opacity:.9;transform:translate(12px,5px)} }
-/* 색종이: 금속광택 그라디언트 */
-.particle.confetti { opacity: var(--do,.82); filter: blur(var(--db,0px)); }
-.confetti.c1 { width: 7px; height: 11px; background: linear-gradient(148deg, #FFD4D8, #FF7888, #FF3050); border-radius: 1px; }
-.confetti.c2 { width: 8px; height: 8px;  background: radial-gradient(circle at 35% 35%, #D0FFD8, #60E070, #20A030); border-radius: 50%; }
-.confetti.c3 { width: 11px; height: 7px; background: linear-gradient(148deg, #D4E8FF, #60A8FF, #2060FF); border-radius: 1px; }
-.confetti.c4 { width: 6px; height: 6px;  background: radial-gradient(circle at 35% 35%, #FFFFD8, #FFE040, #FFA800); border-radius: 50%; }
-.confetti.c5 { width: 7px; height: 11px; background: linear-gradient(148deg, #EDD4FF, #B050FF, #7010E0); border-radius: 1px; }
-/* 꽃잎(petals): 크림/아이보리 방사형 그라디언트 */
-.particle.petal { opacity: var(--do,.7); filter: blur(var(--db,0px)); }
-.petal.p1 { width: 11px; height: 15px; background: radial-gradient(ellipse at 35% 28%, #FFF8F2 0%, #F5D8C8 60%, #E8C0B0 100%); border-radius: 50% 50% 50% 5% / 50% 50% 50% 5%; box-shadow: inset -1px -2px 3px rgba(180,100,80,.12); }
-.petal.p2 { width: 13px; height: 10px; background: radial-gradient(ellipse at 38% 32%, #FFF0F5 0%, #F8D0DC 55%, #EEBECE 100%); border-radius: 50%; box-shadow: inset -1px -1px 3px rgba(200,100,130,.12); }
-.petal.p3 { width: 9px;  height: 13px; background: radial-gradient(ellipse at 40% 28%, #FFF4EE 0%, #F0D8C8 60%, #E0C0B0 100%); border-radius: 5% 50% 50% 50% / 5% 50% 50% 50%; box-shadow: inset -1px -2px 3px rgba(160,90,70,.1); }
-/* 단풍잎: 따뜻한 그라디언트 */
-.particle.autumn-leaf { opacity: var(--do,.72); filter: blur(var(--db,0px)); }
-.autumn-leaf.al1 { width: 15px; height: 15px; background: radial-gradient(ellipse at 40% 30%, #FFD080 0%, #E07030 55%, #A03010 100%); clip-path: polygon(50% 0%,100% 50%,75% 100%,25% 100%,0% 50%); }
-.autumn-leaf.al2 { width: 12px; height: 17px; background: linear-gradient(148deg, #FFAA50 0%, #D05020 50%, #901800 100%); border-radius: 3px 55% 55% 55% / 3px 55% 55% 55%; box-shadow: inset -1px -2px 3px rgba(80,10,5,.22); }
-.autumn-leaf.al3 { width: 14px; height: 14px; background: radial-gradient(ellipse at 38% 32%, #FFD060 0%, #E09020 50%, #B05010 100%); clip-path: polygon(50% 0%,85% 30%,100% 70%,50% 100%,0% 70%,15% 30%); }
-.autumn-leaf.al4 { width: 11px; height: 16px; background: linear-gradient(142deg, #FFC060 0%, #C04010 55%, #801008 100%); border-radius: 55% 3px 55% 55% / 55% 3px 55% 55%; box-shadow: inset -1px -2px 3px rgba(80,10,5,.22); }
+
+/* 단풍잎: clip-path 대신 유기적 블롭 형태, 뮤트된 번트 오렌지/러스트 팔레트 */
+.particle.autumn-leaf { opacity: var(--do,.78); filter: blur(var(--db,0px)); }
+.autumn-leaf.al1 {
+  width: 14px; height: 12px;
+  background: linear-gradient(140deg, #D86828 0%, #902010 100%);
+  border-radius: 60% 30% 60% 30% / 40% 60% 40% 60%;
+}
+.autumn-leaf.al2 {
+  width: 11px; height: 17px;
+  background: linear-gradient(158deg, #B83818 0%, #781008 100%);
+  border-radius: 42% 56% 46% 62% / 56% 42% 62% 46%;
+}
+.autumn-leaf.al3 {
+  width: 17px; height: 12px;
+  background: linear-gradient(140deg, #C88018 0%, #885010 100%);
+  border-radius: 52% 36% 56% 32% / 36% 56% 36% 56%;
+}
+.autumn-leaf.al4 {
+  width: 12px; height: 16px;
+  background: linear-gradient(152deg, #A85028 0%, #722008 100%);
+  border-radius: 36% 62% 46% 56% / 56% 36% 62% 42%;
+}
 
 /* Music float button */
 /* 높이 0인 sticky 래퍼로 레이아웃 밀림 없이 우측 상단 고정 */
