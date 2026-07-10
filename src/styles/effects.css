@@ -90,22 +90,9 @@
 
 /* === 파티클 스타일 — 그라디언트로 입체 음영 표현 === */
 
-/* 벚꽃잎: 타원형, 라이팅 포인트로 볼륨감 */
-.particle.blossom {
-  width: 13px; height: 17px;
-  background: radial-gradient(ellipse at 38% 30%, #FFF2F6 0%, #FFCAD8 52%, #FFB0C8 100%);
-  border-radius: 50% 50% 45% 5% / 50% 50% 45% 5%;
-  box-shadow: inset -1px -2px 3px rgba(200,80,120,.18);
-  opacity: var(--do,.75); filter: blur(var(--db,0px));
-}
-/* 눈송이: 구형, 내부 광택 + 외부 글로우 */
-.particle.snowflake {
-  width: 7px; height: 7px;
-  background: radial-gradient(circle at 38% 35%, #FFFFFF 0%, #D8EEF8 55%, #B8D8EE 100%);
-  border-radius: 50%;
-  box-shadow: 0 0 5px 1px rgba(180,220,255,.55), inset 0 0 2px rgba(255,255,255,.8);
-  opacity: var(--do,.75); filter: blur(var(--db,0px));
-}
+/* 벚꽃잎/눈송이: SVG 파티클 — 형태는 SVG가 담당, opacity/blur만 CSS로 제어 */
+.particle.blossom { opacity: var(--do,.75); filter: blur(var(--db,0px)); }
+.particle.snowflake { opacity: var(--do,.75); filter: blur(var(--db,0px)); }
 /* 별: 정적 깜빡임 */
 .particle.star { width: 4px; height: 4px; background: #D4B896; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(212,184,150,.5); animation: twinkle 2s infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
