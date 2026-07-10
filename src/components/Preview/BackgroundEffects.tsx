@@ -45,7 +45,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'cherry-blossom':
       layer = (
         <div className="effect-layer cherry-blossoms">
-          {[...Array(22)].map((_, i) => {
+          {[...Array(34)].map((_, i) => {
             const gid = `${uid}bl${i}`;
             const [c0, c1, c2] = BLOSSOM_PAL[i % 3];
             const depth = 0.3 + Math.random() * 0.7;
@@ -53,8 +53,8 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const isLarge = Math.random() < 0.2;
             const w = isLarge ? Math.round(12 + Math.random() * 5) : Math.round(5 + Math.random() * 4);
             const h = Math.round(w * 1.35);
-            const dur = (7 + Math.random() * 6).toFixed(1);
-            const delay = (Math.random() * 12).toFixed(1);
+            const dur = (5.5 + Math.random() * 5).toFixed(1);
+            const delay = (Math.random() * 9).toFixed(1);
             return (
               <div key={i} className="particle blossom" style={{
                 // 시작점: 화면 전체에 분산(좌측 편향), top도 화면 전반에 걸쳐 랜덤
