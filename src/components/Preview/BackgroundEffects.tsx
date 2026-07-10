@@ -41,11 +41,15 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
   const anim = (name: string, dur: number, delay: number) =>
     `${name} ${dur.toFixed(1)}s linear ${delay.toFixed(1)}s infinite`;
 
+  // 낙하 파티클 시작 x: 왼쪽 편향 (-10%~65%). 바람이 오른쪽으로 밀어 대각선 궤적.
+  const lx = () => `${(Math.random() * 75 - 10).toFixed(1)}%`;
+
+  // --wd: 항상 양수(오른쪽) 20~85px → 떨어지면서 자연스럽게 우측으로 흘러감
   const ps = (noFlip = false): React.CSSProperties => {
     const depth = Math.random();
-    const sway = Math.round(12 + Math.random() * 28);
-    const wd = Math.round(-55 + Math.random() * 110);
-    const rotation = Math.round(120 + Math.random() * 280) * (Math.random() < 0.5 ? 1 : -1);
+    const sway = Math.round(8 + Math.random() * 20);
+    const wd = Math.round(20 + Math.random() * 65);   // +20~+85, 오른쪽 방향 고정
+    const rotation = Math.round(100 + Math.random() * 260) * (Math.random() < 0.5 ? 1 : -1);
     const flipA = noFlip ? 1 : parseFloat((0.08 + Math.random() * 0.22).toFixed(2));
     const flipB = noFlip ? 1 : parseFloat((0.12 + Math.random() * 0.2).toFixed(2));
     return {
@@ -69,7 +73,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const [c0, c1, c2] = BLOSSOM_PAL[i % 3];
             return (
               <div key={i} className="particle blossom" style={{
-                left: `${Math.random() * 100}%`,
+                left: lx(),
                 animation: anim('fall-natural', 26 + Math.random() * 18, Math.random() * 24),
                 ...ps(),
               }}>
@@ -92,7 +96,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer snow">
           {[...Array(45)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
-              left: `${Math.random() * 100}%`,
+              left: lx(),
               animation: anim('fall-natural', 14 + Math.random() * 10, Math.random() * 16),
               ...ps(true),
             }}>
@@ -158,7 +162,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const [c0, c1, c2] = ROSE_PAL[i % 3];
             return (
               <div key={i} className="particle rose-petal" style={{
-                left: `${Math.random() * 100}%`,
+                left: lx(),
                 animation: anim('fall-natural', 22 + Math.random() * 14, Math.random() * 20),
                 ...ps(),
               }}>
@@ -187,12 +191,12 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const [inner, mid, outer] = BOKEH_PAL[i % 4];
             return (
               <div key={i} className="particle bokeh" style={{
-                left: `${Math.random() * 100}%`,
+                left: lx(),
                 animation: `float-up ${22 + Math.random() * 16}s linear ${Math.random() * 18}s infinite`,
                 '--ds': (0.55 + Math.random() * 0.8).toFixed(2),
                 '--do': (0.35 + Math.random() * 0.5).toFixed(2),
                 '--db': '0px',
-                '--wd': `${Math.round(-28 + Math.random() * 56)}px`,
+                '--wd': `${Math.round(15 + Math.random() * 55)}px`,
               } as React.CSSProperties}>
                 {/* 소프트 보케 광원: 방사형 그라디언트 원 */}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width={sz} height={sz} style={{ display: 'block' }}>
@@ -233,7 +237,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const [g0, g1, g2] = t === 'strip' ? GOLD : t === 'diamond' ? SILVER : ROSE_GOLD;
             return (
               <div key={i} className="particle shimmer" style={{
-                left: `${Math.random() * 100}%`,
+                left: lx(),
                 animation: anim('fall-natural', 12 + Math.random() * 10, Math.random() * 14),
                 ...ps(),
               }}>
@@ -276,7 +280,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const [c0, c1, c2] = MAGNOLIA_PAL[i % 3];
             return (
               <div key={i} className="particle magnolia" style={{
-                left: `${Math.random() * 100}%`,
+                left: lx(),
                 animation: anim('fall-natural', 28 + Math.random() * 16, Math.random() * 24),
                 ...ps(),
               }}>
@@ -301,7 +305,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer autumn-layer">
           {[...Array(16)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
-              left: `${Math.random() * 100}%`,
+              left: lx(),
               animation: anim('fall-leaf', 22 + Math.random() * 14, Math.random() * 22),
               ...ps(),
             }} />
