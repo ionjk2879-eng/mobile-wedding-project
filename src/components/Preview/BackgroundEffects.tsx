@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+import { ScrollRootContext } from './ScrollReveal';
 
 interface BackgroundEffectsProps {
   effect?: string;
@@ -35,6 +37,7 @@ const ROSE_GOLD = ['#F8D8C8', '#C08860', '#F0C0A8'] as const;
 
 const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
   const uid = React.useMemo(() => Math.random().toString(36).slice(2, 7), []);
+  const scrollRoot = React.useContext(ScrollRootContext);
 
   if (!effect || effect === 'none') return null;
 
@@ -64,9 +67,11 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     } as React.CSSProperties;
   };
 
+  let layer: React.ReactElement | null = null;
+
   switch (effect) {
     case 'cherry-blossom':
-      return (
+      layer = (
         <div className="effect-layer cherry-blossoms">
           {[...Array(28)].map((_, i) => {
             const gid = `${uid}bp${i}`;
@@ -90,9 +95,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           })}
         </div>
       );
+      break;
 
     case 'snow':
-      return (
+      layer = (
         <div className="effect-layer snow">
           {[...Array(45)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
@@ -127,9 +133,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
 
     case 'stars':
-      return (
+      layer = (
         <div className="effect-layer stars">
           {[...Array(40)].map((_, i) => {
             const sz = 4 + (i % 4) * 2;
@@ -143,7 +150,6 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
                 animationIterationCount: 'infinite',
                 animationTimingFunction: 'ease-in-out',
               }}>
-                {/* 4포인트 글린트: 빛 반사 느낌의 날카로운 별 */}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={sz} height={sz} style={{ display: 'block' }}>
                   <path d="M12,1 L13.8,10.2 L23,12 L13.8,13.8 L12,23 L10.2,13.8 L1,12 L10.2,10.2 Z"
                         fill="rgba(255,255,255,0.88)"/>
@@ -153,9 +159,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           })}
         </div>
       );
+      break;
 
     case 'leaves':
-      return (
+      layer = (
         <div className="effect-layer rose-petals-layer">
           {[...Array(22)].map((_, i) => {
             const gid = `${uid}rp${i}`;
@@ -166,7 +173,6 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
                 animation: anim('fall-natural', 22 + Math.random() * 14, Math.random() * 20),
                 ...ps(),
               }}>
-                {/* 장미꽃잎: 가로가 넓은 타원 — 벚꽃잎보다 둥글고 납작한 비율 */}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 20" width="19" height="14" style={{ display: 'block' }}>
                   <defs>
                     <radialGradient id={gid} cx="44%" cy="30%" r="65%">
@@ -181,9 +187,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           })}
         </div>
       );
+      break;
 
     case 'hearts':
-      return (
+      layer = (
         <div className="effect-layer bokeh-layer">
           {[...Array(20)].map((_, i) => {
             const gid = `${uid}bk${i}`;
@@ -198,7 +205,6 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
                 '--db': '0px',
                 '--wd': `${Math.round(15 + Math.random() * 55)}px`,
               } as React.CSSProperties}>
-                {/* 소프트 보케 광원: 방사형 그라디언트 원 */}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width={sz} height={sz} style={{ display: 'block' }}>
                   <defs>
                     <radialGradient id={gid} cx="50%" cy="42%" r="50%">
@@ -212,9 +218,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           })}
         </div>
       );
+      break;
 
     case 'firefly':
-      return (
+      layer = (
         <div className="effect-layer fireflies">
           {[...Array(30)].map((_, i) => (
             <div key={i} className="particle firefly" style={{
@@ -226,10 +233,11 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
 
     case 'confetti': {
       const TYPES = ['strip', 'diamond', 'dot'] as const;
-      return (
+      layer = (
         <div className="effect-layer shimmer-layer">
           {[...Array(38)].map((_, i) => {
             const gid = `${uid}sh${i}`;
@@ -270,10 +278,11 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           })}
         </div>
       );
+      break;
     }
 
     case 'petals':
-      return (
+      layer = (
         <div className="effect-layer magnolia-layer">
           {[...Array(22)].map((_, i) => {
             const gid = `${uid}mg${i}`;
@@ -284,7 +293,6 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
                 animation: anim('fall-natural', 28 + Math.random() * 16, Math.random() * 24),
                 ...ps(),
               }}>
-                {/* 목련꽃잎: 길쭉한 타원, 아이보리 크림 계열 */}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 30" width="13" height="22" style={{ display: 'block' }}>
                   <defs>
                     <radialGradient id={gid} cx="40%" cy="25%" r="70%">
@@ -299,9 +307,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           })}
         </div>
       );
+      break;
 
     case 'autumn':
-      return (
+      layer = (
         <div className="effect-layer autumn-layer">
           {[...Array(16)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
@@ -312,10 +321,19 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
-
-    default:
-      return null;
+      break;
   }
+
+  if (!layer) return null;
+
+  // scrollRoot === null: ViewPage / AnniversaryEditPage / TemplatePreviewPage 등 뷰어 컨텍스트
+  // → DOM 조상의 transform/filter/contain 영향을 완전히 차단하기 위해 body에 portal로 마운트
+  // scrollRoot !== null: 에디터 프리뷰 패널 (preview-content-scroll의 transform:translateZ(0)으로 패널 안에 가둠)
+  // → 인라인 렌더링으로 에디터 패널 영역에만 파티클 표시
+  if (scrollRoot === null) {
+    return ReactDOM.createPortal(layer, document.body);
+  }
+  return layer;
 };
 
 export default React.memo(BackgroundEffects);
