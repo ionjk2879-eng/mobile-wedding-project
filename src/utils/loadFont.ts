@@ -16,8 +16,6 @@ const FONT_MAP: Record<string, FontSource> = {
   MaruBuri: { type: 'custom', face: "@font-face{font-family:'MaruBuri';src:url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2) format('woff2');font-weight:400;font-display:swap;}" },
   SUIT: { type: 'custom', face: "@font-face{font-family:'SUIT';src:url(https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2) format('woff2');font-weight:400;font-display:swap;}" },
   Ridibatang: { type: 'custom', face: "@font-face{font-family:'Ridibatang';src:url(https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/RIDIBatang.woff) format('woff');font-weight:400;font-display:swap;}" },
-  OngleipParkDahyeon: { type: 'custom', face: "@font-face{font-family:'OngleipParkDahyeon';src:url(https://cdn.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2) format('woff2');font-weight:400;font-display:swap;}" },
-  Cafe24Anemone: { type: 'custom', face: "@font-face{font-family:'Cafe24Anemone';src:url(https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff) format('woff');font-weight:400;font-display:swap;}" },
 };
 
 function applyFont(key: string): void {

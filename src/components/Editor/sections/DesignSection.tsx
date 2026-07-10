@@ -13,8 +13,6 @@ const FONTS = [
   { name: '마루 부리 (모던 럭셔리 세리프)', value: "'MaruBuri', serif" },
   { name: 'SUIT (심플 모던 산세리프)', value: "'SUIT', sans-serif" },
   { name: '리디바탕 (클래식 럭셔리 세리프)', value: "'Ridibatang', serif" },
-  { name: '온글잎 박다현체 (웨딩 감성 손글씨)', value: "'OngleipParkDahyeon', cursive" },
-  { name: '카페24 아네모네 (발랄 캐주얼)', value: "'Cafe24Anemone', sans-serif" },
 ];
 
 const TEXTURES: { key: NonNullable<InvitationData['bgTexture']>; name: string }[] = [
