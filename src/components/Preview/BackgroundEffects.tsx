@@ -53,8 +53,8 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const isLarge = Math.random() < 0.2;
             const w = isLarge ? Math.round(12 + Math.random() * 5) : Math.round(5 + Math.random() * 4);
             const h = Math.round(w * 1.35);
-            const dur = (5.5 + Math.random() * 5).toFixed(1);
-            const delay = (Math.random() * 9).toFixed(1);
+            const dur = (4 + Math.random() * 4).toFixed(1);
+            const delay = (Math.random() * 7).toFixed(1);
             return (
               <div key={i} className="particle blossom" style={{
                 // 시작점: 화면 전체에 분산(좌측 편향), top도 화면 전반에 걸쳐 랜덤
@@ -78,8 +78,8 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
                       <stop offset="100%" stopColor={c2}/>
                     </radialGradient>
                   </defs>
-                  {/* 벚꽃 꽃잎: 하단 뾰족, 상단 notch(V홈) 있는 하트형 */}
-                  <path d="M10,25 C4,22 0,17 0,10 C0,4 4,0 7.5,0 C8.5,0 9.5,1.5 10,3 C10.5,1.5 11.5,0 12.5,0 C16,0 20,4 20,10 C20,17 16,22 10,25 Z" fill={`url(#${gid})`}/>
+                  {/* 벚꽃 꽃잎: 위아래 뾰족하고 가운데가 볼록한 잎 모양 */}
+                  <path d="M10,0 C15.5,2.5 20,7.5 20,13 C20,18.5 15.5,23.5 10,26 C4.5,23.5 0,18.5 0,13 C0,7.5 4.5,2.5 10,0 Z" fill={`url(#${gid})`}/>
                 </svg>
               </div>
             );
