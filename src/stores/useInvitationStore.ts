@@ -84,7 +84,7 @@ export const initialData: InvitationData = {
   timeline: [],
   interview: [],
   // midphoto는 순서 관리 대상이 아니라 InvitationView에서 활성 섹션 중간에 동적으로 삽입됨
-  sectionOrder: ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'contacts', 'ending', 'share'],
+  sectionOrder: ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'contacts'],
   slug: '',
   shareUrl: '',
   shareTitle: '',
@@ -246,7 +246,7 @@ const useInvitationStore = create<InvitationStore>((set) => ({
 
   moveSection: (index, dir) =>
     set((state) => {
-      const defaultOrder = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'accounts', 'contacts', 'share'];
+      const defaultOrder = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'accounts', 'contacts'];
       const order = [...(state.data.sectionOrder?.length ? state.data.sectionOrder : defaultOrder)];
       const target = index + dir;
       if (target < 0 || target >= order.length) return state;

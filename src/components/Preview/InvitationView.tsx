@@ -132,20 +132,19 @@ function isSectionActive(id: string, data: InvitationData): boolean {
 
 // midphoto를 '현재 활성화된 섹션들' 중 중간 위치에 동적으로 삽입
 export function buildSectionOrder(data: InvitationData): string[] {
+  const FIXED_TAIL = ['ending', 'share'];
   const savedOrder = data.sectionOrder?.length ? data.sectionOrder : DEFAULT_ORDER;
-  const savedNoMid = savedOrder.filter((id) => id !== 'midphoto');
-  const missing = DEFAULT_ORDER.filter((id) => !savedNoMid.includes(id) && id !== 'midphoto');
-  const shareIdx = savedNoMid.indexOf('share');
-  const baseOrder = (shareIdx !== -1 && missing.length > 0)
-    ? [...savedNoMid.slice(0, shareIdx), ...missing, ...savedNoMid.slice(shareIdx)]
-    : [...savedNoMid, ...missing];
+  const savedFiltered = savedOrder.filter((id) => id !== 'midphoto' && !FIXED_TAIL.includes(id));
+  const missing = DEFAULT_ORDER.filter((id) => !savedFiltered.includes(id) && id !== 'midphoto' && !FIXED_TAIL.includes(id));
+  const baseOrder = [...savedFiltered, ...missing, ...FIXED_TAIL];
   if (data.isMidPhotoEnabled === false) return baseOrder;
 
+  // midphoto는 고정 tail(ending/share) 앞의 활성 섹션들 사이 중간에 삽입
   const activeIndices = baseOrder.reduce<number[]>((acc, id, i) => {
-    if (isSectionActive(id, data)) acc.push(i);
+    if (!FIXED_TAIL.includes(id) && isSectionActive(id, data)) acc.push(i);
     return acc;
   }, []);
-  const insertAt = activeIndices.length > 0 ? activeIndices[Math.floor(activeIndices.length / 2)] : baseOrder.length;
+  const insertAt = activeIndices.length > 0 ? activeIndices[Math.floor(activeIndices.length / 2)] : baseOrder.length - FIXED_TAIL.length;
   return [...baseOrder.slice(0, insertAt), 'midphoto', ...baseOrder.slice(insertAt)];
 }
 
