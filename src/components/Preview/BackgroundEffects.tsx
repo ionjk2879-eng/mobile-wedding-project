@@ -53,14 +53,14 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const isLarge = Math.random() < 0.2;
             const w = isLarge ? Math.round(12 + Math.random() * 5) : Math.round(5 + Math.random() * 4);
             const h = Math.round(w * 1.35);
-            const dur = (12 + Math.random() * 10).toFixed(1);
-            const delay = (Math.random() * 20).toFixed(1);
+            const dur = (7 + Math.random() * 6).toFixed(1);
+            const delay = (Math.random() * 12).toFixed(1);
             return (
               <div key={i} className="particle blossom" style={{
                 // 시작점: 화면 전체에 분산(좌측 편향), top도 화면 전반에 걸쳐 랜덤
                 top: `${(-5 + Math.random() * 80).toFixed(1)}%`,
                 left: `${(-20 + Math.random() * 75).toFixed(1)}%`,
-                animation: `blossom-wind-sweep ${dur}s linear ${delay}s infinite`,
+                animation: `blossom-wind-sweep ${dur}s linear ${delay}s infinite backwards`,
                 '--bsc': (0.5 + depth * 0.65).toFixed(2),
                 '--bop': (0.35 + depth * 0.5).toFixed(2),
                 '--bbl': `${((1 - depth) * 1.5).toFixed(1)}px`,
