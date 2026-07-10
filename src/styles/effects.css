@@ -83,11 +83,8 @@
 .confetti.c4 { background: #FFFFBA; border-radius: 50%; width: 5px; height: 5px; }
 .confetti.c5 { background: #E8BAFF; border-radius: 1px; }
 
-/* 꽃잎 - 크림/아이보리 계열 부드러운 꽃잎 */
-.particle.petal { opacity: var(--depth-opacity, 0.65); filter: blur(var(--depth-blur, 0px)); animation: fall linear infinite; transform-origin: center; }
-.petal.p1 { width: 10px; height: 14px; background: #F5E8DC; border-radius: 50% 0 50% 50%; }
-.petal.p2 { width: 12px; height: 10px; background: #F0DDE8; border-radius: 50%; }
-.petal.p3 { width: 8px; height: 12px; background: #FAF0EA; border-radius: 0 50% 50% 50%; }
+/* 해바라기 꽃잎 - SVG(그라데이션 타원)만 보이도록 배경/모양 초기화 */
+.particle.petal { width: auto; height: auto; background: none; border-radius: 0; opacity: var(--depth-opacity, 0.65); filter: blur(var(--depth-blur, 0px)); animation: fall linear infinite; transform-origin: center; }
 
 /* 단풍잎 - 주황/빨강/갈색 계열 */
 .particle.autumn-leaf { opacity: var(--depth-opacity, 0.65); filter: blur(var(--depth-blur, 0px)); animation: fall-sway linear infinite; transform-origin: center; }

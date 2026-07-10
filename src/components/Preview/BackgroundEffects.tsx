@@ -12,14 +12,22 @@ const BLOSSOM_PAL = [
   ['#FEF2F6', '#F8C4D8', '#EE90B4'],
 ] as const;
 
+const SUNFLOWER_PAL = [
+  ['#FFFDF3', '#FFE066', '#F5A623'],
+  ['#FFFBEA', '#FFD23F', '#E8890C'],
+  ['#FFF9E0', '#FFC93C', '#D9720A'],
+] as const;
+
 const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
   const uid = React.useMemo(() => Math.random().toString(36).slice(2, 7), []);
   const scrollRoot = React.useContext(ScrollRootContext);
 
   if (!effect || effect === 'none') return null;
 
-  const fa = (base: string, dur: number, delay: number) =>
-    `${base} ${dur.toFixed(1)}s cubic-bezier(0.45, 0, 0.55, 1) ${delay.toFixed(1)}s infinite`;
+  // 음수 delay: 애니메이션이 이미 진행 중인 것처럼 시작해, 로드 시점에 파티클이
+  // 화면 위쪽 가장자리가 아니라 낙하 경로 전반에 걸쳐 자연스럽게 흩어져 보이게 한다.
+  const fa = (base: string, dur: number) =>
+    `${base} ${dur.toFixed(1)}s cubic-bezier(0.45, 0, 0.55, 1) ${(-(Math.random() * dur)).toFixed(1)}s infinite`;
 
   const depthStyle = (): React.CSSProperties => {
     const depth = Math.random();
@@ -94,7 +102,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(85)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
               left: lx(),
-              animation: fa('fall', 5 + Math.random() * 4, Math.random() * 7),
+              animation: fa('fall', 5 + Math.random() * 4),
               ...depthStyle(),
             }} />
           ))}
@@ -122,7 +130,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(36)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
               left: lx(),
-              animation: fa('fall-sway', 6 + Math.random() * 5, Math.random() * 7),
+              animation: fa('fall-sway', 6 + Math.random() * 5),
               ...depthStyle(),
             }} />
           ))}
@@ -167,7 +175,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(70)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
               left: lx(),
-              animation: fa('confetti-fall', 5 + Math.random() * 4, Math.random() * 7),
+              animation: fa('confetti-fall', 5 + Math.random() * 4),
               ...depthStyle(),
             }} />
           ))}
@@ -178,13 +186,35 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'petals':
       layer = (
         <div className="effect-layer petals-layer">
-          {[...Array(42)].map((_, i) => (
-            <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
-              left: lx(),
-              animation: fa('fall', 6 + Math.random() * 5, Math.random() * 7),
-              ...depthStyle(),
-            }} />
-          ))}
+          {[...Array(42)].map((_, i) => {
+            const gid = `${uid}sf${i}`;
+            const [c0, c1, c2] = SUNFLOWER_PAL[i % 3];
+            const isLarge = Math.random() < 0.2;
+            const w = isLarge ? Math.round(7 + Math.random() * 3) : Math.round(4 + Math.random() * 3);
+            const h = Math.round(w * 2.3);
+            return (
+              <div key={i} className="particle petal" style={{
+                left: lx(),
+                animation: fa('fall', 6 + Math.random() * 5),
+                ...depthStyle(),
+                // 해바라기 꽃잎은 3D 회전 없이 2D 낙하만: X/Y축 회전 성분을 0으로 무효화
+                '--rotate-x': '0deg',
+                '--rotate-y': '0deg',
+              } as React.CSSProperties}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 30" width={w} height={h} style={{ display: 'block' }}>
+                  <defs>
+                    <linearGradient id={gid} x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor={c0}/>
+                      <stop offset="55%" stopColor={c1}/>
+                      <stop offset="100%" stopColor={c2}/>
+                    </linearGradient>
+                  </defs>
+                  {/* 해바라기 꽃잎: 길쭉하고 끝이 둥근 타원형 */}
+                  <path d="M7,0 C9.5,3.5 11,9 11,15 C11,21.5 9.5,27 7,30 C4.5,27 3,21.5 3,15 C3,9 4.5,3.5 7,0 Z" fill={`url(#${gid})`}/>
+                </svg>
+              </div>
+            );
+          })}
         </div>
       );
       break;
@@ -195,7 +225,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(32)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
               left: lx(),
-              animation: fa('fall-sway', 6 + Math.random() * 5, Math.random() * 7),
+              animation: fa('fall-sway', 6 + Math.random() * 5),
               ...depthStyle(),
             }} />
           ))}

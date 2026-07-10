@@ -10,6 +10,11 @@ const FONTS = [
   { name: '고운 돋움 (산세리프)', value: "'Gowun Dodum', sans-serif" },
   { name: '나눔 명조 (클래식)', value: "'Nanum Myeongjo', serif" },
   { name: 'Dancing Script (영문 필기체)', value: "'Dancing Script', cursive" },
+  { name: '마루 부리 (모던 럭셔리 세리프)', value: "'MaruBuri', serif" },
+  { name: 'SUIT (심플 모던 산세리프)', value: "'SUIT', sans-serif" },
+  { name: '리디바탕 (클래식 럭셔리 세리프)', value: "'Ridibatang', serif" },
+  { name: '온글잎 박다현체 (웨딩 감성 손글씨)', value: "'OngleipParkDahyeon', cursive" },
+  { name: '카페24 아네모네 (발랄 캐주얼)', value: "'Cafe24Anemone', sans-serif" },
 ];
 
 const TEXTURES: { key: NonNullable<InvitationData['bgTexture']>; name: string }[] = [
@@ -22,7 +27,7 @@ const EFFECTS: { key: NonNullable<InvitationData['bgEffect']>; name: string; ico
   { key: 'snow', name: '함박눈', icon: '❄️' }, { key: 'stars', name: '별빛', icon: '✨' },
   { key: 'leaves', name: '나뭇잎', icon: '🍃' }, { key: 'hearts', name: '하트', icon: '💕' },
   { key: 'firefly', name: '반딧불', icon: '🔅' }, { key: 'confetti', name: '꽃가루', icon: '🎊' },
-  { key: 'petals', name: '꽃잎', icon: '🌼' }, { key: 'autumn', name: '단풍잎', icon: '🍂' },
+  { key: 'petals', name: '해바라기 꽃잎', icon: '🌻' }, { key: 'autumn', name: '단풍잎', icon: '🍂' },
 ];
 
 const SCROLL_EFFECTS: { key: NonNullable<InvitationData['scrollEffect']>; name: string; icon: string }[] = [
