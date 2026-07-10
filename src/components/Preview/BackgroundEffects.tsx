@@ -48,21 +48,29 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(22)].map((_, i) => {
             const gid = `${uid}bl${i}`;
             const [c0, c1, c2] = BLOSSOM_PAL[i % 3];
-            const depth = 0.35 + Math.random() * 0.65;
-            const w = Math.round(8 + Math.random() * 5);
-            const h = Math.round(w * (1.25 + Math.random() * 0.2));
+            const depth = 0.3 + Math.random() * 0.7;
+            // 크기: 작은 것 위주(5-9px), 20% 확률로 큰 것(12-17px) 혼합
+            const isLarge = Math.random() < 0.2;
+            const w = isLarge ? Math.round(12 + Math.random() * 5) : Math.round(5 + Math.random() * 4);
+            const h = Math.round(w * 1.35);
+            const dur = (12 + Math.random() * 10).toFixed(1);
+            const delay = (Math.random() * 20).toFixed(1);
             return (
               <div key={i} className="particle blossom" style={{
-                left: lx(),
-                animation: `blossom-fall ${(20 + Math.random() * 14).toFixed(1)}s linear ${(Math.random() * 22).toFixed(1)}s infinite`,
+                // 시작점: 화면 전체에 분산(좌측 편향), top도 화면 전반에 걸쳐 랜덤
+                top: `${(-5 + Math.random() * 80).toFixed(1)}%`,
+                left: `${(-20 + Math.random() * 75).toFixed(1)}%`,
+                animation: `blossom-wind-sweep ${dur}s linear ${delay}s infinite`,
                 '--bsc': (0.5 + depth * 0.65).toFixed(2),
-                '--bop': (0.42 + depth * 0.48).toFixed(2),
-                '--bbl': `${((1 - depth) * 1.2).toFixed(1)}px`,
-                '--bsx': `${Math.round(5 + Math.random() * 10)}px`,
-                '--bdr': `${Math.round(60 + Math.random() * 220) * (Math.random() < 0.5 ? 1 : -1)}deg`,
-                '--wind': `${Math.round(200 + Math.random() * 200)}px`,
+                '--bop': (0.35 + depth * 0.5).toFixed(2),
+                '--bbl': `${((1 - depth) * 1.5).toFixed(1)}px`,
+                '--bsx': `${Math.round(3 + Math.random() * 8)}px`,
+                '--wind': `${Math.round(200 + Math.random() * 180)}px`,  // 수평(우측) 이동 200-380px
+                '--drop': `${Math.round(60 + Math.random() * 160)}px`,   // 수직(하향) 이동 60-220px
+                '--r0': `${Math.round(Math.random() * 360)}deg`,
+                '--dr': `${Math.round(80 + Math.random() * 200) * (Math.random() < 0.5 ? 1 : -1)}deg`,
               } as React.CSSProperties}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 24" width={w} height={h} style={{ display: 'block' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 26" width={w} height={h} style={{ display: 'block' }}>
                   <defs>
                     <radialGradient id={gid} cx="40%" cy="28%" r="66%">
                       <stop offset="0%" stopColor={c0}/>
@@ -70,8 +78,8 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
                       <stop offset="100%" stopColor={c2}/>
                     </radialGradient>
                   </defs>
-                  <path d="M10,23 C4,21 0,17 0,12 C0,6 4,0 10,0 C16,0 20,6 20,12 C20,17 16,21 10,23 Z"
-                        fill={`url(#${gid})`}/>
+                  {/* 벚꽃 꽃잎: 하단 뾰족, 상단 notch(V홈) 있는 하트형 */}
+                  <path d="M10,25 C4,22 0,17 0,10 C0,4 4,0 7.5,0 C8.5,0 9.5,1.5 10,3 C10.5,1.5 11.5,0 12.5,0 C16,0 20,4 20,10 C20,17 16,22 10,25 Z" fill={`url(#${gid})`}/>
                 </svg>
               </div>
             );

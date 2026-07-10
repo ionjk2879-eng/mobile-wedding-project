@@ -146,17 +146,17 @@
 }
 
 /* ===== 벚꽃 전용 ===== */
-/* 기존 .particle.blossom CSS(background/border-radius/animation)를 덮어써서 SVG만 보이게 */
+/* background/border-radius/animation 을 덮어써서 SVG만 보이게; top/left/animation은 JS에서 설정 */
 .cherry-blossoms .particle.blossom {
   width: auto; height: auto; background: none; border-radius: 0;
-  opacity: var(--bop, 0.7); filter: blur(var(--bbl, 0px)); animation: none;
+  filter: blur(var(--bbl, 0px));
 }
-@keyframes blossom-fall {
-  0%   { top: -6%;  opacity: 0;             transform: scale(var(--bsc,1)) rotate(0deg)                       translateX(0); }
-  6%   {             opacity: var(--bop,.7); }
-  28%  {                                     transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.28)) translateX(calc(var(--bsx,18px)*-.85 + var(--wind,35px)*.28)); }
-  56%  {                                     transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.56)) translateX(calc(var(--bsx,18px)*.65  + var(--wind,35px)*.56)); }
-  82%  {                                     transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.82)) translateX(calc(var(--bsx,18px)*-.35 + var(--wind,35px)*.82)); }
-  93%  {             opacity: var(--bop,.7); }
-  100% { top: 110%; opacity: 0;             transform: scale(var(--bsc,1)) rotate(var(--bdr,90deg))            translateX(var(--wind,35px)); }
+/* 봄바람 대각선 스윕: top은 JS에서 고정, translate로 우하 방향 이동 (수평 > 수직) */
+@keyframes blossom-wind-sweep {
+  0%   { opacity: 0;              transform: translate(0px,0px)                                                                                                                       rotate(var(--r0,0deg))                              scale(var(--bsc,1)); }
+  8%   { opacity: var(--bop,.65); }
+  33%  {                          transform: translate(calc(var(--wind,220px)*.33 + var(--bsx,6px)),    calc(var(--drop,140px)*.33 - var(--bsx,6px)*.3))  rotate(calc(var(--r0,0deg) + var(--dr,100deg)*.33)) scale(var(--bsc,1)); }
+  66%  {                          transform: translate(calc(var(--wind,220px)*.66 - var(--bsx,6px)*.5), calc(var(--drop,140px)*.66 + var(--bsx,6px)*.2))  rotate(calc(var(--r0,0deg) + var(--dr,100deg)*.66)) scale(var(--bsc,1)); }
+  90%  { opacity: var(--bop,.65); }
+  100% { opacity: 0;              transform: translate(var(--wind,220px),                              var(--drop,140px))                                  rotate(calc(var(--r0,0deg) + var(--dr,100deg)))     scale(var(--bsc,1)); }
 }
