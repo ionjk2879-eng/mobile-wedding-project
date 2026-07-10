@@ -45,7 +45,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'cherry-blossom':
       layer = (
         <div className="effect-layer cherry-blossoms">
-          {[...Array(34)].map((_, i) => {
+          {[...Array(44)].map((_, i) => {
             const gid = `${uid}bl${i}`;
             const [c0, c1, c2] = BLOSSOM_PAL[i % 3];
             const depth = 0.3 + Math.random() * 0.7;
@@ -91,10 +91,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'snow':
       layer = (
         <div className="effect-layer snow">
-          {[...Array(60)].map((_, i) => (
+          {[...Array(85)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
               left: lx(),
-              animation: fa('fall', 10 + Math.random() * 8, Math.random() * 12),
+              animation: fa('fall', 5 + Math.random() * 4, Math.random() * 7),
               ...depthStyle(),
             }} />
           ))}
@@ -105,7 +105,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'stars':
       layer = (
         <div className="effect-layer stars">
-          {[...Array(50)].map((_, i) => (
+          {[...Array(32)].map((_, i) => (
             <div key={i} className="particle star" style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -119,10 +119,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'leaves':
       layer = (
         <div className="effect-layer leaves">
-          {[...Array(25)].map((_, i) => (
+          {[...Array(36)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
               left: lx(),
-              animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
+              animation: fa('fall-sway', 6 + Math.random() * 5, Math.random() * 7),
               ...depthStyle(),
             }} />
           ))}
@@ -133,11 +133,11 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'hearts':
       layer = (
         <div className="effect-layer hearts">
-          {[...Array(25)].map((_, i) => (
+          {[...Array(34)].map((_, i) => (
             <div key={i} className="particle heart" style={{
               left: lx(),
-              animationDelay: `${Math.random() * 12}s`,
-              animationDuration: `${12 + Math.random() * 10}s`,
+              animationDelay: `${Math.random() * 7}s`,
+              animationDuration: `${6 + Math.random() * 5}s`,
               fontSize: `${8 + Math.random() * 10}px`,
               ...depthStyle(),
             }}>♥</div>
@@ -149,7 +149,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'firefly':
       layer = (
         <div className="effect-layer fireflies">
-          {[...Array(40)].map((_, i) => (
+          {[...Array(26)].map((_, i) => (
             <div key={i} className="particle firefly" style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -164,10 +164,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'confetti':
       layer = (
         <div className="effect-layer confetti-layer">
-          {[...Array(50)].map((_, i) => (
+          {[...Array(70)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
               left: lx(),
-              animation: fa('confetti-fall', 10 + Math.random() * 8, Math.random() * 12),
+              animation: fa('confetti-fall', 5 + Math.random() * 4, Math.random() * 7),
               ...depthStyle(),
             }} />
           ))}
@@ -178,10 +178,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'petals':
       layer = (
         <div className="effect-layer petals-layer">
-          {[...Array(30)].map((_, i) => (
+          {[...Array(42)].map((_, i) => (
             <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
               left: lx(),
-              animation: fa('fall', 15 + Math.random() * 12, Math.random() * 14),
+              animation: fa('fall', 6 + Math.random() * 5, Math.random() * 7),
               ...depthStyle(),
             }} />
           ))}
@@ -192,10 +192,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     case 'autumn':
       layer = (
         <div className="effect-layer autumn-layer">
-          {[...Array(22)].map((_, i) => (
+          {[...Array(32)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
               left: lx(),
-              animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
+              animation: fa('fall-sway', 6 + Math.random() * 5, Math.random() * 7),
               ...depthStyle(),
             }} />
           ))}
