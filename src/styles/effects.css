@@ -136,3 +136,23 @@
   0%   { transform: scaleY(0.25); }
   100% { transform: scaleY(1); }
 }
+
+/* ===== 벚꽃 전용 ===== */
+/* portal로 body 직하에 마운트되어 position:fixed가 진짜 뷰포트를 덮는다 */
+.effect-layer.cherry-blossoms {
+  position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; perspective: none;
+}
+/* 기존 .particle.blossom CSS(background/border-radius/animation)를 덮어써서 SVG만 보이게 */
+.cherry-blossoms .particle.blossom {
+  width: auto; height: auto; background: none; border-radius: 0;
+  opacity: var(--bop, 0.7); filter: blur(var(--bbl, 0px)); animation: none;
+}
+@keyframes blossom-fall {
+  0%   { top: -6%;  opacity: 0;              transform: scale(var(--bsc,1)) rotate(0deg)                      translateX(0); }
+  6%   {             opacity: var(--bop,.7); }
+  28%  {                                      transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.28)) translateX(calc(var(--bsx,18px)*-.85)); }
+  56%  {                                      transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.56)) translateX(calc(var(--bsx,18px)*.65)); }
+  82%  {                                      transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.82)) translateX(calc(var(--bsx,18px)*-.35)); }
+  93%  {             opacity: var(--bop,.7); }
+  100% { top: 110%; opacity: 0;              transform: scale(var(--bsc,1)) rotate(var(--bdr,90deg))           translateX(0); }
+}

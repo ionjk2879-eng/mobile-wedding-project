@@ -1,21 +1,26 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+import { ScrollRootContext } from './ScrollReveal';
 
 interface BackgroundEffectsProps {
   effect?: string;
 }
 
+const BLOSSOM_PAL = [
+  ['#FFF5F8', '#FFD0E4', '#F8A8C4'],
+  ['#FFF8FA', '#FFE0EC', '#FFBCD4'],
+  ['#FEF2F6', '#F8C4D8', '#EE90B4'],
+] as const;
+
 const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
+  const uid = React.useMemo(() => Math.random().toString(36).slice(2, 7), []);
+  const scrollRoot = React.useContext(ScrollRootContext);
+
   if (!effect || effect === 'none') return null;
 
   const fa = (base: string, dur: number, delay: number) =>
     `${base} ${dur.toFixed(1)}s cubic-bezier(0.45, 0, 0.55, 1) ${delay.toFixed(1)}s infinite`;
 
-  // 3D 입체감: depth(0~1, 멀리~가까이)에 비례해 크기/불투명도/블러를 계산하고,
-  // 기존 Z축 회전(rotate)과는 별개로 X 또는 Y축 중 하나를 랜덤으로 골라 낙하하며
-  // 뒤집히는 듯한 입체 회전을 준다. --rotate-x/--rotate-y 중 실제 선택된 축만
-  // 0deg→360deg로 애니메이션되고, 나머지는 0deg로 고정돼 사실상 회전하지 않는다.
-  // --sway-x: 좌우로 흔들리는 폭(20~50px)을 파티클마다 랜덤으로 줘서, fall/fall-sway
-  // 키프레임에서 전부 같은 궤적으로 기계적으로 움직이지 않게 한다.
   const depthStyle = (): React.CSSProperties => {
     const depth = Math.random();
     const axis = Math.random() < 0.5 ? 'X' : 'Y';
@@ -30,19 +35,48 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     } as React.CSSProperties;
   };
 
+  if (effect === 'cherry-blossom') {
+    const layer = (
+      <div className="effect-layer cherry-blossoms">
+        {[...Array(22)].map((_, i) => {
+          const gid = `${uid}bl${i}`;
+          const [c0, c1, c2] = BLOSSOM_PAL[i % 3];
+          const depth = 0.35 + Math.random() * 0.65;
+          const w = Math.round(8 + Math.random() * 5);
+          const h = Math.round(w * (1.25 + Math.random() * 0.2));
+          return (
+            <div key={i} className="particle blossom" style={{
+              left: `${(Math.random() * 108 - 4).toFixed(1)}%`,
+              animation: `blossom-fall ${(20 + Math.random() * 14).toFixed(1)}s linear ${(Math.random() * 22).toFixed(1)}s infinite`,
+              '--bsc': (0.5 + depth * 0.65).toFixed(2),
+              '--bop': (0.42 + depth * 0.48).toFixed(2),
+              '--bbl': `${((1 - depth) * 1.2).toFixed(1)}px`,
+              '--bsx': `${Math.round(10 + Math.random() * 20)}px`,
+              '--bdr': `${Math.round(60 + Math.random() * 220) * (Math.random() < 0.5 ? 1 : -1)}deg`,
+            } as React.CSSProperties}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 24" width={w} height={h} style={{ display: 'block' }}>
+                <defs>
+                  <radialGradient id={gid} cx="40%" cy="28%" r="66%">
+                    <stop offset="0%" stopColor={c0}/>
+                    <stop offset="52%" stopColor={c1}/>
+                    <stop offset="100%" stopColor={c2}/>
+                  </radialGradient>
+                </defs>
+                <path d="M10,23 C4,21 0,17 0,12 C0,6 4,0 10,0 C16,0 20,6 20,12 C20,17 16,21 10,23 Z"
+                      fill={`url(#${gid})`}/>
+              </svg>
+            </div>
+          );
+        })}
+      </div>
+    );
+    if (scrollRoot === null) return ReactDOM.createPortal(layer, document.body);
+    return layer;
+  }
+
   switch (effect) {
     case 'cherry-blossom':
-      return (
-        <div className="effect-layer cherry-blossoms">
-          {[...Array(35)].map((_, i) => (
-            <div key={i} className="particle blossom" style={{
-              left: `${Math.random() * 100}%`,
-              animation: fa('fall', 16 + Math.random() * 14, Math.random() * 14),
-              ...depthStyle(),
-            }} />
-          ))}
-        </div>
-      );
+      return null; // 위에서 처리됨
     case 'snow':
       return (
         <div className="effect-layer snow">
