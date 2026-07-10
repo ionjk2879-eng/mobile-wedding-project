@@ -35,50 +35,48 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     } as React.CSSProperties;
   };
 
-  if (effect === 'cherry-blossom') {
-    const layer = (
-      <div className="effect-layer cherry-blossoms">
-        {[...Array(22)].map((_, i) => {
-          const gid = `${uid}bl${i}`;
-          const [c0, c1, c2] = BLOSSOM_PAL[i % 3];
-          const depth = 0.35 + Math.random() * 0.65;
-          const w = Math.round(8 + Math.random() * 5);
-          const h = Math.round(w * (1.25 + Math.random() * 0.2));
-          return (
-            <div key={i} className="particle blossom" style={{
-              left: `${(Math.random() * 108 - 4).toFixed(1)}%`,
-              animation: `blossom-fall ${(20 + Math.random() * 14).toFixed(1)}s linear ${(Math.random() * 22).toFixed(1)}s infinite`,
-              '--bsc': (0.5 + depth * 0.65).toFixed(2),
-              '--bop': (0.42 + depth * 0.48).toFixed(2),
-              '--bbl': `${((1 - depth) * 1.2).toFixed(1)}px`,
-              '--bsx': `${Math.round(10 + Math.random() * 20)}px`,
-              '--bdr': `${Math.round(60 + Math.random() * 220) * (Math.random() < 0.5 ? 1 : -1)}deg`,
-            } as React.CSSProperties}>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 24" width={w} height={h} style={{ display: 'block' }}>
-                <defs>
-                  <radialGradient id={gid} cx="40%" cy="28%" r="66%">
-                    <stop offset="0%" stopColor={c0}/>
-                    <stop offset="52%" stopColor={c1}/>
-                    <stop offset="100%" stopColor={c2}/>
-                  </radialGradient>
-                </defs>
-                <path d="M10,23 C4,21 0,17 0,12 C0,6 4,0 10,0 C16,0 20,6 20,12 C20,17 16,21 10,23 Z"
-                      fill={`url(#${gid})`}/>
-              </svg>
-            </div>
-          );
-        })}
-      </div>
-    );
-    if (scrollRoot === null) return ReactDOM.createPortal(layer, document.body);
-    return layer;
-  }
+  let layer: React.ReactElement | null = null;
 
   switch (effect) {
     case 'cherry-blossom':
-      return null; // 위에서 처리됨
+      layer = (
+        <div className="effect-layer cherry-blossoms">
+          {[...Array(22)].map((_, i) => {
+            const gid = `${uid}bl${i}`;
+            const [c0, c1, c2] = BLOSSOM_PAL[i % 3];
+            const depth = 0.35 + Math.random() * 0.65;
+            const w = Math.round(8 + Math.random() * 5);
+            const h = Math.round(w * (1.25 + Math.random() * 0.2));
+            return (
+              <div key={i} className="particle blossom" style={{
+                left: `${(Math.random() * 108 - 4).toFixed(1)}%`,
+                animation: `blossom-fall ${(20 + Math.random() * 14).toFixed(1)}s linear ${(Math.random() * 22).toFixed(1)}s infinite`,
+                '--bsc': (0.5 + depth * 0.65).toFixed(2),
+                '--bop': (0.42 + depth * 0.48).toFixed(2),
+                '--bbl': `${((1 - depth) * 1.2).toFixed(1)}px`,
+                '--bsx': `${Math.round(10 + Math.random() * 20)}px`,
+                '--bdr': `${Math.round(60 + Math.random() * 220) * (Math.random() < 0.5 ? 1 : -1)}deg`,
+              } as React.CSSProperties}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 24" width={w} height={h} style={{ display: 'block' }}>
+                  <defs>
+                    <radialGradient id={gid} cx="40%" cy="28%" r="66%">
+                      <stop offset="0%" stopColor={c0}/>
+                      <stop offset="52%" stopColor={c1}/>
+                      <stop offset="100%" stopColor={c2}/>
+                    </radialGradient>
+                  </defs>
+                  <path d="M10,23 C4,21 0,17 0,12 C0,6 4,0 10,0 C16,0 20,6 20,12 C20,17 16,21 10,23 Z"
+                        fill={`url(#${gid})`}/>
+                </svg>
+              </div>
+            );
+          })}
+        </div>
+      );
+      break;
+
     case 'snow':
-      return (
+      layer = (
         <div className="effect-layer snow">
           {[...Array(60)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
@@ -89,8 +87,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
+
     case 'stars':
-      return (
+      layer = (
         <div className="effect-layer stars">
           {[...Array(50)].map((_, i) => (
             <div key={i} className="particle star" style={{
@@ -101,8 +101,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
+
     case 'leaves':
-      return (
+      layer = (
         <div className="effect-layer leaves">
           {[...Array(25)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
@@ -113,8 +115,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
+
     case 'hearts':
-      return (
+      layer = (
         <div className="effect-layer hearts">
           {[...Array(25)].map((_, i) => (
             <div key={i} className="particle heart" style={{
@@ -127,8 +131,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
+
     case 'firefly':
-      return (
+      layer = (
         <div className="effect-layer fireflies">
           {[...Array(40)].map((_, i) => (
             <div key={i} className="particle firefly" style={{
@@ -140,8 +146,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
+
     case 'confetti':
-      return (
+      layer = (
         <div className="effect-layer confetti-layer">
           {[...Array(50)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
@@ -152,8 +160,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
+
     case 'petals':
-      return (
+      layer = (
         <div className="effect-layer petals-layer">
           {[...Array(30)].map((_, i) => (
             <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
@@ -164,8 +174,10 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
+      break;
+
     case 'autumn':
-      return (
+      layer = (
         <div className="effect-layer autumn-layer">
           {[...Array(22)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
@@ -176,9 +188,17 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           ))}
         </div>
       );
-    default:
-      return null;
+      break;
   }
+
+  if (!layer) return null;
+
+  // scrollRoot === null: ViewPage / AnniversaryEditPage / TemplatePreviewPage 등 뷰어
+  // → portal로 body 직하에 마운트, position:fixed가 진짜 뷰포트를 덮음
+  // scrollRoot !== null: 에디터 프리뷰 패널
+  // → 인라인 렌더링, preview-content-scroll의 transform:translateZ(0)으로 패널 안에 가둠
+  if (scrollRoot === null) return ReactDOM.createPortal(layer, document.body);
+  return layer;
 };
 
 export default React.memo(BackgroundEffects);

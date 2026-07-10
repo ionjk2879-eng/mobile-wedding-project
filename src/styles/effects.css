@@ -27,7 +27,10 @@
 }
 
 /* Particle effects */
-.effect-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; perspective: 800px; }
+/* position:fixed + portal(body 직하 마운트) 조합으로 뷰포트에 완전 고정된다.
+   ViewPage 등 뷰어 컨텍스트: portal → body 직하 → 조상 CSS 영향 없음 → 진짜 뷰포트 오버레이
+   에디터 프리뷰 패널: 인라인 렌더링 → preview-content-scroll의 transform:translateZ(0)으로 패널 안에 가둠 */
+.effect-layer { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; perspective: 800px; }
 .particle { position: absolute; top: -20px; transform-style: preserve-3d; }
 
 /* 3D 입체감: --depth-scale/--rotate-x/--rotate-y/--sway-x는 BackgroundEffects.tsx에서
@@ -138,10 +141,6 @@
 }
 
 /* ===== 벚꽃 전용 ===== */
-/* portal로 body 직하에 마운트되어 position:fixed가 진짜 뷰포트를 덮는다 */
-.effect-layer.cherry-blossoms {
-  position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; perspective: none;
-}
 /* 기존 .particle.blossom CSS(background/border-radius/animation)를 덮어써서 SVG만 보이게 */
 .cherry-blossoms .particle.blossom {
   width: auto; height: auto; background: none; border-radius: 0;
