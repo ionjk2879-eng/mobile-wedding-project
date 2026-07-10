@@ -27,37 +27,51 @@
 }
 
 /* Particle effects */
-/* position:fixed + portal(body 직하 마운트) 조합으로 뷰포트에 완전 고정된다.
-   ViewPage 등 뷰어 컨텍스트: portal → body 직하 → 조상 CSS 영향 없음 → 진짜 뷰포트 오버레이
-   에디터 프리뷰 패널: 인라인 렌더링 → preview-content-scroll의 transform:translateZ(0)으로 패널 안에 가둠 */
+/* ViewPage (scrollRoot===null): portal → body 직하 마운트, 카드 너비 wrapper로 청첩장 영역만 덮음
+   전체화면 프리뷰: .full-preview-container에 transform 추가로 가두고, 아래 CSS로 카드 폭 제한
+   에디터 프리뷰 패널: 인라인 렌더링, preview-content-scroll의 transform:translateZ(0)으로 패널 안에 가둠 */
 .effect-layer { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; perspective: 800px; }
+/* 전체화면 프리뷰: full-preview-container가 transform으로 가두므로 카드 폭/위치로 제한 */
+.full-preview-container .effect-layer {
+  top: 0; bottom: 0;
+  left: calc((100vw - min(100vw, 430px)) / 2);
+  width: min(100vw, 430px);
+  right: auto;
+}
 .particle { position: absolute; top: -20px; transform-style: preserve-3d; }
 
-/* 3D 입체감: --depth-scale/--rotate-x/--rotate-y/--sway-x는 BackgroundEffects.tsx에서
-   파티클마다 랜덤으로 지정한다. rotateX/rotateY 중 실제 선택되지 않은 축은 0deg 고정이라
-   회전하지 않는다. 각 중간 지점은 최종 회전값에 진행률(0.2/0.4/0.6/0.8)을 곱해 부드럽게
-   이어지게 한다. translateX는 --sway-x(좌우 흔들림 폭)를 좌→우→좌로 반복하며 감쇠시켜
-   일직선 낙하가 아니라 살랑이는 궤적을 만든다. */
+/* --wind: 낙하하면서 오른쪽으로 누적되는 바람 편류(25~75px). 좌→우 대각선 연출.
+   --sway-x: 좌우 진동 폭. 두 값의 합산으로 자연스러운 대각 궤적이 만들어진다. */
 @keyframes fall {
-  0%   { top: -20px; transform: scale(var(--depth-scale, 1)) translateX(0) rotateX(0deg) rotateY(0deg); }
-  20%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * -1)) rotateX(calc(var(--rotate-x, 0deg) * 0.2)) rotateY(calc(var(--rotate-y, 0deg) * 0.2)); }
-  40%  { transform: scale(var(--depth-scale, 1)) translateX(var(--sway-x, 30px)) rotateX(calc(var(--rotate-x, 0deg) * 0.4)) rotateY(calc(var(--rotate-y, 0deg) * 0.4)); }
-  60%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * -0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.6)) rotateY(calc(var(--rotate-y, 0deg) * 0.6)); }
-  80%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * 0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.8)) rotateY(calc(var(--rotate-y, 0deg) * 0.8)); }
-  100% { top: 100%; transform: scale(var(--depth-scale, 1)) translateX(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)); }
+  0%   { top: -20px; transform: scale(var(--depth-scale,1)) translateX(0) rotateX(0deg) rotateY(0deg); }
+  20%  { transform: scale(var(--depth-scale,1)) translateX(calc(var(--sway-x,30px)*-1   + var(--wind,0px)*.2)) rotateX(calc(var(--rotate-x,0deg)*.2)) rotateY(calc(var(--rotate-y,0deg)*.2)); }
+  40%  { transform: scale(var(--depth-scale,1)) translateX(calc(var(--sway-x,30px)      + var(--wind,0px)*.4)) rotateX(calc(var(--rotate-x,0deg)*.4)) rotateY(calc(var(--rotate-y,0deg)*.4)); }
+  60%  { transform: scale(var(--depth-scale,1)) translateX(calc(var(--sway-x,30px)*-.7  + var(--wind,0px)*.6)) rotateX(calc(var(--rotate-x,0deg)*.6)) rotateY(calc(var(--rotate-y,0deg)*.6)); }
+  80%  { transform: scale(var(--depth-scale,1)) translateX(calc(var(--sway-x,30px)*.7   + var(--wind,0px)*.8)) rotateX(calc(var(--rotate-x,0deg)*.8)) rotateY(calc(var(--rotate-y,0deg)*.8)); }
+  100% { top: 100%; transform: scale(var(--depth-scale,1)) translateX(var(--wind,0px)) rotateX(var(--rotate-x,0deg)) rotateY(var(--rotate-y,0deg)); }
 }
 @keyframes fall-sway {
-  0%   { top: -20px; transform: scale(var(--depth-scale, 1)) rotate(0deg) translateX(0) rotateX(0deg) rotateY(0deg); }
-  20%  { transform: scale(var(--depth-scale, 1)) rotate(72deg) translateX(calc(var(--sway-x, 30px) * -1)) rotateX(calc(var(--rotate-x, 0deg) * 0.2)) rotateY(calc(var(--rotate-y, 0deg) * 0.2)); }
-  40%  { transform: scale(var(--depth-scale, 1)) rotate(144deg) translateX(var(--sway-x, 30px)) rotateX(calc(var(--rotate-x, 0deg) * 0.4)) rotateY(calc(var(--rotate-y, 0deg) * 0.4)); }
-  60%  { transform: scale(var(--depth-scale, 1)) rotate(216deg) translateX(calc(var(--sway-x, 30px) * -0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.6)) rotateY(calc(var(--rotate-y, 0deg) * 0.6)); }
-  80%  { transform: scale(var(--depth-scale, 1)) rotate(288deg) translateX(calc(var(--sway-x, 30px) * 0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.8)) rotateY(calc(var(--rotate-y, 0deg) * 0.8)); }
-  100% { top: 100%; transform: scale(var(--depth-scale, 1)) rotate(360deg) translateX(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)); }
+  0%   { top: -20px; transform: scale(var(--depth-scale,1)) rotate(0deg) translateX(0) rotateX(0deg) rotateY(0deg); }
+  20%  { transform: scale(var(--depth-scale,1)) rotate(72deg)  translateX(calc(var(--sway-x,30px)*-1  + var(--wind,0px)*.2)) rotateX(calc(var(--rotate-x,0deg)*.2)) rotateY(calc(var(--rotate-y,0deg)*.2)); }
+  40%  { transform: scale(var(--depth-scale,1)) rotate(144deg) translateX(calc(var(--sway-x,30px)     + var(--wind,0px)*.4)) rotateX(calc(var(--rotate-x,0deg)*.4)) rotateY(calc(var(--rotate-y,0deg)*.4)); }
+  60%  { transform: scale(var(--depth-scale,1)) rotate(216deg) translateX(calc(var(--sway-x,30px)*-.7 + var(--wind,0px)*.6)) rotateX(calc(var(--rotate-x,0deg)*.6)) rotateY(calc(var(--rotate-y,0deg)*.6)); }
+  80%  { transform: scale(var(--depth-scale,1)) rotate(288deg) translateX(calc(var(--sway-x,30px)*.7  + var(--wind,0px)*.8)) rotateX(calc(var(--rotate-x,0deg)*.8)) rotateY(calc(var(--rotate-y,0deg)*.8)); }
+  100% { top: 100%; transform: scale(var(--depth-scale,1)) rotate(360deg) translateX(var(--wind,0px)) rotateX(var(--rotate-x,0deg)) rotateY(var(--rotate-y,0deg)); }
 }
-/* confetti-fall/float-up은 이번 3D 회전(rotateX/Y) 대상이 아니라 기존 Z축 회전만 유지하고,
-   depth-scale만 곱해 넣는다 — transform은 애니메이션이 있으면 정적 규칙이 항상 덮어써지므로
-   scale도 반드시 키프레임 안에서 같이 지정해야 실제로 적용된다. */
-@keyframes confetti-fall { 0% { top: -20px; transform: scale(var(--depth-scale, 1)) rotate(0deg) translateX(0); } 25% { transform: scale(var(--depth-scale, 1)) rotate(120deg) translateX(15px); } 50% { transform: scale(var(--depth-scale, 1)) rotate(240deg) translateX(-10px); } 75% { transform: scale(var(--depth-scale, 1)) rotate(300deg) translateX(12px); } 100% { top: 100%; transform: scale(var(--depth-scale, 1)) rotate(360deg) translateX(0); } }
+@keyframes confetti-fall {
+  0%   { top: -20px; transform: scale(var(--depth-scale,1)) rotate(0deg)   translateX(0); }
+  25%  {              transform: scale(var(--depth-scale,1)) rotate(120deg) translateX(calc( 15px + var(--wind,0px)*.25)); }
+  50%  {              transform: scale(var(--depth-scale,1)) rotate(240deg) translateX(calc(-10px + var(--wind,0px)*.5)); }
+  75%  {              transform: scale(var(--depth-scale,1)) rotate(300deg) translateX(calc( 12px + var(--wind,0px)*.75)); }
+  100% { top: 100%;   transform: scale(var(--depth-scale,1)) rotate(360deg) translateX(var(--wind,0px)); }
+}
+@keyframes float-up {
+  0%   { top: 100%; opacity: 0; transform: scale(calc(var(--depth-scale,1)*.5)) translateX(0); }
+  10%  { opacity: var(--depth-opacity,.5); }
+  50%  { transform: scale(var(--depth-scale,1)) translateX(calc(15px + var(--wind,0px)*.5)); }
+  90%  { opacity: var(--depth-opacity,.5); }
+  100% { top: -20px; opacity: 0; transform: scale(calc(var(--depth-scale,1)*.8)) translateX(var(--wind,0px)); }
+}
 
 /* === 파티클 스타일 === */
 .particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: var(--depth-opacity, 0.7); filter: blur(var(--depth-blur, 0px)); animation: fall linear infinite; }
@@ -147,11 +161,11 @@
   opacity: var(--bop, 0.7); filter: blur(var(--bbl, 0px)); animation: none;
 }
 @keyframes blossom-fall {
-  0%   { top: -6%;  opacity: 0;              transform: scale(var(--bsc,1)) rotate(0deg)                      translateX(0); }
+  0%   { top: -6%;  opacity: 0;             transform: scale(var(--bsc,1)) rotate(0deg)                       translateX(0); }
   6%   {             opacity: var(--bop,.7); }
-  28%  {                                      transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.28)) translateX(calc(var(--bsx,18px)*-.85)); }
-  56%  {                                      transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.56)) translateX(calc(var(--bsx,18px)*.65)); }
-  82%  {                                      transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.82)) translateX(calc(var(--bsx,18px)*-.35)); }
+  28%  {                                     transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.28)) translateX(calc(var(--bsx,18px)*-.85 + var(--wind,35px)*.28)); }
+  56%  {                                     transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.56)) translateX(calc(var(--bsx,18px)*.65  + var(--wind,35px)*.56)); }
+  82%  {                                     transform: scale(var(--bsc,1)) rotate(calc(var(--bdr,90deg)*.82)) translateX(calc(var(--bsx,18px)*-.35 + var(--wind,35px)*.82)); }
   93%  {             opacity: var(--bop,.7); }
-  100% { top: 110%; opacity: 0;              transform: scale(var(--bsc,1)) rotate(var(--bdr,90deg))           translateX(0); }
+  100% { top: 110%; opacity: 0;             transform: scale(var(--bsc,1)) rotate(var(--bdr,90deg))            translateX(var(--wind,35px)); }
 }

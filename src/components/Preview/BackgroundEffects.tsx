@@ -32,8 +32,12 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
       '--rotate-x': axis === 'X' ? '360deg' : '0deg',
       '--rotate-y': axis === 'Y' ? '360deg' : '0deg',
       '--sway-x': `${(20 + Math.random() * 30).toFixed(1)}px`,
+      '--wind': `${Math.round(25 + Math.random() * 50)}px`,
     } as React.CSSProperties;
   };
+
+  // 낙하 파티클 시작 x: 왼쪽 편향(-5%~70%). --wind 바람 편류로 낙하하면서 우측으로 흘러 대각선 연출
+  const lx = () => `${(Math.random() * 75 - 5).toFixed(1)}%`;
 
   let layer: React.ReactElement | null = null;
 
@@ -49,13 +53,14 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
             const h = Math.round(w * (1.25 + Math.random() * 0.2));
             return (
               <div key={i} className="particle blossom" style={{
-                left: `${(Math.random() * 108 - 4).toFixed(1)}%`,
+                left: lx(),
                 animation: `blossom-fall ${(20 + Math.random() * 14).toFixed(1)}s linear ${(Math.random() * 22).toFixed(1)}s infinite`,
                 '--bsc': (0.5 + depth * 0.65).toFixed(2),
                 '--bop': (0.42 + depth * 0.48).toFixed(2),
                 '--bbl': `${((1 - depth) * 1.2).toFixed(1)}px`,
                 '--bsx': `${Math.round(10 + Math.random() * 20)}px`,
                 '--bdr': `${Math.round(60 + Math.random() * 220) * (Math.random() < 0.5 ? 1 : -1)}deg`,
+                '--wind': `${Math.round(25 + Math.random() * 55)}px`,
               } as React.CSSProperties}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 24" width={w} height={h} style={{ display: 'block' }}>
                   <defs>
@@ -80,7 +85,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer snow">
           {[...Array(60)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
-              left: `${Math.random() * 100}%`,
+              left: lx(),
               animation: fa('fall', 10 + Math.random() * 8, Math.random() * 12),
               ...depthStyle(),
             }} />
@@ -108,7 +113,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer leaves">
           {[...Array(25)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
-              left: `${Math.random() * 100}%`,
+              left: lx(),
               animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
               ...depthStyle(),
             }} />
@@ -122,7 +127,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer hearts">
           {[...Array(25)].map((_, i) => (
             <div key={i} className="particle heart" style={{
-              left: `${Math.random() * 100}%`,
+              left: lx(),
               animationDelay: `${Math.random() * 12}s`,
               animationDuration: `${12 + Math.random() * 10}s`,
               fontSize: `${8 + Math.random() * 10}px`,
@@ -153,7 +158,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer confetti-layer">
           {[...Array(50)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
-              left: `${Math.random() * 100}%`,
+              left: lx(),
               animation: fa('confetti-fall', 10 + Math.random() * 8, Math.random() * 12),
               ...depthStyle(),
             }} />
@@ -167,7 +172,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer petals-layer">
           {[...Array(30)].map((_, i) => (
             <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
-              left: `${Math.random() * 100}%`,
+              left: lx(),
               animation: fa('fall', 15 + Math.random() * 12, Math.random() * 14),
               ...depthStyle(),
             }} />
@@ -181,7 +186,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         <div className="effect-layer autumn-layer">
           {[...Array(22)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
-              left: `${Math.random() * 100}%`,
+              left: lx(),
               animation: fa('fall-sway', 14 + Math.random() * 12, Math.random() * 14),
               ...depthStyle(),
             }} />
@@ -197,7 +202,19 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
   // → portal로 body 직하에 마운트, position:fixed가 진짜 뷰포트를 덮음
   // scrollRoot !== null: 에디터 프리뷰 패널
   // → 인라인 렌더링, preview-content-scroll의 transform:translateZ(0)으로 패널 안에 가둠
-  if (scrollRoot === null) return ReactDOM.createPortal(layer, document.body);
+  if (scrollRoot === null) {
+    return ReactDOM.createPortal(
+      <div style={{
+        position: 'fixed', top: 0, bottom: 0,
+        left: 'calc((100vw - min(100vw, 430px)) / 2)',
+        width: 'min(100vw, 430px)',
+        overflow: 'hidden', pointerEvents: 'none', zIndex: 1,
+      }}>
+        {React.cloneElement(layer, { style: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 } })}
+      </div>,
+      document.body
+    );
+  }
   return layer;
 };
 
