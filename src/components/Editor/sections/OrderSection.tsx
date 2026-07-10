@@ -1,5 +1,5 @@
 import React from 'react';
-import { GripVertical, Lock } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import {
   DndContext, closestCenter, PointerSensor, TouchSensor, KeyboardSensor,
   useSensor, useSensors, type DragEndEvent,
@@ -20,7 +20,6 @@ const SECTION_LABELS: Record<string, string> = {
 // ending/share는 항상 맨 마지막에 고정 — 순서 관리 대상 아님
 // midphoto는 활성 섹션 중간에 자동 배치되는 고정 섹션이라 순서 관리 대상에서 제외
 const FIXED_TAIL = ['ending', 'share'] as const;
-const FIXED_TAIL_LABELS: Record<string, string> = { ending: '엔딩', share: '공유' };
 const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'contacts'];
 
 function SortableSectionItem({ id, index }: { id: string; index: number }) {
@@ -85,16 +84,6 @@ const OrderSection: React.FC = () => {
           </div>
         </SortableContext>
       </DndContext>
-      <div style={{ marginTop: 4 }}>
-        {FIXED_TAIL.map((id) => (
-          <div key={id} className="order-item" style={{ opacity: 0.45, cursor: 'default' }}>
-            <span className="order-label">{FIXED_TAIL_LABELS[id]}</span>
-            <span style={{ display: 'flex', alignItems: 'center', color: 'inherit' }}>
-              <Lock size={13} />
-            </span>
-          </div>
-        ))}
-      </div>
     </>
   );
 };
