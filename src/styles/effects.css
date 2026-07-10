@@ -31,37 +31,61 @@
 .particle { position: absolute; top: -8%; }
 
 /* === 낙하 애니메이션 ===
-   rotateX/Y 대신 scaleX 진동으로 텀블링 구현:
-   꽃잎·잎이 옆면으로 돌 때 납작하게(--fa/--fb), 앞면일 때 다시 1로 복귀.
+   --wd(wind drift): 낙하 내내 쌓이는 바람 편류 — translateX에 progress * --wd를 더해
+   파티클이 한쪽으로 흘러가며 진동하는 바람 연출. 파티클마다 방향/크기가 달라 자연스럽다.
+   animation-timing-function을 키프레임 내부에서 ease-in-out으로 지정해 방향 전환을 부드럽게.
    --ds: 원근 크기  --do: 원근 불투명도  --db: 원근 블러
-   --sx: 좌우 흔들림폭  --dr: 총 Z회전각  --fa/--fb: 플립 중간점 scaleX */
+   --sx: 흔들림 진폭  --wd: 바람 편류  --dr: 총 Z회전각  --fa/--fb: 플립 scaleX */
 @keyframes fall-natural {
-  0%   { top: -6%; opacity: 0;             transform: scale(var(--ds,1)) translateX(0px)                          rotate(0deg)                           scaleX(1); }
-  4%   {            opacity: var(--do,.7); }
-  18%  {                                   transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * -.9))   rotate(calc(var(--dr,220deg) * .18))   scaleX(var(--fa,.2)); }
-  35%  {                                   transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * .75))   rotate(calc(var(--dr,220deg) * .35))   scaleX(1); }
-  52%  {                                   transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * -.55))  rotate(calc(var(--dr,220deg) * .52))   scaleX(var(--fb,.3)); }
-  68%  {                                   transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * .6))    rotate(calc(var(--dr,220deg) * .68))   scaleX(1); }
-  85%  {            opacity: var(--do,.7); transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * -.35)) rotate(calc(var(--dr,220deg) * .85))   scaleX(var(--fa,.2)); }
-  100% { top: 110%; opacity: 0;            transform: scale(var(--ds,1)) translateX(0px)                          rotate(var(--dr,220deg))                scaleX(1); }
+  0%   { top: -6%; opacity: 0;
+         transform: scale(var(--ds,1)) translateX(0px) rotate(0deg) scaleX(1); }
+  5%   { opacity: var(--do,.7); }
+  30%  { transform: scale(var(--ds,1))
+           translateX(calc(var(--sx,22px) * -.8 + var(--wd,0px) * .3))
+           rotate(calc(var(--dr,200deg) * .3)) scaleX(var(--fa,.2));
+         animation-timing-function: ease-in-out; }
+  58%  { transform: scale(var(--ds,1))
+           translateX(calc(var(--sx,22px) * .55 + var(--wd,0px) * .58))
+           rotate(calc(var(--dr,200deg) * .58)) scaleX(1);
+         animation-timing-function: ease-in-out; }
+  82%  { transform: scale(var(--ds,1))
+           translateX(calc(var(--sx,22px) * -.3 + var(--wd,0px) * .82))
+           rotate(calc(var(--dr,200deg) * .82)) scaleX(var(--fb,.3));
+         animation-timing-function: ease-out; }
+  93%  { opacity: var(--do,.7); }
+  100% { top: 110%; opacity: 0;
+         transform: scale(var(--ds,1)) translateX(var(--wd,0px))
+           rotate(var(--dr,200deg)) scaleX(1); }
 }
-/* 잎사귀 전용: 더 넓은 흔들림 + 비대칭 박자 */
+/* 잎사귀: 더 큰 흔들림 + 바람 편류 */
 @keyframes fall-leaf {
-  0%   { top: -6%; opacity: 0;              transform: scale(var(--ds,1)) translateX(0px)                          rotate(0deg)                           scaleX(1); }
-  4%   {            opacity: var(--do,.65); }
-  14%  {                                    transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * -1))    rotate(calc(var(--dr,280deg) * .14))   scaleX(var(--fa,.15)); }
-  30%  {                                    transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * .85))   rotate(calc(var(--dr,280deg) * .3))    scaleX(1); }
-  46%  {                                    transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * -.7))   rotate(calc(var(--dr,280deg) * .46))   scaleX(var(--fb,.2)); }
-  62%  {                                    transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * .6))    rotate(calc(var(--dr,280deg) * .62))   scaleX(1); }
-  78%  {            opacity: var(--do,.65); transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * -.45)) rotate(calc(var(--dr,280deg) * .78))   scaleX(var(--fa,.15)); }
-  100% { top: 110%; opacity: 0;             transform: scale(var(--ds,1)) translateX(0px)                          rotate(var(--dr,280deg))                scaleX(1); }
+  0%   { top: -6%; opacity: 0;
+         transform: scale(var(--ds,1)) translateX(0px) rotate(0deg) scaleX(1); }
+  5%   { opacity: var(--do,.65); }
+  28%  { transform: scale(var(--ds,1))
+           translateX(calc(var(--sx,26px) * -.9 + var(--wd,0px) * .28))
+           rotate(calc(var(--dr,260deg) * .28)) scaleX(var(--fa,.15));
+         animation-timing-function: ease-in-out; }
+  55%  { transform: scale(var(--ds,1))
+           translateX(calc(var(--sx,26px) * .7 + var(--wd,0px) * .55))
+           rotate(calc(var(--dr,260deg) * .55)) scaleX(1);
+         animation-timing-function: ease-in-out; }
+  80%  { transform: scale(var(--ds,1))
+           translateX(calc(var(--sx,26px) * -.45 + var(--wd,0px) * .8))
+           rotate(calc(var(--dr,260deg) * .8)) scaleX(var(--fb,.2));
+         animation-timing-function: ease-out; }
+  93%  { opacity: var(--do,.65); }
+  100% { top: 110%; opacity: 0;
+         transform: scale(var(--ds,1)) translateX(var(--wd,0px))
+           rotate(var(--dr,260deg)) scaleX(1); }
 }
 @keyframes float-up {
-  0%   { top: 105%; opacity: 0;              transform: scale(calc(var(--ds,1) * .5)) translateX(0); }
-  6%   {            opacity: var(--do,.5); }
-  40%  {                                     transform: scale(var(--ds,1)) translateX(15px); }
-  90%  {            opacity: var(--do,.5); }
-  100% { top: -8%;  opacity: 0;              transform: scale(calc(var(--ds,1) * .7)) translateX(-10px); }
+  0%   { top: 105%; opacity: 0; transform: scale(calc(var(--ds,1)*.5)) translateX(0); }
+  6%   { opacity: var(--do,.5); }
+  42%  { transform: scale(var(--ds,1)) translateX(calc(var(--wd,0px)*.4 + 10px)); animation-timing-function: ease-in-out; }
+  78%  { transform: scale(var(--ds,1)) translateX(calc(var(--wd,0px)*.78 - 8px)); animation-timing-function: ease-out; }
+  92%  { opacity: var(--do,.5); }
+  100% { top: -8%; opacity: 0; transform: scale(calc(var(--ds,1)*.7)) translateX(var(--wd,0px)); }
 }
 
 /* === 파티클 스타일 — 그라디언트로 입체 음영 표현 === */

@@ -11,12 +11,13 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
     `${name} ${dur.toFixed(1)}s linear ${delay.toFixed(1)}s infinite`;
 
   // depth 0=멀리(작고 흐림), 1=가까이(크고 선명)
-  // scaleX 플립(--fa/--fb): 꽃잎·잎이 공중에서 옆면이 보이다가 다시 앞면으로 돌아오는
-  // 자연스러운 텀블링을 rotateX/Y 없이 구현. 값이 작을수록 더 납작하게 보인다.
+  // --wd(wind drift): 낙하하면서 바람에 밀리는 전체 수평 이동량. 파티클마다 방향/크기가 달라
+  //   가벼운 난류처럼 보인다. scaleX 플립(--fa/--fb)으로 자연스러운 텀블링 표현.
   const ps = (noFlip = false): React.CSSProperties => {
     const depth = Math.random();
-    const sway = Math.round(14 + Math.random() * 38);
-    const rotation = Math.round(160 + Math.random() * 320) * (Math.random() < 0.5 ? 1 : -1);
+    const sway = Math.round(12 + Math.random() * 28);
+    const wd = Math.round(-55 + Math.random() * 110);
+    const rotation = Math.round(120 + Math.random() * 280) * (Math.random() < 0.5 ? 1 : -1);
     const fa = noFlip ? 1 : parseFloat((0.08 + Math.random() * 0.22).toFixed(2));
     const fb = noFlip ? 1 : parseFloat((0.12 + Math.random() * 0.2).toFixed(2));
     return {
@@ -24,6 +25,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
       '--do': (0.18 + depth * 0.82).toFixed(2),
       '--db': `${((1 - depth) * 2.0).toFixed(1)}px`,
       '--sx': `${sway}px`,
+      '--wd': `${wd}px`,
       '--dr': `${rotation}deg`,
       '--fa': `${fa}`,
       '--fb': `${fb}`,
@@ -37,7 +39,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(33)].map((_, i) => (
             <div key={i} className="particle blossom" style={{
               left: `${Math.random() * 100}%`,
-              animation: fa('fall-natural', 16 + Math.random() * 14, Math.random() * 16),
+              animation: fa('fall-natural', 26 + Math.random() * 18, Math.random() * 24),
               ...ps(),
             }} />
           ))}
@@ -49,7 +51,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(55)].map((_, i) => (
             <div key={i} className="particle snowflake" style={{
               left: `${Math.random() * 100}%`,
-              animation: fa('fall-natural', 8 + Math.random() * 7, Math.random() * 10),
+              animation: fa('fall-natural', 14 + Math.random() * 10, Math.random() * 16),
               ...ps(true),
             }} />
           ))}
@@ -73,7 +75,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(22)].map((_, i) => (
             <div key={i} className="particle leaf" style={{
               left: `${Math.random() * 100}%`,
-              animation: fa('fall-leaf', 14 + Math.random() * 10, Math.random() * 14),
+              animation: fa('fall-leaf', 24 + Math.random() * 14, Math.random() * 22),
               ...ps(),
             }} />
           ))}
@@ -85,7 +87,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(22)].map((_, i) => (
             <div key={i} className="particle heart" style={{
               left: `${Math.random() * 100}%`,
-              animation: fa('float-up', 12 + Math.random() * 10, Math.random() * 14),
+              animation: fa('float-up', 18 + Math.random() * 14, Math.random() * 20),
               fontSize: `${9 + Math.random() * 9}px`,
               ...ps(true),
             }}>♥</div>
@@ -111,7 +113,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(45)].map((_, i) => (
             <div key={i} className={`particle confetti c${(i % 5) + 1}`} style={{
               left: `${Math.random() * 100}%`,
-              animation: fa('fall-natural', 9 + Math.random() * 7, Math.random() * 12),
+              animation: fa('fall-natural', 15 + Math.random() * 10, Math.random() * 18),
               ...ps(),
             }} />
           ))}
@@ -123,7 +125,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(28)].map((_, i) => (
             <div key={i} className={`particle petal p${(i % 3) + 1}`} style={{
               left: `${Math.random() * 100}%`,
-              animation: fa('fall-natural', 15 + Math.random() * 11, Math.random() * 14),
+              animation: fa('fall-natural', 26 + Math.random() * 16, Math.random() * 24),
               ...ps(),
             }} />
           ))}
@@ -135,7 +137,7 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
           {[...Array(20)].map((_, i) => (
             <div key={i} className={`particle autumn-leaf al${(i % 4) + 1}`} style={{
               left: `${Math.random() * 100}%`,
-              animation: fa('fall-leaf', 12 + Math.random() * 10, Math.random() * 14),
+              animation: fa('fall-leaf', 22 + Math.random() * 14, Math.random() * 22),
               ...ps(),
             }} />
           ))}
