@@ -986,6 +986,21 @@
   mask-image: var(--op-deco-mask-x), var(--op-deco-mask-y);
   mask-composite: add;
 }
+/* 편지지 — 가로 괘선 + 삼단 접힘선으로 손편지를 접어놓은 듯한 느낌 */
+.op-pattern-letter {
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 33px,
+      var(--op-pattern-color, rgba(255,255,255,0.07)) 33px,
+      var(--op-pattern-color, rgba(255,255,255,0.07)) 34px
+    ),
+    linear-gradient(90deg, transparent calc(33.33% - 1px), var(--op-pattern-color, rgba(255,255,255,0.10)) calc(33.33% - 1px), var(--op-pattern-color, rgba(255,255,255,0.10)) calc(33.33% + 1px), transparent calc(33.33% + 1px)),
+    linear-gradient(90deg, transparent calc(66.66% - 1px), var(--op-pattern-color, rgba(255,255,255,0.10)) calc(66.66% - 1px), var(--op-pattern-color, rgba(255,255,255,0.10)) calc(66.66% + 1px), transparent calc(66.66% + 1px));
+}
+
 /* Preview overlay popup (portal to body) */
 .pv-overlay-root { animation: pv-overlay-in 0.2s ease; }
 @keyframes pv-overlay-in { from { opacity: 0; } to { opacity: 1; } }
