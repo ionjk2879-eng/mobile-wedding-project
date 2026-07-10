@@ -78,8 +78,8 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
                       <stop offset="100%" stopColor={c2}/>
                     </radialGradient>
                   </defs>
-                  {/* 벚꽃 꽃잎: 위아래 뾰족하고 가운데가 볼록한 잎 모양 */}
-                  <path d="M10,0 C15.5,2.5 20,7.5 20,13 C20,18.5 15.5,23.5 10,26 C4.5,23.5 0,18.5 0,13 C0,7.5 4.5,2.5 10,0 Z" fill={`url(#${gid})`}/>
+                  {/* 벚꽃 꽃잎: 위아래로 뾰족한 갸름한 잎 모양 */}
+                  <path d="M10,0 C12.5,3.5 15,8.5 15,13 C15,17.5 12.5,22.5 10,26 C7.5,22.5 5,17.5 5,13 C5,8.5 7.5,3.5 10,0 Z" fill={`url(#${gid})`}/>
                 </svg>
               </div>
             );
