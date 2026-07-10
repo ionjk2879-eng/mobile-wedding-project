@@ -27,66 +27,99 @@
 }
 
 /* Particle effects */
-.effect-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; perspective: 800px; }
-.particle { position: absolute; top: -20px; transform-style: preserve-3d; }
+.effect-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; }
+.particle { position: absolute; top: -8%; }
 
-/* 3D 입체감: --depth-scale/--rotate-x/--rotate-y/--sway-x는 BackgroundEffects.tsx에서
-   파티클마다 랜덤으로 지정한다. rotateX/rotateY 중 실제 선택되지 않은 축은 0deg 고정이라
-   회전하지 않는다. 각 중간 지점은 최종 회전값에 진행률(0.2/0.4/0.6/0.8)을 곱해 부드럽게
-   이어지게 한다. translateX는 --sway-x(좌우 흔들림 폭)를 좌→우→좌로 반복하며 감쇠시켜
-   일직선 낙하가 아니라 살랑이는 궤적을 만든다. */
-@keyframes fall {
-  0%   { top: -20px; transform: scale(var(--depth-scale, 1)) translateX(0) rotateX(0deg) rotateY(0deg); }
-  20%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * -1)) rotateX(calc(var(--rotate-x, 0deg) * 0.2)) rotateY(calc(var(--rotate-y, 0deg) * 0.2)); }
-  40%  { transform: scale(var(--depth-scale, 1)) translateX(var(--sway-x, 30px)) rotateX(calc(var(--rotate-x, 0deg) * 0.4)) rotateY(calc(var(--rotate-y, 0deg) * 0.4)); }
-  60%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * -0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.6)) rotateY(calc(var(--rotate-y, 0deg) * 0.6)); }
-  80%  { transform: scale(var(--depth-scale, 1)) translateX(calc(var(--sway-x, 30px) * 0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.8)) rotateY(calc(var(--rotate-y, 0deg) * 0.8)); }
-  100% { top: 100%; transform: scale(var(--depth-scale, 1)) translateX(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)); }
+/* === 낙하 애니메이션 ===
+   rotateX/Y 대신 scaleX 진동으로 텀블링 구현:
+   꽃잎·잎이 옆면으로 돌 때 납작하게(--fa/--fb), 앞면일 때 다시 1로 복귀.
+   --ds: 원근 크기  --do: 원근 불투명도  --db: 원근 블러
+   --sx: 좌우 흔들림폭  --dr: 총 Z회전각  --fa/--fb: 플립 중간점 scaleX */
+@keyframes fall-natural {
+  0%   { top: -6%; opacity: 0;             transform: scale(var(--ds,1)) translateX(0px)                          rotate(0deg)                           scaleX(1); }
+  4%   {            opacity: var(--do,.7); }
+  18%  {                                   transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * -.9))   rotate(calc(var(--dr,220deg) * .18))   scaleX(var(--fa,.2)); }
+  35%  {                                   transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * .75))   rotate(calc(var(--dr,220deg) * .35))   scaleX(1); }
+  52%  {                                   transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * -.55))  rotate(calc(var(--dr,220deg) * .52))   scaleX(var(--fb,.3)); }
+  68%  {                                   transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * .6))    rotate(calc(var(--dr,220deg) * .68))   scaleX(1); }
+  85%  {            opacity: var(--do,.7); transform: scale(var(--ds,1)) translateX(calc(var(--sx,28px) * -.35)) rotate(calc(var(--dr,220deg) * .85))   scaleX(var(--fa,.2)); }
+  100% { top: 110%; opacity: 0;            transform: scale(var(--ds,1)) translateX(0px)                          rotate(var(--dr,220deg))                scaleX(1); }
 }
-@keyframes fall-sway {
-  0%   { top: -20px; transform: scale(var(--depth-scale, 1)) rotate(0deg) translateX(0) rotateX(0deg) rotateY(0deg); }
-  20%  { transform: scale(var(--depth-scale, 1)) rotate(72deg) translateX(calc(var(--sway-x, 30px) * -1)) rotateX(calc(var(--rotate-x, 0deg) * 0.2)) rotateY(calc(var(--rotate-y, 0deg) * 0.2)); }
-  40%  { transform: scale(var(--depth-scale, 1)) rotate(144deg) translateX(var(--sway-x, 30px)) rotateX(calc(var(--rotate-x, 0deg) * 0.4)) rotateY(calc(var(--rotate-y, 0deg) * 0.4)); }
-  60%  { transform: scale(var(--depth-scale, 1)) rotate(216deg) translateX(calc(var(--sway-x, 30px) * -0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.6)) rotateY(calc(var(--rotate-y, 0deg) * 0.6)); }
-  80%  { transform: scale(var(--depth-scale, 1)) rotate(288deg) translateX(calc(var(--sway-x, 30px) * 0.7)) rotateX(calc(var(--rotate-x, 0deg) * 0.8)) rotateY(calc(var(--rotate-y, 0deg) * 0.8)); }
-  100% { top: 100%; transform: scale(var(--depth-scale, 1)) rotate(360deg) translateX(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)); }
+/* 잎사귀 전용: 더 넓은 흔들림 + 비대칭 박자 */
+@keyframes fall-leaf {
+  0%   { top: -6%; opacity: 0;              transform: scale(var(--ds,1)) translateX(0px)                          rotate(0deg)                           scaleX(1); }
+  4%   {            opacity: var(--do,.65); }
+  14%  {                                    transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * -1))    rotate(calc(var(--dr,280deg) * .14))   scaleX(var(--fa,.15)); }
+  30%  {                                    transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * .85))   rotate(calc(var(--dr,280deg) * .3))    scaleX(1); }
+  46%  {                                    transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * -.7))   rotate(calc(var(--dr,280deg) * .46))   scaleX(var(--fb,.2)); }
+  62%  {                                    transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * .6))    rotate(calc(var(--dr,280deg) * .62))   scaleX(1); }
+  78%  {            opacity: var(--do,.65); transform: scale(var(--ds,1)) translateX(calc(var(--sx,40px) * -.45)) rotate(calc(var(--dr,280deg) * .78))   scaleX(var(--fa,.15)); }
+  100% { top: 110%; opacity: 0;             transform: scale(var(--ds,1)) translateX(0px)                          rotate(var(--dr,280deg))                scaleX(1); }
 }
-/* confetti-fall/float-up은 이번 3D 회전(rotateX/Y) 대상이 아니라 기존 Z축 회전만 유지하고,
-   depth-scale만 곱해 넣는다 — transform은 애니메이션이 있으면 정적 규칙이 항상 덮어써지므로
-   scale도 반드시 키프레임 안에서 같이 지정해야 실제로 적용된다. */
-@keyframes confetti-fall { 0% { top: -20px; transform: scale(var(--depth-scale, 1)) rotate(0deg) translateX(0); } 25% { transform: scale(var(--depth-scale, 1)) rotate(120deg) translateX(15px); } 50% { transform: scale(var(--depth-scale, 1)) rotate(240deg) translateX(-10px); } 75% { transform: scale(var(--depth-scale, 1)) rotate(300deg) translateX(12px); } 100% { top: 100%; transform: scale(var(--depth-scale, 1)) rotate(360deg) translateX(0); } }
+@keyframes float-up {
+  0%   { top: 105%; opacity: 0;              transform: scale(calc(var(--ds,1) * .5)) translateX(0); }
+  6%   {            opacity: var(--do,.5); }
+  40%  {                                     transform: scale(var(--ds,1)) translateX(15px); }
+  90%  {            opacity: var(--do,.5); }
+  100% { top: -8%;  opacity: 0;              transform: scale(calc(var(--ds,1) * .7)) translateX(-10px); }
+}
 
-/* === 파티클 스타일 === */
-.particle.blossom { width: 15px; height: 15px; background: #FFD1DC; border-radius: 50% 0 50% 50%; opacity: var(--depth-opacity, 0.7); filter: blur(var(--depth-blur, 0px)); animation: fall linear infinite; }
-.particle.snowflake { width: 6px; height: 6px; background: #C8D8E8; border-radius: 50%; opacity: var(--depth-opacity, 0.7); filter: blur(var(--depth-blur, 0px)); box-shadow: 0 0 4px rgba(200,216,232,0.5); animation: fall linear infinite; }
-.particle.star { width: 4px; height: 4px; background: #D4B896; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(212,184,150,0.5); animation: twinkle 2s infinite; }
+/* === 파티클 스타일 — 그라디언트로 입체 음영 표현 === */
+
+/* 벚꽃잎: 타원형, 라이팅 포인트로 볼륨감 */
+.particle.blossom {
+  width: 13px; height: 17px;
+  background: radial-gradient(ellipse at 38% 30%, #FFF2F6 0%, #FFCAD8 52%, #FFB0C8 100%);
+  border-radius: 50% 50% 45% 5% / 50% 50% 45% 5%;
+  box-shadow: inset -1px -2px 3px rgba(200,80,120,.18);
+  opacity: var(--do,.75); filter: blur(var(--db,0px));
+}
+/* 눈송이: 구형, 내부 광택 + 외부 글로우 */
+.particle.snowflake {
+  width: 7px; height: 7px;
+  background: radial-gradient(circle at 38% 35%, #FFFFFF 0%, #D8EEF8 55%, #B8D8EE 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 5px 1px rgba(180,220,255,.55), inset 0 0 2px rgba(255,255,255,.8);
+  opacity: var(--do,.75); filter: blur(var(--db,0px));
+}
+/* 별: 정적 깜빡임 */
+.particle.star { width: 4px; height: 4px; background: #D4B896; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(212,184,150,.5); animation: twinkle 2s infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-.particle.leaf { width: 12px; height: 16px; background: #A8C686; border-radius: 2px 50% 50% 50%; opacity: var(--depth-opacity, 0.6); filter: blur(var(--depth-blur, 0px)); animation: fall-sway linear infinite; transform-origin: center; }
-.particle.heart { color: #F4A0B0; opacity: var(--depth-opacity, 0.5); filter: blur(var(--depth-blur, 0px)); animation: float-up linear infinite; line-height: 1; }
-/* float-up도 자체 scale(0.5→1→0.8)/opacity(0→0.5→0.5→0) 팝 연출이 이미 키프레임 안에 있어,
-   depth-scale/depth-opacity를 곱하는 형태로 얹는다(정적 규칙으로는 덮어써져 무시된다). */
-@keyframes float-up { 0% { top: 100%; opacity: 0; transform: scale(calc(var(--depth-scale, 1) * 0.5)) translateX(0); } 10% { opacity: var(--depth-opacity, 0.5); } 50% { transform: scale(var(--depth-scale, 1)) translateX(15px); } 90% { opacity: var(--depth-opacity, 0.5); } 100% { top: -20px; opacity: 0; transform: scale(calc(var(--depth-scale, 1) * 0.8)) translateX(-10px); } }
-.particle.firefly { width: 5px; height: 5px; background: #F5E6A3; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(245,230,163,0.6); animation: firefly-glow ease-in-out infinite; }
-@keyframes firefly-glow { 0%, 100% { opacity: 0.1; transform: translate(0, 0); } 25% { opacity: 0.8; transform: translate(10px, -15px); } 50% { opacity: 0.3; transform: translate(-8px, 10px); } 75% { opacity: 0.9; transform: translate(12px, 5px); } }
-.particle.confetti { width: 6px; height: 10px; opacity: var(--depth-opacity, 0.7); filter: blur(var(--depth-blur, 0px)); animation: confetti-fall linear infinite; }
-.confetti.c1 { background: #FFB3BA; border-radius: 1px; }
-.confetti.c2 { background: #BAFFC9; border-radius: 50%; width: 7px; height: 7px; }
-.confetti.c3 { background: #BAE1FF; border-radius: 1px; transform: rotate(45deg); }
-.confetti.c4 { background: #FFFFBA; border-radius: 50%; width: 5px; height: 5px; }
-.confetti.c5 { background: #E8BAFF; border-radius: 1px; }
-
-/* 꽃잎 - 크림/아이보리 계열 부드러운 꽃잎 */
-.particle.petal { opacity: var(--depth-opacity, 0.65); filter: blur(var(--depth-blur, 0px)); animation: fall linear infinite; transform-origin: center; }
-.petal.p1 { width: 10px; height: 14px; background: #F5E8DC; border-radius: 50% 0 50% 50%; }
-.petal.p2 { width: 12px; height: 10px; background: #F0DDE8; border-radius: 50%; }
-.petal.p3 { width: 8px; height: 12px; background: #FAF0EA; border-radius: 0 50% 50% 50%; }
-
-/* 단풍잎 - 주황/빨강/갈색 계열 */
-.particle.autumn-leaf { opacity: var(--depth-opacity, 0.65); filter: blur(var(--depth-blur, 0px)); animation: fall-sway linear infinite; transform-origin: center; }
-.autumn-leaf.al1 { width: 14px; height: 14px; background: #D4724A; clip-path: polygon(50% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
-.autumn-leaf.al2 { width: 12px; height: 16px; background: #C45A30; border-radius: 2px 50% 50% 50%; }
-.autumn-leaf.al3 { width: 13px; height: 13px; background: #E8904A; clip-path: polygon(50% 0%, 85% 30%, 100% 70%, 50% 100%, 0% 70%, 15% 30%); }
-.autumn-leaf.al4 { width: 11px; height: 15px; background: #A85830; border-radius: 50% 2px 50% 50%; }
+/* 잎: 선형 그라디언트로 잎맥 입체감 */
+.particle.leaf {
+  width: 12px; height: 18px;
+  background: linear-gradient(148deg, #D4EDB0 0%, #8FC25A 38%, #5A9E2F 65%, #3D7A1C 100%);
+  border-radius: 4px 55% 55% 55% / 4px 55% 55% 55%;
+  box-shadow: inset -1px -2px 4px rgba(30,80,10,.25);
+  opacity: var(--do,.65); filter: blur(var(--db,0px));
+}
+/* 하트: 위로 떠오름 */
+.particle.heart {
+  color: #F4A0B0; line-height: 1;
+  text-shadow: 0 1px 4px rgba(220,100,130,.28);
+  opacity: var(--do,.5); filter: blur(var(--db,0px));
+}
+/* 반딧불: 정적 이동 */
+.particle.firefly { width: 5px; height: 5px; background: #F5E6A3; border-radius: 50%; box-shadow: 0 0 6px 2px rgba(245,230,163,.6); animation: firefly-glow ease-in-out infinite; }
+@keyframes firefly-glow { 0%,100%{opacity:.1;transform:translate(0,0)} 25%{opacity:.8;transform:translate(10px,-15px)} 50%{opacity:.3;transform:translate(-8px,10px)} 75%{opacity:.9;transform:translate(12px,5px)} }
+/* 색종이: 금속광택 그라디언트 */
+.particle.confetti { opacity: var(--do,.82); filter: blur(var(--db,0px)); }
+.confetti.c1 { width: 7px; height: 11px; background: linear-gradient(148deg, #FFD4D8, #FF7888, #FF3050); border-radius: 1px; }
+.confetti.c2 { width: 8px; height: 8px;  background: radial-gradient(circle at 35% 35%, #D0FFD8, #60E070, #20A030); border-radius: 50%; }
+.confetti.c3 { width: 11px; height: 7px; background: linear-gradient(148deg, #D4E8FF, #60A8FF, #2060FF); border-radius: 1px; }
+.confetti.c4 { width: 6px; height: 6px;  background: radial-gradient(circle at 35% 35%, #FFFFD8, #FFE040, #FFA800); border-radius: 50%; }
+.confetti.c5 { width: 7px; height: 11px; background: linear-gradient(148deg, #EDD4FF, #B050FF, #7010E0); border-radius: 1px; }
+/* 꽃잎(petals): 크림/아이보리 방사형 그라디언트 */
+.particle.petal { opacity: var(--do,.7); filter: blur(var(--db,0px)); }
+.petal.p1 { width: 11px; height: 15px; background: radial-gradient(ellipse at 35% 28%, #FFF8F2 0%, #F5D8C8 60%, #E8C0B0 100%); border-radius: 50% 50% 50% 5% / 50% 50% 50% 5%; box-shadow: inset -1px -2px 3px rgba(180,100,80,.12); }
+.petal.p2 { width: 13px; height: 10px; background: radial-gradient(ellipse at 38% 32%, #FFF0F5 0%, #F8D0DC 55%, #EEBECE 100%); border-radius: 50%; box-shadow: inset -1px -1px 3px rgba(200,100,130,.12); }
+.petal.p3 { width: 9px;  height: 13px; background: radial-gradient(ellipse at 40% 28%, #FFF4EE 0%, #F0D8C8 60%, #E0C0B0 100%); border-radius: 5% 50% 50% 50% / 5% 50% 50% 50%; box-shadow: inset -1px -2px 3px rgba(160,90,70,.1); }
+/* 단풍잎: 따뜻한 그라디언트 */
+.particle.autumn-leaf { opacity: var(--do,.72); filter: blur(var(--db,0px)); }
+.autumn-leaf.al1 { width: 15px; height: 15px; background: radial-gradient(ellipse at 40% 30%, #FFD080 0%, #E07030 55%, #A03010 100%); clip-path: polygon(50% 0%,100% 50%,75% 100%,25% 100%,0% 50%); }
+.autumn-leaf.al2 { width: 12px; height: 17px; background: linear-gradient(148deg, #FFAA50 0%, #D05020 50%, #901800 100%); border-radius: 3px 55% 55% 55% / 3px 55% 55% 55%; box-shadow: inset -1px -2px 3px rgba(80,10,5,.22); }
+.autumn-leaf.al3 { width: 14px; height: 14px; background: radial-gradient(ellipse at 38% 32%, #FFD060 0%, #E09020 50%, #B05010 100%); clip-path: polygon(50% 0%,85% 30%,100% 70%,50% 100%,0% 70%,15% 30%); }
+.autumn-leaf.al4 { width: 11px; height: 16px; background: linear-gradient(142deg, #FFC060 0%, #C04010 55%, #801008 100%); border-radius: 55% 3px 55% 55% / 55% 3px 55% 55%; box-shadow: inset -1px -2px 3px rgba(80,10,5,.22); }
 
 /* Music float button */
 /* 높이 0인 sticky 래퍼로 레이아웃 밀림 없이 우측 상단 고정 */
