@@ -292,7 +292,7 @@ const OpeningSection: React.FC = () => {
                   { key: 'frame', name: '이중 테두리',  desc: '고급 초대장의 안쪽 액자 프레임' },
                   { key: 'grain', name: '그레인 노이즈', desc: '필름 입자 질감, 빈티지·아날로그 감성' },
                   { key: 'deco-lines', name: '아르데코 라인', desc: '가장자리를 두르는 얇은 대각선 기하학 패턴' },
-                  { key: 'letter', name: '편지지', desc: '괘선과 삼단 접힘선으로 손편지 같은 감성' },
+                  { key: 'letter', name: '편지 봉투', desc: '하단 개봉선으로 봉투에서 편지를 꺼낸 듯한 느낌' },
                 ] as const).map(p => (
                   <button key={p.key} type="button"
                     className={`account-style-btn ${p.key === 'none' ? (selected.length === 0 ? 'active' : '') : selected.includes(p.key) ? 'active' : ''}`}

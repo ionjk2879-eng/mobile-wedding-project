@@ -986,19 +986,18 @@
   mask-image: var(--op-deco-mask-x), var(--op-deco-mask-y);
   mask-composite: add;
 }
-/* 편지지 — 가로 괘선 + 삼단 접힘선으로 손편지를 접어놓은 듯한 느낌 */
-.op-pattern-letter {
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0,
-      transparent 33px,
-      var(--op-pattern-color, rgba(255,255,255,0.07)) 33px,
-      var(--op-pattern-color, rgba(255,255,255,0.07)) 34px
-    ),
-    linear-gradient(90deg, transparent calc(33.33% - 1px), var(--op-pattern-color, rgba(255,255,255,0.10)) calc(33.33% - 1px), var(--op-pattern-color, rgba(255,255,255,0.10)) calc(33.33% + 1px), transparent calc(33.33% + 1px)),
-    linear-gradient(90deg, transparent calc(66.66% - 1px), var(--op-pattern-color, rgba(255,255,255,0.10)) calc(66.66% - 1px), var(--op-pattern-color, rgba(255,255,255,0.10)) calc(66.66% + 1px), transparent calc(66.66% + 1px));
+/* 편지 봉투 — 화면 하단에 봉투 개봉선(V자)을 두어, 그 위 내용이 봉투에서 편지를 꺼낸 듯한 느낌 */
+.op-pattern-letter { inset: 0; }
+.op-pattern-letter::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 46%;
+  background: var(--op-pattern-color, rgba(255,255,255,0.35));
+  clip-path: polygon(
+    0% 0px, 50% 90%, 100% 0px,
+    100% 2px, 50% calc(90% + 2px), 0% 2px
+  );
 }
 
 /* Preview overlay popup (portal to body) */
