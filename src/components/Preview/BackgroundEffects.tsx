@@ -31,8 +31,8 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
       '--depth-blur': `${(2 - depth * 2).toFixed(2)}px`,
       '--rotate-x': axis === 'X' ? '360deg' : '0deg',
       '--rotate-y': axis === 'Y' ? '360deg' : '0deg',
-      '--sway-x': `${(20 + Math.random() * 30).toFixed(1)}px`,
-      '--wind': `${Math.round(25 + Math.random() * 50)}px`,
+      '--sway-x': `${(5 + Math.random() * 12).toFixed(1)}px`,
+      '--wind': `${Math.round(200 + Math.random() * 200)}px`,
     } as React.CSSProperties;
   };
 
@@ -58,9 +58,9 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
                 '--bsc': (0.5 + depth * 0.65).toFixed(2),
                 '--bop': (0.42 + depth * 0.48).toFixed(2),
                 '--bbl': `${((1 - depth) * 1.2).toFixed(1)}px`,
-                '--bsx': `${Math.round(10 + Math.random() * 20)}px`,
+                '--bsx': `${Math.round(5 + Math.random() * 10)}px`,
                 '--bdr': `${Math.round(60 + Math.random() * 220) * (Math.random() < 0.5 ? 1 : -1)}deg`,
-                '--wind': `${Math.round(25 + Math.random() * 55)}px`,
+                '--wind': `${Math.round(200 + Math.random() * 200)}px`,
               } as React.CSSProperties}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 24" width={w} height={h} style={{ display: 'block' }}>
                   <defs>
@@ -198,10 +198,9 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
 
   if (!layer) return null;
 
-  // scrollRoot === null: ViewPage / AnniversaryEditPage / TemplatePreviewPage 등 뷰어
-  // → portal로 body 직하에 마운트, position:fixed가 진짜 뷰포트를 덮음
-  // scrollRoot !== null: 에디터 프리뷰 패널
-  // → 인라인 렌더링, preview-content-scroll의 transform:translateZ(0)으로 패널 안에 가둠
+  const innerLayer = React.cloneElement(layer, { style: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 } });
+
+  // ViewPage (scrollRoot===null): portal to body, truly viewport-fixed
   if (scrollRoot === null) {
     return ReactDOM.createPortal(
       <div style={{
@@ -210,12 +209,30 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
         width: 'min(100vw, 430px)',
         overflow: 'hidden', pointerEvents: 'none', zIndex: 1,
       }}>
-        {React.cloneElement(layer, { style: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 } })}
+        {innerLayer}
       </div>,
       document.body
     );
   }
-  return layer;
+
+  // 에디터/전체화면 미리보기: position:sticky + height:0 으로 스크롤 중에도 보이는 화면 상단에 고정
+  // (music 버튼과 동일한 패턴. transform 컨테이너 내 position:fixed 는 스크롤과 함께 밀려 올라가는 브라우저 버그 우회)
+  return (
+    <div style={{
+      position: 'sticky', top: 0,
+      height: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 1,
+    }}>
+      <div style={{
+        position: 'absolute', top: 0,
+        left: 'calc((100% - min(100%, 430px)) / 2)',
+        width: 'min(100%, 430px)',
+        height: '100dvh',
+        overflow: 'hidden', pointerEvents: 'none',
+      }}>
+        {innerLayer}
+      </div>
+    </div>
+  );
 };
 
 export default React.memo(BackgroundEffects);

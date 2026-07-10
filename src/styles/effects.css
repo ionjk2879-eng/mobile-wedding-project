@@ -27,17 +27,8 @@
 }
 
 /* Particle effects */
-/* ViewPage (scrollRoot===null): portal → body 직하 마운트, 카드 너비 wrapper로 청첩장 영역만 덮음
-   전체화면 프리뷰: .full-preview-container에 transform 추가로 가두고, 아래 CSS로 카드 폭 제한
-   에디터 프리뷰 패널: 인라인 렌더링, preview-content-scroll의 transform:translateZ(0)으로 패널 안에 가둠 */
-.effect-layer { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; perspective: 800px; }
-/* 전체화면 프리뷰: full-preview-container가 transform으로 가두므로 카드 폭/위치로 제한 */
-.full-preview-container .effect-layer {
-  top: 0; bottom: 0;
-  left: calc((100vw - min(100vw, 430px)) / 2);
-  width: min(100vw, 430px);
-  right: auto;
-}
+/* position/size는 JS(BackgroundEffects.tsx)에서 cloneElement로 주입. CSS는 시각 속성만 담당. */
+.effect-layer { overflow: hidden; pointer-events: none; z-index: 1; perspective: 800px; }
 .particle { position: absolute; top: -20px; transform-style: preserve-3d; }
 
 /* --wind: 낙하하면서 오른쪽으로 누적되는 바람 편류(25~75px). 좌→우 대각선 연출.
