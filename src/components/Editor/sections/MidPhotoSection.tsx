@@ -4,6 +4,7 @@ import useInvitationStore from '../../../stores/useInvitationStore';
 import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
 import { getApiErrorMessage } from '../../../utils/apiError';
+import { formatPosOffset } from '../../../utils/photoPosOffset';
 
 const MidPhotoSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -61,14 +62,17 @@ const MidPhotoSection: React.FC = () => {
               <div className="photo-pos-row">
                 <span className="photo-pos-label">좌우</span>
                 <input type="range" min={0} max={100} value={data.midPhotoX ?? 50} onChange={(e) => updateField('midPhotoX', Number(e.target.value))} className="photo-pos-slider" />
+                <span className="photo-pos-value">{formatPosOffset(data.midPhotoX ?? 50, 50)}</span>
               </div>
               <div className="photo-pos-row">
                 <span className="photo-pos-label">상하</span>
                 <input type="range" min={0} max={100} value={data.midPhotoY ?? 50} onChange={(e) => updateField('midPhotoY', Number(e.target.value))} className="photo-pos-slider" />
+                <span className="photo-pos-value">{formatPosOffset(data.midPhotoY ?? 50, 50)}</span>
               </div>
               <div className="photo-pos-row">
                 <span className="photo-pos-label">확대</span>
                 <input type="range" min={100} max={200} value={data.midPhotoScale ?? 100} onChange={(e) => updateField('midPhotoScale', Number(e.target.value))} className="photo-pos-slider" />
+                <span className="photo-pos-value">{formatPosOffset(data.midPhotoScale ?? 100, 100)}</span>
               </div>
             </div>
           )}

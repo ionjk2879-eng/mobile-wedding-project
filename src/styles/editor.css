@@ -189,6 +189,7 @@
 .photo-pos-row { display: flex; align-items: center; gap: 10px; }
 .photo-pos-label { font-size: 0.75rem; font-weight: 600; color: #6B7280; min-width: 28px; }
 .photo-pos-slider { flex: 1; accent-color: #D4A5C6; }
+.photo-pos-value { font-size: 0.72rem; font-weight: 600; color: #9CA3AF; min-width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
 .photo-pos-reset { display: block; margin: 8px 0 0 auto; padding: 6px 12px; border: 1px solid #E5E7EB; border-radius: 8px; background: white; font-size: 0.72rem; color: #9CA3AF; cursor: pointer; transition: all 0.2s; }
 .photo-pos-reset:hover { border-color: #D4A5C6; color: #D4A5C6; }
 .hero-style-grid { display: flex; flex-wrap: wrap; gap: 6px; }

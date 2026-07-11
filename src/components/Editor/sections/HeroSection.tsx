@@ -6,6 +6,7 @@ import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
 import { getApiErrorMessage } from '../../../utils/apiError';
 import { isFixedLookHeroStyle } from '../../../data/heroStyleConfig';
+import { formatPosOffset } from '../../../utils/photoPosOffset';
 
 const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; name: string }[] = [
   { key: 'basic', name: '기본' },
@@ -87,14 +88,17 @@ const HeroSection: React.FC = () => {
               <div className="photo-pos-row">
                 <span className="photo-pos-label">좌우</span>
                 <input type="range" min={0} max={100} value={data.heroPhotoX ?? 50} onChange={(e) => updateField('heroPhotoX', Number(e.target.value))} className="photo-pos-slider" />
+                <span className="photo-pos-value">{formatPosOffset(data.heroPhotoX ?? 50, 50)}</span>
               </div>
               <div className="photo-pos-row">
                 <span className="photo-pos-label">상하</span>
                 <input type="range" min={0} max={100} value={data.heroPhotoY ?? 50} onChange={(e) => updateField('heroPhotoY', Number(e.target.value))} className="photo-pos-slider" />
+                <span className="photo-pos-value">{formatPosOffset(data.heroPhotoY ?? 50, 50)}</span>
               </div>
               <div className="photo-pos-row">
                 <span className="photo-pos-label">확대</span>
                 <input type="range" min={100} max={200} value={data.heroPhotoScale ?? 100} onChange={(e) => updateField('heroPhotoScale', Number(e.target.value))} className="photo-pos-slider" />
+                <span className="photo-pos-value">{formatPosOffset(data.heroPhotoScale ?? 100, 100)}</span>
               </div>
             </div>
           )}
