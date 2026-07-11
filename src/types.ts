@@ -102,7 +102,7 @@ export interface ContentData {
   groomPhoto: string;
   bridePhoto: string;
   photos: string[];
-  galleryStyle: 'slide' | 'style3' | 'auto';
+  galleryStyle: 'slide' | 'style3' | 'auto' | 'slideshow';
   calendarStyle?: 'card' | 'plain';
   locationStyle?: 'card' | 'plain';
   messageStyle?: 'card' | 'plain';

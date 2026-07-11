@@ -416,6 +416,13 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+
+/* 슬라이드쇼 — 사진을 한 장씩 크로스페이드로 보여주며 일정 시간마다 자동으로 넘어간다. */
+.gallery-slideshow { text-align: center; }
+.gallery-slideshow-vp { position: relative; width: 100%; border-radius: 12px; overflow: hidden; transition: padding-bottom 0.4s ease; }
+.gallery-slideshow-item { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease; cursor: pointer; }
+.gallery-slideshow-item.active { opacity: 1; z-index: 1; }
+.gallery-slideshow-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; }
 .lightbox-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--wedding-bg); }
 .close-btn { position: absolute; top: 20px; right: 20px; color: #000000; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: all 0.2s; }

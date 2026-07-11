@@ -29,6 +29,16 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
   const slideTrackRef = useRef<HTMLDivElement>(null);
   const slideVpRef = useRef<HTMLDivElement>(null);
 
+  // 슬라이드쇼: 1장씩 크로스페이드로 보여주며 몇 초 후 자동으로 다음 사진으로 넘어간다.
+  const [slideshowIdx, setSlideshowIdx] = useState(0);
+  useEffect(() => {
+    if (data.galleryStyle !== 'slideshow' || data.photos.length <= 1) return;
+    const timer = setInterval(() => {
+      setSlideshowIdx(i => (i + 1) % data.photos.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [data.galleryStyle, data.photos.length]);
+
   const makeDrag = (
     idxRef: { current: number },
     setIdx: (v: number) => void,
@@ -165,7 +175,7 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
     );
   };
 
-  const style = data.galleryStyle === 'style3' ? 'style3' : data.galleryStyle === 'auto' ? 'auto' : 'slide';
+  const style = data.galleryStyle === 'style3' ? 'style3' : data.galleryStyle === 'auto' ? 'auto' : data.galleryStyle === 'slideshow' ? 'slideshow' : 'slide';
   // 자동 애니메이션: 사진 배열을 두 번 이어붙여 폭의 절반(-50%)만큼 translateX 하면
   // 이음매 없이 무한 루프된다(물결 효과와 같은 방식). 속도는 사진 수에 비례해
   // 사진이 많아져도 개별 사진이 흐르는 체감 속도가 비슷하게 유지되게 한다.
@@ -235,6 +245,25 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {style === 'slideshow' && (
+            <div className="gallery-slideshow">
+              <div className="gallery-slideshow-vp" style={{ paddingBottom: `${(photoRatios[slideshowIdx] || 0.75) * 100}%` }}>
+                {data.photos.map((src, i) => (
+                  <div key={i} className={`gallery-slideshow-item ${i === slideshowIdx ? 'active' : ''}`} onClick={() => setSelectedIndex(i)}>
+                    <img src={src} alt={`Gallery ${i}`} draggable="false" loading="lazy" decoding="async" />
+                  </div>
+                ))}
+              </div>
+              {data.photos.length > 1 && (
+                <div className="gallery-slide-dots">
+                  {data.photos.map((_, i) => (
+                    <button key={i} className={`gallery-slide-dot ${i === slideshowIdx ? 'active' : ''}`} onClick={() => setSlideshowIdx(i)} aria-label={`사진 ${i + 1}`} />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </>
