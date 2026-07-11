@@ -42,11 +42,6 @@ const HeroArch: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
   </div>
 );
 
-// 하단(또는 상단) 그라데이션 페이드 — 사진이 배경색으로 자연스럽게 스며들 듯 사라진다.
-const HeroGradient: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
-  <div className={`hero-gradient hero-gradient-${position}`} aria-hidden="true" />
-);
-
 const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
@@ -117,15 +112,14 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   // 경계 효과는 메인화면 섹션 전체가 아니라, 실제 들어간 사진(+사진 모형) 위에 얹혀야
   // 어떤 메인화면 스타일을 고르든 사진 경계를 그대로 따라간다.
-  const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch' | 'gradient', React.FC<{ position: 'top' | 'bottom' }>> = {
+  const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch', React.FC<{ position: 'top' | 'bottom' }>> = {
     wave: HeroWave,
     diagonal: HeroDiagonal,
     arch: HeroArch,
-    gradient: HeroGradient,
   };
   const renderPhotoWithWave = (inner: React.ReactNode): React.ReactNode => {
-    if (effectType === 'none') return inner;
-    const EffectComponent = EFFECT_COMPONENTS[effectType];
+    if (effectType === 'none' || !(effectType in EFFECT_COMPONENTS)) return inner;
+    const EffectComponent = EFFECT_COMPONENTS[effectType as 'wave' | 'diagonal' | 'arch'];
     return (
       <div className="hero-photo-frame">
         {inner}

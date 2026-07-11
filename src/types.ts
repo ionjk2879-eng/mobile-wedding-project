@@ -75,7 +75,7 @@ export interface DesignConfig {
   // 이 값이 'none'이 아니면 물결 효과로 취급해 하위 호환한다.)
   heroWaveEffect?: 'none' | 'top' | 'bottom' | 'both';
   // 메인화면 사진 경계 효과 종류. 미지정 시 heroWaveEffect로 하위 호환 판단.
-  heroEffectType?: 'none' | 'wave' | 'diagonal' | 'arch' | 'gradient';
+  heroEffectType?: 'none' | 'wave' | 'diagonal' | 'arch';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype' | 'magframe' | 'boldtype' | 'datesplit';

@@ -42,11 +42,6 @@
 .hero-arch-top { top: 0; transform: scaleY(-1); }
 .hero-arch-layer { position: absolute; bottom: -1px; left: 0; width: 100%; height: 100%; fill: var(--wedding-bg, #FFFFFF); }
 
-/* 그라데이션 페이드 — 사진이 배경색으로 스며들듯 사라지는 효과. */
-.hero-gradient { position: absolute; left: 0; right: 0; height: 35%; pointer-events: none; z-index: 3; }
-.hero-gradient-bottom { bottom: 0; background: linear-gradient(to top, var(--wedding-bg, #FFFFFF), transparent); }
-.hero-gradient-top { top: 0; background: linear-gradient(to bottom, var(--wedding-bg, #FFFFFF), transparent); }
-
 /* 사진 모형(heroPhotoShape) — Hero.tsx 대표 사진에만 적용되는 축. 각 heroStyle이 만든
    기존 wrap 요소(.hero-img-wrap 등) 안에 이 클래스가 감싸져 들어가며, width/height는
    부모 wrap을 100% 채운다. */
