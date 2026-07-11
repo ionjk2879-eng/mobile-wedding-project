@@ -196,13 +196,23 @@ const HeroSection: React.FC = () => {
             { key: 'filmstrip', name: '필름 스틸' },
             { key: 'verttype', name: '세로 타이포' },
             { key: 'magframe', name: '매거진 프레임' },
-            { key: 'boldtype', name: '볼드 타이포' },
             { key: 'datesplit', name: '데이트 스플릿' },
           ] as { key: InvitationData['heroStyle']; name: string }[]).map(s => (
             <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
               <strong>{s.name}</strong>
             </button>
           ))}
+        </div>
+      </div>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">타이포그래피</label>
+        <div className="account-style-grid">
+          <button type="button" className={`account-style-btn ${(data.heroTypography || 'none') === 'none' ? 'active' : ''}`} onClick={() => updateField('heroTypography', 'none')}>
+            <strong>없음</strong>
+          </button>
+          <button type="button" className={`account-style-btn ${data.heroTypography === 'ourwedding' ? 'active' : ''}`} onClick={() => updateField('heroTypography', 'ourwedding')}>
+            <strong>OUR WEDDING</strong>
+          </button>
         </div>
       </div>
       <div className="opt-inline-group">

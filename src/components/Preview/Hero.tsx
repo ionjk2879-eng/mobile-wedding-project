@@ -76,6 +76,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   // heroEffectType이 없는 기존 데이터는 heroWaveEffect만 있으면 물결 효과로 간주(하위 호환).
   const effectType = data.heroEffectType || (data.heroWaveEffect && data.heroWaveEffect !== 'none' ? 'wave' : 'none');
   const effectPosition = data.heroWaveEffect || 'none';
+  const typography = data.heroTypography || 'none';
   const yearStr = data.weddingDateISO ? data.weddingDateISO.slice(0, 4) : String(new Date().getFullYear());
 
   const calculateDDay = () => {
@@ -117,21 +118,29 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     diagonal: HeroDiagonal,
     arch: HeroArch,
   };
-  const renderPhotoWithWave = (inner: React.ReactNode): React.ReactNode => {
-    if (effectType === 'none' || !(effectType in EFFECT_COMPONENTS)) return inner;
-    const EffectComponent = EFFECT_COMPONENTS[effectType as 'wave' | 'diagonal' | 'arch'];
+  const renderPhotoWithWave = (inner: React.ReactNode, includeTypography = false): React.ReactNode => {
+    const hasEffect = effectType !== 'none' && effectType in EFFECT_COMPONENTS;
+    const hasTypography = includeTypography && typography === 'ourwedding';
+    if (!hasEffect && !hasTypography) return inner;
+    const EffectComponent = hasEffect ? EFFECT_COMPONENTS[effectType as 'wave' | 'diagonal' | 'arch'] : null;
     return (
       <div className="hero-photo-frame">
         {inner}
-        {(effectPosition === 'top' || effectPosition === 'both') && <EffectComponent position="top" />}
-        {(effectPosition === 'bottom' || effectPosition === 'both') && <EffectComponent position="bottom" />}
+        {EffectComponent && (effectPosition === 'top' || effectPosition === 'both') && <EffectComponent position="top" />}
+        {EffectComponent && (effectPosition === 'bottom' || effectPosition === 'both') && <EffectComponent position="bottom" />}
+        {hasTypography && (
+          <div className="hero-typo-overlay" aria-hidden="true">
+            <span className="hero-typo-dots">•••</span>
+            <h1 className="hero-typo-statement"><span>Our</span><span>Wedding.</span></h1>
+          </div>
+        )}
       </div>
     );
   };
 
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
   const emptyPhotoEl = <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>;
-  const photoEl = renderPhotoWithWave(wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl, data.heroPhotoScale ?? 100));
+  const photoEl = renderPhotoWithWave(wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl, data.heroPhotoScale ?? 100), true);
 
   const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
   const photo2El = data.heroPhoto2 ? renderPhotoWithWave(wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl)) : photoEl;
@@ -518,6 +527,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhotoShape === next.data.heroPhotoShape
   && prev.data.heroWaveEffect === next.data.heroWaveEffect
   && prev.data.heroEffectType === next.data.heroEffectType
+  && prev.data.heroTypography === next.data.heroTypography
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily

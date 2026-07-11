@@ -42,6 +42,14 @@
 .hero-arch-top { top: 0; transform: scaleY(-1); }
 .hero-arch-layer { position: absolute; bottom: -1px; left: 0; width: 100%; height: 100%; fill: var(--wedding-bg, #FFFFFF); }
 
+/* 타이포그래피(OUR WEDDING) — 특정 메인화면 스타일 전용이 아니라 어떤 스타일의 사진
+   위에도 얹을 수 있는 독립 오버레이. 원래 "볼드 타이포" 스타일 전용이던 문구를
+   범용화한 것 — 하단 그라데이션으로 사진 위에서도 텍스트 가독성을 확보한다. */
+.hero-typo-overlay { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; justify-content: flex-end; padding: 24px 20px 26px; box-sizing: border-box; background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.30) 100%); pointer-events: none; }
+.hero-typo-dots { position: absolute; top: 20px; right: 20px; color: #fff; opacity: 0.9; font-size: 0.9em; letter-spacing: 2px; background: rgba(255,255,255,0.20); padding: 4px 10px; border-radius: 14px; }
+.hero-typo-statement { margin: 0; font-weight: 800; font-family: 'Pretendard', 'Noto Sans KR', sans-serif; line-height: 0.88; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.25); }
+.hero-typo-statement span { display: block; font-size: 2.3em; letter-spacing: -0.01em; }
+
 /* 사진 모형(heroPhotoShape) — Hero.tsx 대표 사진에만 적용되는 축. 각 heroStyle이 만든
    기존 wrap 요소(.hero-img-wrap 등) 안에 이 클래스가 감싸져 들어가며, width/height는
    부모 wrap을 100% 채운다. */

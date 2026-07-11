@@ -76,6 +76,9 @@ export interface DesignConfig {
   heroWaveEffect?: 'none' | 'top' | 'bottom' | 'both';
   // 메인화면 사진 경계 효과 종류. 미지정 시 heroWaveEffect로 하위 호환 판단.
   heroEffectType?: 'none' | 'wave' | 'diagonal' | 'arch';
+  // 메인화면 사진 위에 얹는 "Our Wedding." 볼드 타이포그래피 오버레이. 특정 메인화면
+  // 스타일 전용이 아니라 어떤 스타일을 고르든 함께 켤 수 있는 독립 옵션.
+  heroTypography?: 'none' | 'ourwedding';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype' | 'magframe' | 'boldtype' | 'datesplit';
