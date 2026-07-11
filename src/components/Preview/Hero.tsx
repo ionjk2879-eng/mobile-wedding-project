@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { InvitationData } from '../../types';
 import { isFixedLookHeroStyle } from '../../data/heroStyleConfig';
 import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateTime';
@@ -6,70 +6,6 @@ import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateT
 interface PreviewProps {
   data: InvitationData;
 }
-
-// 메인화면 경계에 얹는 물결(파도) 효과. 봉우리 사이 골이 맨 아래(y=100)에 완전히
-// 닿는 파도 모양이라야 뭉게구름처럼 안 보이고 "물결"로 읽힌다 — 봉우리만 둥글고
-// 골이 바닥에 닿지 않으면 경계가 흐릿한 구름 실루엣처럼 보인다. 레이어 2장을 서로
-// 다른 속도로 좌우로 흘려보내는 옅은 패럴랙스를 낸다 — SVG 폭을 컨테이너의 2배(200%)로
-// 두고 정확히 절반(-50%)만큼 translateX 하면, 패스 패턴이 정확히 한 주기(뷰박스 절반)씩
-// 반복되므로 이음매 없이 무한 루프된다. 색은 --wedding-bg(테마 배경색)를 그대로 써서
-// 어떤 테마에서도 "그 다음 배경이 비쳐 보이는" 느낌을 유지한다.
-// 메인화면 자체가 hero-fade-in(0.8s, opacity+translateY)으로 등장하는 도중에 물결이
-// 같이 움직이면, 두 애니메이션(부모의 슬라이드 + 물결의 가로 드리프트)이 겹쳐 보이면서
-// "잔상을 남기다 멈추고 정상 동작으로 바뀌는" 것처럼 부자연스럽게 보인다. 그래서 첫
-// requestAnimationFrame(첫 페인트 확정)을 확인한 뒤, hero-fade-in이 다 끝날 시간만큼
-// 더 기다렸다가(0.8s와 맞춤) 물결을 시작시킨다 — 메인화면이 완전히 자리 잡고 정지한
-// 상태에서만 물결이 흐르기 시작하므로 두 움직임이 겹치지 않는다. 페이지가 막 뜨는
-// 무거운 렌더링 시점도 이 시간 동안 충분히 지나가므로 저사양 기기 튐 문제도 같이 피한다.
-const HERO_ENTRANCE_MS = 800;
-function useWaveStarted(): boolean {
-  const [started, setStarted] = useState(false);
-  useEffect(() => {
-    let raf = 0;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    raf = requestAnimationFrame(() => {
-      timer = setTimeout(() => setStarted(true), HERO_ENTRANCE_MS);
-    });
-    return () => {
-      cancelAnimationFrame(raf);
-      if (timer) clearTimeout(timer);
-    };
-  }, []);
-  return started;
-}
-
-const HeroWave: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => {
-  const started = useWaveStarted();
-  return (
-    <div className={`hero-wave hero-wave-${position}`} aria-hidden="true">
-      <svg className={`hero-wave-layer hero-wave-layer-back${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 150" preserveAspectRatio="none">
-        <path d="M0,100 C200,100 300,52 600,52 C900,52 1000,100 1200,100 C1400,100 1500,52 1800,52 C2100,52 2200,100 2400,100 L2400,150 L0,150 Z" />
-      </svg>
-      <svg className={`hero-wave-layer hero-wave-layer-front${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 150" preserveAspectRatio="none">
-        <path d="M0,100 C200,100 300,65 600,65 C900,65 1000,100 1200,100 C1400,100 1500,65 1800,65 C2100,65 2200,100 2400,100 L2400,150 L0,150 Z" />
-      </svg>
-    </div>
-  );
-};
-
-// 대각선 컷 — 사진 경계를 한 방향으로 떨어지는 사선으로 자른다. 물결과 달리 애니메이션
-// 없이 고정된 단일 레이어.
-const HeroDiagonal: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
-  <div className={`hero-diagonal hero-diagonal-${position}`} aria-hidden="true">
-    <svg className="hero-diagonal-layer" viewBox="0 0 2400 100" preserveAspectRatio="none">
-      <path d="M0,100 L2400,35 L2400,100 Z" />
-    </svg>
-  </div>
-);
-
-// 아치 커브 — 반복 없는 완만한 곡선 하나로 사진 경계를 감싼다.
-const HeroArch: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
-  <div className={`hero-arch hero-arch-${position}`} aria-hidden="true">
-    <svg className="hero-arch-layer" viewBox="0 0 2400 100" preserveAspectRatio="none">
-      <path d="M0,60 Q1200,-20 2400,60 L2400,100 L0,100 Z" />
-    </svg>
-  </div>
-);
 
 const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
@@ -102,9 +38,6 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return data.time;
   })();
   const style = data.heroStyle || 'classic';
-  // heroEffectType이 없는 기존 데이터는 heroWaveEffect만 있으면 물결 효과로 간주(하위 호환).
-  const effectType = data.heroEffectType || (data.heroWaveEffect && data.heroWaveEffect !== 'none' ? 'wave' : 'none');
-  const effectPosition = data.heroWaveEffect || 'none';
   const typography = data.heroTypography || 'none';
   const yearStr = data.weddingDateISO ? data.weddingDateISO.slice(0, 4) : String(new Date().getFullYear());
 
@@ -125,30 +58,15 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   // 갖고 있어 이 축을 무시(항상 basic 취급)한다.
   const heroShape = isFixedLookHeroStyle(style) ? 'basic' : (data.heroPhotoShape || 'basic');
 
-  // 경계 효과(물결/대각선/아치)와 타이포그래피는 사진 모형(heroPhotoShape, 오벌/육각형/
-  // 블롭 등)이 아니라 메인화면 스타일의 전체 사각형 틀 하단에 걸리도록 그린다 — 오벌/
-  // 육각형처럼 좁고 각진 모형 경계에 맞춰 잘리면 물결 모양 자체가 이상하게 잘려 보인다.
-  const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch', React.FC<{ position: 'top' | 'bottom' }>> = {
-    wave: HeroWave,
-    diagonal: HeroDiagonal,
-    arch: HeroArch,
-  };
+  // 타이포그래피는 사진 모형(heroPhotoShape, 오벌/육각형/블롭 등)이 아니라 메인화면
+  // 스타일의 전체 사각형 틀에 걸리도록 그린다.
   const buildEffectsNode = (includeTypography = false): React.ReactNode => {
-    const hasEffect = effectType !== 'none' && effectType in EFFECT_COMPONENTS;
-    const hasTypography = includeTypography && typography === 'ourwedding';
-    if (!hasEffect && !hasTypography) return null;
-    const EffectComponent = hasEffect ? EFFECT_COMPONENTS[effectType as 'wave' | 'diagonal' | 'arch'] : null;
+    if (!includeTypography || typography !== 'ourwedding') return null;
     return (
-      <>
-        {EffectComponent && (effectPosition === 'top' || effectPosition === 'both') && <EffectComponent position="top" />}
-        {EffectComponent && (effectPosition === 'bottom' || effectPosition === 'both') && <EffectComponent position="bottom" />}
-        {hasTypography && (
-          <div className="hero-typo-overlay" aria-hidden="true">
-            <span className="hero-typo-dots">•••</span>
-            <h1 className="hero-typo-statement"><span>Our</span><span>Wedding.</span></h1>
-          </div>
-        )}
-      </>
+      <div className="hero-typo-overlay" aria-hidden="true">
+        <span className="hero-typo-dots">•••</span>
+        <h1 className="hero-typo-statement"><span>Our</span><span>Wedding.</span></h1>
+      </div>
     );
   };
 
@@ -560,8 +478,6 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhoto2Y === next.data.heroPhoto2Y
   && prev.data.heroStyle === next.data.heroStyle
   && prev.data.heroPhotoShape === next.data.heroPhotoShape
-  && prev.data.heroWaveEffect === next.data.heroWaveEffect
-  && prev.data.heroEffectType === next.data.heroEffectType
   && prev.data.heroTypography === next.data.heroTypography
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language

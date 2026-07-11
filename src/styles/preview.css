@@ -12,46 +12,8 @@
 .hero-photo-empty span { font-size: 0.9em; color: #000000; line-height: 1; }
 .hero-img-wrap { overflow: hidden; line-height: 0; }
 
-/* 물결 효과가 켜졌을 때만 사진(+사진 모형)을 감싸는 래퍼 — 메인화면 섹션 전체가
-   아니라 실제 사진 경계를 기준으로 물결이 붙도록 위치 기준점 역할만 한다. */
-.hero-photo-frame { position: relative; width: 100%; height: 100%; display: block; overflow: hidden; }
-
-/* 메인화면 물결(파도) 효과 — 완만한 봉우리 하나가 반복되는 곡선 레이어 2장을 서로
-   다른 속도로 좌우로 흘려보내는 옅은 패럴랙스. SVG 폭을 200%로 두고 정확히 -50%만큼
-   translateX 하면 뷰박스 절반 단위로 반복되는 패스 패턴이 이음매 없이 무한 루프된다.
-   뷰박스를 세로로 더 키우고(0~150) 물결 패턴 자체(y 0~100)는 그대로 유지한 채
-   그 아래로 순수 단색 영역(y 100~150)을 덧붙였다 — 물결 봉우리 크기는 그대로 두고
-   바닥 쪽 "받침" 영역만 아래로 더 늘어난 느낌을 준다. */
-.hero-wave { position: absolute; left: 0; right: 0; height: 96px; overflow: hidden; pointer-events: none; z-index: 3; }
-.hero-wave-bottom { bottom: -32px; }
-.hero-wave-top { top: -32px; transform: scaleY(-1); }
-.hero-wave-layer { position: absolute; bottom: -1px; left: 0; width: 200%; height: 100%; fill: var(--wedding-bg, #FFFFFF); will-change: transform; }
-/* 페이지가 막 뜨는 무거운 렌더링 시점(React가 전체 트리를 한 번에 마운트하는 순간)과
-   물결 애니메이션 시작이 겹치면 저사양 기기에서 부자연스럽게 튀는 현상이 있어, CSS
-   타이머(animation-delay) 대신 Hero.tsx가 이중 requestAnimationFrame으로 실제 준비된
-   시점에 .hero-wave-playing 클래스를 붙여야만 흐르기 시작한다. 그 전까지는 아래 정적
-   transform(각 레이어의 애니메이션 시작 지점과 동일한 모양)으로 고정돼 있어, 애니메이션이
-   시작되는 순간에도 위치가 튀지 않는다. */
-.hero-wave-layer-back { opacity: 0.55; transform: translateX(0); }
-.hero-wave-layer-front { opacity: 0.92; transform: translateX(-50%); }
-.hero-wave-layer-back.hero-wave-playing { animation: hero-wave-drift 17s linear infinite; }
-.hero-wave-layer-front.hero-wave-playing { animation: hero-wave-drift 11s linear infinite reverse; }
-@keyframes hero-wave-drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-/* 대각선 컷 — 물결과 같은 위치/z-index 규칙을 쓰되 애니메이션 없는 고정 사선 한 장. */
-.hero-diagonal { position: absolute; left: 0; right: 0; height: 64px; overflow: hidden; pointer-events: none; z-index: 3; }
-.hero-diagonal-bottom { bottom: 0; }
-.hero-diagonal-top { top: 0; transform: scaleY(-1); }
-.hero-diagonal-layer { position: absolute; bottom: -1px; left: 0; width: 100%; height: 100%; fill: var(--wedding-bg, #FFFFFF); }
-
-/* 아치 커브 — 반복 없는 완만한 곡선 한 장. */
-.hero-arch { position: absolute; left: 0; right: 0; height: 64px; overflow: hidden; pointer-events: none; z-index: 3; }
-.hero-arch-bottom { bottom: 0; }
-.hero-arch-top { top: 0; transform: scaleY(-1); }
-.hero-arch-layer { position: absolute; bottom: -1px; left: 0; width: 100%; height: 100%; fill: var(--wedding-bg, #FFFFFF); }
+/* 타이포그래피 오버레이가 켜졌을 때만 사진(+사진 모형)을 감싸는 래퍼. */
+.hero-photo-frame { position: relative; width: 100%; height: 100%; display: block; }
 
 /* 타이포그래피(OUR WEDDING) — 특정 메인화면 스타일 전용이 아니라 어떤 스타일의 사진
    위에도 얹을 수 있는 독립 오버레이. 원래 "볼드 타이포" 스타일 전용이던 문구를
