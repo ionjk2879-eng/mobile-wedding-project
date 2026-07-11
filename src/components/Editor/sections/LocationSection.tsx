@@ -69,28 +69,38 @@ const LocationSection: React.FC = () => {
 
   return (
     <>
-      <div className="input-group">
-        <label>예식장 주소</label>
-        <div className="modern-search-box">
-          <input type="text" value={data.venueAddress} readOnly className="modern-input" />
-          <button onClick={handleAddressSearch} className="search-btn"><Search size={16} /> 주소 검색</button>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">예식장 주소</label>
+        <div className="opt-inline-content">
+          <div className="modern-search-box">
+            <input type="text" value={data.venueAddress} readOnly className="modern-input" />
+            <button onClick={handleAddressSearch} className="search-btn"><Search size={16} /> 주소 검색</button>
+          </div>
         </div>
       </div>
-      <div className="input-group">
-        <label>예식장 이름</label>
-        <input type="text" value={data.venueName} onChange={(e) => updateField('venueName', e.target.value)} className="modern-input" />
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">예식장 이름</label>
+        <div className="opt-inline-content">
+          <input type="text" value={data.venueName} onChange={(e) => updateField('venueName', e.target.value)} className="modern-input" />
+        </div>
       </div>
-      <div className="input-group">
-        <label>지하철</label>
-        <textarea value={data.transport.subway} onChange={(e) => updateTransport('subway', e.target.value)} rows={2} className="modern-input" />
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">지하철</label>
+        <div className="opt-inline-content">
+          <textarea value={data.transport.subway} onChange={(e) => updateTransport('subway', e.target.value)} rows={2} className="modern-input" />
+        </div>
       </div>
-      <div className="input-group">
-        <label>버스</label>
-        <textarea value={data.transport.bus} onChange={(e) => updateTransport('bus', e.target.value)} rows={2} className="modern-input" />
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">버스</label>
+        <div className="opt-inline-content">
+          <textarea value={data.transport.bus} onChange={(e) => updateTransport('bus', e.target.value)} rows={2} className="modern-input" />
+        </div>
       </div>
-      <div className="input-group">
-        <label>주차</label>
-        <textarea value={data.transport.parking} onChange={(e) => updateTransport('parking', e.target.value)} rows={2} className="modern-input" />
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">주차</label>
+        <div className="opt-inline-content">
+          <textarea value={data.transport.parking} onChange={(e) => updateTransport('parking', e.target.value)} rows={2} className="modern-input" />
+        </div>
       </div>
       <div className="opt-inline-group">
         <label className="opt-inline-label">장소 표시 스타일</label>
