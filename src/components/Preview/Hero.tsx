@@ -88,12 +88,25 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return <div className={`hero-shape hero-shape-${heroShape}`}>{img}</div>;
   };
 
+  // 물결 효과는 메인화면 섹션 전체가 아니라, 실제 들어간 사진(+사진 모형) 위에 얹혀야
+  // 어떤 메인화면 스타일을 고르든 사진 경계를 그대로 따라간다.
+  const renderPhotoWithWave = (inner: React.ReactNode): React.ReactNode => {
+    if (waveEffect === 'none') return inner;
+    return (
+      <div className="hero-photo-frame">
+        {inner}
+        {(waveEffect === 'top' || waveEffect === 'both') && <HeroWave position="top" />}
+        {(waveEffect === 'bottom' || waveEffect === 'both') && <HeroWave position="bottom" />}
+      </div>
+    );
+  };
+
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
   const emptyPhotoEl = <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>;
-  const photoEl = wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl);
+  const photoEl = renderPhotoWithWave(wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl));
 
   const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
-  const photo2El = data.heroPhoto2 ? wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl) : photoEl;
+  const photo2El = data.heroPhoto2 ? renderPhotoWithWave(wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl)) : photoEl;
 
   const renderClassic = () => (
     <div className="hero-classic">
@@ -458,9 +471,6 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
         {style === 'boldtype' && renderBoldtype()}
         {style === 'datesplit' && renderDatesplit()}
       </div>
-
-      {(waveEffect === 'top' || waveEffect === 'both') && <HeroWave position="top" />}
-      {(waveEffect === 'bottom' || waveEffect === 'both') && <HeroWave position="bottom" />}
     </section>
   );
 }, (prev, next) =>

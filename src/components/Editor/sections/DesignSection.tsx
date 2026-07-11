@@ -206,7 +206,7 @@ const DesignSection: React.FC = () => {
           {(data.bgEffect || 'none') !== 'none' && (
             <label className="modern-checkbox" style={{ marginTop: 10 }}>
               <input type="checkbox" checked={!!data.bgEffectHeroOnly} onChange={(e) => updateField('bgEffectHeroOnly', e.target.checked)} />
-              <span>메인화면 영역에만 표시 (스크롤하면 사라짐)</span>
+              <span>메인화면 영역에만 표시</span>
             </label>
           )}
         </div>

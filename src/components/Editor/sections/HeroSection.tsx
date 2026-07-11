@@ -187,17 +187,28 @@ const HeroSection: React.FC = () => {
       </div>
       <div className="opt-inline-group">
         <label className="opt-inline-label">메인화면 효과</label>
-        <div className="account-style-grid">
-          {([
-            { key: 'none', name: '없음' },
-            { key: 'top', name: '상단' },
-            { key: 'bottom', name: '하단' },
-            { key: 'both', name: '상하단' },
-          ] as { key: NonNullable<InvitationData['heroWaveEffect']>; name: string }[]).map(s => (
-            <button key={s.key} type="button" className={`account-style-btn ${(data.heroWaveEffect || 'none') === s.key ? 'active' : ''}`} onClick={() => updateField('heroWaveEffect', s.key)}>
-              <strong>{s.name}</strong>
+        <div className="opt-inline-content">
+          <div className="account-style-grid">
+            <button type="button" className={`account-style-btn ${(data.heroWaveEffect || 'none') === 'none' ? 'active' : ''}`} onClick={() => updateField('heroWaveEffect', 'none')}>
+              <strong>없음</strong>
             </button>
-          ))}
+            <button type="button" className={`account-style-btn ${(data.heroWaveEffect || 'none') !== 'none' ? 'active' : ''}`} onClick={() => updateField('heroWaveEffect', data.heroWaveEffect && data.heroWaveEffect !== 'none' ? data.heroWaveEffect : 'bottom')}>
+              <strong>물결</strong>
+            </button>
+          </div>
+          {(data.heroWaveEffect || 'none') !== 'none' && (
+            <div className="account-style-grid" style={{ marginTop: 8 }}>
+              {([
+                { key: 'top', name: '상단' },
+                { key: 'bottom', name: '하단' },
+                { key: 'both', name: '상하단' },
+              ] as { key: NonNullable<InvitationData['heroWaveEffect']>; name: string }[]).map(s => (
+                <button key={s.key} type="button" className={`account-style-btn ${data.heroWaveEffect === s.key ? 'active' : ''}`} onClick={() => updateField('heroWaveEffect', s.key)}>
+                  <strong>{s.name}</strong>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>
