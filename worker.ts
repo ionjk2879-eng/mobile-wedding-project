@@ -1523,6 +1523,40 @@ function buildICS(data: any): string | null {
   return lines.join('\r\n');
 }
 
+// 안드로이드 전용 — 크롬이 인식하는 intent:// URL로 "일정 삽입(ACTION_INSERT)"을 카카오톡
+// 앱(package=com.kakao.talk)으로 직접 요청한다. 카카오톡이 이 인텐트를 처리하면 톡캘린더의
+// "일정 만들기" 편집 화면이 필드가 채워진 채로 바로 열리고(다운로드 과정 없음), 처리하지
+// 못하면(구버전 등) 1.5초 후 자동으로 .ics 파일 방식으로 대체된다.
+function buildAndroidCalendarIntentUrl(data: any, fallbackUrl: string): string | null {
+  const dt = new Date(data.weddingDateISO);
+  if (isNaN(dt.getTime())) return null;
+  let h = 12, m = 0;
+  const parts = (data.time as string | undefined)?.match(/(AM|PM)\s(\d+):(\d+)/);
+  if (parts) {
+    h = parseInt(parts[2]);
+    if (parts[1] === 'PM' && h !== 12) h += 12;
+    if (parts[1] === 'AM' && h === 12) h = 0;
+    m = parseInt(parts[3]);
+  }
+  const y = dt.getFullYear(), mo = dt.getMonth(), d = dt.getDate();
+  const startUtc = new Date(Date.UTC(y, mo, d, h - 9, m, 0));
+  const endUtc = new Date(startUtc.getTime() + 60 * 60 * 1000);
+  const isEn = data.language === 'en', isJa = data.language === 'ja';
+  const title = isEn ? `${data.groomName} & ${data.brideName}'s Wedding` : isJa ? `${data.groomName}・${data.brideName} 結婚式` : `${data.groomName} ♥ ${data.brideName} 결혼식`;
+  const location = [data.venueName, data.venueAddress].filter(Boolean).join(', ');
+  const extras = [
+    'action=android.intent.action.INSERT',
+    'package=com.kakao.talk',
+    'type=vnd.android.cursor.item%2Fevent',
+    `S.title=${encodeURIComponent(title)}`,
+    ...(location ? [`S.eventLocation=${encodeURIComponent(location)}`] : []),
+    `l.beginTime=${startUtc.getTime()}`,
+    `l.endTime=${endUtc.getTime()}`,
+    `S.browser_fallback_url=${encodeURIComponent(fallbackUrl)}`,
+  ];
+  return `intent:#Intent;${extras.join(';')};end`;
+}
+
 // --- Notification emails (유료 청첩장 전용) ---
 
 async function sendGuestbookNotification(env: Env, slug: string, guestName: string, content: string, side: string): Promise<void> {
@@ -1736,15 +1770,33 @@ export default {
         return Response.redirect(`${url.origin}/og-image.png`, 302);
       }
 
-      // Calendar (.ics) — 카카오톡 공유 메시지의 "일정 등록" 버튼이 여는 링크. 플랫폼별로
-      // 분기하지 않고 .ics를 그대로 내려준다 — 폰에 설치된 캘린더 앱(구글/톡캘린더/삼성
-      // 캘린더 등)이 OS 차원에서 파일을 넘겨받아 각자의 "일정 만들기" 화면을 띄워준다.
-      // 특정 캘린더 앱으로 강제 리다이렉트하면 오히려 사용자가 실제 쓰는 앱을 못 고른다.
+      // Calendar (smart) — 카카오톡 공유 메시지의 "일정 등록" 버튼이 여는 링크.
+      // 안드로이드: intent:// URL로 카카오톡(톡캘린더) 앱을 직접 지정해 "일정 삽입"을
+      // 요청한다 — 다운로드 없이 톡캘린더의 편집 화면이 바로 열린다. 카카오톡이 이
+      // 인텐트를 처리 못 하면 1.5초 후 .ics로 자동 대체. 그 외(iOS 등): .ics를 inline으로
+      // 내려줘 사파리가 캘린더 담기 시트를 바로 띄우게 한다.
       const calMatch = pathname.match(/^\/calendar\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
       if (calMatch) {
         const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(calMatch[1]).first();
         if (!row) return new Response('Not found', { status: 404 });
         const data = JSON.parse(row.data as string);
+        const ua = request.headers.get('User-Agent') || '';
+        if (/android/i.test(ua)) {
+          const fallbackUrl = `${url.origin}/calendar/${calMatch[1]}.ics`;
+          const intentUrl = buildAndroidCalendarIntentUrl(data, fallbackUrl);
+          if (intentUrl) {
+            const html = `<!doctype html><html><head><meta charset="utf-8"><title>캘린더로 이동 중...</title></head>
+<body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:'Pretendard',sans-serif;color:#9CA3AF;">
+<p>캘린더 앱으로 이동 중...</p>
+<script>
+  var timer = setTimeout(function () { location.replace(${JSON.stringify(fallbackUrl)}); }, 1500);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) clearTimeout(timer); });
+  location.replace(${JSON.stringify(intentUrl)});
+</script>
+</body></html>`;
+            return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+          }
+        }
         const ics = buildICS(data);
         if (!ics) return new Response('Not found', { status: 404 });
         return new Response(ics, {

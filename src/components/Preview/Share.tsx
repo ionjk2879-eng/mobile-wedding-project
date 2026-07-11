@@ -47,9 +47,9 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
     const slug = data.slug || '';
     const calendarButtonLabel = isEn ? 'Add to Calendar' : isJa ? 'カレンダーに追加' : '일정 등록';
     // 청첩장 안이 아니라 카카오톡 공유 메시지 자체에 일정등록 버튼을 넣는다 — 눌렀을 때
-    // 서버가 내려주는 .ics 파일을 그대로 연다. 특정 캘린더 앱으로 강제 이동시키지 않고
-    // OS가 파일을 넘겨받아 폰에 설치된 캘린더 앱(구글/톡캘린더/삼성 캘린더 등)의 "일정
-    // 만들기" 화면으로 바로 이어지게 한다.
+    // 안드로이드는 intent:// 리다이렉트로 카카오톡(톡캘린더) 앱을 직접 지정해 다운로드
+    // 없이 "일정 만들기" 화면을 열고(처리 못 하면 .ics로 자동 대체), iOS는 .ics를
+    // inline으로 열어 캘린더 담기 시트가 바로 뜨게 한다.
     // '청첩장 보기' 버튼은 따로 두지 않는다 — 메시지 썸네일(content.link)을 눌러도 어차피
     // 같은 청첩장으로 이동하므로 버튼 두 개를 둘 필요가 없다.
     const calendarLink = slug ? `${SITE_ORIGIN}/calendar/${slug}` : '';
