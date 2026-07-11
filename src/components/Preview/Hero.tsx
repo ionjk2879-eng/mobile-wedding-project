@@ -125,11 +125,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   // 갖고 있어 이 축을 무시(항상 basic 취급)한다.
   const heroShape = isFixedLookHeroStyle(style) ? 'basic' : (data.heroPhotoShape || 'basic');
 
-  // 경계 효과(물결/대각선/아치)와 타이포그래피는 사진 모형(heroPhotoShape)이 오벌/육각형/
-  // 블롭처럼 실제 보이는 영역이 사각형 프레임보다 좁은 경우, 그 모형을 감싸는 요소
-  // 바깥(형제)에 그리면 모형 밖으로 삐져나와 "이미지보다 큰 범위를 덮는" 것처럼 보인다.
-  // 그래서 아래 wrapWithShape가 모형 wrapper의 overflow:hidden(또는 clip-path)이
-  // 실제로 적용되는 자식 위치에 함께 그려 넣도록, 효과 노드를 인자로 받아 그 안에 넣는다.
+  // 경계 효과(물결/대각선/아치)와 타이포그래피는 사진 모형(heroPhotoShape, 오벌/육각형/
+  // 블롭 등)이 아니라 메인화면 스타일의 전체 사각형 틀 하단에 걸리도록 그린다 — 오벌/
+  // 육각형처럼 좁고 각진 모형 경계에 맞춰 잘리면 물결 모양 자체가 이상하게 잘려 보인다.
   const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch', React.FC<{ position: 'top' | 'bottom' }>> = {
     wave: HeroWave,
     diagonal: HeroDiagonal,
@@ -154,30 +152,33 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     );
   };
 
-  const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode, scale = 100, effectsNode: React.ReactNode = null): React.ReactNode => {
+  const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode, scale = 100): React.ReactNode => {
     const photoStyle: React.CSSProperties = { objectPosition: pos, transform: scale !== 100 ? `scale(${scale / 100})` : undefined };
     const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={photoStyle} decoding="async" /> : fallback;
-    if (heroShape === 'basic') {
-      if (!effectsNode) return img;
-      return <div className="hero-photo-frame">{img}{effectsNode}</div>;
-    }
+    if (heroShape === 'basic') return img;
     if (heroShape === 'polaroid') {
       return (
         <div className="hero-shape hero-shape-polaroid">
           {src && <img src={src} alt="" aria-hidden="true" className="hero-photo hero-photo-back" style={photoStyle} />}
-          <div className="hero-photo-front">{img}{effectsNode}</div>
+          <div className="hero-photo-front">{img}</div>
         </div>
       );
     }
-    return <div className={`hero-shape hero-shape-${heroShape}`}>{img}{effectsNode}</div>;
+    return <div className={`hero-shape hero-shape-${heroShape}`}>{img}</div>;
+  };
+
+  const renderPhotoWithEffects = (inner: React.ReactNode, includeTypography = false): React.ReactNode => {
+    const effectsNode = buildEffectsNode(includeTypography);
+    if (!effectsNode) return inner;
+    return <div className="hero-photo-frame">{inner}{effectsNode}</div>;
   };
 
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
   const emptyPhotoEl = <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>;
-  const photoEl = wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl, data.heroPhotoScale ?? 100, buildEffectsNode(true));
+  const photoEl = renderPhotoWithEffects(wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl, data.heroPhotoScale ?? 100), true);
 
   const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
-  const photo2El = data.heroPhoto2 ? wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl, 100, buildEffectsNode(false)) : photoEl;
+  const photo2El = data.heroPhoto2 ? renderPhotoWithEffects(wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl)) : photoEl;
 
   const renderClassic = () => (
     <div className="hero-classic">
