@@ -1439,8 +1439,12 @@ async function notifyExpiringInvitations(env: Env): Promise<void> {
 
 async function deleteExpiredInvitations(env: Env): Promise<void> {
   const now = new Date().toISOString();
+  // is_paid = 1인 청첩장은 절대 삭제하지 않는다 — expires_at은 결제 완료 시 NULL로
+  // 비워지는 게 정상이지만(activateInvitationPaid), 그 경로를 타지 않은 채 과거 값으로
+  // 남아있는 경우가 실제로 발생해 결제된 청첩장이 삭제된 사고가 있었다(2026-07-11).
+  // is_paid 체크를 여기 추가해 expires_at 값과 무관하게 결제 청첩장을 보호한다.
   const expired = await env.DB.prepare(
-    'SELECT slug FROM invitations WHERE expires_at IS NOT NULL AND expires_at <= ? AND (is_template_sample IS NULL OR is_template_sample = 0)'
+    'SELECT slug FROM invitations WHERE expires_at IS NOT NULL AND expires_at <= ? AND is_paid = 0 AND (is_template_sample IS NULL OR is_template_sample = 0)'
   ).bind(now).all();
   for (const row of expired.results) {
     const slug = row.slug as string;
