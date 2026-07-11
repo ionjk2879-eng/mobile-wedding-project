@@ -14,21 +14,25 @@ interface PreviewProps {
 // 두고 정확히 절반(-50%)만큼 translateX 하면, 패스 패턴이 정확히 한 주기(뷰박스 절반)씩
 // 반복되므로 이음매 없이 무한 루프된다. 색은 --wedding-bg(테마 배경색)를 그대로 써서
 // 어떤 테마에서도 "그 다음 배경이 비쳐 보이는" 느낌을 유지한다.
-// 마운트 직후 이중 requestAnimationFrame(브라우저가 첫 무거운 페인트를 실제로 끝낸
-// 다음 프레임)이 지나야 흐르기 시작한다 — 페이지가 막 뜨는 무거운 렌더링 시점과
-// 물결 애니메이션 시작이 겹치면 저사양 기기에서 애니메이션이 튀는 현상이 있어,
-// CSS animation-delay 같은 고정 타이머 대신 실제로 준비된 시점에 JS로 시작시킨다.
+// 메인화면 자체가 hero-fade-in(0.8s, opacity+translateY)으로 등장하는 도중에 물결이
+// 같이 움직이면, 두 애니메이션(부모의 슬라이드 + 물결의 가로 드리프트)이 겹쳐 보이면서
+// "잔상을 남기다 멈추고 정상 동작으로 바뀌는" 것처럼 부자연스럽게 보인다. 그래서 첫
+// requestAnimationFrame(첫 페인트 확정)을 확인한 뒤, hero-fade-in이 다 끝날 시간만큼
+// 더 기다렸다가(0.8s와 맞춤) 물결을 시작시킨다 — 메인화면이 완전히 자리 잡고 정지한
+// 상태에서만 물결이 흐르기 시작하므로 두 움직임이 겹치지 않는다. 페이지가 막 뜨는
+// 무거운 렌더링 시점도 이 시간 동안 충분히 지나가므로 저사양 기기 튐 문제도 같이 피한다.
+const HERO_ENTRANCE_MS = 800;
 function useWaveStarted(): boolean {
   const [started, setStarted] = useState(false);
   useEffect(() => {
-    let raf1 = 0;
-    let raf2 = 0;
-    raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setStarted(true));
+    let raf = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    raf = requestAnimationFrame(() => {
+      timer = setTimeout(() => setStarted(true), HERO_ENTRANCE_MS);
     });
     return () => {
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
+      cancelAnimationFrame(raf);
+      if (timer) clearTimeout(timer);
     };
   }, []);
   return started;
@@ -39,10 +43,10 @@ const HeroWave: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => {
   return (
     <div className={`hero-wave hero-wave-${position}`} aria-hidden="true">
       <svg className={`hero-wave-layer hero-wave-layer-back${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 100" preserveAspectRatio="none">
-        <path d="M0,100 C200,100 300,30 600,30 C900,30 1000,100 1200,100 C1400,100 1500,30 1800,30 C2100,30 2200,100 2400,100 Z" />
+        <path d="M0,100 C200,100 300,52 600,52 C900,52 1000,100 1200,100 C1400,100 1500,52 1800,52 C2100,52 2200,100 2400,100 Z" />
       </svg>
       <svg className={`hero-wave-layer hero-wave-layer-front${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 100" preserveAspectRatio="none">
-        <path d="M0,100 C200,100 300,48 600,48 C900,48 1000,100 1200,100 C1400,100 1500,48 1800,48 C2100,48 2200,100 2400,100 Z" />
+        <path d="M0,100 C200,100 300,65 600,65 C900,65 1000,100 1200,100 C1400,100 1500,65 1800,65 C2100,65 2200,100 2400,100 Z" />
       </svg>
     </div>
   );
