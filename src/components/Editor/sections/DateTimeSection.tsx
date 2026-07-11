@@ -63,14 +63,14 @@ const DateTimeSection: React.FC = () => {
         </div>
       </div>
 
-      <div className="input-group">
-        <label>달력 스타일</label>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">달력 스타일</label>
         <div className="account-style-grid">
           <button type="button" className={`account-style-btn ${(data.calendarStyle || 'card') === 'card' ? 'active' : ''}`} onClick={() => updateField('calendarStyle', 'card')}>
-            <strong>카드형</strong><span>흰 배경 카드에 테두리·그림자로 감싸 표시</span>
+            <strong>카드형</strong>
           </button>
           <button type="button" className={`account-style-btn ${data.calendarStyle === 'plain' ? 'active' : ''}`} onClick={() => updateField('calendarStyle', 'plain')}>
-            <strong>배경 일체형</strong><span>테두리 없이 청첩장 배경색과 자연스럽게 이어짐</span>
+            <strong>배경 일체형</strong>
           </button>
         </div>
       </div>

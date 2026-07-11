@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image as ImageIcon, Loader2, Move } from 'lucide-react';
+import { Image as ImageIcon, Loader2, Move, Plus } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { uploadImage } from '../../../services/storageService';
 import { toast } from '../../../stores/useToastStore';
@@ -46,8 +46,8 @@ const MidPhotoSection: React.FC = () => {
             </>
           ) : (
             <label className="hero-empty-upload">
-              <ImageIcon size={24} />
-              <span>중간 사진 등록</span>
+              <span className="hero-empty-upload-plus"><Plus size={18} /></span>
+              <span>중간 사진</span>
               <input type="file" accept="image/*" onChange={handleUpload} hidden />
             </label>
           )}

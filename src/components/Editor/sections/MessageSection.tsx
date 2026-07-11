@@ -72,14 +72,14 @@ const MessageSection: React.FC = () => {
       </div>
       {renderCard('groom')}
       {renderCard('bride')}
-      <div className="input-group">
-        <label>한마디 표시 스타일</label>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">한마디 표시 스타일</label>
         <div className="account-style-grid">
           <button type="button" className={`account-style-btn ${(data.messageStyle || 'card') === 'card' ? 'active' : ''}`} onClick={() => updateField('messageStyle', 'card')}>
-            <strong>카드형</strong><span>둥근 프로필 사진과 카드 배경으로 표시</span>
+            <strong>카드형</strong>
           </button>
           <button type="button" className={`account-style-btn ${data.messageStyle === 'plain' ? 'active' : ''}`} onClick={() => updateField('messageStyle', 'plain')}>
-            <strong>배경 일체형</strong><span>테두리 없이 배경색과 이어지고, 사진은 우표 느낌의 사각형으로 표시</span>
+            <strong>배경 일체형</strong>
           </button>
         </div>
       </div>

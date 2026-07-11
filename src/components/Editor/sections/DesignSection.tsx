@@ -76,112 +76,115 @@ const DesignSection: React.FC = () => {
 
   return (
     <>
-      <div className="input-grid-2">
-        <div className="input-group">
-          <label>기본 언어</label>
-          <div className="tab-group modern">
-            <button className={`tab-btn ${data.language === 'ko' ? 'active' : ''}`} onClick={() => updateField('language', 'ko')}>KOREAN</button>
-            <button className={`tab-btn ${data.language === 'en' ? 'active' : ''}`} onClick={() => updateField('language', 'en')}>ENGLISH</button>
-            <button className={`tab-btn ${data.language === 'ja' ? 'active' : ''}`} onClick={() => updateField('language', 'ja')}>日本語</button>
-          </div>
-        </div>
-        <div className="input-group">
-          <label>글꼴 선택</label>
-          <select value={data.fontFamily} onChange={(e) => updateField('fontFamily', e.target.value)} className="modern-input">
-            {FONTS.map(font => <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>{font.name}</option>)}
-          </select>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">기본 언어</label>
+        <div className="tab-group modern">
+          <button className={`tab-btn ${data.language === 'ko' ? 'active' : ''}`} onClick={() => updateField('language', 'ko')}>KOREAN</button>
+          <button className={`tab-btn ${data.language === 'en' ? 'active' : ''}`} onClick={() => updateField('language', 'en')}>ENGLISH</button>
+          <button className={`tab-btn ${data.language === 'ja' ? 'active' : ''}`} onClick={() => updateField('language', 'ja')}>日本語</button>
         </div>
       </div>
       <div className="input-group">
-        <label>글씨 크기</label>
+        <label>글꼴 선택</label>
+        <select value={data.fontFamily} onChange={(e) => updateField('fontFamily', e.target.value)} className="modern-input">
+          {FONTS.map(font => <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>{font.name}</option>)}
+        </select>
+      </div>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">글씨 크기</label>
         <div className="tab-group modern">
           <button className={`tab-btn ${data.fontSize === 'small' ? 'active' : ''}`} onClick={() => updateField('fontSize', 'small')}>작게</button>
           <button className={`tab-btn ${data.fontSize === 'medium' ? 'active' : ''}`} onClick={() => updateField('fontSize', 'medium')}>중간</button>
           <button className={`tab-btn ${data.fontSize === 'large' ? 'active' : ''}`} onClick={() => updateField('fontSize', 'large')}>크게</button>
         </div>
       </div>
-      <div className="input-group">
-        <label>배경 색상</label>
-        <div className="color-pick-grid">
-          {BG_COLORS.map(c => (
-            <button key={c.name} type="button" className={`color-pick-btn ${(data.customBgColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customBgColor', c.value)} title={c.name}>
-              <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
-              <span className="color-pick-name">{c.name}</span>
-            </button>
-          ))}
-        </div>
-        <div className="color-custom-row">
-          <input type="color" value={data.customBgColor || '#FFFFFF'} onChange={(e) => updateField('customBgColor', e.target.value)} className="color-picker-input" />
-          <div className="color-hex-field">
-            <span className="color-hex-prefix">#</span>
-            <input type="text" value={(data.customBgColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customBgColor', v ? '#' + v : ''); }} placeholder="FFFFFF" maxLength={6} className="modern-input color-hex-input" />
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">배경 색상</label>
+        <div className="opt-inline-content">
+          <div className="color-pick-grid">
+            {BG_COLORS.map(c => (
+              <button key={c.name} type="button" className={`color-pick-btn ${(data.customBgColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customBgColor', c.value)} title={c.name}>
+                <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
+                <span className="color-pick-name">{c.name}</span>
+              </button>
+            ))}
           </div>
-          {data.customBgColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customBgColor', '')}>초기화</button>}
-        </div>
-        <span className="input-hint">프리셋 선택 또는 팔레트/코드로 자유롭게 지정하세요.</span>
-      </div>
-      <div className="input-group">
-        <label>강조 색상</label>
-        <div className="color-pick-grid">
-          {ACCENT_COLORS.map(c => (
-            <button key={c.name} type="button" className={`color-pick-btn ${(data.customAccentColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customAccentColor', c.value)} title={c.name}>
-              <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
-              <span className="color-pick-name">{c.name}</span>
-            </button>
-          ))}
-        </div>
-        <div className="color-custom-row">
-          <input type="color" value={data.customAccentColor || '#D4A5C6'} onChange={(e) => updateField('customAccentColor', e.target.value)} className="color-picker-input" />
-          <div className="color-hex-field">
-            <span className="color-hex-prefix">#</span>
-            <input type="text" value={(data.customAccentColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customAccentColor', v ? '#' + v : ''); }} placeholder="D4A5C6" maxLength={6} className="modern-input color-hex-input" />
+          <div className="color-custom-row">
+            <input type="color" value={data.customBgColor || '#FFFFFF'} onChange={(e) => updateField('customBgColor', e.target.value)} className="color-picker-input" />
+            <div className="color-hex-field">
+              <span className="color-hex-prefix">#</span>
+              <input type="text" value={(data.customBgColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customBgColor', v ? '#' + v : ''); }} placeholder="FFFFFF" maxLength={6} className="modern-input color-hex-input" />
+            </div>
+            {data.customBgColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customBgColor', '')}>초기화</button>}
           </div>
-          {data.customAccentColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customAccentColor', '')}>초기화</button>}
         </div>
-        <span className="input-hint">프리셋 선택 또는 팔레트/코드로 자유롭게 지정하세요.</span>
       </div>
-      <div className="input-group">
-        <label>섹션 라벨 색상</label>
-        <div className="color-pick-grid">
-          {ACCENT_COLORS.map(c => (
-            <button key={c.name} type="button" className={`color-pick-btn ${(data.customLabelColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customLabelColor', c.value)} title={c.name}>
-              <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
-              <span className="color-pick-name">{c.name}</span>
-            </button>
-          ))}
-        </div>
-        <div className="color-custom-row">
-          <input type="color" value={data.customLabelColor || THEME_LABEL_DEFAULTS[data.theme || 'blush'] || '#DDA5A3'} onChange={(e) => updateField('customLabelColor', e.target.value)} className="color-picker-input" />
-          <div className="color-hex-field">
-            <span className="color-hex-prefix">#</span>
-            <input type="text" value={(data.customLabelColor || THEME_LABEL_DEFAULTS[data.theme || 'blush'] || '#DDA5A3').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customLabelColor', v ? '#' + v : ''); }} placeholder="DDA5A3" maxLength={6} className="modern-input color-hex-input" />
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">강조 색상</label>
+        <div className="opt-inline-content">
+          <div className="color-pick-grid">
+            {ACCENT_COLORS.map(c => (
+              <button key={c.name} type="button" className={`color-pick-btn ${(data.customAccentColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customAccentColor', c.value)} title={c.name}>
+                <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
+                <span className="color-pick-name">{c.name}</span>
+              </button>
+            ))}
           </div>
-          {data.customLabelColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customLabelColor', '')}>초기화</button>}
-        </div>
-        <span className="input-hint">MESSAGE, LOCATION처럼 섹션을 표시하는 영문 라벨의 색상입니다. 지정하지 않으면 강조 색상을 따릅니다.</span>
-      </div>
-      <div className="input-group">
-        <label>텍스트 색상</label>
-        <div className="color-pick-grid">
-          {ACCENT_COLORS.map(c => (
-            <button key={c.name} type="button" className={`color-pick-btn ${(data.customTextColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customTextColor', c.value)} title={c.name}>
-              <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
-              <span className="color-pick-name">{c.name}</span>
-            </button>
-          ))}
-        </div>
-        <div className="color-custom-row">
-          <input type="color" value={data.customTextColor || '#000000'} onChange={(e) => updateField('customTextColor', e.target.value)} className="color-picker-input" />
-          <div className="color-hex-field">
-            <span className="color-hex-prefix">#</span>
-            <input type="text" value={(data.customTextColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customTextColor', v ? '#' + v : ''); }} placeholder="000000" maxLength={6} className="modern-input color-hex-input" />
+          <div className="color-custom-row">
+            <input type="color" value={data.customAccentColor || '#D4A5C6'} onChange={(e) => updateField('customAccentColor', e.target.value)} className="color-picker-input" />
+            <div className="color-hex-field">
+              <span className="color-hex-prefix">#</span>
+              <input type="text" value={(data.customAccentColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customAccentColor', v ? '#' + v : ''); }} placeholder="D4A5C6" maxLength={6} className="modern-input color-hex-input" />
+            </div>
+            {data.customAccentColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customAccentColor', '')}>초기화</button>}
           </div>
-          {data.customTextColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customTextColor', '')}>초기화</button>}
         </div>
-        <span className="input-hint">이름, 날짜, 본문 등 일반 텍스트의 색상입니다.</span>
       </div>
-      <div className="input-group">
-        <label>배경 재질</label>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">섹션 라벨 색상</label>
+        <div className="opt-inline-content">
+          <div className="color-pick-grid">
+            {ACCENT_COLORS.map(c => (
+              <button key={c.name} type="button" className={`color-pick-btn ${(data.customLabelColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customLabelColor', c.value)} title={c.name}>
+                <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
+                <span className="color-pick-name">{c.name}</span>
+              </button>
+            ))}
+          </div>
+          <div className="color-custom-row">
+            <input type="color" value={data.customLabelColor || THEME_LABEL_DEFAULTS[data.theme || 'blush'] || '#DDA5A3'} onChange={(e) => updateField('customLabelColor', e.target.value)} className="color-picker-input" />
+            <div className="color-hex-field">
+              <span className="color-hex-prefix">#</span>
+              <input type="text" value={(data.customLabelColor || THEME_LABEL_DEFAULTS[data.theme || 'blush'] || '#DDA5A3').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customLabelColor', v ? '#' + v : ''); }} placeholder="DDA5A3" maxLength={6} className="modern-input color-hex-input" />
+            </div>
+            {data.customLabelColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customLabelColor', '')}>초기화</button>}
+          </div>
+          <span className="input-hint">MESSAGE, LOCATION처럼 섹션을 표시하는 영문 라벨의 색상입니다. 지정하지 않으면 강조 색상을 따릅니다.</span>
+        </div>
+      </div>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">텍스트 색상</label>
+        <div className="opt-inline-content">
+          <div className="color-pick-grid">
+            {ACCENT_COLORS.map(c => (
+              <button key={c.name} type="button" className={`color-pick-btn ${(data.customTextColor || '') === c.value ? 'active' : ''}`} onClick={() => updateField('customTextColor', c.value)} title={c.name}>
+                <span className="color-pick-swatch" style={{ background: c.value || '#FFFFFF' }} />
+                <span className="color-pick-name">{c.name}</span>
+              </button>
+            ))}
+          </div>
+          <div className="color-custom-row">
+            <input type="color" value={data.customTextColor || '#000000'} onChange={(e) => updateField('customTextColor', e.target.value)} className="color-picker-input" />
+            <div className="color-hex-field">
+              <span className="color-hex-prefix">#</span>
+              <input type="text" value={(data.customTextColor || '').replace(/^#/, '')} onChange={(e) => { const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6); updateField('customTextColor', v ? '#' + v : ''); }} placeholder="000000" maxLength={6} className="modern-input color-hex-input" />
+            </div>
+            {data.customTextColor && <button type="button" className="color-reset-btn" onClick={() => updateField('customTextColor', '')}>초기화</button>}
+          </div>
+        </div>
+      </div>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">배경 재질</label>
         <div className="theme-select-grid modern">
           {TEXTURES.map(t => (
             <button key={t.key} type="button" className={`theme-chip ${(data.bgTexture || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgTexture', t.key)}>
@@ -190,8 +193,8 @@ const DesignSection: React.FC = () => {
           ))}
         </div>
       </div>
-      <div className="input-group">
-        <label>흩날리는 효과</label>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">흩날리는 효과</label>
         <div className="theme-select-grid modern">
           {EFFECTS.map(t => (
             <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgEffect', t.key)}>
@@ -200,14 +203,17 @@ const DesignSection: React.FC = () => {
           ))}
         </div>
       </div>
-      <div className="input-group">
-        <label>스크롤 등장 효과 <span className="label-hint">(전체화면으로 확인해보세요!)</span></label>
-        <div className="theme-select-grid modern">
-          {SCROLL_EFFECTS.map(t => (
-            <button key={t.key} type="button" className={`theme-chip ${(data.scrollEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('scrollEffect', t.key)}>
-              <span className="effect-icon">{t.icon}</span>{t.name}
-            </button>
-          ))}
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">스크롤 등장 효과</label>
+        <div className="opt-inline-content">
+          <div className="theme-select-grid modern">
+            {SCROLL_EFFECTS.map(t => (
+              <button key={t.key} type="button" className={`theme-chip ${(data.scrollEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('scrollEffect', t.key)}>
+                <span className="effect-icon">{t.icon}</span>{t.name}
+              </button>
+            ))}
+          </div>
+          <span className="input-hint">전체화면으로 확인해보세요!</span>
         </div>
       </div>
     </>
