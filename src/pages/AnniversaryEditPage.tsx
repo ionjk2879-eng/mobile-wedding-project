@@ -55,14 +55,16 @@ const AnniversaryEditPage: React.FC = () => {
 
   useEffect(() => {
     if (!slug) return;
-    loadInvitation(slug).then((inv) => {
+    loadInvitation(slug).then(async (inv) => {
       if (inv) {
         setData(inv);
-        loadFont(inv.fontFamily);
         const am = inv.anniversaryMode;
         setHeroPhoto(am?.heroPhoto || inv.heroPhoto || '');
         setPhotos(am?.photos || inv.photos || []);
         setOpeningStyle(am?.openingStyle);
+        // 폰트가 실제로 준비된 뒤에 화면을 보여줘야 메인화면 텍스트 높이가 바뀌며
+        // 다음 섹션이 밀리는 현상을 막을 수 있다.
+        await loadFont(inv.fontFamily);
       }
       setLoading(false);
     });

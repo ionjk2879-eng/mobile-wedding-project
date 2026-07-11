@@ -5,7 +5,7 @@ import { InvitationData } from '../types';
 import { loadInvitationPublic } from '../services/publicLoad';
 import InvitationView from '../components/Preview/InvitationView';
 import { ScrollRootContext } from '../components/Preview/ScrollReveal';
-import { loadAllFonts } from '../utils/loadFont';
+import { loadAllFonts, loadFont } from '../utils/loadFont';
 import '../styles/effects.css';
 import '../styles/builder.css';
 
@@ -26,7 +26,14 @@ const TemplatePreviewPage: React.FC = () => {
     if (!preset?.sampleSlug) return;
     setLoading(true);
     loadInvitationPublic(preset.sampleSlug)
-      .then(d => { if (d) setSampleData(d); })
+      .then(async d => {
+        if (d) {
+          setSampleData(d);
+          // 폰트가 실제로 준비된 뒤에 화면을 보여줘야 메인화면 텍스트 높이가 바뀌며
+          // 다음 섹션이 밀리는 현상을 막을 수 있다.
+          await loadFont(d.fontFamily);
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [preset?.sampleSlug]);

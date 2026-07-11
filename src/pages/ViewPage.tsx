@@ -82,10 +82,12 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
 
   useEffect(() => {
     if (!slug) return;
-    loadInvitationPublic(slug).then(d => {
+    loadInvitationPublic(slug).then(async d => {
       if (d) {
         setData(d);
-        loadFont(d.fontFamily);
+        // 폰트가 실제로 준비된 뒤에 화면을 보여줘야, 폴백 글꼴 → 커스텀 글꼴 교체로
+        // 메인화면 텍스트 높이가 바뀌면서 다음 섹션이 밀리는 현상을 막을 수 있다.
+        await loadFont(d.fontFamily);
       }
       else setError(true);
       setLoading(false);

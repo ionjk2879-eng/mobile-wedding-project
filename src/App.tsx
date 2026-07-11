@@ -7,7 +7,7 @@ import useInvitationStore, { initialData } from './stores/useInvitationStore';
 import { toast } from './stores/useToastStore';
 import { saveInvitation, checkSlugAvailable, loadInvitation } from './services/invitationService';
 import { getApiErrorMessage } from './utils/apiError';
-import { loadAllFonts } from './utils/loadFont';
+import { loadAllFonts, loadFont } from './utils/loadFont';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Edit3, Eye, Save, RotateCcw, Menu, X } from 'lucide-react';
 import { AI_PRESETS, applyPreset } from './data/aiPresets';
@@ -42,31 +42,41 @@ const App: React.FC = () => {
   useEffect(() => {
     if (loadedRef.current) return;
     loadedRef.current = true;
-    if (urlSlug) {
-      loadInvitation(urlSlug).then((saved) => {
-        if (saved) {
-          setData(saved);
-          hasSavedOnceRef.current = true;
+    // 폰트가 실제로 준비된 뒤에 로딩 화면을 내려야, 폴백 글꼴 → 커스텀 글꼴 교체로
+    // 메인화면 텍스트 높이가 바뀌면서 다음 섹션이 밀리는 현상을 막을 수 있다.
+    (async () => {
+      if (urlSlug) {
+        try {
+          const saved = await loadInvitation(urlSlug);
+          if (saved) {
+            setData(saved);
+            hasSavedOnceRef.current = true;
+            setShowStartScreen(false);
+            await loadFont(saved.fontFamily);
+          } else {
+            setShowStartScreen(true);
+          }
+        } catch {
+          setShowStartScreen(true);
+        }
+      } else {
+        const templateParam = searchParams.get('template');
+        if (templateParam) {
+          const preset = AI_PRESETS.find(p => p.id === templateParam);
+          if (preset) {
+            const presetData = applyPreset(preset);
+            setData(presetData);
+            hasSavedOnceRef.current = false;
+            await loadFont(presetData.fontFamily);
+          }
           setShowStartScreen(false);
         } else {
           setShowStartScreen(true);
         }
-      }).catch(() => { setShowStartScreen(true); }).finally(() => { setLoadingData(false); dataReadyRef.current = true; });
-    } else {
-      const templateParam = searchParams.get('template');
-      if (templateParam) {
-        const preset = AI_PRESETS.find(p => p.id === templateParam);
-        if (preset) {
-          setData(applyPreset(preset));
-          hasSavedOnceRef.current = false;
-        }
-        setShowStartScreen(false);
-      } else {
-        setShowStartScreen(true);
       }
       setLoadingData(false);
       dataReadyRef.current = true;
-    }
+    })();
   }, []);
 
   // 브라우저 뒤로/앞으로 이동 시 URL ↔ 화면 동기화
