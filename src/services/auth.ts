@@ -25,7 +25,7 @@ function encodeState(data: object): string {
   return btoa(JSON.stringify(data));
 }
 
-export function decodeState(encoded: string): { provider: 'google' | 'kakao' | 'naver'; returnUrl: string; nonce: string } {
+export function decodeState(encoded: string): { provider: 'google' | 'kakao' | 'naver' | 'kakao-calendar'; returnUrl: string; nonce: string; slug?: string } {
   return JSON.parse(atob(encoded));
 }
 
@@ -73,6 +73,28 @@ export const initiateKakaoLogin = (returnUrl = '/manage'): void => {
     state: encodeState({ provider: 'kakao', returnUrl, nonce }),
   });
   window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`;
+};
+
+// 하객이 청첩장 공유 메시지의 "일정 등록" 버튼으로 들어와 본인 톡캘린더에 예식 일정을
+// 바로 추가하는 흐름 — 청첩장 소유자 로그인(위 initiateKakaoLogin)과는 별개의 1회성 동작.
+export const initiateKakaoCalendarLogin = (slug: string): void => {
+  const nonce = crypto.randomUUID();
+  sessionStorage.setItem('oauth_nonce', nonce);
+  const params = new URLSearchParams({
+    client_id: '7edc2c74f346bfad9c9006cd26d04e3c',
+    redirect_uri: `${window.location.origin}/auth/callback`,
+    response_type: 'code',
+    scope: 'talk_calendar',
+    state: encodeState({ provider: 'kakao-calendar', returnUrl: '', nonce, slug }),
+  });
+  window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`;
+};
+
+export const addWeddingToKakaoCalendar = async (code: string, redirectUri: string, slug: string): Promise<{ ok: boolean; message: string }> => {
+  return apiFetch('/api/calendar/kakao-add', {
+    method: 'POST',
+    body: JSON.stringify({ code, redirectUri, slug }),
+  }) as Promise<{ ok: boolean; message: string }>;
 };
 
 // Naver
