@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image as ImageIcon, Loader2, Move } from 'lucide-react';
+import { Image as ImageIcon, Loader2, Move, Plus } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { InvitationData } from '../../../types';
 import { uploadImage } from '../../../services/storageService';
@@ -7,16 +7,16 @@ import { toast } from '../../../stores/useToastStore';
 import { getApiErrorMessage } from '../../../utils/apiError';
 import { isFixedLookHeroStyle } from '../../../data/heroStyleConfig';
 
-const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; name: string; desc: string }[] = [
-  { key: 'basic', name: '기본', desc: '사각형 그대로' },
-  { key: 'fill', name: '라운드', desc: '모서리를 둥글게' },
-  { key: 'arch', name: '아치형', desc: '위쪽을 둥근 아치로' },
-  { key: 'oval', name: '오벌형', desc: '타원형으로' },
-  { key: 'frame', name: '액자형', desc: '흰 여백 액자를 두름' },
-  { key: 'blob', name: '물방울형', desc: '불규칙한 유기적 곡선' },
-  { key: 'polaroid', name: '폴라로이드형', desc: '하단 여백 + 살짝 기울임' },
-  { key: 'hexagon', name: '육각형', desc: '각진 다각형으로' },
-  { key: 'hairline', name: '헤어라인', desc: '얇은 선 + 비대칭 여백' },
+const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; name: string }[] = [
+  { key: 'basic', name: '기본' },
+  { key: 'fill', name: '라운드' },
+  { key: 'arch', name: '아치형' },
+  { key: 'oval', name: '오벌형' },
+  { key: 'frame', name: '액자형' },
+  { key: 'blob', name: '물방울형' },
+  { key: 'polaroid', name: '폴라로이드형' },
+  { key: 'hexagon', name: '육각형' },
+  { key: 'hairline', name: '헤어라인' },
 ];
 
 
@@ -72,8 +72,8 @@ const HeroSection: React.FC = () => {
             </>
           ) : (
             <label className="hero-empty-upload">
-              <ImageIcon size={24} />
-              <span>메인 사진 등록</span>
+              <span className="hero-empty-upload-plus"><Plus size={18} /></span>
+              <span>메인 사진</span>
               <input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden />
             </label>
           )}
@@ -109,8 +109,8 @@ const HeroSection: React.FC = () => {
                 </>
               ) : (
                 <label className="hero-empty-upload">
-                  <ImageIcon size={24} />
-                  <span>신부 사진 등록</span>
+                  <span className="hero-empty-upload-plus"><Plus size={18} /></span>
+                  <span>신부 사진</span>
                   <input type="file" accept="image/*" onChange={handleHeroPhoto2Upload} hidden />
                 </label>
               )}
@@ -150,7 +150,6 @@ const HeroSection: React.FC = () => {
               >
                 <span className={`hero-shape-preview hero-shape-preview-${s.key}`} />
                 <strong>{s.name}</strong>
-                <span className="hero-shape-btn-desc">{s.desc}</span>
               </button>
             ))}
           </div>
@@ -160,21 +159,20 @@ const HeroSection: React.FC = () => {
         <label>메인화면 스타일</label>
         <div className="hero-style-grid">
           {([
-            { key: 'classic', name: '클래식', desc: '사진 위, 정보 아래' },
-            { key: 'overlay', name: '오버레이', desc: '사진 위에 텍스트 겹침' },
-            { key: 'minimal', name: '미니멀', desc: '이름과 날짜만 강조' },
-            { key: 'editorial', name: '에디토리얼', desc: '매거진 느낌 레이아웃' },
-            { key: 'fullscreen', name: '풀스크린', desc: '사진이 전체를 채움' },
-            { key: 'split', name: '스플릿', desc: '좌우 분할 레이아웃' },
-            { key: 'centercard', name: '센터 카드', desc: '카드형 사진 중앙 배치' },
-            { key: 'glassframe', name: '투명 액자', desc: '사진 위에 유리 액자가 떠 있는 느낌' },
-            { key: 'instacard', name: '인스타그램', desc: '인스타그램 포스트 감성 레이아웃' },
-            { key: 'bookcover', name: '북커버', desc: '고급 양장본 표지 스타일' },
-            { key: 'bookpage', name: '책 한 페이지', desc: '아름다운 책 속 삽화 페이지 느낌' },
-          ] as { key: InvitationData['heroStyle']; name: string; desc: string }[]).map(s => (
+            { key: 'classic', name: '클래식' },
+            { key: 'overlay', name: '오버레이' },
+            { key: 'minimal', name: '미니멀' },
+            { key: 'editorial', name: '에디토리얼' },
+            { key: 'fullscreen', name: '풀스크린' },
+            { key: 'split', name: '스플릿' },
+            { key: 'centercard', name: '센터 카드' },
+            { key: 'glassframe', name: '투명 액자' },
+            { key: 'instacard', name: '인스타그램' },
+            { key: 'bookcover', name: '북커버' },
+            { key: 'bookpage', name: '책 한 페이지' },
+          ] as { key: InvitationData['heroStyle']; name: string }[]).map(s => (
             <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
               <strong>{s.name}</strong>
-              <span>{s.desc}</span>
             </button>
           ))}
         </div>
@@ -182,12 +180,11 @@ const HeroSection: React.FC = () => {
           <span className="hero-style-subgroup-label">매거진 커버</span>
           <div className="hero-style-grid">
             {([
-              { key: 'filmstrip' as InvitationData['heroStyle'], name: '필름 스틸', desc: '상하 필름 바 + 사진 중앙' },
-              { key: 'verttype' as InvitationData['heroStyle'], name: '세로 타이포', desc: '세로 타이틀 스파인 + 사진' },
+              { key: 'filmstrip' as InvitationData['heroStyle'], name: '필름 스틸' },
+              { key: 'verttype' as InvitationData['heroStyle'], name: '세로 타이포' },
             ]).map(s => (
               <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
                 <strong>{s.name}</strong>
-                <span>{s.desc}</span>
               </button>
             ))}
           </div>
@@ -196,13 +193,12 @@ const HeroSection: React.FC = () => {
           <span className="hero-style-subgroup-label">포토그래피</span>
           <div className="hero-style-grid">
             {([
-              { key: 'magframe' as InvitationData['heroStyle'], name: '매거진 프레임', desc: '세로 타이틀 + 액자 사진 + 시그니처 이름' },
-              { key: 'boldtype' as InvitationData['heroStyle'], name: '볼드 타이포', desc: '사진 위 굵은 타이포 강조' },
-              { key: 'datesplit' as InvitationData['heroStyle'], name: '데이트 스플릿', desc: '사진 + 큰 날짜 숫자 컬럼' },
+              { key: 'magframe' as InvitationData['heroStyle'], name: '매거진 프레임' },
+              { key: 'boldtype' as InvitationData['heroStyle'], name: '볼드 타이포' },
+              { key: 'datesplit' as InvitationData['heroStyle'], name: '데이트 스플릿' },
             ]).map(s => (
               <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
                 <strong>{s.name}</strong>
-                <span>{s.desc}</span>
               </button>
             ))}
           </div>

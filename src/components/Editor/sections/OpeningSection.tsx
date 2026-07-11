@@ -68,18 +68,18 @@ const OpeningSection: React.FC = () => {
 
       {opening.openingEnabled && (
         <>
-          <div className="input-group">
-            <label>내용 연출</label>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">내용 연출</label>
             <div className="account-style-grid">
               {([
-                { key: 'sequential' as const, name: '순차 등장', desc: '이름·멘트·날짜가 순서대로 서서히 나타남' },
-                { key: 'typing' as const, name: '타이핑', desc: '글자가 한 자씩 타이핑되는 감성 연출' },
-                { key: 'lines' as const, name: '줄 단위 등장', desc: '이름과 멘트가 한 번에, 나머지는 순서대로 나타남' },
+                { key: 'sequential' as const, name: '순차 등장' },
+                { key: 'typing' as const, name: '타이핑' },
+                { key: 'lines' as const, name: '줄 단위 등장' },
               ]).map(s => (
                 <button key={s.key} type="button"
                   className={`account-style-btn ${(opening.openingContentStyle || 'sequential') === s.key ? 'active' : ''}`}
                   onClick={() => update({ openingContentStyle: s.key })}>
-                  <strong>{s.name}</strong><span>{s.desc}</span>
+                  <strong>{s.name}</strong>
                 </button>
               ))}
             </div>
@@ -89,45 +89,45 @@ const OpeningSection: React.FC = () => {
             <label>전환 스타일</label>
             <div className="account-style-grid">
               {([
-                { key: 'curtain' as const, name: '커튼', desc: '그라데이션 배경에 단색 커튼이 닫히며 전환' },
-                { key: 'circle' as const, name: '원형 확산', desc: '중앙에서 원형으로 펼쳐짐' },
-                { key: 'veil' as const, name: '베일 드롭', desc: '위에서 베일이 내려오듯 등장, 클릭 시 걷힘' },
-                { key: 'blind' as const, name: '블라인드', desc: '수평 슬라이스가 하나씩 열리며 등장' },
-                { key: 'frame' as const, name: '투명 액자', desc: '유리 액자 속에 담은 고급스러운 연출' },
-                { key: 'insta' as const, name: '인스타그램', desc: '스토리 형식의 감각적인 연출' },
+                { key: 'curtain' as const, name: '커튼' },
+                { key: 'circle' as const, name: '원형 확산' },
+                { key: 'veil' as const, name: '베일 드롭' },
+                { key: 'blind' as const, name: '블라인드' },
+                { key: 'frame' as const, name: '투명 액자' },
+                { key: 'insta' as const, name: '인스타그램' },
               ]).map(s => (
                 <button key={s.key} type="button"
                   className={`account-style-btn ${(opening.openingStyle === 'typing' ? 'curtain' : opening.openingStyle) === s.key ? 'active' : ''}`}
                   onClick={() => update({ openingStyle: s.key })}>
-                  <strong>{s.name}</strong><span>{s.desc}</span>
+                  <strong>{s.name}</strong>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="input-group">
-            <label>배경색</label>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">배경색</label>
             <div className="account-style-grid">
               <button type="button" className={`account-style-btn ${opening.openingColorMode === 'theme' ? 'active' : ''}`} onClick={() => update({ openingColorMode: 'theme' })}>
-                <strong>테마 색상</strong><span>선택한 테마에 맞춰 자동 적용</span>
+                <strong>테마 색상</strong>
               </button>
               <button type="button" className={`account-style-btn ${opening.openingColorMode === 'custom' ? 'active' : ''}`} onClick={() => update({ openingColorMode: 'custom' })}>
-                <strong>단색</strong><span>원하는 색상을 직접 지정</span>
+                <strong>단색</strong>
               </button>
               <button type="button" className={`account-style-btn ${opening.openingColorMode === 'gradient' ? 'active' : ''}`} onClick={() => update({ openingColorMode: 'gradient', openingGradientMode: opening.openingGradientMode || 'theme' })}>
-                <strong>그라데이션</strong><span>두 색상이 부드럽게 전환</span>
+                <strong>그라데이션</strong>
               </button>
             </div>
           </div>
 
-          <div className="input-group">
-            <label>글자 색상</label>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">글자 색상</label>
             <div className="account-style-grid">
               <button type="button"
                 className={`account-style-btn ${!opening.openingTextColor ? 'active' : ''}`}
                 onClick={() => update({ openingTextColor: undefined })}
               >
-                <strong>자동</strong><span>배경 밝기에 맞춰 자동 선택</span>
+                <strong>자동</strong>
               </button>
               <button type="button"
                 className={`account-style-btn ${opening.openingTextColor === 'white' ? 'active' : ''}`}
@@ -153,26 +153,26 @@ const OpeningSection: React.FC = () => {
           </div>
 
           {opening.openingColorMode === 'gradient' && (
-            <div className="input-group" style={{ marginTop: -8 }}>
-              <label>그라데이션 색상</label>
+            <div className="opt-inline-group" style={{ marginTop: -8 }}>
+              <label className="opt-inline-label">그라데이션 색상</label>
               <div className="account-style-grid">
                 <button type="button"
                   className={`account-style-btn ${(!opening.openingGradientMode || opening.openingGradientMode === 'theme') ? 'active' : ''}`}
                   onClick={() => update({ openingGradientMode: 'theme' })}
                 >
-                  <strong>테마 자동</strong><span>청첩장 테마 색상으로 자동 생성</span>
+                  <strong>테마 자동</strong>
                 </button>
                 <button type="button"
                   className={`account-style-btn ${opening.openingGradientMode === 'preset' ? 'active' : ''}`}
                   onClick={() => update({ openingGradientMode: 'preset' })}
                 >
-                  <strong>프리셋</strong><span>감성 컬러 조합에서 선택</span>
+                  <strong>프리셋</strong>
                 </button>
                 <button type="button"
                   className={`account-style-btn ${opening.openingGradientMode === 'custom' ? 'active' : ''}`}
                   onClick={() => update({ openingGradientMode: 'custom' })}
                 >
-                  <strong>직접 지정</strong><span>시작·끝 색상을 직접 선택</span>
+                  <strong>직접 지정</strong>
                 </button>
               </div>
 
@@ -251,21 +251,21 @@ const OpeningSection: React.FC = () => {
             <label>장식 효과</label>
             <div className="account-style-grid">
               {([
-                { key: 'none'          as const, name: '없음',         desc: '추가 장식 없이 깔끔하게' },
-                { key: 'dots'          as const, name: '떠다니는 점',   desc: '작은 점들이 은은하게 부유' },
-                { key: 'ripple'        as const, name: '원형 파동',     desc: '중앙에서 원형 파동이 퍼져나감' },
-                { key: 'sparkle'       as const, name: '반짝이',        desc: '✦ 별 입자가 감성적으로 반짝임' },
-                { key: 'bokeh'         as const, name: '빛망울',        desc: '사진 bokeh처럼 은은한 빛 입자' },
-                { key: 'aurora'        as const, name: '오로라',        desc: '빛이 부드럽게 번지는 오로라' },
-                { key: 'firefly'       as const, name: '반딧불',        desc: '작은 불빛이 유기적으로 유영' },
-                { key: 'petal'         as const, name: '꽃비',          desc: '꽃잎이 하늘에서 천천히 낙하' },
-                { key: 'aurora-bokeh'  as const, name: '오로라+빛망울', desc: '오로라 위로 빛망울이 떠오름' },
-                { key: 'firefly-petal' as const, name: '반딧불+꽃비',   desc: '꽃잎 낙하와 반딧불이 공존' },
+                { key: 'none'          as const, name: '없음' },
+                { key: 'dots'          as const, name: '떠다니는 점' },
+                { key: 'ripple'        as const, name: '원형 파동' },
+                { key: 'sparkle'       as const, name: '반짝이' },
+                { key: 'bokeh'         as const, name: '빛망울' },
+                { key: 'aurora'        as const, name: '오로라' },
+                { key: 'firefly'       as const, name: '반딧불' },
+                { key: 'petal'         as const, name: '꽃비' },
+                { key: 'aurora-bokeh'  as const, name: '오로라+빛망울' },
+                { key: 'firefly-petal' as const, name: '반딧불+꽃비' },
               ]).map(e => (
                 <button key={e.key} type="button"
                   className={`account-style-btn ${(opening.openingDecoEffect || 'none') === e.key ? 'active' : ''}`}
                   onClick={() => update({ openingDecoEffect: e.key })}>
-                  <strong>{e.name}</strong><span>{e.desc}</span>
+                  <strong>{e.name}</strong>
                 </button>
               ))}
             </div>
@@ -285,33 +285,33 @@ const OpeningSection: React.FC = () => {
                   update({ openingBgPattern: next });
                 };
                 return ([
-                  { key: 'none',  name: '없음',        desc: '패턴 없이 깔끔한 배경' },
-                  { key: 'dots',  name: '미세 도트',    desc: '촘촘한 점 패턴, 고급스러운 질감' },
-                  { key: 'wave',  name: '웨이브',       desc: '사선 줄무늬, 세련된 다이내믹' },
-                  { key: 'frame', name: '이중 테두리',  desc: '고급 초대장의 안쪽 액자 프레임' },
-                  { key: 'grain', name: '그레인 노이즈', desc: '필름 입자 질감, 빈티지·아날로그 감성' },
-                  { key: 'letter', name: '편지 봉투', desc: '하단 봉투색과 개봉선으로 편지를 꺼낸 듯한 느낌' },
+                  { key: 'none',  name: '없음' },
+                  { key: 'dots',  name: '미세 도트' },
+                  { key: 'wave',  name: '웨이브' },
+                  { key: 'frame', name: '이중 테두리' },
+                  { key: 'grain', name: '그레인 노이즈' },
+                  { key: 'letter', name: '편지 봉투' },
                 ] as const).map(p => (
                   <button key={p.key} type="button"
                     className={`account-style-btn ${p.key === 'none' ? (selected.length === 0 ? 'active' : '') : selected.includes(p.key) ? 'active' : ''}`}
                     onClick={() => toggle(p.key)}>
-                    <strong>{p.name}</strong><span>{p.desc}</span>
+                    <strong>{p.name}</strong>
                   </button>
                 ));
               })()}
             </div>
           </div>
 
-          <div className="input-group">
-            <label>멘트 폰트 스타일</label>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">멘트 폰트 스타일</label>
             <div className="account-style-grid">
               {([
-                { key: 'elegant' as const, name: '세련됨', desc: 'Noto Serif KR · 고급스러운 세리프' },
-                { key: 'simple' as const, name: '심플함', desc: 'Noto Sans KR · 모던 미니멀' },
-                { key: 'clean' as const, name: '깔끔함', desc: 'Gowun Batang · 단정한 바탕체' },
+                { key: 'elegant' as const, name: '세련됨' },
+                { key: 'simple' as const, name: '심플함' },
+                { key: 'clean' as const, name: '깔끔함' },
               ]).map(s => (
                 <button key={s.key} type="button" className={`account-style-btn ${(opening.openingFontStyle || 'elegant') === s.key ? 'active' : ''}`} onClick={() => update({ openingFontStyle: s.key })}>
-                  <strong>{s.name}</strong><span>{s.desc}</span>
+                  <strong>{s.name}</strong>
                 </button>
               ))}
             </div>

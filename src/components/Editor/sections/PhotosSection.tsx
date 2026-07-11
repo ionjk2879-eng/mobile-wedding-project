@@ -32,16 +32,18 @@ const PhotosSection: React.FC = () => {
 
   return (
     <div className="modern-photo-editor">
-      <div className="photo-label">갤러리 연출 방식</div>
-      <div className="account-style-grid" style={{ marginBottom: '20px' }}>
-        {([
-          { key: 'slide', name: '슬라이드', desc: '한 장씩 좌우로 넘기기' },
-          { key: 'style3', name: '메이슨리', desc: '사진 미리보기 + 자유 배치' },
-        ] as { key: InvitationData['galleryStyle']; name: string; desc: string }[]).map(s => (
-          <button key={s.key} type="button" className={`account-style-btn ${data.galleryStyle === s.key ? 'active' : ''}`} onClick={() => updateField('galleryStyle', s.key)}>
-            <strong>{s.name}</strong><span>{s.desc}</span>
-          </button>
-        ))}
+      <div className="opt-inline-group" style={{ marginBottom: '20px' }}>
+        <span className="opt-inline-label">갤러리 연출 방식</span>
+        <div className="account-style-grid">
+          {([
+            { key: 'slide', name: '슬라이드' },
+            { key: 'style3', name: '메이슨리' },
+          ] as { key: InvitationData['galleryStyle']; name: string }[]).map(s => (
+            <button key={s.key} type="button" className={`account-style-btn ${data.galleryStyle === s.key ? 'active' : ''}`} onClick={() => updateField('galleryStyle', s.key)}>
+              <strong>{s.name}</strong>
+            </button>
+          ))}
+        </div>
       </div>
       <div className="photo-label">갤러리 사진 (다중 선택 가능)</div>
       <div className="modern-gallery-grid">

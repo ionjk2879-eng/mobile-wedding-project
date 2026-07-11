@@ -9,17 +9,17 @@ const AccountsSection: React.FC = () => {
 
   return (
     <>
-      <div className="input-group">
-        <label>연출 방식</label>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">연출 방식</label>
         <div className="account-style-grid">
           {([
-            { key: 'style1', name: '신랑·신부 구분형', desc: '신랑측과 신부측을 나누어 표시' },
-            { key: 'style2', name: '탭 전환 + 카드 슬라이드', desc: '신랑/신부 탭으로 전환, 좌우 스크롤 카드' },
-            { key: 'style3', name: '아코디언 펼치기', desc: '신랑/신부측을 각각 열고 닫기' },
-            { key: 'style4', name: '팝업', desc: '"계좌 정보 보기" 버튼을 누르면 팝업으로 표시' },
-          ] as { key: InvitationData['accountStyle']; name: string; desc: string }[]).map(s => (
+            { key: 'style1', name: '신랑·신부 구분형' },
+            { key: 'style2', name: '탭 전환 + 카드 슬라이드' },
+            { key: 'style3', name: '아코디언 펼치기' },
+            { key: 'style4', name: '팝업' },
+          ] as { key: InvitationData['accountStyle']; name: string }[]).map(s => (
             <button key={s.key} type="button" className={`account-style-btn ${data.accountStyle === s.key ? 'active' : ''}`} onClick={() => updateField('accountStyle', s.key)}>
-              <strong>{s.name}</strong><span>{s.desc}</span>
+              <strong>{s.name}</strong>
             </button>
           ))}
         </div>
