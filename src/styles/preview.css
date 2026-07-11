@@ -23,12 +23,16 @@
 .hero-wave-bottom { bottom: 0; }
 .hero-wave-top { top: 0; transform: scaleY(-1); }
 .hero-wave-layer { position: absolute; bottom: -1px; left: 0; width: 200%; height: 100%; fill: var(--wedding-bg, #FFFFFF); will-change: transform; }
-/* 메인화면 자체가 hero-fade-in(0.8s)으로 위치를 잡는 동안에는 물결을 정지해두고, 그
-   등장 애니메이션이 끝난 뒤에야 흐르기 시작한다 — 페이지가 처음 뜨는 순간(React가
-   전체 트리를 한 번에 마운트하는 무거운 시점)과 물결의 애니메이션 시작이 겹치면
-   저사양 기기에서 물결이 부자연스럽게 튀는(끊기는) 현상이 있어, 그 시점을 피한다. */
-.hero-wave-layer-back { opacity: 0.55; animation: hero-wave-drift 17s linear infinite; animation-delay: 0.8s; animation-fill-mode: backwards; }
-.hero-wave-layer-front { opacity: 0.92; animation: hero-wave-drift 11s linear infinite reverse; animation-delay: 0.8s; animation-fill-mode: backwards; }
+/* 페이지가 막 뜨는 무거운 렌더링 시점(React가 전체 트리를 한 번에 마운트하는 순간)과
+   물결 애니메이션 시작이 겹치면 저사양 기기에서 부자연스럽게 튀는 현상이 있어, CSS
+   타이머(animation-delay) 대신 Hero.tsx가 이중 requestAnimationFrame으로 실제 준비된
+   시점에 .hero-wave-playing 클래스를 붙여야만 흐르기 시작한다. 그 전까지는 아래 정적
+   transform(각 레이어의 애니메이션 시작 지점과 동일한 모양)으로 고정돼 있어, 애니메이션이
+   시작되는 순간에도 위치가 튀지 않는다. */
+.hero-wave-layer-back { opacity: 0.55; transform: translateX(0); }
+.hero-wave-layer-front { opacity: 0.92; transform: translateX(-50%); }
+.hero-wave-layer-back.hero-wave-playing { animation: hero-wave-drift 17s linear infinite; }
+.hero-wave-layer-front.hero-wave-playing { animation: hero-wave-drift 11s linear infinite reverse; }
 @keyframes hero-wave-drift {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }

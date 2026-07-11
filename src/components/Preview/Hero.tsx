@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { InvitationData } from '../../types';
 import { isFixedLookHeroStyle } from '../../data/heroStyleConfig';
 import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateTime';
@@ -12,16 +12,39 @@ interface PreviewProps {
 // translateX 하면, 패스 패턴이 정확히 한 주기(뷰박스 절반)씩 반복되므로 이음매 없이
 // 무한 루프된다. 색은 --wedding-bg(테마 배경색)를 그대로 써서 어떤 테마에서도 "그 다음
 // 배경이 비쳐 보이는" 느낌을 유지한다.
-const HeroWave: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
-  <div className={`hero-wave hero-wave-${position}`} aria-hidden="true">
-    <svg className="hero-wave-layer hero-wave-layer-back" viewBox="0 0 2400 100" preserveAspectRatio="none">
-      <path d="M0,55 C150,25 450,25 600,55 C750,85 1050,85 1200,55 C1350,25 1650,25 1800,55 C1950,85 2250,85 2400,55 L2400,100 L0,100 Z" />
-    </svg>
-    <svg className="hero-wave-layer hero-wave-layer-front" viewBox="0 0 2400 100" preserveAspectRatio="none">
-      <path d="M0,62 C150,38 450,38 600,62 C750,86 1050,86 1200,62 C1350,38 1650,38 1800,62 C1950,86 2250,86 2400,62 L2400,100 L0,100 Z" />
-    </svg>
-  </div>
-);
+// 마운트 직후 이중 requestAnimationFrame(브라우저가 첫 무거운 페인트를 실제로 끝낸
+// 다음 프레임)이 지나야 흐르기 시작한다 — 페이지가 막 뜨는 무거운 렌더링 시점과
+// 물결 애니메이션 시작이 겹치면 저사양 기기에서 애니메이션이 튀는 현상이 있어,
+// CSS animation-delay 같은 고정 타이머 대신 실제로 준비된 시점에 JS로 시작시킨다.
+function useWaveStarted(): boolean {
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    let raf1 = 0;
+    let raf2 = 0;
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setStarted(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, []);
+  return started;
+}
+
+const HeroWave: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => {
+  const started = useWaveStarted();
+  return (
+    <div className={`hero-wave hero-wave-${position}`} aria-hidden="true">
+      <svg className={`hero-wave-layer hero-wave-layer-back${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 100" preserveAspectRatio="none">
+        <path d="M0,55 C150,25 450,25 600,55 C750,85 1050,85 1200,55 C1350,25 1650,25 1800,55 C1950,85 2250,85 2400,55 L2400,100 L0,100 Z" />
+      </svg>
+      <svg className={`hero-wave-layer hero-wave-layer-front${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 100" preserveAspectRatio="none">
+        <path d="M0,62 C150,38 450,38 600,62 C750,86 1050,86 1200,62 C1350,38 1650,38 1800,62 C1950,86 2250,86 2400,62 L2400,100 L0,100 Z" />
+      </svg>
+    </div>
+  );
+};
 
 // 대각선 컷 — 사진 경계를 한 방향으로 떨어지는 사선으로 자른다. 물결과 달리 애니메이션
 // 없이 고정된 단일 레이어.

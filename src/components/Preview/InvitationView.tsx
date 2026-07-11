@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   LayoutTemplate, MessageSquare, Clock, Heart, MessagesSquare,
   Image as ImageIcon, Milestone, MapPin, CalendarCheck, CreditCard,
@@ -23,7 +23,7 @@ import MidPhoto from './MidPhoto';
 import Share from './Share';
 import Guestbook from './Guestbook';
 import LiveGallery from './LiveGallery';
-import ScrollReveal from './ScrollReveal';
+import ScrollReveal, { ScrollRootContext, ScrollRevealProvider } from './ScrollReveal';
 import BackgroundEffects from './BackgroundEffects';
 import MusicPlayer from './MusicPlayer';
 import Opening from './Opening';
@@ -163,6 +163,9 @@ export function buildSectionOrder(data: InvitationData): string[] {
 
 const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, showOpening, shareEnabled = false, openingTopOffset, onSectionNav, forceAnniversaryMode, guestName, guestRelation, guestCode, guestMessageIndex, enableAnonymousOpening, onOpeningActiveChange, isOwnerPreview }) => {
   const openingPreviewKey = useInvitationStore((s) => s.openingPreviewKey);
+  // ScrollReveal 배치 코디네이터에 넘길 스크롤 루트 — 호출부(ViewPage/App.tsx 등)가
+  // ScrollRootContext.Provider로 이미 제공하고 있는 값을 그대로 재사용한다.
+  const scrollRoot = useContext(ScrollRootContext);
 
   const daysAfterWedding = (() => {
     if (!data.weddingDateISO) return 0;
@@ -337,17 +340,19 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           {data.bgEffectHeroOnly && <BackgroundEffects effect={data.bgEffect} confined />}
         </div>
       )}
-      {effectiveSectionOrder.map((id, i) => {
-        const eff = data.scrollEffect || 'none';
-        const delay = i % 2 === 0 ? 0 : 100;
-        const ref = previewRefs?.[id];
-        const editorId = PREVIEW_TO_EDITOR[id] || id;
-        return (
-          <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} onNavExtra={id === 'contacts' && onSectionNav ? () => onSectionNav('contacts') : undefined} guestName={guestName} guestCode={guestCode} isOwnerPreview={isOwnerPreview} />
-          </ScrollReveal>
-        );
-      })}
+      <ScrollRevealProvider rootRef={scrollRoot}>
+        {effectiveSectionOrder.map((id, i) => {
+          const eff = data.scrollEffect || 'none';
+          const delay = i % 2 === 0 ? 0 : 100;
+          const ref = previewRefs?.[id];
+          const editorId = PREVIEW_TO_EDITOR[id] || id;
+          return (
+            <ScrollReveal key={id} effect={eff} delay={delay}>
+              <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} onNavExtra={id === 'contacts' && onSectionNav ? () => onSectionNav('contacts') : undefined} guestName={guestName} guestCode={guestCode} isOwnerPreview={isOwnerPreview} />
+            </ScrollReveal>
+          );
+        })}
+      </ScrollRevealProvider>
     </article>
   );
 };
