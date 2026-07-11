@@ -1610,6 +1610,7 @@ async function ensureKakaoPublicEvent(env: Env, slug: string, data: any): Promis
       body: new URLSearchParams({ event_id: existingId, event: JSON.stringify(event), ...channelParams }),
     });
     if (updateRes.ok) return existingId;
+    console.error('[kakao public event] update failed', updateRes.status, await updateRes.text());
   }
 
   const createRes = await fetch('https://kapi.kakao.com/v2/api/calendar/public/create/event', {
@@ -1617,7 +1618,10 @@ async function ensureKakaoPublicEvent(env: Env, slug: string, data: any): Promis
     headers,
     body: new URLSearchParams({ event: JSON.stringify(event), ...channelParams }),
   });
-  if (!createRes.ok) return null;
+  if (!createRes.ok) {
+    console.error('[kakao public event] create failed', createRes.status, await createRes.text());
+    return null;
+  }
   const created = await createRes.json() as { event_id?: string };
   if (!created.event_id) return null;
   await env.DB.prepare('UPDATE invitations SET kakao_event_id = ? WHERE slug = ?').bind(created.event_id, slug).run();
