@@ -20,6 +20,13 @@ const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; n
   { key: 'hairline', name: '헤어라인' },
 ];
 
+const HERO_EFFECT_TYPES: { key: NonNullable<InvitationData['heroEffectType']>; name: string }[] = [
+  { key: 'none', name: '없음' },
+  { key: 'wave', name: '물결' },
+  { key: 'diagonal', name: '대각선' },
+  { key: 'arch', name: '아치' },
+  { key: 'gradient', name: '그라데이션' },
+];
 
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
@@ -203,12 +210,22 @@ const HeroSection: React.FC = () => {
         <label className="opt-inline-label">메인화면 효과</label>
         <div className="opt-inline-content">
           <div className="account-style-grid">
-            <button type="button" className={`account-style-btn ${(data.heroWaveEffect || 'none') === 'none' ? 'active' : ''}`} onClick={() => updateField('heroWaveEffect', 'none')}>
-              <strong>없음</strong>
-            </button>
-            <button type="button" className={`account-style-btn ${(data.heroWaveEffect || 'none') !== 'none' ? 'active' : ''}`} onClick={() => updateField('heroWaveEffect', data.heroWaveEffect && data.heroWaveEffect !== 'none' ? data.heroWaveEffect : 'bottom')}>
-              <strong>물결</strong>
-            </button>
+            {(() => {
+              const effectType = data.heroEffectType || (data.heroWaveEffect && data.heroWaveEffect !== 'none' ? 'wave' : 'none');
+              return HERO_EFFECT_TYPES.map(t => (
+                <button
+                  key={t.key}
+                  type="button"
+                  className={`account-style-btn ${effectType === t.key ? 'active' : ''}`}
+                  onClick={() => {
+                    if (t.key === 'none') { updateFields({ heroEffectType: 'none', heroWaveEffect: 'none' }); return; }
+                    updateFields({ heroEffectType: t.key, heroWaveEffect: data.heroWaveEffect && data.heroWaveEffect !== 'none' ? data.heroWaveEffect : 'bottom' });
+                  }}
+                >
+                  <strong>{t.name}</strong>
+                </button>
+              ));
+            })()}
           </div>
           {(data.heroWaveEffect || 'none') !== 'none' && (
             <div className="account-style-grid" style={{ marginTop: 8 }}>

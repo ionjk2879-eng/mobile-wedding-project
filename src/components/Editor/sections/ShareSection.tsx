@@ -59,13 +59,15 @@ const ShareSection: React.FC = () => {
   return (
     <>
       <p className="section-desc">청첩장 주소를 설정하고 저장하면 하객에게 공유할 수 있습니다.</p>
-      <div className="input-group">
-        <label>청첩장 주소</label>
-        <div className="slug-input-row">
-          <span className="slug-prefix">sonett.kr/</span>
-          <input type="text" value={slug || ''} onChange={handleSlugChange} className={`modern-input ${slugStatus === 'taken' || slugStatus === 'invalid' ? 'input-error' : slugStatus === 'available' ? 'input-valid' : ''}`} placeholder="jihyun-minji" />
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">청첩장 주소</label>
+        <div className="opt-inline-content">
+          <div className="slug-input-row">
+            <span className="slug-prefix">sonett.kr/</span>
+            <input type="text" value={slug || ''} onChange={handleSlugChange} className={`modern-input ${slugStatus === 'taken' || slugStatus === 'invalid' ? 'input-error' : slugStatus === 'available' ? 'input-valid' : ''}`} placeholder="jihyun-minji" />
+          </div>
+          {slugHint()}
         </div>
-        {slugHint()}
       </div>
       <div className="share-divider" />
       <p className="section-desc">카카오톡으로 공유할 때 표시될 정보를 설정합니다.</p>

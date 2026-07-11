@@ -70,8 +70,12 @@ export interface DesignConfig {
   // true면 흩날리는 효과를 메인화면(Hero) 영역 안에만 가두어 스크롤하면 함께 사라지게
   // 한다. 기본값(false/미지정)은 기존처럼 화면 전체에 고정되어 스크롤해도 계속 보인다.
   bgEffectHeroOnly?: boolean;
-  // 메인화면(Hero) 사진 경계에 얹는 물결(파도) 효과. 위/아래/양쪽 중 어디에 표시할지.
+  // 메인화면(Hero) 사진 경계에 얹는 효과의 위치. 위/아래/양쪽 중 어디에 표시할지.
+  // (필드명은 물결 효과였던 시절 이름 그대로 유지 — heroEffectType이 없는 기존 데이터는
+  // 이 값이 'none'이 아니면 물결 효과로 취급해 하위 호환한다.)
   heroWaveEffect?: 'none' | 'top' | 'bottom' | 'both';
+  // 메인화면 사진 경계 효과 종류. 미지정 시 heroWaveEffect로 하위 호환 판단.
+  heroEffectType?: 'none' | 'wave' | 'diagonal' | 'arch' | 'gradient';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype' | 'magframe' | 'boldtype' | 'datesplit';

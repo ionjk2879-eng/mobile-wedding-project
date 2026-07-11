@@ -23,6 +23,30 @@ const HeroWave: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
   </div>
 );
 
+// 대각선 컷 — 사진 경계를 한 방향으로 떨어지는 사선으로 자른다. 물결과 달리 애니메이션
+// 없이 고정된 단일 레이어.
+const HeroDiagonal: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
+  <div className={`hero-diagonal hero-diagonal-${position}`} aria-hidden="true">
+    <svg className="hero-diagonal-layer" viewBox="0 0 2400 100" preserveAspectRatio="none">
+      <path d="M0,100 L2400,35 L2400,100 Z" />
+    </svg>
+  </div>
+);
+
+// 아치 커브 — 반복 없는 완만한 곡선 하나로 사진 경계를 감싼다.
+const HeroArch: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
+  <div className={`hero-arch hero-arch-${position}`} aria-hidden="true">
+    <svg className="hero-arch-layer" viewBox="0 0 2400 100" preserveAspectRatio="none">
+      <path d="M0,60 Q1200,-20 2400,60 L2400,100 L0,100 Z" />
+    </svg>
+  </div>
+);
+
+// 하단(또는 상단) 그라데이션 페이드 — 사진이 배경색으로 자연스럽게 스며들 듯 사라진다.
+const HeroGradient: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
+  <div className={`hero-gradient hero-gradient-${position}`} aria-hidden="true" />
+);
+
 const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
@@ -54,7 +78,9 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return data.time;
   })();
   const style = data.heroStyle || 'classic';
-  const waveEffect = data.heroWaveEffect || 'none';
+  // heroEffectType이 없는 기존 데이터는 heroWaveEffect만 있으면 물결 효과로 간주(하위 호환).
+  const effectType = data.heroEffectType || (data.heroWaveEffect && data.heroWaveEffect !== 'none' ? 'wave' : 'none');
+  const effectPosition = data.heroWaveEffect || 'none';
   const yearStr = data.weddingDateISO ? data.weddingDateISO.slice(0, 4) : String(new Date().getFullYear());
 
   const calculateDDay = () => {
@@ -89,15 +115,22 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return <div className={`hero-shape hero-shape-${heroShape}`}>{img}</div>;
   };
 
-  // 물결 효과는 메인화면 섹션 전체가 아니라, 실제 들어간 사진(+사진 모형) 위에 얹혀야
+  // 경계 효과는 메인화면 섹션 전체가 아니라, 실제 들어간 사진(+사진 모형) 위에 얹혀야
   // 어떤 메인화면 스타일을 고르든 사진 경계를 그대로 따라간다.
+  const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch' | 'gradient', React.FC<{ position: 'top' | 'bottom' }>> = {
+    wave: HeroWave,
+    diagonal: HeroDiagonal,
+    arch: HeroArch,
+    gradient: HeroGradient,
+  };
   const renderPhotoWithWave = (inner: React.ReactNode): React.ReactNode => {
-    if (waveEffect === 'none') return inner;
+    if (effectType === 'none') return inner;
+    const EffectComponent = EFFECT_COMPONENTS[effectType];
     return (
       <div className="hero-photo-frame">
         {inner}
-        {(waveEffect === 'top' || waveEffect === 'both') && <HeroWave position="top" />}
-        {(waveEffect === 'bottom' || waveEffect === 'both') && <HeroWave position="bottom" />}
+        {(effectPosition === 'top' || effectPosition === 'both') && <EffectComponent position="top" />}
+        {(effectPosition === 'bottom' || effectPosition === 'both') && <EffectComponent position="bottom" />}
       </div>
     );
   };
@@ -490,6 +523,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroStyle === next.data.heroStyle
   && prev.data.heroPhotoShape === next.data.heroPhotoShape
   && prev.data.heroWaveEffect === next.data.heroWaveEffect
+  && prev.data.heroEffectType === next.data.heroEffectType
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily
