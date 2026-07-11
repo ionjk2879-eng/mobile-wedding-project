@@ -121,36 +121,23 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   // 갖고 있어 이 축을 무시(항상 basic 취급)한다.
   const heroShape = isFixedLookHeroStyle(style) ? 'basic' : (data.heroPhotoShape || 'basic');
 
-  const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode, scale = 100): React.ReactNode => {
-    const photoStyle: React.CSSProperties = { objectPosition: pos, transform: scale !== 100 ? `scale(${scale / 100})` : undefined };
-    const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={photoStyle} decoding="async" /> : fallback;
-    if (heroShape === 'basic') return img;
-    if (heroShape === 'polaroid') {
-      return (
-        <div className="hero-shape hero-shape-polaroid">
-          {src && <img src={src} alt="" aria-hidden="true" className="hero-photo hero-photo-back" style={photoStyle} />}
-          <div className="hero-photo-front">{img}</div>
-        </div>
-      );
-    }
-    return <div className={`hero-shape hero-shape-${heroShape}`}>{img}</div>;
-  };
-
-  // 경계 효과는 메인화면 섹션 전체가 아니라, 실제 들어간 사진(+사진 모형) 위에 얹혀야
-  // 어떤 메인화면 스타일을 고르든 사진 경계를 그대로 따라간다.
+  // 경계 효과(물결/대각선/아치)와 타이포그래피는 사진 모형(heroPhotoShape)이 오벌/육각형/
+  // 블롭처럼 실제 보이는 영역이 사각형 프레임보다 좁은 경우, 그 모형을 감싸는 요소
+  // 바깥(형제)에 그리면 모형 밖으로 삐져나와 "이미지보다 큰 범위를 덮는" 것처럼 보인다.
+  // 그래서 아래 wrapWithShape가 모형 wrapper의 overflow:hidden(또는 clip-path)이
+  // 실제로 적용되는 자식 위치에 함께 그려 넣도록, 효과 노드를 인자로 받아 그 안에 넣는다.
   const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch', React.FC<{ position: 'top' | 'bottom' }>> = {
     wave: HeroWave,
     diagonal: HeroDiagonal,
     arch: HeroArch,
   };
-  const renderPhotoWithWave = (inner: React.ReactNode, includeTypography = false): React.ReactNode => {
+  const buildEffectsNode = (includeTypography = false): React.ReactNode => {
     const hasEffect = effectType !== 'none' && effectType in EFFECT_COMPONENTS;
     const hasTypography = includeTypography && typography === 'ourwedding';
-    if (!hasEffect && !hasTypography) return inner;
+    if (!hasEffect && !hasTypography) return null;
     const EffectComponent = hasEffect ? EFFECT_COMPONENTS[effectType as 'wave' | 'diagonal' | 'arch'] : null;
     return (
-      <div className="hero-photo-frame">
-        {inner}
+      <>
         {EffectComponent && (effectPosition === 'top' || effectPosition === 'both') && <EffectComponent position="top" />}
         {EffectComponent && (effectPosition === 'bottom' || effectPosition === 'both') && <EffectComponent position="bottom" />}
         {hasTypography && (
@@ -159,16 +146,34 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
             <h1 className="hero-typo-statement"><span>Our</span><span>Wedding.</span></h1>
           </div>
         )}
-      </div>
+      </>
     );
+  };
+
+  const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode, scale = 100, effectsNode: React.ReactNode = null): React.ReactNode => {
+    const photoStyle: React.CSSProperties = { objectPosition: pos, transform: scale !== 100 ? `scale(${scale / 100})` : undefined };
+    const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={photoStyle} decoding="async" /> : fallback;
+    if (heroShape === 'basic') {
+      if (!effectsNode) return img;
+      return <div className="hero-photo-frame">{img}{effectsNode}</div>;
+    }
+    if (heroShape === 'polaroid') {
+      return (
+        <div className="hero-shape hero-shape-polaroid">
+          {src && <img src={src} alt="" aria-hidden="true" className="hero-photo hero-photo-back" style={photoStyle} />}
+          <div className="hero-photo-front">{img}{effectsNode}</div>
+        </div>
+      );
+    }
+    return <div className={`hero-shape hero-shape-${heroShape}`}>{img}{effectsNode}</div>;
   };
 
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
   const emptyPhotoEl = <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>;
-  const photoEl = renderPhotoWithWave(wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl, data.heroPhotoScale ?? 100), true);
+  const photoEl = wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl, data.heroPhotoScale ?? 100, buildEffectsNode(true));
 
   const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
-  const photo2El = data.heroPhoto2 ? renderPhotoWithWave(wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl)) : photoEl;
+  const photo2El = data.heroPhoto2 ? wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl, 100, buildEffectsNode(false)) : photoEl;
 
   const renderClassic = () => (
     <div className="hero-classic">
