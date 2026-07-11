@@ -98,7 +98,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode, scale = 100): React.ReactNode => {
     const photoStyle: React.CSSProperties = { objectPosition: pos, transform: scale !== 100 ? `scale(${scale / 100})` : undefined };
-    const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={photoStyle} /> : fallback;
+    const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={photoStyle} decoding="async" /> : fallback;
     if (heroShape === 'basic') return img;
     if (heroShape === 'polaroid') {
       return (
