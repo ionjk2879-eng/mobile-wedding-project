@@ -160,9 +160,9 @@ const HeroSection: React.FC = () => {
                 type="button"
                 className={`hero-shape-btn ${(data.heroPhotoShape || 'basic') === s.key ? 'active' : ''}`}
                 onClick={() => updateField('heroPhotoShape', s.key)}
+                title={s.name}
               >
                 <span className={`hero-shape-preview hero-shape-preview-${s.key}`} />
-                <strong>{s.name}</strong>
               </button>
             ))}
           </div>
