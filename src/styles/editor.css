@@ -292,15 +292,17 @@
 .modern-list-item.col { flex-direction: column; align-items: stretch; padding: 15px; }
 .role-tag { background: #FCE7F3; color: #D4A5C6; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; white-space: nowrap; }
 .photo-label { font-size: 0.8rem; font-weight: 800; color: #9CA3AF; text-transform: uppercase; margin-bottom: 12px; }
-.modern-hero-upload { position: relative; width: 100%; border-radius: 16px; display: flex; align-items: center; justify-content: flex-start; }
-.modern-hero-upload:has(img) { overflow: hidden; background: #F3F4F6; border-radius: 20px; min-height: 180px; justify-content: center; }
-.modern-hero-upload img { width: 100%; display: block; }
-/* 소형 세로 직사각형 업로드 카드 — 컬러 보더 + 원형 플러스 아이콘 */
+/* 사진이 있든 없든 항상 같은 소형 세로 직사각형 카드 크기를 쓴다 (전체 폭으로
+   커지지 않도록) — 컬러 보더 + 원형 플러스 아이콘은 빈 상태에서만, 사진이 있으면
+   그 카드 안에 꽉 채워 보여주고 우하단에 작은 "변경" 버튼을 얹는다. */
+.modern-hero-upload { position: relative; width: 118px; height: 156px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+.modern-hero-upload:has(img) { overflow: hidden; background: #F3F4F6; }
+.modern-hero-upload img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hero-empty-upload { width: 118px; height: 156px; display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #B07A8E; cursor: pointer; border: 1.5px solid #E8B4C6; border-radius: 14px; transition: all 0.2s; box-sizing: border-box; background: #FFF9FB; }
 .hero-empty-upload:hover { border-color: #D4A5C6; background: #FFF3F7; }
 .hero-empty-upload span { font-size: 0.72rem; font-weight: 700; }
 .hero-empty-upload-plus { width: 34px; height: 34px; border-radius: 50%; background: #6B7280; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.change-btn { position: absolute; bottom: 20px; right: 20px; background: white; color: #111827; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.change-btn { position: absolute; bottom: 6px; right: 6px; background: white; color: #111827; padding: 5px 9px; border-radius: 20px; font-size: 0.62rem; font-weight: 800; display: flex; align-items: center; gap: 3px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .modern-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; }
 .add-photo-card { aspect-ratio: 3 / 4; border: 1.5px solid #E8B4C6; background: #FFF9FB; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #B07A8E; cursor: pointer; transition: all 0.2s; }
 .add-photo-card:hover { border-color: #D4A5C6; background: #FFF3F7; }

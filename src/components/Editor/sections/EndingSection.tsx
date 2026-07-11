@@ -42,7 +42,7 @@ const EndingSection: React.FC = () => {
           ) : data.endingPhoto ? (
             <>
               <img src={data.endingPhoto} alt="Ending" />
-              <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleUpload} hidden /></label>
+              <label className="change-btn"><ImageIcon size={11} /> 변경<input type="file" accept="image/*" onChange={handleUpload} hidden /></label>
             </>
           ) : (
             <label className="hero-empty-upload">

@@ -68,7 +68,7 @@ const HeroSection: React.FC = () => {
           ) : data.heroPhoto ? (
             <>
               <img src={data.heroPhoto} alt="Hero" />
-              <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden /></label>
+              <label className="change-btn"><ImageIcon size={11} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhotoUpload} hidden /></label>
             </>
           ) : (
             <label className="hero-empty-upload">
@@ -105,7 +105,7 @@ const HeroSection: React.FC = () => {
               ) : data.heroPhoto2 ? (
                 <>
                   <img src={data.heroPhoto2} alt="Bride" />
-                  <label className="change-btn"><ImageIcon size={16} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhoto2Upload} hidden /></label>
+                  <label className="change-btn"><ImageIcon size={11} /> 변경<input type="file" accept="image/*" onChange={handleHeroPhoto2Upload} hidden /></label>
                 </>
               ) : (
                 <label className="hero-empty-upload">
