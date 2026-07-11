@@ -250,12 +250,14 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
 
           {style === 'slideshow' && (
             <div className="gallery-slideshow">
-              <div className="gallery-slideshow-vp" style={{ paddingBottom: `${(photoRatios[slideshowIdx] || 0.75) * 100}%` }}>
-                {data.photos.map((src, i) => (
-                  <div key={i} className={`gallery-slideshow-item ${i === slideshowIdx ? 'active' : ''}`} onClick={() => setSelectedIndex(i)}>
-                    <img src={src} alt={`Gallery ${i}`} draggable="false" loading="lazy" decoding="async" />
-                  </div>
-                ))}
+              <div className="gallery-slideshow-vp">
+                <div className="gallery-slideshow-track" style={{ transform: `translateX(-${slideshowIdx * 100}%)` }}>
+                  {data.photos.map((src, i) => (
+                    <div key={i} className="gallery-slideshow-item" onClick={() => setSelectedIndex(i)}>
+                      <img src={src} alt={`Gallery ${i}`} draggable="false" loading="lazy" decoding="async" />
+                    </div>
+                  ))}
+                </div>
               </div>
               {data.photos.length > 1 && (
                 <div className="gallery-slide-dots">

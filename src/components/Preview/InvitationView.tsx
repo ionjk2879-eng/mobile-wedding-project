@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   LayoutTemplate, MessageSquare, Clock, Heart, MessagesSquare,
   Image as ImageIcon, Milestone, MapPin, CalendarCheck, CreditCard,
-  Info, BookOpen, Camera, Send, Palette,
+  Info, BookOpen, Camera, Send, Palette, Phone,
 } from 'lucide-react';
 import { InvitationData, GuestRelation, OpeningConfig } from '../../types';
 import useInvitationStore from '../../stores/useInvitationStore';
@@ -79,15 +79,28 @@ export const SECTION_NAV_INFO: Record<string, { icon: React.ReactNode; label: st
   share:     { icon: <Send size={13} />,           label: '주소',          labelEn: 'Address',      labelJa: '住所' },
 };
 
-const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; guestName?: string; guestCode?: string; isOwnerPreview?: boolean }> = ({ id, data, refEl, shareEnabled, onNav, guestName, guestCode, isOwnerPreview }) => {
+const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: React.RefObject<HTMLDivElement>; shareEnabled?: boolean; onNav?: () => void; onNavExtra?: () => void; guestName?: string; guestCode?: string; isOwnerPreview?: boolean }> = ({ id, data, refEl, shareEnabled, onNav, onNavExtra, guestName, guestCode, isOwnerPreview }) => {
   const navInfo = SECTION_NAV_INFO[id];
   const wrap = (children: React.ReactNode) => (
     <div ref={refEl} className={onNav ? 'preview-nav-section' : undefined}>
       {onNav && navInfo && (
-        <button className="preview-section-nav-btn" onClick={onNav} title={`${navInfo.label} 편집`} aria-label={`${navInfo.label} 편집`}>
-          {navInfo.icon}
-          <span className="preview-nav-label">{navInfo.label}</span>
-        </button>
+        onNavExtra ? (
+          <div className="preview-nav-btn-stack">
+            <button className="preview-section-nav-btn" onClick={onNav} title={`${navInfo.label} 편집`} aria-label={`${navInfo.label} 편집`}>
+              {navInfo.icon}
+              <span className="preview-nav-label">{navInfo.label}</span>
+            </button>
+            <button className="preview-section-nav-btn" onClick={onNavExtra} title="연락처 편집" aria-label="연락처 편집">
+              <Phone size={13} />
+              <span className="preview-nav-label">연락처</span>
+            </button>
+          </div>
+        ) : (
+          <button className="preview-section-nav-btn" onClick={onNav} title={`${navInfo.label} 편집`} aria-label={`${navInfo.label} 편집`}>
+            {navInfo.icon}
+            <span className="preview-nav-label">{navInfo.label}</span>
+          </button>
+        )
       )}
       {children}
     </div>
@@ -114,7 +127,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 };
 
 // midphoto는 순서 관리 대상이 아니라 활성 섹션 중간에 자동 배치되는 고정 섹션이라 여기서 제외
-export const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'contacts', 'ending', 'share'];
+export const DEFAULT_ORDER = ['greeting', 'contacts', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'ending', 'share'];
 
 // 각 섹션의 on/off 토글 여부 (없는 섹션은 항상 활성)
 function isSectionActive(id: string, data: InvitationData): boolean {
@@ -331,7 +344,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         const editorId = PREVIEW_TO_EDITOR[id] || id;
         return (
           <ScrollReveal key={id} effect={eff} delay={delay}>
-            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} guestName={guestName} guestCode={guestCode} isOwnerPreview={isOwnerPreview} />
+            <SectionComponent id={id} data={effectiveData} refEl={ref} shareEnabled={shareEnabled} onNav={onSectionNav ? () => onSectionNav(editorId) : undefined} onNavExtra={id === 'contacts' && onSectionNav ? () => onSectionNav('contacts') : undefined} guestName={guestName} guestCode={guestCode} isOwnerPreview={isOwnerPreview} />
           </ScrollReveal>
         );
       })}

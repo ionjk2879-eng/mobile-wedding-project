@@ -20,7 +20,7 @@ const SECTION_LABELS: Record<string, string> = {
 // ending/share는 항상 맨 마지막에 고정 — 순서 관리 대상 아님
 // midphoto는 활성 섹션 중간에 자동 배치되는 고정 섹션이라 순서 관리 대상에서 제외
 const FIXED_TAIL = ['ending', 'share'] as const;
-const DEFAULT_ORDER = ['greeting', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'contacts'];
+const DEFAULT_ORDER = ['greeting', 'contacts', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts'];
 
 function SortableSectionItem({ id, index }: { id: string; index: number }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
