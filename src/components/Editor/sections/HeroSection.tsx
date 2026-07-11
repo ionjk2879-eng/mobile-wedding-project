@@ -173,6 +173,11 @@ const HeroSection: React.FC = () => {
             { key: 'instacard', name: '인스타그램' },
             { key: 'bookcover', name: '북커버' },
             { key: 'bookpage', name: '책 한 페이지' },
+            { key: 'filmstrip', name: '필름 스틸' },
+            { key: 'verttype', name: '세로 타이포' },
+            { key: 'magframe', name: '매거진 프레임' },
+            { key: 'boldtype', name: '볼드 타이포' },
+            { key: 'datesplit', name: '데이트 스플릿' },
           ] as { key: InvitationData['heroStyle']; name: string }[]).map(s => (
             <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
               <strong>{s.name}</strong>
@@ -180,28 +185,16 @@ const HeroSection: React.FC = () => {
           ))}
         </div>
       </div>
-      <div className="opt-inline-subgroup">
-        <label className="opt-inline-label">매거진 커버</label>
-        <div className="hero-style-grid">
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">메인화면 효과</label>
+        <div className="account-style-grid">
           {([
-            { key: 'filmstrip' as InvitationData['heroStyle'], name: '필름 스틸' },
-            { key: 'verttype' as InvitationData['heroStyle'], name: '세로 타이포' },
-          ]).map(s => (
-            <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
-              <strong>{s.name}</strong>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="opt-inline-subgroup">
-        <label className="opt-inline-label">포토그래피</label>
-        <div className="hero-style-grid">
-          {([
-            { key: 'magframe' as InvitationData['heroStyle'], name: '매거진 프레임' },
-            { key: 'boldtype' as InvitationData['heroStyle'], name: '볼드 타이포' },
-            { key: 'datesplit' as InvitationData['heroStyle'], name: '데이트 스플릿' },
-          ]).map(s => (
-            <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
+            { key: 'none', name: '없음' },
+            { key: 'top', name: '상단' },
+            { key: 'bottom', name: '하단' },
+            { key: 'both', name: '상하단' },
+          ] as { key: NonNullable<InvitationData['heroWaveEffect']>; name: string }[]).map(s => (
+            <button key={s.key} type="button" className={`account-style-btn ${(data.heroWaveEffect || 'none') === s.key ? 'active' : ''}`} onClick={() => updateField('heroWaveEffect', s.key)}>
               <strong>{s.name}</strong>
             </button>
           ))}

@@ -252,8 +252,6 @@
 /* 라벨 하나에 그리드+커스텀 입력줄+힌트처럼 자식이 여러 개 붙는 경우를 감싸는
    범용 래퍼 — 내부는 기존처럼 세로로 쌓이고, 전체가 라벨 오른쪽 칸을 차지한다. */
 .opt-inline-content { display: block; }
-.opt-inline-subgroup { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; }
-.opt-inline-subgroup > .opt-inline-label { flex: 0 0 78px; width: 78px; font-size: 0.66rem; font-weight: 600; color: #B0BAC8; letter-spacing: 0.5px; padding-top: 7px; line-height: 1.35; word-break: keep-all; }
 
 /* Order management */
 .order-list { display: flex; flex-direction: column; gap: 6px; }

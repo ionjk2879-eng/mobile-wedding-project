@@ -12,6 +12,20 @@
 .hero-photo-empty span { font-size: 0.9em; color: #000000; line-height: 1; }
 .hero-img-wrap { overflow: hidden; line-height: 0; }
 
+/* 메인화면 물결(파도) 효과 — 레이어 2장을 서로 다른 속도로 좌우로 흘려보내는 옅은
+   패럴랙스. SVG 폭을 200%로 두고 정확히 -50%만큼 translateX 하면 뷰박스 절반 단위로
+   반복되는 패스 패턴이 이음매 없이 무한 루프된다. */
+.hero-wave { position: absolute; left: 0; right: 0; height: 56px; overflow: hidden; pointer-events: none; z-index: 3; }
+.hero-wave-bottom { bottom: 0; }
+.hero-wave-top { top: 0; transform: scaleY(-1); }
+.hero-wave-layer { position: absolute; bottom: -1px; left: 0; width: 200%; height: 100%; fill: var(--wedding-bg, #FFFFFF); }
+.hero-wave-layer-back { opacity: 0.55; animation: hero-wave-drift 17s linear infinite; }
+.hero-wave-layer-front { opacity: 0.92; animation: hero-wave-drift 11s linear infinite reverse; }
+@keyframes hero-wave-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 /* 사진 모형(heroPhotoShape) — Hero.tsx 대표 사진에만 적용되는 축. 각 heroStyle이 만든
    기존 wrap 요소(.hero-img-wrap 등) 안에 이 클래스가 감싸져 들어가며, width/height는
    부모 wrap을 100% 채운다. */
