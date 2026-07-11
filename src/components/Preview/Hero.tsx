@@ -42,6 +42,24 @@ const HeroArch: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
   </div>
 );
 
+// 샤인 스윕 — 사진을 가리지 않고, 옅은 대각선 빛줄기가 경계 밴드를 주기적으로 한 번씩
+// 스쳐 지나간다. 물결처럼 색을 채우는 대신 반투명 흰색 그라데이션만 얹어 사진이 그대로
+// 비쳐 보이게 한다.
+const HeroShine: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
+  <div className={`hero-shine hero-shine-${position}`} aria-hidden="true">
+    <span className="hero-shine-band" />
+  </div>
+);
+
+// 리플 — 경계선을 중심으로 옅은 동심원 두 개가 시차를 두고 퍼졌다 사라진다. 물방울이
+// 수면에 닿는 듯한 느낌.
+const HeroRipple: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
+  <div className={`hero-ripple hero-ripple-${position}`} aria-hidden="true">
+    <span className="hero-ripple-ring" />
+    <span className="hero-ripple-ring hero-ripple-ring2" />
+  </div>
+);
+
 const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
@@ -112,14 +130,16 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   // 경계 효과는 메인화면 섹션 전체가 아니라, 실제 들어간 사진(+사진 모형) 위에 얹혀야
   // 어떤 메인화면 스타일을 고르든 사진 경계를 그대로 따라간다.
-  const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch', React.FC<{ position: 'top' | 'bottom' }>> = {
+  const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch' | 'shine' | 'ripple', React.FC<{ position: 'top' | 'bottom' }>> = {
     wave: HeroWave,
     diagonal: HeroDiagonal,
     arch: HeroArch,
+    shine: HeroShine,
+    ripple: HeroRipple,
   };
   const renderPhotoWithWave = (inner: React.ReactNode): React.ReactNode => {
     if (effectType === 'none' || !(effectType in EFFECT_COMPONENTS)) return inner;
-    const EffectComponent = EFFECT_COMPONENTS[effectType as 'wave' | 'diagonal' | 'arch'];
+    const EffectComponent = EFFECT_COMPONENTS[effectType as 'wave' | 'diagonal' | 'arch' | 'shine' | 'ripple'];
     return (
       <div className="hero-photo-frame">
         {inner}
