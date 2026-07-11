@@ -955,18 +955,14 @@
 }
 /* 편지 봉투 — 화면 하단을 봉투 색(다른 톤 채움)으로 구분하고, 그 위로 봉투
    개봉선(V자)이 편지가 담긴 안쪽(패턴 없는 영역)을 가른다. ::before는 봉투
-   영역 채움(상단 중앙에 V자 노치를 낸 사각형, 안쪽 명암으로 입체감 부여),
-   ::after는 그 경계의 개봉선(접힌 자국) — 위쪽(편지지 쪽)엔 그림자,
-   아래쪽(봉투 쪽)엔 하이라이트를 드리워 실제로 접힌 듯한 굴곡을 표현한다. */
+   영역 채움(상단 중앙에 V자 노치를 낸 사각형), ::after는 그 경계의 개봉선. */
 .op-pattern-letter { inset: 0; }
 .op-pattern-letter::before {
   content: '';
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 46%;
-  background:
-    linear-gradient(180deg, rgba(0,0,0,0.16) 0%, transparent 18%, transparent 74%, rgba(0,0,0,0.22) 100%),
-    var(--op-envelope-tint, rgba(255,255,255,0.16));
+  background: var(--op-envelope-tint, rgba(255,255,255,0.16));
   clip-path: polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%, 50% 90%);
 }
 .op-pattern-letter::after {
@@ -977,11 +973,8 @@
   background: var(--op-accent, rgba(255,255,255,0.6));
   clip-path: polygon(
     0% 0px, 50% 90%, 100% 0px,
-    100% 3.5px, 50% calc(90% + 3.5px), 0% 3.5px
+    100% 2.5px, 50% calc(90% + 2.5px), 0% 2.5px
   );
-  filter:
-    drop-shadow(0 -4px 6px rgba(0,0,0,0.42))
-    drop-shadow(0 2px 0 rgba(255,255,255,0.30));
 }
 
 /* Preview overlay popup (portal to body) */
