@@ -85,8 +85,8 @@ const OpeningSection: React.FC = () => {
             </div>
           </div>
 
-          <div className="input-group">
-            <label>전환 스타일</label>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">전환 스타일</label>
             <div className="account-style-grid">
               {([
                 { key: 'curtain' as const, name: '커튼' },
@@ -247,8 +247,8 @@ const OpeningSection: React.FC = () => {
             <input type="range" min="0.3" max="1" step="0.01" value={opening.openingBgOpacity} onChange={(e) => update({ openingBgOpacity: parseFloat(e.target.value) })} style={{ width: '100%' }} />
           </div>
 
-          <div className="input-group">
-            <label>장식 효과</label>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">장식 효과</label>
             <div className="account-style-grid">
               {([
                 { key: 'none'          as const, name: '없음' },
@@ -271,8 +271,8 @@ const OpeningSection: React.FC = () => {
             </div>
           </div>
 
-          <div className="input-group">
-            <label>오프닝 패턴 <span style={{ fontSize: '0.78em', opacity: 0.6, fontWeight: 400 }}>최대 2개 조합 가능</span></label>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">오프닝 패턴</label>
             <div className="account-style-grid">
               {(() => {
                 const raw = opening.openingBgPattern;

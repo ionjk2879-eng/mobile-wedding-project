@@ -135,11 +135,14 @@ const HeroSection: React.FC = () => {
           )}
         </>
       )}
-      <div className="input-group">
-        <label>사진 모형</label>
-        {isFixedLook ? (
+      {isFixedLook ? (
+        <div className="input-group">
+          <label>사진 모형</label>
           <p className="hero-fixed-look-notice">이 스타일은 사진 모형과 무관하게 고유한 디자인을 사용합니다.</p>
-        ) : (
+        </div>
+      ) : (
+        <div className="opt-inline-group">
+          <label className="opt-inline-label">사진 모형</label>
           <div className="hero-shape-grid">
             {HERO_PHOTO_SHAPES.map((s) => (
               <button
@@ -153,10 +156,10 @@ const HeroSection: React.FC = () => {
               </button>
             ))}
           </div>
-        )}
-      </div>
-      <div className="input-group">
-        <label>메인화면 스타일</label>
+        </div>
+      )}
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">메인화면 스타일</label>
         <div className="hero-style-grid">
           {([
             { key: 'classic', name: '클래식' },
@@ -176,32 +179,32 @@ const HeroSection: React.FC = () => {
             </button>
           ))}
         </div>
-        <div className="hero-style-subgroup">
-          <span className="hero-style-subgroup-label">매거진 커버</span>
-          <div className="hero-style-grid">
-            {([
-              { key: 'filmstrip' as InvitationData['heroStyle'], name: '필름 스틸' },
-              { key: 'verttype' as InvitationData['heroStyle'], name: '세로 타이포' },
-            ]).map(s => (
-              <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
-                <strong>{s.name}</strong>
-              </button>
-            ))}
-          </div>
+      </div>
+      <div className="opt-inline-subgroup">
+        <label className="opt-inline-label">매거진 커버</label>
+        <div className="hero-style-grid">
+          {([
+            { key: 'filmstrip' as InvitationData['heroStyle'], name: '필름 스틸' },
+            { key: 'verttype' as InvitationData['heroStyle'], name: '세로 타이포' },
+          ]).map(s => (
+            <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
+              <strong>{s.name}</strong>
+            </button>
+          ))}
         </div>
-        <div className="hero-style-subgroup">
-          <span className="hero-style-subgroup-label">포토그래피</span>
-          <div className="hero-style-grid">
-            {([
-              { key: 'magframe' as InvitationData['heroStyle'], name: '매거진 프레임' },
-              { key: 'boldtype' as InvitationData['heroStyle'], name: '볼드 타이포' },
-              { key: 'datesplit' as InvitationData['heroStyle'], name: '데이트 스플릿' },
-            ]).map(s => (
-              <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
-                <strong>{s.name}</strong>
-              </button>
-            ))}
-          </div>
+      </div>
+      <div className="opt-inline-subgroup">
+        <label className="opt-inline-label">포토그래피</label>
+        <div className="hero-style-grid">
+          {([
+            { key: 'magframe' as InvitationData['heroStyle'], name: '매거진 프레임' },
+            { key: 'boldtype' as InvitationData['heroStyle'], name: '볼드 타이포' },
+            { key: 'datesplit' as InvitationData['heroStyle'], name: '데이트 스플릿' },
+          ]).map(s => (
+            <button key={s.key} type="button" className={`hero-style-btn ${data.heroStyle === s.key ? 'active' : ''}`} onClick={() => updateField('heroStyle', s.key)}>
+              <strong>{s.name}</strong>
+            </button>
+          ))}
         </div>
       </div>
     </>

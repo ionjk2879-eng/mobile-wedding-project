@@ -208,8 +208,6 @@
 .hero-style-btn.active { border-color: #D4A5C6; background: #FFF9FB; box-shadow: 0 2px 8px rgba(212,165,198,0.1); }
 .hero-style-btn strong { font-size: 0.76rem; font-weight: 600; color: #1F2937; white-space: nowrap; }
 .hero-style-btn.active strong { color: #D4A5C6; }
-.hero-style-subgroup { margin-top: 12px; padding-top: 12px; border-top: 1px solid #F0F0F0; }
-.hero-style-subgroup-label { display: block; font-size: 0.68rem; font-weight: 600; color: #B0BAC8; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
 
 /* Hero photo shape */
 .hero-shape-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 6px; }
@@ -239,12 +237,16 @@
 .account-style-btn strong { font-size: 0.76rem; font-weight: 600; color: #1F2937; white-space: nowrap; }
 .account-style-btn.active strong { color: #D4A5C6; }
 
-/* 라벨-왼쪽 / 버튼줄-오른쪽 인라인 토글 그룹 (짧은 2~4개 옵션용).
-   라벨은 항상 좌측 상단에 고정하고, 버튼 줄만 독립적으로 우측에서 줄바꿈되도록
-   바깥 flex는 wrap하지 않고 안쪽 account-style-grid만 wrap한다. */
-.opt-inline-group { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 25px; }
-.opt-inline-group > .opt-inline-label { flex-shrink: 0; font-size: 0.85rem; font-weight: 700; color: #4B5563; padding-top: 7px; }
-.opt-inline-group .account-style-grid { justify-content: flex-end; flex: 1; min-width: 0; }
+/* 라벨-왼쪽 / 버튼줄-오른쪽 인라인 그룹. 라벨 칸 너비를 고정해 모든 그룹의
+   버튼 시작 위치(세로선)가 한 줄로 정렬되도록 한다. 버튼 줄은 좌측 정렬로
+   시작해 필요하면 그 자리에서 줄바꿈된다(오른쪽 끝으로 밀지 않음). */
+.opt-inline-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+.opt-inline-group > .opt-inline-label { flex: 0 0 78px; width: 78px; font-size: 0.78rem; font-weight: 700; color: #4B5563; padding-top: 7px; line-height: 1.35; word-break: keep-all; }
+.opt-inline-group .account-style-grid,
+.opt-inline-group .hero-style-grid,
+.opt-inline-group .hero-shape-grid { justify-content: flex-start; flex: 1; min-width: 0; }
+.opt-inline-subgroup { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; }
+.opt-inline-subgroup > .opt-inline-label { flex: 0 0 78px; width: 78px; font-size: 0.66rem; font-weight: 600; color: #B0BAC8; letter-spacing: 0.5px; padding-top: 7px; line-height: 1.35; word-break: keep-all; }
 
 /* Order management */
 .order-list { display: flex; flex-direction: column; gap: 6px; }

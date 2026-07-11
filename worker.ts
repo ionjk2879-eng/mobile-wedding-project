@@ -1523,6 +1523,37 @@ function buildICS(data: any): string | null {
   return lines.join('\r\n');
 }
 
+// 안드로이드용 — 구글 캘린더 "일정 추가" 화면으로 바로 이동시켜 원탭으로 등록되게 한다.
+// (.ics 다운로드와 달리 파일을 받아서 따로 열 필요가 없다)
+function buildGoogleCalendarUrl(data: any): string | null {
+  const dt = new Date(data.weddingDateISO);
+  if (isNaN(dt.getTime())) return null;
+  let h = 12, m = 0;
+  const parts = (data.time as string | undefined)?.match(/(AM|PM)\s(\d+):(\d+)/);
+  if (parts) {
+    h = parseInt(parts[2]);
+    if (parts[1] === 'PM' && h !== 12) h += 12;
+    if (parts[1] === 'AM' && h === 12) h = 0;
+    m = parseInt(parts[3]);
+  }
+  const y = dt.getFullYear(), mo = dt.getMonth(), d = dt.getDate();
+  // 청첩장 시간은 한국시간(KST, UTC+9) 벽시계 기준이므로 UTC 인스턴트로 변환
+  const startUtc = new Date(Date.UTC(y, mo, d, h - 9, m, 0));
+  const endUtc = new Date(startUtc.getTime() + 60 * 60 * 1000);
+  const fmt = (dtu: Date) => dtu.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const isEn = data.language === 'en', isJa = data.language === 'ja';
+  const title = isEn ? `${data.groomName} & ${data.brideName}'s Wedding` : isJa ? `${data.groomName}・${data.brideName} 結婚式` : `${data.groomName} ♥ ${data.brideName} 결혼식`;
+  const location = [data.venueName, data.venueAddress].filter(Boolean).join(', ');
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    dates: `${fmt(startUtc)}/${fmt(endUtc)}`,
+    ctz: 'Asia/Seoul',
+  });
+  if (location) params.set('location', location);
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 // --- Notification emails (유료 청첩장 전용) ---
 
 async function sendGuestbookNotification(env: Env, slug: string, guestName: string, content: string, side: string): Promise<void> {
@@ -1736,7 +1767,32 @@ export default {
         return Response.redirect(`${url.origin}/og-image.png`, 302);
       }
 
-      // Calendar (.ics) — 카카오톡 공유 메시지의 "일정등록" 버튼이 여는 링크
+      // Calendar (smart) — 카카오톡 공유 메시지의 "일정 등록" 버튼이 여는 링크.
+      // 안드로이드는 구글 캘린더 등록 화면으로 바로 리다이렉트해 원탭으로 등록되게 하고,
+      // 그 외(iOS 등)는 .ics를 inline으로 내려줘 사파리가 파일 다운로드 없이 캘린더 담기
+      // 시트를 바로 띄우게 한다.
+      const calMatch = pathname.match(/^\/calendar\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+      if (calMatch) {
+        const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(calMatch[1]).first();
+        if (!row) return new Response('Not found', { status: 404 });
+        const data = JSON.parse(row.data as string);
+        const ua = request.headers.get('User-Agent') || '';
+        if (/android/i.test(ua)) {
+          const gcalUrl = buildGoogleCalendarUrl(data);
+          if (gcalUrl) return Response.redirect(gcalUrl, 302);
+        }
+        const ics = buildICS(data);
+        if (!ics) return new Response('Not found', { status: 404 });
+        return new Response(ics, {
+          headers: {
+            'Content-Type': 'text/calendar; charset=utf-8',
+            'Content-Disposition': 'inline; filename="wedding.ics"',
+            'Cache-Control': 'public, max-age=600',
+          },
+        });
+      }
+
+      // Calendar (.ics) — 구버전/직접 링크 호환용. 위 스마트 라우트와 달리 항상 .ics를 내려준다.
       const icsMatch = pathname.match(/^\/calendar\/([a-z0-9]+(?:-[a-z0-9]+)*)\.ics$/);
       if (icsMatch) {
         const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(icsMatch[1]).first();
@@ -1747,7 +1803,7 @@ export default {
         return new Response(ics, {
           headers: {
             'Content-Type': 'text/calendar; charset=utf-8',
-            'Content-Disposition': 'attachment; filename="wedding.ics"',
+            'Content-Disposition': 'inline; filename="wedding.ics"',
             'Cache-Control': 'public, max-age=600',
           },
         });
