@@ -242,9 +242,12 @@ const OpeningSection: React.FC = () => {
             </>
           )}
 
-          <div className="input-group">
-            <label>배경 불투명도 ({Math.round(opening.openingBgOpacity * 100)}%)</label>
-            <input type="range" min="0.3" max="1" step="0.01" value={opening.openingBgOpacity} onChange={(e) => update({ openingBgOpacity: parseFloat(e.target.value) })} style={{ width: '100%' }} />
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">배경 불투명도</label>
+            <div className="opt-inline-content" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input type="range" min="0.3" max="1" step="0.01" value={opening.openingBgOpacity} onChange={(e) => update({ openingBgOpacity: parseFloat(e.target.value) })} style={{ flex: 1 }} />
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', minWidth: 34, textAlign: 'right', flexShrink: 0 }}>{Math.round(opening.openingBgOpacity * 100)}%</span>
+            </div>
           </div>
 
           <div className="opt-inline-group">
@@ -317,19 +320,21 @@ const OpeningSection: React.FC = () => {
             </div>
           </div>
 
-          <div className="input-group">
-            <label>메인 멘트</label>
-            <div style={{ padding: '10px 14px', borderRadius: 10, background: '#F9F5FF', border: '1px solid #E8D8F0', fontSize: '0.8rem', color: '#7A5A8A', lineHeight: 1.6 }}>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">메인 멘트</label>
+            <div className="opt-inline-content" style={{ padding: '10px 14px', borderRadius: 10, background: '#F9F5FF', border: '1px solid #E8D8F0', fontSize: '0.8rem', color: '#7A5A8A', lineHeight: 1.6, boxSizing: 'border-box' }}>
               <strong style={{ display: 'block', marginBottom: 4, color: '#6A4A7A' }}>방문자 유형에 따라 자동 설정됩니다</strong>
               하객 링크로 방문 시 → 이름·관계에 맞는 개인화 문구<br />
               일반 링크로 방문 시 → 랜덤 감성 문구 중 하나
             </div>
           </div>
 
-          <div className="input-group">
-            <label>서브 멘트</label>
-            <input type="text" value={opening.openingSubText} onChange={(e) => update({ openingSubText: e.target.value })} className="modern-input" placeholder="2026. 10. 24" />
-            <span className="input-hint">비워두면 예식 날짜가 자동으로 표시됩니다. 예식장 이름은 날짜 아래에 자동으로 추가됩니다.</span>
+          <div className="opt-inline-group">
+            <label className="opt-inline-label">서브 멘트</label>
+            <div className="opt-inline-content">
+              <input type="text" value={opening.openingSubText} onChange={(e) => update({ openingSubText: e.target.value })} className="modern-input" placeholder="2026. 10. 24" />
+              <span className="input-hint">비워두면 예식 날짜가 자동으로 표시됩니다. 예식장 이름은 날짜 아래에 자동으로 추가됩니다.</span>
+            </div>
           </div>
         </>
       )}

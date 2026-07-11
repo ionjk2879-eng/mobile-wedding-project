@@ -86,31 +86,18 @@
 .modern-input.readonly { background: #F3F4F6; cursor: default; color: #6B7280; }
 .modern-input.transparent { background: transparent; border-color: transparent; padding: 8px 12px; }
 .modern-input.transparent:focus { background: #FFF; border-color: #D4A5C6; }
-.tab-group.modern { display: flex; background: #F3F4F6; padding: 4px; border-radius: 12px; }
-.tab-btn { flex: 1; padding: 10px; border: none; background: none; font-size: 0.75rem; font-weight: 800; color: #6B7280; cursor: pointer; border-radius: 8px; }
-.tab-btn.active { background: white; color: #D4A5C6; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-/* Color pick grid */
-.color-pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.color-pick-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border: 2px solid transparent; border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s; }
+/* Color pick grid — 이름 텍스트 없이 색상 원만 흐르듯 나열. 맨 앞 팔레트 스와치는
+   네이티브 컬러피커를 여는 버튼(=직접 입력), 나머지는 프리셋 색상. */
+.color-pick-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.color-pick-btn { display: block; width: 34px; height: 34px; padding: 0; border: 2px solid transparent; border-radius: 50%; cursor: pointer; transition: all 0.2s; position: relative; box-sizing: border-box; }
 .color-pick-btn:hover { border-color: #E5E7EB; }
-.color-pick-btn.active { border-color: #D4A5C6; background: #FFF9FB; }
-.color-pick-swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-.color-pick-name { font-size: 0.65rem; font-weight: 700; color: #6B7280; }
-
-/* Color picker custom row */
-.color-custom-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-.color-picker-input { width: 40px; height: 40px; border: 2px solid #E5E7EB; border-radius: 10px; padding: 2px; cursor: pointer; background: white; flex-shrink: 0; }
-.color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
-.color-picker-input::-webkit-color-swatch { border: none; border-radius: 6px; }
-.color-hex-input { flex: 1; font-family: monospace; font-size: 0.85rem; text-transform: uppercase; }
-.color-reset-btn { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 10px; background: white; color: #9CA3AF; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-.color-reset-btn:hover { border-color: #D4A5C6; color: #D4A5C6; }
-.color-hex-field { flex: 1; display: flex; align-items: center; border: 1px solid #E5E7EB; border-radius: 12px; background: #FFFFFF; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
-.color-hex-field:focus-within { border-color: #D4A5C6; box-shadow: 0 0 0 4px rgba(212,165,198,0.1); }
-.color-hex-prefix { padding: 0 2px 0 12px; color: #6B7280; font-family: monospace; font-size: 0.85rem; font-weight: 600; flex-shrink: 0; user-select: none; }
-.color-hex-field .color-hex-input { border: none !important; box-shadow: none !important; border-radius: 0 !important; background: transparent !important; padding-left: 2px !important; min-width: 0; }
-.color-hex-field .color-hex-input:focus { outline: none; }
+.color-pick-btn.active { border-color: #1F2937; }
+.color-pick-swatch { display: block; width: 100%; height: 100%; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.06); box-sizing: border-box; }
+.color-pick-custom { overflow: hidden; }
+.color-pick-swatch-custom { background: conic-gradient(from 180deg, #FF5252, #FFD152, #52FF7A, #52D9FF, #7A52FF, #FF52D9, #FF5252); }
+.color-pick-custom svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); pointer-events: none; }
+.color-pick-custom input[type="color"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: none; padding: 0; cursor: pointer; }
 
 /* Theme & design chips */
 .theme-select-grid.modern { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -196,7 +183,12 @@
 .share-preview-info p { font-size: 0.78rem; color: #6B7280; margin: 0; line-height: 1.5; white-space: pre-line; word-break: keep-all; }
 
 /* Hero style grid */
-.photo-pos-controls { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #F9FAFB; border-radius: 12px; }
+/* 사진 업로드 칸 + 위치 조정 슬라이더를 한 줄에 나란히 배치해 세로 공간을 아낀다 */
+.photo-pos-header-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.photo-pos-header-row label { margin-bottom: 0; }
+.photo-pos-header-row label:last-child { font-size: 0.78rem; font-weight: 600; color: #6B7280; white-space: nowrap; }
+.photo-with-pos-row { display: flex; align-items: flex-start; gap: 14px; }
+.photo-pos-controls { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #F9FAFB; border-radius: 12px; box-sizing: border-box; }
 .photo-pos-row { display: flex; align-items: center; gap: 10px; }
 .photo-pos-label { font-size: 0.75rem; font-weight: 600; color: #6B7280; min-width: 28px; }
 .photo-pos-slider { flex: 1; accent-color: #D4A5C6; }
@@ -245,7 +237,6 @@
 .opt-inline-group .account-style-grid,
 .opt-inline-group .hero-style-grid,
 .opt-inline-group .hero-shape-grid,
-.opt-inline-group .tab-group,
 .opt-inline-group .color-pick-grid,
 .opt-inline-group .theme-select-grid,
 .opt-inline-group > .opt-inline-content { justify-content: flex-start; flex: 1; min-width: 0; }
