@@ -16,10 +16,12 @@
    아니라 실제 사진 경계를 기준으로 물결이 붙도록 위치 기준점 역할만 한다. */
 .hero-photo-frame { position: relative; width: 100%; height: 100%; display: block; }
 
-/* 메인화면 물결(파도) 효과 — 레이어 2장을 서로 다른 속도로 좌우로 흘려보내는 옅은
-   패럴랙스. SVG 폭을 200%로 두고 정확히 -50%만큼 translateX 하면 뷰박스 절반 단위로
-   반복되는 패스 패턴이 이음매 없이 무한 루프된다. */
-.hero-wave { position: absolute; left: 0; right: 0; height: 56px; overflow: hidden; pointer-events: none; z-index: 3; }
+/* 메인화면 물결(파도) 효과 — 완만한 봉우리 하나가 반복되는 곡선 레이어 2장을 서로
+   다른 속도로 좌우로 흘려보내는 옅은 패럴랙스. SVG 폭을 200%로 두고 정확히 -50%만큼
+   translateX 하면 뷰박스 절반 단위로 반복되는 패스 패턴이 이음매 없이 무한 루프된다.
+   패스 자체의 기준선을 아래쪽(y 35~68)으로 낮춰서 사진을 덜 가리고 더 자연스럽게
+   이어지도록 한다. */
+.hero-wave { position: absolute; left: 0; right: 0; height: 64px; overflow: hidden; pointer-events: none; z-index: 3; }
 .hero-wave-bottom { bottom: 0; }
 .hero-wave-top { top: 0; transform: scaleY(-1); }
 .hero-wave-layer { position: absolute; bottom: -1px; left: 0; width: 200%; height: 100%; fill: var(--wedding-bg, #FFFFFF); will-change: transform; }
