@@ -195,12 +195,20 @@ const DesignSection: React.FC = () => {
       </div>
       <div className="opt-inline-group">
         <label className="opt-inline-label">흩날리는 효과</label>
-        <div className="theme-select-grid modern">
-          {EFFECTS.map(t => (
-            <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgEffect', t.key)}>
-              <span className="effect-icon">{t.icon}</span>{t.name}
-            </button>
-          ))}
+        <div className="opt-inline-content">
+          <div className="theme-select-grid modern">
+            {EFFECTS.map(t => (
+              <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgEffect', t.key)}>
+                <span className="effect-icon">{t.icon}</span>{t.name}
+              </button>
+            ))}
+          </div>
+          {(data.bgEffect || 'none') !== 'none' && (
+            <label className="modern-checkbox" style={{ marginTop: 10 }}>
+              <input type="checkbox" checked={!!data.bgEffectHeroOnly} onChange={(e) => updateField('bgEffectHeroOnly', e.target.checked)} />
+              <span>메인화면 영역에만 표시 (스크롤하면 사라짐)</span>
+            </label>
+          )}
         </div>
       </div>
       <div className="opt-inline-group">

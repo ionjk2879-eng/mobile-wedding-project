@@ -299,10 +299,10 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           venueName={data.venueName}
         />
       )}
-      <BackgroundEffects effect={data.bgEffect} />
+      {!data.bgEffectHeroOnly && <BackgroundEffects effect={data.bgEffect} />}
       <MusicPlayer url={data.bgMusicUrl} />
       {previewRefs?.hero ? (
-        <div ref={previewRefs.hero} className={onSectionNav ? 'preview-nav-section' : undefined}>
+        <div ref={previewRefs.hero} className={onSectionNav ? 'preview-nav-section' : undefined} style={{ position: 'relative' }}>
           {onSectionNav && (
             <div className="preview-nav-btn-stack">
               <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="메인화면 편집" aria-label="메인화면 편집">
@@ -316,9 +316,13 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             </div>
           )}
           <Hero data={effectiveData} />
+          {data.bgEffectHeroOnly && <BackgroundEffects effect={data.bgEffect} confined />}
         </div>
       ) : (
-        <Hero data={effectiveData} />
+        <div style={{ position: 'relative' }}>
+          <Hero data={effectiveData} />
+          {data.bgEffectHeroOnly && <BackgroundEffects effect={data.bgEffect} confined />}
+        </div>
       )}
       {effectiveSectionOrder.map((id, i) => {
         const eff = data.scrollEffect || 'none';

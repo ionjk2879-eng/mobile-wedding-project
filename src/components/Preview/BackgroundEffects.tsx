@@ -4,6 +4,9 @@ import { ScrollRootContext } from './ScrollReveal';
 
 interface BackgroundEffectsProps {
   effect?: string;
+  // true면 화면 전체에 고정하지 않고 가장 가까운 relative 부모(메인화면 영역) 안에만
+  // 가둔다 — 스크롤하면 그 영역과 함께 자연스럽게 사라진다.
+  confined?: boolean;
 }
 
 const BLOSSOM_PAL = [
@@ -18,7 +21,7 @@ const SUNFLOWER_PAL = [
   ['#FFF9E0', '#FFC93C', '#D9720A'],
 ] as const;
 
-const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
+const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect, confined }) => {
   const uid = React.useMemo(() => Math.random().toString(36).slice(2, 7), []);
   const scrollRoot = React.useContext(ScrollRootContext);
 
@@ -244,6 +247,17 @@ const BackgroundEffects: React.FC<BackgroundEffectsProps> = ({ effect }) => {
   if (!layer) return null;
 
   const innerLayer = React.cloneElement(layer, { style: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 } });
+
+  // 메인화면 전용 모드: 화면 전체에 고정하지 않고, 가장 가까운(position: relative)
+  // 부모 — 메인화면 래퍼 — 안에만 가둔다. 포털도, sticky 트릭도 필요 없다: 그냥
+  // 그 영역을 채우고 스크롤하면 부모와 함께 자연스럽게 지나간다.
+  if (confined) {
+    return (
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
+        {innerLayer}
+      </div>
+    );
+  }
 
   // ViewPage (scrollRoot===null): portal to body, truly viewport-fixed
   if (scrollRoot === null) {

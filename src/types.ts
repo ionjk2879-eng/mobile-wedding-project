@@ -67,6 +67,9 @@ export interface DesignConfig {
   customTextColor?: string;
   bgTexture?: 'none' | 'paper' | 'linen' | 'pattern' | 'silk' | 'watercolor';
   bgEffect?: 'none' | 'cherry-blossom' | 'snow' | 'stars' | 'leaves' | 'hearts' | 'firefly' | 'confetti' | 'petals' | 'autumn';
+  // true면 흩날리는 효과를 메인화면(Hero) 영역 안에만 가두어 스크롤하면 함께 사라지게
+  // 한다. 기본값(false/미지정)은 기존처럼 화면 전체에 고정되어 스크롤해도 계속 보인다.
+  bgEffectHeroOnly?: boolean;
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype' | 'magframe' | 'boldtype' | 'datesplit';
