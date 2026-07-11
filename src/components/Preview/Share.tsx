@@ -34,7 +34,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
     toast.success(isEn ? 'Link copied!' : isJa ? 'コピーしました' : '링크가 복사되었습니다');
   };
 
-  const handleKakaoShare = () => {
+  const handleKakaoShare = async () => {
     if (!shareEnabled) return;
     if (!ensureKakaoInit()) {
       toast.error(isEn ? 'Kakao SDK not loaded yet. Please try again.' : isJa ? 'Kakao SDKの読み込みが完了していません。' : '카카오 SDK가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
@@ -45,21 +45,56 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
     // description에는 날짜만 넣어 중복을 없앰
     const description = data.shareDescription || getDefaultShareDescription(data);
     const slug = data.slug || '';
-    const calendarButtonLabel = isEn ? 'Add to Calendar' : isJa ? 'カレンダーに追加' : '일정 등록';
-    // 청첩장 안이 아니라 카카오톡 공유 메시지 자체에 일정등록 버튼을 넣는다 — 눌렀을 때
-    // 안드로이드는 intent:// 리다이렉트로 카카오톡(톡캘린더) 앱을 직접 지정해 다운로드
-    // 없이 "일정 만들기" 화면을 열고(처리 못 하면 .ics로 자동 대체), iOS는 .ics를
-    // inline으로 열어 캘린더 담기 시트가 바로 뜨게 한다.
-    // '청첩장 보기' 버튼은 따로 두지 않는다 — 메시지 썸네일(content.link)을 눌러도 어차피
-    // 같은 청첩장으로 이동하므로 버튼 두 개를 둘 필요가 없다.
-    const calendarLink = slug ? `${SITE_ORIGIN}/calendar/${slug}` : '';
+    const imageUrl = slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`;
+
+    // 카카오 "공개 일정"(공식 톡캘린더 API, 채널 연결 + 사용 권한 심사 필요)을 먼저
+    // 시도한다. 성공하면 카카오가 메시지에 자동으로 붙여주는 "일정 등록" 버튼을 통해
+    // 앱 안에서 바로(다운로드·별도 로그인 없이) 톡캘린더에 등록된다. 심사 전이거나
+    // 서버에 어드민 키가 아직 설정 안 됐으면 실패하는데, 그 경우 기존 방식(feed 메시지
+    // + intent:///.ics 일정등록 버튼)으로 조용히 대체한다.
+    let kakaoEventId: string | null = null;
+    if (slug) {
+      try {
+        const res = await fetch('/api/calendar/kakao-event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug }),
+        });
+        if (res.ok) {
+          const j = await res.json() as { event_id?: string };
+          kakaoEventId = j.event_id || null;
+        }
+      } catch {
+        // 네트워크 오류 등은 무시하고 feed 방식으로 대체
+      }
+    }
+
     try {
+      if (kakaoEventId) {
+        window.Kakao.Share.sendDefault({
+          objectType: 'calendar',
+          idType: 'event',
+          id: kakaoEventId,
+          content: {
+            title,
+            description,
+            imageUrl,
+            link: { mobileWebUrl: shareLink, webUrl: shareLink },
+          },
+        });
+        return;
+      }
+
+      const calendarButtonLabel = isEn ? 'Add to Calendar' : isJa ? 'カレンダーに追加' : '일정 등록';
+      // '청첩장 보기' 버튼은 따로 두지 않는다 — 메시지 썸네일(content.link)을 눌러도 어차피
+      // 같은 청첩장으로 이동하므로 버튼 두 개를 둘 필요가 없다.
+      const calendarLink = slug ? `${SITE_ORIGIN}/calendar/${slug}` : '';
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
           title,
           description,
-          imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
+          imageUrl,
           link: { mobileWebUrl: shareLink, webUrl: shareLink },
         },
         ...(calendarLink ? { buttons: [{ title: calendarButtonLabel, link: { mobileWebUrl: calendarLink, webUrl: calendarLink } }] } : {}),

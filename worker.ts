@@ -5,6 +5,8 @@ interface Env {
   JWT_SECRET: string;
   KAKAO_REST_API_KEY: string;
   KAKAO_CLIENT_SECRET: string;
+  KAKAO_ADMIN_KEY?: string;
+  KAKAO_CHANNEL_PUBLIC_ID?: string;
   NAVER_CLIENT_ID: string;
   NAVER_CLIENT_SECRET: string;
   GOOGLE_CLIENT_ID?: string;
@@ -1557,6 +1559,71 @@ function buildAndroidCalendarIntentUrl(data: any, fallbackUrl: string): string |
   return `intent:#Intent;${extras.join(';')};end`;
 }
 
+// 카카오 "공개 일정" 생성/수정용 event 페이로드 — POST /v2/api/calendar/public/create(update)/event 스키마.
+// 어드민 키로 청첩장마다 공개 일정을 하나 만들어두면, 카카오톡 공유 메시지를 캘린더
+// 템플릿(objectType: 'calendar', id_type: 'event')으로 보낼 때 그 일정 ID를 붙여 보낼 수
+// 있고, 카카오가 자동으로 붙여주는 "일정 등록" 버튼을 누르면 앱 안에서 바로(다운로드나
+// 별도 로그인 화면 없이) 톡캘린더에 등록된다.
+function buildKakaoPublicEventPayload(data: any): { title: string; time: { start_at: string; end_at: string; time_zone: string; all_day: boolean }; location?: { name: string; address?: string } } | null {
+  const dt = new Date(data.weddingDateISO);
+  if (isNaN(dt.getTime())) return null;
+  let h = 12, m = 0;
+  const parts = (data.time as string | undefined)?.match(/(AM|PM)\s(\d+):(\d+)/);
+  if (parts) {
+    h = parseInt(parts[2]);
+    if (parts[1] === 'PM' && h !== 12) h += 12;
+    if (parts[1] === 'AM' && h === 12) h = 0;
+    m = parseInt(parts[3]);
+  }
+  const y = dt.getFullYear(), mo = dt.getMonth(), d = dt.getDate();
+  const startUtc = new Date(Date.UTC(y, mo, d, h - 9, m, 0));
+  const endUtc = new Date(startUtc.getTime() + 60 * 60 * 1000);
+  const fmt = (dtu: Date) => dtu.toISOString().slice(0, 19) + 'Z';
+  const isEn = data.language === 'en', isJa = data.language === 'ja';
+  const title = isEn ? `${data.groomName} & ${data.brideName}'s Wedding` : isJa ? `${data.groomName}・${data.brideName} 結婚式` : `${data.groomName} ♥ ${data.brideName} 결혼식`;
+  const venueName = data.venueName || '';
+  const venueAddress = data.venueAddress || '';
+  return {
+    title,
+    time: { start_at: fmt(startUtc), end_at: fmt(endUtc), time_zone: 'Asia/Seoul', all_day: false },
+    ...((venueName || venueAddress) ? { location: { name: venueName || venueAddress, ...(venueAddress ? { address: venueAddress } : {}) } } : {}),
+  };
+}
+
+// slug당 공개 일정을 하나만 유지한다 — 이미 만든 적 있으면 최신 청첩장 정보로 수정을
+// 시도하고, 그게 실패하면(예: 카카오 쪽에서 삭제됨) 새로 만든다. KAKAO_ADMIN_KEY가
+// 설정돼 있지 않거나(비밀 키 미등록) 카카오 쪽 API 사용 권한 심사 전이면 null을 반환한다.
+async function ensureKakaoPublicEvent(env: Env, slug: string, data: any): Promise<string | null> {
+  if (!env.KAKAO_ADMIN_KEY) return null;
+  const event = buildKakaoPublicEventPayload(data);
+  if (!event) return null;
+
+  const row = await env.DB.prepare('SELECT kakao_event_id FROM invitations WHERE slug = ?').bind(slug).first();
+  const existingId = row?.kakao_event_id as string | null;
+  const headers = { Authorization: `KakaoAK ${env.KAKAO_ADMIN_KEY}`, 'Content-Type': 'application/x-www-form-urlencoded' };
+  const channelParams = env.KAKAO_CHANNEL_PUBLIC_ID ? { channel_public_id: env.KAKAO_CHANNEL_PUBLIC_ID } : {};
+
+  if (existingId) {
+    const updateRes = await fetch('https://kapi.kakao.com/v2/api/calendar/public/update/event', {
+      method: 'POST',
+      headers,
+      body: new URLSearchParams({ event_id: existingId, event: JSON.stringify(event), ...channelParams }),
+    });
+    if (updateRes.ok) return existingId;
+  }
+
+  const createRes = await fetch('https://kapi.kakao.com/v2/api/calendar/public/create/event', {
+    method: 'POST',
+    headers,
+    body: new URLSearchParams({ event: JSON.stringify(event), ...channelParams }),
+  });
+  if (!createRes.ok) return null;
+  const created = await createRes.json() as { event_id?: string };
+  if (!created.event_id) return null;
+  await env.DB.prepare('UPDATE invitations SET kakao_event_id = ? WHERE slug = ?').bind(created.event_id, slug).run();
+  return created.event_id;
+}
+
 // --- Notification emails (유료 청첩장 전용) ---
 
 async function sendGuestbookNotification(env: Env, slug: string, guestName: string, content: string, side: string): Promise<void> {
@@ -1651,6 +1718,22 @@ export default {
       if (pathname === '/api/auth/google') return await handleGoogleAuth(request, env);
       if (pathname === '/api/auth/kakao') return await handleKakaoAuth(request, env);
       if (pathname === '/api/auth/naver') return await handleNaverAuth(request, env);
+
+      // 카카오톡 공유하기를 누를 때 클라이언트가 먼저 호출 — 이 청첩장의 카카오 공개
+      // 일정을 만들어두거나(최초 1회) 최신 정보로 갱신하고 event_id를 돌려준다.
+      // KAKAO_ADMIN_KEY 미설정이거나 카카오 API 사용 권한 심사 전이면 실패 응답을 주고,
+      // 클라이언트는 이 경우 기존 방식(feed 메시지 + .ics 버튼)으로 대체한다.
+      if (pathname === '/api/calendar/kakao-event' && request.method === 'POST') {
+        const origin = request.headers.get('Origin') || '*';
+        const body = await request.json() as { slug?: string };
+        if (!body.slug) return json({ error: 'slug is required' }, 400, origin);
+        const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(body.slug).first();
+        if (!row) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
+        const data = JSON.parse(row.data as string);
+        const eventId = await ensureKakaoPublicEvent(env, body.slug, data);
+        if (!eventId) return json({ error: '카카오 공개 일정 등록에 실패했습니다.' }, 400, origin);
+        return json({ event_id: eventId }, 200, origin);
+      }
 
       // Invitations
       if (pathname === '/api/invitations') return await handleInvitations(request, env);

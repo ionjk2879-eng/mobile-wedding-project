@@ -50,7 +50,7 @@ interface KakaoSDK {
   isInitialized(): boolean;
   Share: {
     sendDefault(settings: {
-      objectType: string;
+      objectType: 'feed';
       content: {
         title: string;
         description: string;
@@ -61,6 +61,18 @@ interface KakaoSDK {
         title: string;
         link: { mobileWebUrl: string; webUrl: string };
       }>;
+    } | {
+      // 카카오 "공개 일정"에 연결된 캘린더 템플릿 — 카카오가 자동으로 붙여주는
+      // "일정 등록" 버튼을 눌렀을 때 앱 안에서 바로 톡캘린더에 등록된다.
+      objectType: 'calendar';
+      idType: 'event' | 'calendar';
+      id: string;
+      content?: {
+        title?: string;
+        description?: string;
+        imageUrl?: string;
+        link?: { mobileWebUrl?: string; webUrl?: string };
+      };
     }): void;
     sendScrap(settings: { requestUrl: string }): void;
   };
