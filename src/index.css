@@ -50,6 +50,18 @@ html, body {
    원색으로 고정되어(브라우저가 상속받은 커스텀 프로퍼티의 color-mix() 인자를 선언
    시점 스코프로 굳혀버림) 다른 테마를 선택해도 파생색이 안 바뀌는 문제가 있었다.
    그래서 계산을 아예 없애고 디자인 확정값을 그대로 박아넣는다. */
+.theme-none {
+  --wedding-bg: #FFFFFF;
+  --wedding-border: #E5E7EB;
+  --wedding-main: #000000;
+  --wedding-emphasis: #000000;
+  --wedding-card-bg: #FFFFFF;
+  --wedding-text-main: #000000;
+  --wedding-text-body: #000000;
+  --wedding-text-sub: #9CA3AF;
+  --wedding-label: #000000;
+}
+
 .theme-ivorynavy {
   --wedding-bg: #EFEDE7;
   --wedding-border: #D3C6BB;

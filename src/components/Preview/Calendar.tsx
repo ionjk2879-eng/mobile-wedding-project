@@ -1,5 +1,6 @@
 import React from 'react';
 import { InvitationData } from '../../types';
+import { isFixedHoliday } from '../../data/holidays';
 
 interface CalendarProps {
   data: InvitationData;
@@ -107,7 +108,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           {days.map((d, index) => (
             <div
               key={index}
-              className={`calendar-day ${d === date ? 'selected' : ''} ${index % 7 === 0 ? 'sunday' : ''}`}
+              className={`calendar-day ${d === date ? 'selected' : ''} ${index % 7 === 0 ? 'sunday' : ''} ${d !== null && isFixedHoliday(month, d) ? 'holiday' : ''}`}
             >
               {d}
             </div>

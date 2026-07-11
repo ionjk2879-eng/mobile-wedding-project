@@ -96,6 +96,8 @@
 .color-pick-swatch { display: block; width: 100%; height: 100%; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.06); box-sizing: border-box; }
 .color-pick-swatch-custom { background: conic-gradient(from 180deg, #FF5252, #FFD152, #52FF7A, #52D9FF, #7A52FF, #FF52D9, #FF5252); }
 .color-pick-custom svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); pointer-events: none; }
+.color-pick-reset { display: flex; align-items: center; justify-content: center; background: #F3F4F6; border: 1px solid #E5E7EB; color: #6B7280; margin-left: 4px; }
+.color-pick-reset:hover { background: #E5E7EB; color: #1F2937; border-color: #D1D5DB; }
 
 /* 팔레트 스와치를 누르면 펼쳐지는 HEX 직접 입력 — 기본 입력 방식은 텍스트, 옆의
    작은 원형 스와치는 색상표로 고르고 싶을 때를 위한 보조 수단. */

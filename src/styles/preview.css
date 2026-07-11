@@ -700,7 +700,8 @@
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 30px; }
 .weekday-label { font-size: 0.7em; font-weight: 700; color: var(--wedding-emphasis); padding: 10px 0; }
 .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; color: #000000; position: relative; border-radius: 50%; }
-.calendar-day.sunday { color: var(--wedding-emphasis); }
+.calendar-day.sunday,
+.calendar-day.holiday { color: #E5484D; }
 .calendar-day.selected { background: var(--wedding-main); color: white; font-weight: 700; }
 .heart-marker { position: absolute; bottom: -2px; font-size: 0.6em; color: var(--wedding-emphasis); display: none; }
 .calendar-day.selected .heart-marker { display: block; color: white; bottom: 2px; }

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Pipette } from 'lucide-react';
+import { Pipette, RotateCcw } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { InvitationData } from '../../../types';
+import { THEMES, THEME_LABEL_DEFAULTS } from '../../../data/themes';
 
 const FONTS = [
   { name: '기본 (Pretendard)', value: "'Pretendard', sans-serif" },
@@ -56,21 +57,6 @@ const ACCENT_COLORS = [
   { name: '코럴', value: '#E08B7A' },
 ];
 
-const THEME_LABEL_DEFAULTS: Record<string, string> = {
-  blush: '#DDA5A3',
-  ivorynavy: '#415E7A',
-  mochaneutral: '#AF8259',
-  dustyblue: '#5E8BDC',
-  pastelblush: '#E1ADAA',
-  sagenature: '#59884D',
-  warmcharcoal: '#C59274',
-  sunsetgold: '#F8AF5B',
-  deepteal: '#399A9E',
-  deepplum: '#794178',
-  terracotta: '#CB7D59',
-  ivorychampagne: '#D3B34F',
-};
-
 // 프리셋은 색깔 원만 보여주고(이름 텍스트 없음), 맨 앞의 팔레트 스와치를 누르면 직접
 // 지정 칸이 펼쳐진다 — 기본 입력 방식은 HEX 텍스트 입력이고, 옆의 작은 원형 스와치는
 // 색상표로 고르고 싶을 때를 위한 보조 수단이다. 현재 값이 프리셋 중 어디에도 없으면
@@ -80,7 +66,8 @@ const ColorPickerRow: React.FC<{
   value: string;
   fallback: string;
   onChange: (v: string) => void;
-}> = ({ colors, value, fallback, onChange }) => {
+  onReset?: () => void;
+}> = ({ colors, value, fallback, onChange, onReset }) => {
   const [hexOpen, setHexOpen] = useState(false);
   const isCustom = !!value && !colors.some(c => c.value === value);
   const current = value || fallback;
@@ -96,6 +83,11 @@ const ColorPickerRow: React.FC<{
             <span className="color-pick-swatch" style={{ background: c.value }} />
           </button>
         ))}
+        {onReset && (
+          <button type="button" className="color-pick-btn color-pick-reset" title="테마 색상으로 초기화" onClick={onReset}>
+            <RotateCcw size={13} />
+          </button>
+        )}
       </div>
       {hexOpen && (
         <div className="color-hex-field">
@@ -122,6 +114,9 @@ const ColorPickerRow: React.FC<{
 const DesignSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
+  const themeKey = data.theme || 'ivorynavy';
+  const themeColors = THEMES.find(t => t.key === themeKey)?.colors || THEMES[0].colors;
+  const themeLabelColor = THEME_LABEL_DEFAULTS[themeKey] || THEME_LABEL_DEFAULTS.ivorynavy;
 
   return (
     <>
@@ -152,26 +147,26 @@ const DesignSection: React.FC = () => {
       <div className="opt-inline-group">
         <label className="opt-inline-label">배경 색상</label>
         <div className="opt-inline-content">
-          <ColorPickerRow colors={BG_COLORS} value={data.customBgColor || ''} fallback="#FFFFFF" onChange={(v) => updateField('customBgColor', v)} />
+          <ColorPickerRow colors={BG_COLORS} value={data.customBgColor || ''} fallback="#FFFFFF" onChange={(v) => updateField('customBgColor', v)} onReset={() => updateField('customBgColor', themeColors[0])} />
         </div>
       </div>
       <div className="opt-inline-group">
         <label className="opt-inline-label">강조 색상</label>
         <div className="opt-inline-content">
-          <ColorPickerRow colors={ACCENT_COLORS} value={data.customAccentColor || ''} fallback="#D4A5C6" onChange={(v) => updateField('customAccentColor', v)} />
+          <ColorPickerRow colors={ACCENT_COLORS} value={data.customAccentColor || ''} fallback="#D4A5C6" onChange={(v) => updateField('customAccentColor', v)} onReset={() => updateField('customAccentColor', themeColors[2])} />
         </div>
       </div>
       <div className="opt-inline-group">
         <label className="opt-inline-label">섹션 라벨 색상</label>
         <div className="opt-inline-content">
-          <ColorPickerRow colors={ACCENT_COLORS} value={data.customLabelColor || ''} fallback={THEME_LABEL_DEFAULTS[data.theme || 'blush'] || '#DDA5A3'} onChange={(v) => updateField('customLabelColor', v)} />
+          <ColorPickerRow colors={ACCENT_COLORS} value={data.customLabelColor || ''} fallback={themeLabelColor} onChange={(v) => updateField('customLabelColor', v)} onReset={() => updateField('customLabelColor', themeLabelColor)} />
           <span className="input-hint">MESSAGE, LOCATION처럼 섹션을 표시하는 영문 라벨의 색상입니다. 지정하지 않으면 강조 색상을 따릅니다.</span>
         </div>
       </div>
       <div className="opt-inline-group">
         <label className="opt-inline-label">텍스트 색상</label>
         <div className="opt-inline-content">
-          <ColorPickerRow colors={ACCENT_COLORS} value={data.customTextColor || ''} fallback="#000000" onChange={(v) => updateField('customTextColor', v)} />
+          <ColorPickerRow colors={ACCENT_COLORS} value={data.customTextColor || ''} fallback="#000000" onChange={(v) => updateField('customTextColor', v)} onReset={() => updateField('customTextColor', themeColors[3])} />
         </div>
       </div>
       <div className="opt-inline-group">
