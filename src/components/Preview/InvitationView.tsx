@@ -127,7 +127,7 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 };
 
 // midphoto는 순서 관리 대상이 아니라 활성 섹션 중간에 자동 배치되는 고정 섹션이라 여기서 제외
-export const DEFAULT_ORDER = ['greeting', 'contacts', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts', 'ending', 'share'];
+export const DEFAULT_ORDER = ['greeting', 'contacts', 'calendar', 'message', 'interview', 'photos', 'timeline', 'location', 'rsvp', 'guestbook', 'livegallery', 'accounts', 'ending', 'share'];
 
 // 각 섹션의 on/off 토글 여부 (없는 섹션은 항상 활성)
 function isSectionActive(id: string, data: InvitationData): boolean {
