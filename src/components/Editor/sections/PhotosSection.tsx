@@ -38,6 +38,7 @@ const PhotosSection: React.FC = () => {
           {([
             { key: 'slide', name: '슬라이드' },
             { key: 'style3', name: '메이슨리' },
+            { key: 'auto', name: '자동 애니메이션' },
           ] as { key: InvitationData['galleryStyle']; name: string }[]).map(s => (
             <button key={s.key} type="button" className={`account-style-btn ${data.galleryStyle === s.key ? 'active' : ''}`} onClick={() => updateField('galleryStyle', s.key)}>
               <strong>{s.name}</strong>

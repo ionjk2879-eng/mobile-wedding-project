@@ -75,7 +75,7 @@ export interface DesignConfig {
   // 이 값이 'none'이 아니면 물결 효과로 취급해 하위 호환한다.)
   heroWaveEffect?: 'none' | 'top' | 'bottom' | 'both';
   // 메인화면 사진 경계 효과 종류. 미지정 시 heroWaveEffect로 하위 호환 판단.
-  heroEffectType?: 'none' | 'wave' | 'diagonal' | 'arch' | 'shine' | 'ripple';
+  heroEffectType?: 'none' | 'wave' | 'diagonal' | 'arch';
   scrollEffect?: 'none' | 'fade-up' | 'fade-in' | 'slide-in';
   heroPhoto: string;
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype' | 'magframe' | 'boldtype' | 'datesplit';
@@ -102,7 +102,7 @@ export interface ContentData {
   groomPhoto: string;
   bridePhoto: string;
   photos: string[];
-  galleryStyle: 'slide' | 'style3';
+  galleryStyle: 'slide' | 'style3' | 'auto';
   calendarStyle?: 'card' | 'plain';
   locationStyle?: 'card' | 'plain';
   messageStyle?: 'card' | 'plain';
@@ -127,7 +127,7 @@ export interface ContentData {
 export interface OpeningConfig {
   openingEnabled: boolean;
   openingStyle: 'curtain' | 'circle' | 'veil' | 'blind' | 'frame' | 'insta' | 'typing'; // 'typing' kept for backwards compat
-  openingContentStyle?: 'sequential' | 'typing' | 'lines';
+  openingContentStyle?: 'sequential' | 'typing' | 'lines' | 'flip';
   openingColorMode: 'theme' | 'custom' | 'gradient';
   openingGradientMode?: 'theme' | 'preset' | 'custom';
   openingTextColor?: 'white' | 'dark';

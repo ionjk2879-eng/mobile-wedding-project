@@ -75,6 +75,7 @@ const OpeningSection: React.FC = () => {
                 { key: 'sequential' as const, name: '순차 등장' },
                 { key: 'typing' as const, name: '타이핑' },
                 { key: 'lines' as const, name: '줄 단위 등장' },
+                { key: 'flip' as const, name: '플립 등장' },
               ]).map(s => (
                 <button key={s.key} type="button"
                   className={`account-style-btn ${(opening.openingContentStyle || 'sequential') === s.key ? 'active' : ''}`}

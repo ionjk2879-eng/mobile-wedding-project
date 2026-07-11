@@ -89,9 +89,9 @@
 
 /* Color pick grid — 이름 텍스트 없이 색상 원만 흐르듯 나열. 맨 앞 팔레트 스와치를
    누르면 아래 HEX 입력칸이 펼쳐진다(=직접 입력), 나머지는 프리셋 색상. */
-.color-pick-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-.color-pick-btn { display: block; width: 34px; height: 34px; padding: 0; border: 2px solid transparent; border-radius: 50%; cursor: pointer; transition: all 0.2s; position: relative; box-sizing: border-box; }
-.color-pick-btn:hover { border-color: #E5E7EB; }
+.color-pick-grid { display: flex; flex-wrap: wrap; gap: 13px; }
+.color-pick-btn { display: block; width: 34px; height: 34px; padding: 0; border: 2px solid #E5E7EB; border-radius: 50%; cursor: pointer; transition: all 0.2s; position: relative; box-sizing: border-box; }
+.color-pick-btn:hover { border-color: #D1D5DB; }
 .color-pick-btn.active { border-color: #1F2937; }
 .color-pick-swatch { display: block; width: 100%; height: 100%; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.06); box-sizing: border-box; }
 .color-pick-swatch-custom { background: conic-gradient(from 180deg, #FF5252, #FFD152, #52FF7A, #52D9FF, #7A52FF, #FF52D9, #FF5252); }

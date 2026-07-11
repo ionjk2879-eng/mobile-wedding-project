@@ -25,8 +25,6 @@ const HERO_EFFECT_TYPES: { key: NonNullable<InvitationData['heroEffectType']>; n
   { key: 'wave', name: '물결' },
   { key: 'diagonal', name: '대각선' },
   { key: 'arch', name: '아치' },
-  { key: 'shine', name: '샤인' },
-  { key: 'ripple', name: '리플' },
 ];
 
 const HeroSection: React.FC = () => {
