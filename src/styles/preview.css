@@ -976,20 +976,6 @@
     100% 2.5px, 50% calc(90% + 2.5px), 0% 2.5px
   );
 }
-/* 편지지 접힌 선 — 봉투에 넣으려고 3단으로 접었던 자국. 그라데이션 없이
-   밝은 선(위, 종이가 위로 살짝 들리는 쪽) + 어두운 선(바로 아래, 그늘진 쪽)
-   한 쌍만으로 접힌 능선의 입체감을 낸다. 편지지가 봉투에서 나온 부분(패턴
-   콘텐츠 영역) 위에 걸치도록 텍스트보다 뒤(z-index: 0)에 둔다. */
-.op-pattern-letter-crease {
-  position: absolute;
-  left: 10%; right: 10%;
-  height: 0;
-  border-top: 1px solid var(--op-accent, rgba(255,255,255,0.5));
-  opacity: 0.5;
-  box-shadow: 0 1.5px 0 rgba(0,0,0,0.28);
-  pointer-events: none;
-  z-index: 0;
-}
 
 /* Preview overlay popup (portal to body) */
 .pv-overlay-root { animation: pv-overlay-in 0.2s ease; }

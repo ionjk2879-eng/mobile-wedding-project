@@ -11,7 +11,6 @@ const ViewPage = React.lazy(() => import('./pages/ViewPage'))
 const AdminPage = React.lazy(() => import('./pages/AdminPage'))
 const ManagePage = React.lazy(() => import('./pages/ManagePage'))
 const AuthCallbackPage = React.lazy(() => import('./pages/AuthCallbackPage'))
-const KakaoCalendarStartPage = React.lazy(() => import('./pages/KakaoCalendarStartPage'))
 const TermsPage = React.lazy(() => import('./pages/TermsPage'))
 const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'))
 const SuperAdminPage = React.lazy(() => import('./pages/SuperAdminPage'))
@@ -37,7 +36,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
-        <Route path="/calendar/:slug/kakao" element={<KakaoCalendarStartPage />} />
         <Route path="/" element={<LandingPage />} />
         <Route path="/editor" element={<AuthGate><App /></AuthGate>} />
         <Route path="/edit/:slug" element={<AuthGate><App /></AuthGate>} />

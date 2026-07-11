@@ -590,15 +590,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       className={`op-root op-${effectiveStyle} op-phase-${phase}`}
       style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', '--op-pattern-color': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)', '--op-frame-color': isDark ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.30)', '--op-frame-color2': isDark ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)', '--op-curtain-bg': isDark ? 'rgba(195,193,198,0.50)' : bgColor, '--op-frame-bg': isDark ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.07)', '--op-frame-shadow': isDark ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)', '--op-frame-inset': isDark ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)', '--op-insta-track': isDark ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.22)', '--op-insta-fill': isDark ? 'rgba(0,0,0,0.90)' : 'rgba(255,255,255,0.95)', '--op-insta-pct': isDark ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.85)', '--op-btn-bg': btnBg, '--op-btn-shadow': btnShadow, '--op-envelope-tint': isDark ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.16)', ...bgOverride, ...editorBounds, ...(topOffset != null && !Object.keys(editorBounds).length ? { top: topOffset, height: `calc(100% - ${topOffset}px)` } : {}) } as React.CSSProperties}
     >
-      {bgPatterns.map(pat => pat === 'letter' ? (
-        <React.Fragment key={pat}>
-          <div className="op-pattern op-pattern-letter" aria-hidden="true" />
-          <div className="op-pattern-letter-crease" style={{ top: '31%' }} aria-hidden="true" />
-          <div className="op-pattern-letter-crease" style={{ top: '59%' }} aria-hidden="true" />
-        </React.Fragment>
-      ) : (
-        <div key={pat} className={`op-pattern op-pattern-${pat}`} aria-hidden="true" />
-      ))}
+      {bgPatterns.map(pat => <div key={pat} className={`op-pattern op-pattern-${pat}`} aria-hidden="true" />)}
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
       {isBlind && (

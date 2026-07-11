@@ -196,39 +196,6 @@ async function handleKakaoAuth(request: Request, env: Env): Promise<Response> {
   return json({ token, uid, name, email, photo }, 200, origin);
 }
 
-// 하객이 "일정 등록" 버튼 → 카카오 로그인(talk_calendar 동의)을 거쳐 본인의 톡캘린더에 예식
-// 일정을 바로 추가하는 흐름. 청첩장 소유자 계정 생성/로그인과는 무관한 1회성 동작이라
-// 세션 토큰을 발급하지 않고 성공/실패만 반환한다.
-async function handleKakaoCalendarAdd(request: Request, env: Env): Promise<Response> {
-  const origin = request.headers.get('Origin') || '*';
-  const body = await request.json() as { code?: string; redirectUri?: string; slug?: string };
-  if (!body.code || !body.redirectUri || !body.slug) return json({ error: '요청 정보가 올바르지 않습니다.' }, 400, origin);
-
-  const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ grant_type: 'authorization_code', client_id: env.KAKAO_REST_API_KEY || '7edc2c74f346bfad9c9006cd26d04e3c', client_secret: env.KAKAO_CLIENT_SECRET, redirect_uri: body.redirectUri, code: body.code }),
-  });
-  const tokenData = await tokenRes.json() as { access_token?: string; error_description?: string };
-  if (!tokenData.access_token) return json({ error: tokenData.error_description || '카카오 로그인에 실패했습니다.' }, 401, origin);
-
-  const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(body.slug).first();
-  if (!row) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
-  const data = JSON.parse(row.data as string);
-  const event = buildKakaoCalendarEvent(data);
-  if (!event) return json({ error: '예식 일정이 아직 설정되지 않았습니다.' }, 400, origin);
-
-  const evRes = await fetch('https://kapi.kakao.com/v2/api/calendar/create/event', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${tokenData.access_token}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ event: JSON.stringify(event) }),
-  });
-  const evData = await evRes.json() as { event_id?: string; msg?: string };
-  if (!evData.event_id) return json({ error: evData.msg || '카카오 캘린더 등록 권한이 아직 없습니다. (카카오 API 사용 권한 심사가 필요할 수 있습니다)' }, 400, origin);
-
-  return json({ ok: true, message: '카카오톡 캘린더에 일정이 추가되었습니다.' }, 200, origin);
-}
-
 async function handleNaverAuth(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get('Origin') || '*';
   const body = await request.json() as { code?: string; state?: string };
@@ -1556,64 +1523,6 @@ function buildICS(data: any): string | null {
   return lines.join('\r\n');
 }
 
-// 안드로이드용 — 구글 캘린더 "일정 추가" 화면으로 바로 이동시켜 원탭으로 등록되게 한다.
-// (.ics 다운로드와 달리 파일을 받아서 따로 열 필요가 없다)
-function buildGoogleCalendarUrl(data: any): string | null {
-  const dt = new Date(data.weddingDateISO);
-  if (isNaN(dt.getTime())) return null;
-  let h = 12, m = 0;
-  const parts = (data.time as string | undefined)?.match(/(AM|PM)\s(\d+):(\d+)/);
-  if (parts) {
-    h = parseInt(parts[2]);
-    if (parts[1] === 'PM' && h !== 12) h += 12;
-    if (parts[1] === 'AM' && h === 12) h = 0;
-    m = parseInt(parts[3]);
-  }
-  const y = dt.getFullYear(), mo = dt.getMonth(), d = dt.getDate();
-  // 청첩장 시간은 한국시간(KST, UTC+9) 벽시계 기준이므로 UTC 인스턴트로 변환
-  const startUtc = new Date(Date.UTC(y, mo, d, h - 9, m, 0));
-  const endUtc = new Date(startUtc.getTime() + 60 * 60 * 1000);
-  const fmt = (dtu: Date) => dtu.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-  const isEn = data.language === 'en', isJa = data.language === 'ja';
-  const title = isEn ? `${data.groomName} & ${data.brideName}'s Wedding` : isJa ? `${data.groomName}・${data.brideName} 結婚式` : `${data.groomName} ♥ ${data.brideName} 결혼식`;
-  const location = [data.venueName, data.venueAddress].filter(Boolean).join(', ');
-  const params = new URLSearchParams({
-    action: 'TEMPLATE',
-    text: title,
-    dates: `${fmt(startUtc)}/${fmt(endUtc)}`,
-    ctz: 'Asia/Seoul',
-  });
-  if (location) params.set('location', location);
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
-}
-
-// 카카오톡 톡캘린더(개인 캘린더)에 넣을 event 파라미터 — POST /v2/api/calendar/create/event 스키마
-function buildKakaoCalendarEvent(data: any): { title: string; time: { start_at: string; end_at: string; time_zone: string; all_day: boolean }; location?: { name: string; address?: string } } | null {
-  const dt = new Date(data.weddingDateISO);
-  if (isNaN(dt.getTime())) return null;
-  let h = 12, m = 0;
-  const parts = (data.time as string | undefined)?.match(/(AM|PM)\s(\d+):(\d+)/);
-  if (parts) {
-    h = parseInt(parts[2]);
-    if (parts[1] === 'PM' && h !== 12) h += 12;
-    if (parts[1] === 'AM' && h === 12) h = 0;
-    m = parseInt(parts[3]);
-  }
-  const y = dt.getFullYear(), mo = dt.getMonth(), d = dt.getDate();
-  const startUtc = new Date(Date.UTC(y, mo, d, h - 9, m, 0));
-  const endUtc = new Date(startUtc.getTime() + 60 * 60 * 1000);
-  const fmt = (dtu: Date) => dtu.toISOString().slice(0, 19) + 'Z';
-  const isEn = data.language === 'en', isJa = data.language === 'ja';
-  const title = isEn ? `${data.groomName} & ${data.brideName}'s Wedding` : isJa ? `${data.groomName}・${data.brideName} 結婚式` : `${data.groomName} ♥ ${data.brideName} 결혼식`;
-  const venueName = data.venueName || '';
-  const venueAddress = data.venueAddress || '';
-  return {
-    title,
-    time: { start_at: fmt(startUtc), end_at: fmt(endUtc), time_zone: 'Asia/Seoul', all_day: false },
-    ...((venueName || venueAddress) ? { location: { name: venueName || venueAddress, ...(venueAddress ? { address: venueAddress } : {}) } } : {}),
-  };
-}
-
 // --- Notification emails (유료 청첩장 전용) ---
 
 async function sendGuestbookNotification(env: Env, slug: string, guestName: string, content: string, side: string): Promise<void> {
@@ -1708,7 +1617,6 @@ export default {
       if (pathname === '/api/auth/google') return await handleGoogleAuth(request, env);
       if (pathname === '/api/auth/kakao') return await handleKakaoAuth(request, env);
       if (pathname === '/api/auth/naver') return await handleNaverAuth(request, env);
-      if (pathname === '/api/calendar/kakao-add' && request.method === 'POST') return await handleKakaoCalendarAdd(request, env);
 
       // Invitations
       if (pathname === '/api/invitations') return await handleInvitations(request, env);
@@ -1828,20 +1736,15 @@ export default {
         return Response.redirect(`${url.origin}/og-image.png`, 302);
       }
 
-      // Calendar (smart) — 카카오톡 공유 메시지의 "일정 등록" 버튼이 여는 링크.
-      // 안드로이드는 구글 캘린더 등록 화면으로 바로 리다이렉트해 원탭으로 등록되게 하고,
-      // 그 외(iOS 등)는 .ics를 inline으로 내려줘 사파리가 파일 다운로드 없이 캘린더 담기
-      // 시트를 바로 띄우게 한다.
+      // Calendar (.ics) — 카카오톡 공유 메시지의 "일정 등록" 버튼이 여는 링크. 플랫폼별로
+      // 분기하지 않고 .ics를 그대로 내려준다 — 폰에 설치된 캘린더 앱(구글/톡캘린더/삼성
+      // 캘린더 등)이 OS 차원에서 파일을 넘겨받아 각자의 "일정 만들기" 화면을 띄워준다.
+      // 특정 캘린더 앱으로 강제 리다이렉트하면 오히려 사용자가 실제 쓰는 앱을 못 고른다.
       const calMatch = pathname.match(/^\/calendar\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
       if (calMatch) {
         const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(calMatch[1]).first();
         if (!row) return new Response('Not found', { status: 404 });
         const data = JSON.parse(row.data as string);
-        const ua = request.headers.get('User-Agent') || '';
-        if (/android/i.test(ua)) {
-          const gcalUrl = buildGoogleCalendarUrl(data);
-          if (gcalUrl) return Response.redirect(gcalUrl, 302);
-        }
         const ics = buildICS(data);
         if (!ics) return new Response('Not found', { status: 404 });
         return new Response(ics, {
@@ -1853,7 +1756,7 @@ export default {
         });
       }
 
-      // Calendar (.ics) — 구버전/직접 링크 호환용. 위 스마트 라우트와 달리 항상 .ics를 내려준다.
+      // Calendar (.ics) — 구버전/직접 링크 호환용. 동작은 위와 동일.
       const icsMatch = pathname.match(/^\/calendar\/([a-z0-9]+(?:-[a-z0-9]+)*)\.ics$/);
       if (icsMatch) {
         const row = await env.DB.prepare('SELECT data FROM invitations WHERE slug = ?').bind(icsMatch[1]).first();
