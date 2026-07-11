@@ -66,10 +66,16 @@ const EndingSection: React.FC = () => {
                 <span className="photo-pos-label">상하</span>
                 <input type="range" min={0} max={100} value={data.endingPhotoY ?? 50} onChange={(e) => updateField('endingPhotoY', Number(e.target.value))} className="photo-pos-slider" />
               </div>
-              <button type="button" className="photo-pos-reset" onClick={() => updateFields({ endingPhotoX: 50, endingPhotoY: 50 })}>중앙으로 초기화</button>
+              <div className="photo-pos-row">
+                <span className="photo-pos-label">확대</span>
+                <input type="range" min={100} max={200} value={data.endingPhotoScale ?? 100} onChange={(e) => updateField('endingPhotoScale', Number(e.target.value))} className="photo-pos-slider" />
+              </div>
             </div>
           )}
         </div>
+        {data.endingPhoto && (
+          <button type="button" className="photo-pos-reset" onClick={() => updateFields({ endingPhotoX: 50, endingPhotoY: 50, endingPhotoScale: 100 })}>초기화</button>
+        )}
         <span className="input-hint">청첩장 맨 마지막에 보여줄 사진입니다.</span>
       </div>
       <div className="input-group">

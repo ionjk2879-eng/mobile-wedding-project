@@ -77,6 +77,9 @@ export interface DesignConfig {
   heroStyle: 'classic' | 'overlay' | 'minimal' | 'editorial' | 'fullscreen' | 'split' | 'centercard' | 'magcover' | 'glassframe' | 'instacard' | 'bookcover' | 'bookpage' | 'filmstrip' | 'verttype' | 'magframe' | 'boldtype' | 'datesplit';
   heroPhotoX?: number;
   heroPhotoY?: number;
+  // 사진 확대 비율(%). 100 = 원본(확대 없음). object-fit: cover로 이미 채워진 사진을
+  // 중심 기준으로 더 확대해 보여준다.
+  heroPhotoScale?: number;
   heroPhoto2?: string;
   heroPhoto2X?: number;
   heroPhoto2Y?: number;
@@ -108,10 +111,12 @@ export interface ContentData {
   endingPhoto: string;
   endingPhotoX?: number;
   endingPhotoY?: number;
+  endingPhotoScale?: number;
   endingMessage: string;
   midPhoto: string;
   midPhotoX?: number;
   midPhotoY?: number;
+  midPhotoScale?: number;
   midPhotoCaption?: string;
 }
 

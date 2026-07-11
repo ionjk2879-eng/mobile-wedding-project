@@ -27,12 +27,13 @@ const Ending: React.FC<PreviewProps> = React.memo(({ data }) => {
     : '저희의 새로운 시작을 함께해주셔서\n진심으로 감사합니다.';
   const message = data.endingMessage || defaultMessage;
   const photoPos = `${data.endingPhotoX ?? 50}% ${data.endingPhotoY ?? 50}%`;
+  const scale = data.endingPhotoScale ?? 100;
 
   return (
     <section className="ending" aria-label="엔딩">
       <div className="ending-frame">
         {data.endingPhoto ? (
-          <img src={data.endingPhoto} alt="Ending" className="ending-photo" style={{ objectPosition: photoPos }} />
+          <img src={data.endingPhoto} alt="Ending" className="ending-photo" style={{ objectPosition: photoPos, transform: scale !== 100 ? `scale(${scale / 100})` : undefined }} />
         ) : (
           <div className="ending-photo-empty"><span>엔딩 사진을 등록해주세요</span></div>
         )}
@@ -51,6 +52,7 @@ const Ending: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.endingPhoto === next.data.endingPhoto
   && prev.data.endingPhotoX === next.data.endingPhotoX
   && prev.data.endingPhotoY === next.data.endingPhotoY
+  && prev.data.endingPhotoScale === next.data.endingPhotoScale
   && prev.data.endingMessage === next.data.endingMessage
   && prev.data.groomName === next.data.groomName
   && prev.data.brideName === next.data.brideName

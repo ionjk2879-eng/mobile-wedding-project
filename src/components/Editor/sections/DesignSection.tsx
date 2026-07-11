@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pipette } from 'lucide-react';
 import useInvitationStore from '../../../stores/useInvitationStore';
 import { InvitationData } from '../../../types';
@@ -21,17 +21,17 @@ const TEXTURES: { key: NonNullable<InvitationData['bgTexture']>; name: string }[
   { key: 'pattern', name: '도트' }, { key: 'silk', name: '실크' }, { key: 'watercolor', name: '수채화' },
 ];
 
-const EFFECTS: { key: NonNullable<InvitationData['bgEffect']>; name: string; icon: string }[] = [
-  { key: 'none', name: '없음', icon: '—' }, { key: 'cherry-blossom', name: '벚꽃', icon: '🌸' },
-  { key: 'snow', name: '함박눈', icon: '❄️' }, { key: 'stars', name: '별빛', icon: '✨' },
-  { key: 'leaves', name: '나뭇잎', icon: '🍃' }, { key: 'hearts', name: '하트', icon: '💕' },
-  { key: 'firefly', name: '반딧불', icon: '🔅' }, { key: 'confetti', name: '꽃가루', icon: '🎊' },
-  { key: 'petals', name: '해바라기 꽃잎', icon: '🌻' }, { key: 'autumn', name: '단풍잎', icon: '🍂' },
+const EFFECTS: { key: NonNullable<InvitationData['bgEffect']>; name: string }[] = [
+  { key: 'none', name: '없음' }, { key: 'cherry-blossom', name: '벚꽃' },
+  { key: 'snow', name: '함박눈' }, { key: 'stars', name: '별빛' },
+  { key: 'leaves', name: '나뭇잎' }, { key: 'hearts', name: '하트' },
+  { key: 'firefly', name: '반딧불' }, { key: 'confetti', name: '꽃가루' },
+  { key: 'petals', name: '해바라기 꽃잎' }, { key: 'autumn', name: '단풍잎' },
 ];
 
-const SCROLL_EFFECTS: { key: NonNullable<InvitationData['scrollEffect']>; name: string; icon: string }[] = [
-  { key: 'none', name: '없음', icon: '—' }, { key: 'fade-up', name: '페이드 업', icon: '↑' },
-  { key: 'fade-in', name: '페이드 인', icon: '◎' }, { key: 'slide-in', name: '슬라이드', icon: '→' },
+const SCROLL_EFFECTS: { key: NonNullable<InvitationData['scrollEffect']>; name: string }[] = [
+  { key: 'none', name: '없음' }, { key: 'fade-up', name: '페이드 업' },
+  { key: 'fade-in', name: '페이드 인' }, { key: 'slide-in', name: '슬라이드' },
 ];
 
 const BG_COLORS = [
@@ -71,29 +71,50 @@ const THEME_LABEL_DEFAULTS: Record<string, string> = {
   ivorychampagne: '#D3B34F',
 };
 
-// 프리셋은 색깔 원만 보여주고(이름 텍스트 없음), 맨 앞의 팔레트 스와치를 누르면
-// 네이티브 컬러피커가 바로 열려 원하는 색을 직접 지정할 수 있다 — 별도 입력칸을 두지
-// 않는다. 현재 값이 프리셋 중 어디에도 없으면(=직접 지정한 색) 팔레트 스와치에
-// 선택 링을 띄운다.
+// 프리셋은 색깔 원만 보여주고(이름 텍스트 없음), 맨 앞의 팔레트 스와치를 누르면 직접
+// 지정 칸이 펼쳐진다 — 기본 입력 방식은 HEX 텍스트 입력이고, 옆의 작은 원형 스와치는
+// 색상표로 고르고 싶을 때를 위한 보조 수단이다. 현재 값이 프리셋 중 어디에도 없으면
+// (=직접 지정한 색) 팔레트 스와치에 선택 링을 띄운다.
 const ColorPickerRow: React.FC<{
   colors: { name: string; value: string }[];
   value: string;
   fallback: string;
   onChange: (v: string) => void;
 }> = ({ colors, value, fallback, onChange }) => {
+  const [hexOpen, setHexOpen] = useState(false);
   const isCustom = !!value && !colors.some(c => c.value === value);
+  const current = value || fallback;
   return (
-    <div className="color-pick-grid">
-      <label className={`color-pick-btn color-pick-custom ${isCustom ? 'active' : ''}`} title="직접 선택">
-        <span className="color-pick-swatch color-pick-swatch-custom" />
-        <Pipette size={13} />
-        <input type="color" value={value || fallback} onChange={(e) => onChange(e.target.value)} />
-      </label>
-      {colors.map(c => (
-        <button key={c.name} type="button" className={`color-pick-btn ${value === c.value ? 'active' : ''}`} onClick={() => onChange(c.value)} title={c.name}>
-          <span className="color-pick-swatch" style={{ background: c.value }} />
+    <div>
+      <div className="color-pick-grid">
+        <button type="button" className={`color-pick-btn color-pick-custom ${isCustom ? 'active' : ''}`} title="직접 입력 (HEX)" onClick={() => setHexOpen(v => !v)}>
+          <span className="color-pick-swatch color-pick-swatch-custom" />
+          <Pipette size={13} />
         </button>
-      ))}
+        {colors.map(c => (
+          <button key={c.name} type="button" className={`color-pick-btn ${value === c.value ? 'active' : ''}`} onClick={() => onChange(c.value)} title={c.name}>
+            <span className="color-pick-swatch" style={{ background: c.value }} />
+          </button>
+        ))}
+      </div>
+      {hexOpen && (
+        <div className="color-hex-field">
+          <span className="color-hex-prefix">#</span>
+          <input
+            type="text"
+            autoFocus
+            value={current.replace(/^#/, '')}
+            onChange={(e) => {
+              const v = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6);
+              if (v.length === 6) onChange('#' + v);
+            }}
+            maxLength={6}
+            placeholder="FFFFFF"
+            className="modern-input color-hex-input"
+          />
+          <input type="color" value={current} onChange={(e) => onChange(e.target.value)} className="color-hex-native" title="색상표에서 선택" />
+        </div>
+      )}
     </div>
   );
 };
@@ -155,10 +176,10 @@ const DesignSection: React.FC = () => {
       </div>
       <div className="opt-inline-group">
         <label className="opt-inline-label">배경 재질</label>
-        <div className="theme-select-grid modern">
+        <div className="account-style-grid">
           {TEXTURES.map(t => (
-            <button key={t.key} type="button" className={`theme-chip ${(data.bgTexture || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgTexture', t.key)}>
-              <span className={`texture-preview tex-${t.key}`}></span>{t.name}
+            <button key={t.key} type="button" className={`account-style-btn ${(data.bgTexture || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgTexture', t.key)}>
+              <strong>{t.name}</strong>
             </button>
           ))}
         </div>
@@ -166,10 +187,10 @@ const DesignSection: React.FC = () => {
       <div className="opt-inline-group">
         <label className="opt-inline-label">흩날리는 효과</label>
         <div className="opt-inline-content">
-          <div className="theme-select-grid modern">
+          <div className="account-style-grid">
             {EFFECTS.map(t => (
-              <button key={t.key} type="button" className={`theme-chip ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgEffect', t.key)}>
-                <span className="effect-icon">{t.icon}</span>{t.name}
+              <button key={t.key} type="button" className={`account-style-btn ${(data.bgEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('bgEffect', t.key)}>
+                <strong>{t.name}</strong>
               </button>
             ))}
           </div>
@@ -184,10 +205,10 @@ const DesignSection: React.FC = () => {
       <div className="opt-inline-group">
         <label className="opt-inline-label">스크롤 등장 효과</label>
         <div className="opt-inline-content">
-          <div className="theme-select-grid modern">
+          <div className="account-style-grid">
             {SCROLL_EFFECTS.map(t => (
-              <button key={t.key} type="button" className={`theme-chip ${(data.scrollEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('scrollEffect', t.key)}>
-                <span className="effect-icon">{t.icon}</span>{t.name}
+              <button key={t.key} type="button" className={`account-style-btn ${(data.scrollEffect || 'none') === t.key ? 'active' : ''}`} onClick={() => updateField('scrollEffect', t.key)}>
+                <strong>{t.name}</strong>
               </button>
             ))}
           </div>

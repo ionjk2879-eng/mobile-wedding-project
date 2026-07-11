@@ -87,24 +87,29 @@
 .modern-input.transparent { background: transparent; border-color: transparent; padding: 8px 12px; }
 .modern-input.transparent:focus { background: #FFF; border-color: #D4A5C6; }
 
-/* Color pick grid — 이름 텍스트 없이 색상 원만 흐르듯 나열. 맨 앞 팔레트 스와치는
-   네이티브 컬러피커를 여는 버튼(=직접 입력), 나머지는 프리셋 색상. */
+/* Color pick grid — 이름 텍스트 없이 색상 원만 흐르듯 나열. 맨 앞 팔레트 스와치를
+   누르면 아래 HEX 입력칸이 펼쳐진다(=직접 입력), 나머지는 프리셋 색상. */
 .color-pick-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .color-pick-btn { display: block; width: 34px; height: 34px; padding: 0; border: 2px solid transparent; border-radius: 50%; cursor: pointer; transition: all 0.2s; position: relative; box-sizing: border-box; }
 .color-pick-btn:hover { border-color: #E5E7EB; }
 .color-pick-btn.active { border-color: #1F2937; }
 .color-pick-swatch { display: block; width: 100%; height: 100%; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.06); box-sizing: border-box; }
-.color-pick-custom { overflow: hidden; }
 .color-pick-swatch-custom { background: conic-gradient(from 180deg, #FF5252, #FFD152, #52FF7A, #52D9FF, #7A52FF, #FF52D9, #FF5252); }
 .color-pick-custom svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); pointer-events: none; }
-.color-pick-custom input[type="color"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: none; padding: 0; cursor: pointer; }
+
+/* 팔레트 스와치를 누르면 펼쳐지는 HEX 직접 입력 — 기본 입력 방식은 텍스트, 옆의
+   작은 원형 스와치는 색상표로 고르고 싶을 때를 위한 보조 수단. */
+.color-hex-field { display: flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 4px 4px 12px; border: 1px solid #E5E7EB; border-radius: 10px; background: #FFFFFF; transition: border-color 0.2s, box-shadow 0.2s; }
+.color-hex-field:focus-within { border-color: #D4A5C6; box-shadow: 0 0 0 4px rgba(212,165,198,0.1); }
+.color-hex-prefix { color: #6B7280; font-family: monospace; font-size: 0.85rem; font-weight: 600; flex-shrink: 0; user-select: none; }
+.color-hex-field .color-hex-input { flex: 1; min-width: 0; border: none !important; box-shadow: none !important; padding: 8px 0 !important; font-family: monospace; font-size: 0.85rem; text-transform: uppercase; }
+.color-hex-field .color-hex-input:focus { outline: none; }
+.color-hex-native { width: 30px; height: 30px; flex-shrink: 0; border: 1px solid #E5E7EB; border-radius: 50%; padding: 2px; cursor: pointer; background: white; }
+.color-hex-native::-webkit-color-swatch-wrapper { padding: 0; border-radius: 50%; overflow: hidden; }
+.color-hex-native::-webkit-color-swatch { border: none; border-radius: 50%; }
 
 /* Theme & design chips */
 .theme-select-grid.modern { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.theme-chip { padding: 10px 16px; border-radius: 14px; border: 2px solid #E5E7EB; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.8rem; font-weight: 700; color: #4B5563; transition: all 0.2s; }
-.theme-chip:hover { border-color: #D1D5DB; background: #FAFAFA; }
-.theme-chip.active { border-color: #D4A5C6; background: #FFF9FB; color: #D4A5C6; box-shadow: 0 4px 12px rgba(212, 165, 198, 0.15); }
-.theme-chip .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
 .theme-chip-v2 { padding: 12px 14px; border-radius: 14px; border: 1.5px solid #E5E7EB; background: white; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: all 0.2s; text-align: left; }
 .theme-chip-v2:hover { border-color: #D1D5DB; background: #FAFAFA; }
 .theme-chip-v2.active { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
@@ -120,20 +125,10 @@
 .theme-page-dot { width: 8px; height: 8px; border-radius: 50%; border: none; background: #D9D9D9; cursor: pointer; padding: 0; transition: all 0.25s ease; }
 .theme-page-dot.active { background: #D4A5C6; width: 20px; border-radius: 4px; }
 
-/* Texture previews */
-.texture-preview { width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; border: 1px solid #E5E7EB; }
-.tex-none { background: #FFFFFF; }
-.tex-paper { background: #F5EDE3; background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E"); }
-.tex-linen { background: #F0EBE3; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px); }
-.tex-pattern { background: #F8F8F8; background-image: radial-gradient(circle, #D1D5DB 0.5px, transparent 0.5px); background-size: 6px 6px; }
-.tex-silk { background: #F5F0EC; background-image: repeating-linear-gradient(135deg, transparent, transparent 2px, rgba(255,255,255,0.3) 2px, rgba(255,255,255,0.3) 4px); }
-.tex-watercolor { background: #F3EEF5; background-image: radial-gradient(ellipse at 30% 50%, rgba(200,150,180,0.15) 0%, transparent 70%); }
-
 /* Misc editor controls */
 .section-desc { font-size: 0.85rem; color: #6B7280; margin: 0 0 20px 0; }
 .input-hint { display: block; font-size: 0.78rem; color: #9CA3AF; margin-top: 6px; }
 .label-hint { font-size: 0.78rem; font-weight: 500; color: #D4A5C6; }
-.effect-icon { font-size: 1rem; line-height: 1; }
 .modern-checkbox { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 .modern-checkbox input { width: 20px; height: 20px; accent-color: #D4A5C6; }
 .modern-checkbox span { font-size: 0.9rem; font-weight: 700; color: #374151; }
@@ -192,7 +187,7 @@
 .photo-pos-row { display: flex; align-items: center; gap: 10px; }
 .photo-pos-label { font-size: 0.75rem; font-weight: 600; color: #6B7280; min-width: 28px; }
 .photo-pos-slider { flex: 1; accent-color: #D4A5C6; }
-.photo-pos-reset { padding: 6px 12px; border: 1px solid #E5E7EB; border-radius: 8px; background: white; font-size: 0.72rem; color: #9CA3AF; cursor: pointer; transition: all 0.2s; align-self: flex-end; }
+.photo-pos-reset { display: block; margin: 8px 0 0 auto; padding: 6px 12px; border: 1px solid #E5E7EB; border-radius: 8px; background: white; font-size: 0.72rem; color: #9CA3AF; cursor: pointer; transition: all 0.2s; }
 .photo-pos-reset:hover { border-color: #D4A5C6; color: #D4A5C6; }
 .hero-style-grid { display: flex; flex-wrap: wrap; gap: 6px; }
 .hero-style-btn { display: inline-flex; align-items: center; gap: 0; padding: 7px 12px; border-radius: 9px; border: 1px solid #E5E7EB; background: #F9FAFB; text-align: center; cursor: pointer; transition: all 0.2s; }

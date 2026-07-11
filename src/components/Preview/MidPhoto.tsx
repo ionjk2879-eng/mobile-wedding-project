@@ -10,12 +10,13 @@ const MidPhoto: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const caption = data.midPhotoCaption || '';
   const photoPos = `${data.midPhotoX ?? 50}% ${data.midPhotoY ?? 50}%`;
+  const scale = data.midPhotoScale ?? 100;
 
   return (
     <section className="midphoto" aria-label="중간사진">
       <div className="midphoto-frame">
         {data.midPhoto ? (
-          <img src={data.midPhoto} alt="" className="midphoto-photo" style={{ objectPosition: photoPos }} />
+          <img src={data.midPhoto} alt="" className="midphoto-photo" style={{ objectPosition: photoPos, transform: scale !== 100 ? `scale(${scale / 100})` : undefined }} />
         ) : (
           <div className="midphoto-photo-empty"><span>중간 사진을 등록해주세요</span></div>
         )}
@@ -34,6 +35,7 @@ const MidPhoto: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.midPhoto === next.data.midPhoto
   && prev.data.midPhotoX === next.data.midPhotoX
   && prev.data.midPhotoY === next.data.midPhotoY
+  && prev.data.midPhotoScale === next.data.midPhotoScale
   && prev.data.midPhotoCaption === next.data.midPhotoCaption
 );
 

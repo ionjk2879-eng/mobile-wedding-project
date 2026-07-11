@@ -74,13 +74,14 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   // 갖고 있어 이 축을 무시(항상 basic 취급)한다.
   const heroShape = isFixedLookHeroStyle(style) ? 'basic' : (data.heroPhotoShape || 'basic');
 
-  const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode): React.ReactNode => {
-    const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={{ objectPosition: pos }} /> : fallback;
+  const wrapWithShape = (src: string | undefined, pos: string, fallback: React.ReactNode, scale = 100): React.ReactNode => {
+    const photoStyle: React.CSSProperties = { objectPosition: pos, transform: scale !== 100 ? `scale(${scale / 100})` : undefined };
+    const img = src ? <img src={src} alt="Wedding" className="hero-photo" style={photoStyle} /> : fallback;
     if (heroShape === 'basic') return img;
     if (heroShape === 'polaroid') {
       return (
         <div className="hero-shape hero-shape-polaroid">
-          {src && <img src={src} alt="" aria-hidden="true" className="hero-photo hero-photo-back" style={{ objectPosition: pos }} />}
+          {src && <img src={src} alt="" aria-hidden="true" className="hero-photo hero-photo-back" style={photoStyle} />}
           <div className="hero-photo-front">{img}</div>
         </div>
       );
@@ -103,7 +104,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
 
   const photoPos = `${data.heroPhotoX ?? 50}% ${data.heroPhotoY ?? 50}%`;
   const emptyPhotoEl = <div className="hero-photo-empty"><span>사진을 등록해주세요</span></div>;
-  const photoEl = renderPhotoWithWave(wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl));
+  const photoEl = renderPhotoWithWave(wrapWithShape(data.heroPhoto, photoPos, emptyPhotoEl, data.heroPhotoScale ?? 100));
 
   const photo2Pos = `${data.heroPhoto2X ?? 50}% ${data.heroPhoto2Y ?? 50}%`;
   const photo2El = data.heroPhoto2 ? renderPhotoWithWave(wrapWithShape(data.heroPhoto2, photo2Pos, emptyPhotoEl)) : photoEl;
@@ -482,6 +483,7 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhoto === next.data.heroPhoto
   && prev.data.heroPhotoX === next.data.heroPhotoX
   && prev.data.heroPhotoY === next.data.heroPhotoY
+  && prev.data.heroPhotoScale === next.data.heroPhotoScale
   && prev.data.heroPhoto2 === next.data.heroPhoto2
   && prev.data.heroPhoto2X === next.data.heroPhoto2X
   && prev.data.heroPhoto2Y === next.data.heroPhoto2Y

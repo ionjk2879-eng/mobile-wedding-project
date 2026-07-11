@@ -66,10 +66,16 @@ const MidPhotoSection: React.FC = () => {
                 <span className="photo-pos-label">상하</span>
                 <input type="range" min={0} max={100} value={data.midPhotoY ?? 50} onChange={(e) => updateField('midPhotoY', Number(e.target.value))} className="photo-pos-slider" />
               </div>
-              <button type="button" className="photo-pos-reset" onClick={() => updateFields({ midPhotoX: 50, midPhotoY: 50 })}>중앙으로 초기화</button>
+              <div className="photo-pos-row">
+                <span className="photo-pos-label">확대</span>
+                <input type="range" min={100} max={200} value={data.midPhotoScale ?? 100} onChange={(e) => updateField('midPhotoScale', Number(e.target.value))} className="photo-pos-slider" />
+              </div>
             </div>
           )}
         </div>
+        {data.midPhoto && (
+          <button type="button" className="photo-pos-reset" onClick={() => updateFields({ midPhotoX: 50, midPhotoY: 50, midPhotoScale: 100 })}>초기화</button>
+        )}
         <span className="input-hint">청첩장 중간에 보여줄 사진입니다.</span>
       </div>
       <div className="input-group">

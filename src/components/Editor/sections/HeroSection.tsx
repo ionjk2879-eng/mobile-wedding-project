@@ -92,10 +92,16 @@ const HeroSection: React.FC = () => {
                 <span className="photo-pos-label">상하</span>
                 <input type="range" min={0} max={100} value={data.heroPhotoY ?? 50} onChange={(e) => updateField('heroPhotoY', Number(e.target.value))} className="photo-pos-slider" />
               </div>
-              <button type="button" className="photo-pos-reset" onClick={() => updateFields({ heroPhotoX: 50, heroPhotoY: 50 })}>중앙으로 초기화</button>
+              <div className="photo-pos-row">
+                <span className="photo-pos-label">확대</span>
+                <input type="range" min={100} max={200} value={data.heroPhotoScale ?? 100} onChange={(e) => updateField('heroPhotoScale', Number(e.target.value))} className="photo-pos-slider" />
+              </div>
             </div>
           )}
         </div>
+        {data.heroPhoto && (
+          <button type="button" className="photo-pos-reset" onClick={() => updateFields({ heroPhotoX: 50, heroPhotoY: 50, heroPhotoScale: 100 })}>초기화</button>
+        )}
       </div>
       {data.heroStyle === 'split' && (
         <>
