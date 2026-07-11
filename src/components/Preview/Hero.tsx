@@ -42,11 +42,11 @@ const HeroWave: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => {
   const started = useWaveStarted();
   return (
     <div className={`hero-wave hero-wave-${position}`} aria-hidden="true">
-      <svg className={`hero-wave-layer hero-wave-layer-back${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 100" preserveAspectRatio="none">
-        <path d="M0,100 C200,100 300,52 600,52 C900,52 1000,100 1200,100 C1400,100 1500,52 1800,52 C2100,52 2200,100 2400,100 Z" />
+      <svg className={`hero-wave-layer hero-wave-layer-back${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 150" preserveAspectRatio="none">
+        <path d="M0,100 C200,100 300,52 600,52 C900,52 1000,100 1200,100 C1400,100 1500,52 1800,52 C2100,52 2200,100 2400,100 L2400,150 L0,150 Z" />
       </svg>
-      <svg className={`hero-wave-layer hero-wave-layer-front${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 100" preserveAspectRatio="none">
-        <path d="M0,100 C200,100 300,65 600,65 C900,65 1000,100 1200,100 C1400,100 1500,65 1800,65 C2100,65 2200,100 2400,100 Z" />
+      <svg className={`hero-wave-layer hero-wave-layer-front${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 150" preserveAspectRatio="none">
+        <path d="M0,100 C200,100 300,65 600,65 C900,65 1000,100 1200,100 C1400,100 1500,65 1800,65 C2100,65 2200,100 2400,100 L2400,150 L0,150 Z" />
       </svg>
     </div>
   );
