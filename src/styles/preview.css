@@ -28,11 +28,14 @@
 .hero-wave-layer { position: absolute; bottom: -1px; left: 0; width: 200%; height: 100%; fill: var(--wedding-bg, #FFFFFF); will-change: transform; }
 /* 두 레이어 모두 테마 배경색(--wedding-bg) 하나만 쓴다 — 색을 따로 두지 않고
    투명도만 다르게 줘서 깊이감을 낸다: 뒤쪽은 느리고(20s) 옅게(opacity+blur),
-   앞쪽은 빠르고(12s, 역방향) 진하게. 시작 전(정지 상태)에는 애니메이션 시작
-   지점과 동일한 정적 transform으로 고정해 전환 시 튀지 않는다. */
-.hero-wave-layer-back { opacity: 0.35; filter: blur(1.5px); transform: translateX(0); }
+   앞쪽은 빠르고(12s) 진하게. 방향은 둘 다 동일(reverse = 왼쪽→오른쪽)하게 맞춰
+   속도 차이만으로 패럴랙스를 낸다 — 두 레이어의 정적(재생 전) transform도 reverse
+   애니메이션의 시작 지점과 같은 translateX(-50%)로 맞춰뒀다. 이 값이 다르면
+   .hero-wave-playing이 붙는 순간 정지 위치에서 애니메이션 시작 위치로 순간
+   이동하며 튀어 보인다. */
+.hero-wave-layer-back { opacity: 0.35; filter: blur(1.5px); transform: translateX(-50%); }
 .hero-wave-layer-front { opacity: 0.75; transform: translateX(-50%); }
-.hero-wave-layer-back.hero-wave-playing { animation: hero-wave-drift 20s linear infinite; }
+.hero-wave-layer-back.hero-wave-playing { animation: hero-wave-drift 20s linear infinite reverse; }
 .hero-wave-layer-front.hero-wave-playing { animation: hero-wave-drift 12s linear infinite reverse; }
 @keyframes hero-wave-drift {
   from { transform: translateX(0); }
