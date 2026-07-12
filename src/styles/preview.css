@@ -12,8 +12,45 @@
 .hero-photo-empty span { font-size: 0.9em; color: #000000; line-height: 1; }
 .hero-img-wrap { overflow: hidden; line-height: 0; }
 
-/* 타이포그래피 오버레이가 켜졌을 때만 사진(+사진 모형)을 감싸는 래퍼. */
-.hero-photo-frame { position: relative; width: 100%; height: 100%; display: block; }
+/* 경계 효과(대각선/아치)나 타이포그래피 오버레이가 켜졌을 때만 사진(+사진 모형)을
+   감싸는 래퍼 — 메인화면 섹션 전체가 아니라 실제 사진 경계를 기준으로 효과가 붙도록
+   위치 기준점 역할만 한다. */
+.hero-photo-frame { position: relative; width: 100%; height: 100%; display: block; overflow: hidden; }
+
+/* 메인화면 물결(파도) 효과 — 완만한 봉우리 하나가 반복되는 곡선 레이어 2장을 서로
+   다른 색/속도/방향으로 흘려보내는 옅은 패럴랙스. 뷰박스를 세로로 키우고(0~150)
+   물결 패턴(y 0~100) 아래로 순수 단색 "받침" 영역(y 100~150)을 붙여, 봉우리 크기는
+   그대로 두고 바닥 쪽만 더 늘어난 느낌을 준다. 애니메이션은 순수 CSS
+   @keyframes(transform만 사용, GPU 컴포지팅)로만 동작하며, 시작 타이밍만
+   Hero.tsx의 useWaveStarted가 JS로 게이팅한다(매 프레임 재계산 아님) — 상세 이유는
+   Hero.tsx 주석 참고. */
+.hero-wave { position: absolute; left: 0; right: 0; height: 96px; overflow: hidden; pointer-events: none; z-index: 3; }
+.hero-wave-bottom { bottom: -32px; }
+.hero-wave-top { top: -32px; transform: scaleY(-1); }
+.hero-wave-layer { position: absolute; bottom: -1px; left: 0; width: 200%; height: 100%; will-change: transform; }
+/* 뒤쪽 레이어: 테마 배경색 기반, 느리고(20s) 흐릿하게(blur+낮은 opacity).
+   앞쪽 레이어: 테마 포인트색 기반, 빠르고(12s, 역방향) 또렷하게. 시작 전(정지 상태)
+   에는 애니메이션 시작 지점과 동일한 정적 transform으로 고정해 전환 시 튀지 않는다. */
+.hero-wave-layer-back { fill: var(--wedding-bg, #FFFFFF); opacity: 0.5; filter: blur(1.5px); transform: translateX(0); }
+.hero-wave-layer-front { fill: var(--wedding-accent, #000000); opacity: 0.4; transform: translateX(-50%); }
+.hero-wave-layer-back.hero-wave-playing { animation: hero-wave-drift 20s linear infinite; }
+.hero-wave-layer-front.hero-wave-playing { animation: hero-wave-drift 12s linear infinite reverse; }
+@keyframes hero-wave-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* 대각선 컷 — 애니메이션 없는 고정 사선 한 장. */
+.hero-diagonal { position: absolute; left: 0; right: 0; height: 64px; overflow: hidden; pointer-events: none; z-index: 3; }
+.hero-diagonal-bottom { bottom: 0; }
+.hero-diagonal-top { top: 0; transform: scaleY(-1); }
+.hero-diagonal-layer { position: absolute; bottom: -1px; left: 0; width: 100%; height: 100%; fill: var(--wedding-bg, #FFFFFF); }
+
+/* 아치 커브 — 반복 없는 완만한 곡선 한 장. */
+.hero-arch { position: absolute; left: 0; right: 0; height: 64px; overflow: hidden; pointer-events: none; z-index: 3; }
+.hero-arch-bottom { bottom: 0; }
+.hero-arch-top { top: 0; transform: scaleY(-1); }
+.hero-arch-layer { position: absolute; bottom: -1px; left: 0; width: 100%; height: 100%; fill: var(--wedding-bg, #FFFFFF); }
 
 /* 타이포그래피(OUR WEDDING) — 특정 메인화면 스타일 전용이 아니라 어떤 스타일의 사진
    위에도 얹을 수 있는 독립 오버레이. 원래 "볼드 타이포" 스타일 전용이던 문구를

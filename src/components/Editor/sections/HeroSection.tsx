@@ -20,6 +20,13 @@ const HERO_PHOTO_SHAPES: { key: NonNullable<InvitationData['heroPhotoShape']>; n
   { key: 'hairline', name: '헤어라인' },
 ];
 
+const HERO_EFFECT_TYPES: { key: NonNullable<InvitationData['heroEffectType']>; name: string }[] = [
+  { key: 'none', name: '없음' },
+  { key: 'wave', name: '물결' },
+  { key: 'diagonal', name: '대각선' },
+  { key: 'arch', name: '아치' },
+];
+
 const HeroSection: React.FC = () => {
   const data = useInvitationStore((s) => s.data);
   const updateField = useInvitationStore((s) => s.updateField);
@@ -206,6 +213,39 @@ const HeroSection: React.FC = () => {
           <button type="button" className={`account-style-btn ${data.heroTypography === 'ourwedding' ? 'active' : ''}`} onClick={() => updateField('heroTypography', 'ourwedding')}>
             <strong>OUR WEDDING</strong>
           </button>
+        </div>
+      </div>
+      <div className="opt-inline-group">
+        <label className="opt-inline-label">메인화면 효과</label>
+        <div className="opt-inline-content">
+          <div className="account-style-grid">
+            {HERO_EFFECT_TYPES.map(t => (
+              <button
+                key={t.key}
+                type="button"
+                className={`account-style-btn ${(data.heroEffectType || 'none') === t.key ? 'active' : ''}`}
+                onClick={() => {
+                  if (t.key === 'none') { updateFields({ heroEffectType: 'none', heroWaveEffect: 'none' }); return; }
+                  updateFields({ heroEffectType: t.key, heroWaveEffect: data.heroWaveEffect && data.heroWaveEffect !== 'none' ? data.heroWaveEffect : 'bottom' });
+                }}
+              >
+                <strong>{t.name}</strong>
+              </button>
+            ))}
+          </div>
+          {(data.heroWaveEffect || 'none') !== 'none' && (
+            <div className="account-style-grid" style={{ marginTop: 8 }}>
+              {([
+                { key: 'top', name: '상단' },
+                { key: 'bottom', name: '하단' },
+                { key: 'both', name: '상하단' },
+              ] as { key: NonNullable<InvitationData['heroWaveEffect']>; name: string }[]).map(s => (
+                <button key={s.key} type="button" className={`account-style-btn ${data.heroWaveEffect === s.key ? 'active' : ''}`} onClick={() => updateField('heroWaveEffect', s.key)}>
+                  <strong>{s.name}</strong>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>

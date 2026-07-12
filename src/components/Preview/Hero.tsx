@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { InvitationData } from '../../types';
 import { isFixedLookHeroStyle } from '../../data/heroStyleConfig';
 import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateTime';
@@ -6,6 +6,68 @@ import { formatShareDate, formatShareDateJa } from '../../utils/formatShareDateT
 interface PreviewProps {
   data: InvitationData;
 }
+
+// 물결 애니메이션 자체는 순수 CSS transform(@keyframes hero-wave-drift)만 쓴다 — 매
+// 프레임 JS로 경로를 재계산하지 않는다. 여기 JS는 오직 "언제 흐르기 시작할지"만 결정한다.
+// 페이지 최초 마운트 시점(React가 청첩장 전체를 한 번에 그리는 무거운 렌더링, 실측
+// 약 82ms 롱태스크)과 애니메이션 시작이 겹치면 저사양 기기에서 튀는 현상이 있어,
+// 이중 requestAnimationFrame으로 그 무거운 페인트가 실제로 끝난 다음 프레임에야
+// .hero-wave-playing을 붙여 흐르기 시작한다. 그 전까지는 애니메이션 시작 지점과
+// 동일한 정적 transform으로 고정돼 있어 전환 시 위치가 튀지 않는다.
+function useWaveStarted(): boolean {
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    let raf1 = 0;
+    let raf2 = 0;
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setStarted(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, []);
+  return started;
+}
+
+// 메인화면 경계에 얹는 물결(파도) 효과. 봉우리 사이 골이 맨 아래(y=100)에 완전히
+// 닿아야 뭉게구름처럼 안 보이고 "물결"로 읽힌다. 레이어 2장을 서로 다른 색/속도/
+// 방향으로 흘려보내 입체감을 낸다 — 뒤쪽은 테마 배경색 기반으로 느리고 흐릿하게,
+// 앞쪽은 테마 포인트색(accent) 기반으로 빠르고 또렷하게. SVG 폭을 200%로 두고
+// 정확히 -50%만큼 translateX 하면 뷰박스 절반 단위로 반복되는 패스가 이음매 없이
+// 무한 루프된다.
+const HeroWave: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => {
+  const started = useWaveStarted();
+  return (
+    <div className={`hero-wave hero-wave-${position}`} aria-hidden="true">
+      <svg className={`hero-wave-layer hero-wave-layer-back${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 150" preserveAspectRatio="none">
+        <path d="M0,100 C200,100 300,52 600,52 C900,52 1000,100 1200,100 C1400,100 1500,52 1800,52 C2100,52 2200,100 2400,100 L2400,150 L0,150 Z" />
+      </svg>
+      <svg className={`hero-wave-layer hero-wave-layer-front${started ? ' hero-wave-playing' : ''}`} viewBox="0 0 2400 150" preserveAspectRatio="none">
+        <path d="M0,100 C200,100 300,65 600,65 C900,65 1000,100 1200,100 C1400,100 1500,65 1800,65 C2100,65 2200,100 2400,100 L2400,150 L0,150 Z" />
+      </svg>
+    </div>
+  );
+};
+
+// 대각선 컷 — 사진 경계를 한 방향으로 떨어지는 사선으로 자른다. 애니메이션 없이
+// 고정된 단일 레이어.
+const HeroDiagonal: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
+  <div className={`hero-diagonal hero-diagonal-${position}`} aria-hidden="true">
+    <svg className="hero-diagonal-layer" viewBox="0 0 2400 100" preserveAspectRatio="none">
+      <path d="M0,100 L2400,35 L2400,100 Z" />
+    </svg>
+  </div>
+);
+
+// 아치 커브 — 반복 없는 완만한 곡선 하나로 사진 경계를 감싼다.
+const HeroArch: React.FC<{ position: 'top' | 'bottom' }> = ({ position }) => (
+  <div className={`hero-arch hero-arch-${position}`} aria-hidden="true">
+    <svg className="hero-arch-layer" viewBox="0 0 2400 100" preserveAspectRatio="none">
+      <path d="M0,60 Q1200,-20 2400,60 L2400,100 L0,100 Z" />
+    </svg>
+  </div>
+);
 
 const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   const isEn = data.language === 'en';
@@ -38,6 +100,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     return data.time;
   })();
   const style = data.heroStyle || 'classic';
+  const effectType = data.heroEffectType || 'none';
+  const effectPosition = data.heroWaveEffect || 'none';
   const typography = data.heroTypography || 'none';
   const yearStr = data.weddingDateISO ? data.weddingDateISO.slice(0, 4) : String(new Date().getFullYear());
 
@@ -58,15 +122,30 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   // 갖고 있어 이 축을 무시(항상 basic 취급)한다.
   const heroShape = isFixedLookHeroStyle(style) ? 'basic' : (data.heroPhotoShape || 'basic');
 
-  // 타이포그래피는 사진 모형(heroPhotoShape, 오벌/육각형/블롭 등)이 아니라 메인화면
-  // 스타일의 전체 사각형 틀에 걸리도록 그린다.
+  // 경계 효과(대각선/아치)와 타이포그래피는 사진 모형(heroPhotoShape, 오벌/육각형/
+  // 블롭 등)이 아니라 메인화면 스타일의 전체 사각형 틀 하단에 걸리도록 그린다 — 오벌/
+  // 육각형처럼 좁고 각진 모형 경계에 맞춰 잘리면 효과 모양 자체가 이상하게 잘려 보인다.
+  const EFFECT_COMPONENTS: Record<'wave' | 'diagonal' | 'arch', React.FC<{ position: 'top' | 'bottom' }>> = {
+    wave: HeroWave,
+    diagonal: HeroDiagonal,
+    arch: HeroArch,
+  };
   const buildEffectsNode = (includeTypography = false): React.ReactNode => {
-    if (!includeTypography || typography !== 'ourwedding') return null;
+    const hasEffect = effectType !== 'none' && effectType in EFFECT_COMPONENTS;
+    const hasTypography = includeTypography && typography === 'ourwedding';
+    if (!hasEffect && !hasTypography) return null;
+    const EffectComponent = hasEffect ? EFFECT_COMPONENTS[effectType as 'wave' | 'diagonal' | 'arch'] : null;
     return (
-      <div className="hero-typo-overlay" aria-hidden="true">
-        <span className="hero-typo-dots">•••</span>
-        <h1 className="hero-typo-statement"><span>Our</span><span>Wedding.</span></h1>
-      </div>
+      <>
+        {EffectComponent && (effectPosition === 'top' || effectPosition === 'both') && <EffectComponent position="top" />}
+        {EffectComponent && (effectPosition === 'bottom' || effectPosition === 'both') && <EffectComponent position="bottom" />}
+        {hasTypography && (
+          <div className="hero-typo-overlay" aria-hidden="true">
+            <span className="hero-typo-dots">•••</span>
+            <h1 className="hero-typo-statement"><span>Our</span><span>Wedding.</span></h1>
+          </div>
+        )}
+      </>
     );
   };
 
@@ -478,6 +557,8 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
   && prev.data.heroPhoto2Y === next.data.heroPhoto2Y
   && prev.data.heroStyle === next.data.heroStyle
   && prev.data.heroPhotoShape === next.data.heroPhotoShape
+  && prev.data.heroWaveEffect === next.data.heroWaveEffect
+  && prev.data.heroEffectType === next.data.heroEffectType
   && prev.data.heroTypography === next.data.heroTypography
   && prev.data.weddingDateISO === next.data.weddingDateISO
   && prev.data.language === next.data.language

@@ -70,6 +70,10 @@ export interface DesignConfig {
   // true면 흩날리는 효과를 메인화면(Hero) 영역 안에만 가두어 스크롤하면 함께 사라지게
   // 한다. 기본값(false/미지정)은 기존처럼 화면 전체에 고정되어 스크롤해도 계속 보인다.
   bgEffectHeroOnly?: boolean;
+  // 메인화면(Hero) 사진 경계에 얹는 효과의 위치. 위/아래/양쪽 중 어디에 표시할지.
+  heroWaveEffect?: 'none' | 'top' | 'bottom' | 'both';
+  // 메인화면 사진 경계 효과 종류.
+  heroEffectType?: 'none' | 'wave' | 'diagonal' | 'arch';
   // 메인화면 사진 위에 얹는 "Our Wedding." 볼드 타이포그래피 오버레이. 특정 메인화면
   // 스타일 전용이 아니라 어떤 스타일을 고르든 함께 켤 수 있는 독립 옵션.
   heroTypography?: 'none' | 'ourwedding';
