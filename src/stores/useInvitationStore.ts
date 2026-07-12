@@ -84,7 +84,7 @@ export const initialData: InvitationData = {
   timeline: [],
   interview: [],
   // midphoto는 순서 관리 대상이 아니라 InvitationView에서 활성 섹션 중간에 동적으로 삽입됨
-  sectionOrder: ['greeting', 'contacts', 'photos', 'calendar', 'message', 'interview', 'timeline', 'location', 'guestbook', 'livegallery', 'rsvp', 'accounts'],
+  sectionOrder: ['greeting', 'contacts', 'photos', 'calendar', 'message', 'interview', 'timeline', 'location', 'rsvp', 'guestbook', 'livegallery', 'accounts'],
   slug: '',
   shareUrl: '',
   shareTitle: '',
