@@ -18,7 +18,7 @@
 .hero-photo-frame { position: relative; width: 100%; height: 100%; display: block; overflow: hidden; }
 
 /* 메인화면 물결(파도) 효과 — 완만한 봉우리 하나가 반복되는 곡선 레이어 2장을 서로
-   다른 색/속도/방향으로 흘려보내는 옅은 패럴랙스. 뷰박스를 세로로 키우고(0~150)
+   다른 속도/방향으로 흘려보내는 옅은 패럴랙스. 뷰박스를 세로로 키우고(0~150)
    물결 패턴(y 0~100) 아래로 순수 단색 "받침" 영역(y 100~150)을 붙여, 봉우리 크기는
    그대로 두고 바닥 쪽만 더 늘어난 느낌을 준다. 애니메이션은 순수 CSS
    @keyframes(transform만 사용, GPU 컴포지팅)로만 동작하며, 시작 타이밍만
@@ -27,12 +27,13 @@
 .hero-wave { position: absolute; left: 0; right: 0; height: 96px; overflow: hidden; pointer-events: none; z-index: 3; }
 .hero-wave-bottom { bottom: -32px; }
 .hero-wave-top { top: -32px; transform: scaleY(-1); }
-.hero-wave-layer { position: absolute; bottom: -1px; left: 0; width: 200%; height: 100%; will-change: transform; }
-/* 뒤쪽 레이어: 테마 배경색 기반, 느리고(20s) 흐릿하게(blur+낮은 opacity).
-   앞쪽 레이어: 테마 포인트색 기반, 빠르고(12s, 역방향) 또렷하게. 시작 전(정지 상태)
-   에는 애니메이션 시작 지점과 동일한 정적 transform으로 고정해 전환 시 튀지 않는다. */
-.hero-wave-layer-back { fill: var(--wedding-bg, #FFFFFF); opacity: 0.5; filter: blur(1.5px); transform: translateX(0); }
-.hero-wave-layer-front { fill: var(--wedding-accent, #000000); opacity: 0.4; transform: translateX(-50%); }
+.hero-wave-layer { position: absolute; bottom: -1px; left: 0; width: 200%; height: 100%; fill: var(--wedding-bg, #FFFFFF); will-change: transform; }
+/* 두 레이어 모두 테마 배경색(--wedding-bg) 하나만 쓴다 — 색을 따로 두지 않고
+   투명도만 다르게 줘서 깊이감을 낸다: 뒤쪽은 느리고(20s) 옅게(opacity+blur),
+   앞쪽은 빠르고(12s, 역방향) 진하게. 시작 전(정지 상태)에는 애니메이션 시작
+   지점과 동일한 정적 transform으로 고정해 전환 시 튀지 않는다. */
+.hero-wave-layer-back { opacity: 0.35; filter: blur(1.5px); transform: translateX(0); }
+.hero-wave-layer-front { opacity: 0.75; transform: translateX(-50%); }
 .hero-wave-layer-back.hero-wave-playing { animation: hero-wave-drift 20s linear infinite; }
 .hero-wave-layer-front.hero-wave-playing { animation: hero-wave-drift 12s linear infinite reverse; }
 @keyframes hero-wave-drift {
