@@ -14,6 +14,12 @@ interface PreviewProps {
 // 이중 requestAnimationFrame으로 그 무거운 페인트가 실제로 끝난 다음 프레임에야
 // .hero-wave-playing을 붙여 흐르기 시작한다. 그 전까지는 애니메이션 시작 지점과
 // 동일한 정적 transform으로 고정돼 있어 전환 시 위치가 튀지 않는다.
+//
+// (hero-fade-in과의 겹침 자체가 원인이라는 가설은 실측으로 반증됐다: 물결 시작을
+// hero-fade-in 종료 이후로 지연시켜도, hero-fade-in을 아예 꺼도 동일한 저사양 CPU
+// 조건에서 프레임 드랍이 그대로 발생했고, 물결을 완전히 꺼고 리마운트만 시켜도
+// 비슷한 드랍이 있었다 — 즉 드랍의 실체는 리렌더링/리마운트 자체의 비용이지 두
+// 애니메이션의 타이밍 겹침이 아니다. 그래서 불필요한 지연 없이 이중 rAF만 유지한다.)
 function useWaveStarted(): boolean {
   const [started, setStarted] = useState(false);
   useEffect(() => {
@@ -520,7 +526,6 @@ const Hero: React.FC<PreviewProps> = React.memo(({ data }) => {
     <section className="hero" style={{ fontFamily: data.fontFamily }} aria-label="메인">
       <div
         key={`${groomName}-${brideName}-${style}`}
-        className="hero-entrance"
       >
         {style === 'classic' && renderClassic()}
         {style === 'overlay' && renderOverlay()}
