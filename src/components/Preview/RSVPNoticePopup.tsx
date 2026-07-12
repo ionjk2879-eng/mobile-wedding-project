@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { X, Heart } from 'lucide-react';
 import { InvitationData } from '../../types';
@@ -9,10 +9,46 @@ interface Props {
   onClose: () => void;
 }
 
+// 팝업 배경(오버레이)의 가로 폭을 실제 청첩장 카드(.invitation-page) 너비에 맞춘다.
+// 예전엔 max-width 430px를 CSS calc에 하드코딩해 가정했는데, 이는 view-container/
+// full-preview-container 등 실제 컨테이너와 별도로 document.body 기준 뷰포트 폭에서
+// 계산되어(스크롤바 폭 등으로) 카드 실제 렌더 폭과 어긋날 수 있었다. Opening.tsx/
+// usePreviewPopup.tsx가 쓰는 것과 같은 방식으로, 실제 .invitation-page의
+// getBoundingClientRect()를 읽어 그 폭에 정확히 맞춘다.
+function useInvitationBounds(): { left: number; width: number } | null {
+  const [bounds, setBounds] = useState<{ left: number; width: number } | null>(null);
+
+  useEffect(() => {
+    const update = () => {
+      // 에디터 라이브 프리뷰 패널 — transform: translateZ(0)이 있어 position: fixed의
+      // 포함 블록이 이 컨테이너 자체가 되므로, 그 안에서는 컨테이너 폭이 곧 카드 폭이다.
+      const scroll = document.querySelector<HTMLElement>('.preview-content-scroll');
+      if (scroll) { setBounds({ left: 0, width: scroll.clientWidth }); return; }
+
+      // 그 외(ViewPage 등)에서는 document.body에 포털되므로, 실제 .invitation-page의
+      // 뷰포트 기준 위치/폭을 그대로 읽어야 카드와 어긋나지 않는다.
+      const invPage = document.querySelector<HTMLElement>('.invitation-page');
+      if (invPage) {
+        const rect = invPage.getBoundingClientRect();
+        setBounds({ left: rect.left, width: rect.width });
+        return;
+      }
+
+      setBounds({ left: 0, width: window.innerWidth });
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  return bounds;
+}
+
 const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
   const [hideToday, setHideToday] = useState(false);
   const isEn = data.language === 'en';
   const isJa = data.language === 'ja';
+  const bounds = useInvitationBounds();
 
   const handleClose = () => {
     if (hideToday && data.slug) {
@@ -46,8 +82,10 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
     document.dispatchEvent(new CustomEvent('sonett-open-rsvp'));
   };
 
-  const customVars: React.CSSProperties = {};
-  if (data.customAccentColor) (customVars as Record<string, string>)['--wedding-main'] = data.customAccentColor;
+  if (!bounds) return null;
+
+  const overlayStyle: React.CSSProperties = { left: bounds.left, width: bounds.width };
+  if (data.customAccentColor) (overlayStyle as Record<string, string>)['--wedding-main'] = data.customAccentColor;
 
   // 에디터 미리보기 컨테이너가 있으면 그 안에 포털 — transform: translateZ(0)이 있어
   // position: fixed가 자동으로 해당 컨테이너 기준이 되므로 오버레이가 청첩장 패널에만 한정됨.
@@ -58,7 +96,7 @@ const RSVPNoticePopup: React.FC<Props> = ({ data, onClose }) => {
   const popup = (
     <div
       className={`rsvp-notice-overlay theme-${data.theme || 'blush'}`}
-      style={customVars}
+      style={overlayStyle}
     >
       <div
         className="rsvp-notice-popup"
