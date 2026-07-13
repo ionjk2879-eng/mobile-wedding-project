@@ -5,7 +5,17 @@ import { signInWithGoogle, initiateKakaoLogin, initiateNaverLogin } from '../ser
 
 function isInAppBrowser(): boolean {
   const ua = navigator.userAgent;
-  return /KAKAOTALK|NaverApp|Instagram|FBAN|FBAV|Twitter|Line\/|MicroMessenger/i.test(ua);
+  // 명시적 인앱 브라우저 식별자
+  if (/KAKAOTALK|kakaotalk/i.test(ua)) return true;
+  if (/NaverApp/i.test(ua)) return true;
+  if (/Instagram|FBAN|FBAV/i.test(ua)) return true;
+  if (/Line\//i.test(ua)) return true;
+  if (/MicroMessenger/i.test(ua)) return true;
+  // Android WebView 범용 감지 (Chrome 기반 WebView는 UA에 "wv" 포함)
+  if (/Android/.test(ua) && /wv\b/.test(ua)) return true;
+  // iOS WebView: AppleWebKit은 있지만 Safari가 없음
+  if (/iPhone|iPad|iPod/.test(ua) && /AppleWebKit/.test(ua) && !/Safari/.test(ua)) return true;
+  return false;
 }
 
 function isAndroid(): boolean {
