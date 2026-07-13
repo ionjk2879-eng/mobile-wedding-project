@@ -283,17 +283,6 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   };
 
   const trackRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (data.scrollDirection !== 'horizontal') return;
-    const el = trackRef.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      el.scrollLeft += e.deltaY + e.deltaX;
-    };
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, [data.scrollDirection]);
 
   if (data.scrollDirection === 'horizontal') {
     return (
