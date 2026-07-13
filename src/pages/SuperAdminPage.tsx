@@ -631,7 +631,7 @@ const SuperAdminPage: React.FC = () => {
                           <a href={`https://sonett.kr/${row.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: '#9CA3AF', lineHeight: 1 }}><ExternalLink size={11} /></a>
                         </div>
                         <div>
-                          {days === null ? <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>—</span>
+                          {row.isPaid || days === null ? <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>—</span>
                             : days < 0 ? <span style={{ fontSize: '0.75rem', color: '#DC2626', fontWeight: 700 }}>만료됨</span>
                             : <span style={{ fontSize: '0.75rem', color: urgent ? '#DC2626' : '#6B7280', fontWeight: urgent ? 700 : 400 }}>D-{days}</span>}
                         </div>

@@ -299,10 +299,10 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
     // 유료 전환은 오직 handleActivate(슈퍼관리자 전용, 결제 확인 후 수동 처리)를 통해서만 가능하다.
     const isPaid = !!existing?.is_paid;
     let expiresAt: string | null;
-    if (existing && isPaid && existing.expires_at) {
-      // 기존 유료: 만료일 보존
-      expiresAt = existing.expires_at as string;
-    } else if (existing && !isPaid && existing.expires_at) {
+    if (isPaid) {
+      // 유료 청첩장은 만료일 없음 — NULL로 고정. expires_at이 남아있어도 덮어쓴다.
+      expiresAt = null;
+    } else if (existing?.expires_at) {
       // 기존 미결제 수정: 최초 생성 시점 기준 만료일 유지 (편집할 때마다 리셋 방지)
       expiresAt = existing.expires_at as string;
     } else {
@@ -480,9 +480,15 @@ async function handleExtendExpiry(request: Request, env: Env, slug: string): Pro
   const count = (row.extension_count as number) ?? 0;
   if (count >= 2) return json({ error: '더 이상 연장할 수 없습니다.' }, 400, origin);
 
+  // datetime(expires_at, '+7 days')는 ISO 8601 포맷(toISOString)을 못 파싱하면 NULL을
+  // 반환하고, expires_at = NULL이 되면 삭제 크론에서 영원히 스킵된다.
+  // JavaScript에서 파싱·계산 후 ISO 문자열로 바인딩하는 방식으로 대체한다.
+  const base = row.expires_at ? new Date(row.expires_at as string) : new Date();
+  const newExpiry = new Date(base.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
   await env.DB.prepare(
-    `UPDATE invitations SET expires_at = datetime(expires_at, '+7 days'), extension_count = extension_count + 1, updated_at = datetime('now') WHERE slug = ?`
-  ).bind(slug).run();
+    `UPDATE invitations SET expires_at = ?, extension_count = extension_count + 1, updated_at = datetime('now') WHERE slug = ?`
+  ).bind(newExpiry, slug).run();
 
   return json({ ok: true }, 200, origin);
 }
@@ -1421,7 +1427,7 @@ async function notifyExpiringInvitations(env: Env): Promise<void> {
     FROM invitations i
     JOIN users u ON i.owner_uid = u.uid
     WHERE i.expires_at IS NOT NULL
-      AND i.is_paid = 1
+      AND i.is_paid = 0
       AND i.expires_at > datetime('now')
       AND i.expires_at <= datetime('now', '+7 days')
       AND i.notified = 0
