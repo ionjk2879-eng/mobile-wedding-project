@@ -475,7 +475,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             })}
           </ScrollRevealProvider>
         </div>
-        {effectiveData.horizontalPageMode === 'tap' && (
+        {/* 탭 넘기기 안내 버튼은 처음 보는 메인화면(첫 슬라이드)에서만 살짝 보여주고,
+            한 번이라도 넘어가면 시야를 가리지 않도록 사라진다. */}
+        {effectiveData.horizontalPageMode === 'tap' && hTapIndex === 0 && (
           <>
             <button
               type="button"
