@@ -475,13 +475,14 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             })}
           </ScrollRevealProvider>
         </div>
-        {/* 탭 넘기기 안내 버튼은 처음 보는 메인화면(첫 슬라이드)에서만 살짝 보여주고,
-            한 번이라도 넘어가면 시야를 가리지 않도록 사라진다. */}
-        {effectiveData.horizontalPageMode === 'tap' && hTapIndex === 0 && (
+        {/* 탭으로 넘기는 기능 자체는 모든 섹션에서 계속 동작해야 하므로 버튼을 계속
+            렌더링해두되, 처음 보는 메인화면(첫 슬라이드) 이후로는 시야를 가리지 않도록
+            눈에만 안 보이게(opacity 0) 한다 — pointer-events는 그대로 살아있어 계속 탭할 수 있다. */}
+        {effectiveData.horizontalPageMode === 'tap' && (
           <>
             <button
               type="button"
-              className="h-tap-nav-btn h-tap-nav-btn--prev"
+              className={`h-tap-nav-btn h-tap-nav-btn--prev${hTapIndex > 0 ? ' h-tap-nav-btn--dim' : ''}`}
               onClick={() => goToHSlide(-1)}
               disabled={hTapIndex <= 0}
               aria-label="이전 섹션"
@@ -490,7 +491,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             </button>
             <button
               type="button"
-              className="h-tap-nav-btn h-tap-nav-btn--next"
+              className={`h-tap-nav-btn h-tap-nav-btn--next${hTapIndex > 0 ? ' h-tap-nav-btn--dim' : ''}`}
               onClick={() => goToHSlide(1)}
               disabled={hTapIndex >= hTapTotal - 1}
               aria-label="다음 섹션"
