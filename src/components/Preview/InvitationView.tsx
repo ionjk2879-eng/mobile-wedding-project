@@ -299,6 +299,63 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
 
   const trackRef = useRef<HTMLDivElement>(null);
 
+  // PC에서는 트랙패드/시프트+휠이 아니면 가로 스크롤을 시작할 방법이 마땅치 않고
+  // 스크롤바도 숨겨져 있어(preview.css) 더 안 보인다. 마우스 왼쪽 버튼을 누른 채
+  // 좌우로 끌면 네이티브 scrollLeft를 직접 옮겨 트랙패드 드래그처럼 넘어가게 한다.
+  // 실제로 끌린 경우에만(임계값 이상 이동) 뒤이은 click을 취소해, 버튼/링크/입력창
+  // 클릭이나 포커스는 그대로 정상 동작한다.
+  useEffect(() => {
+    if (data.scrollDirection !== 'horizontal') return;
+    const el = trackRef.current;
+    if (!el) return;
+    let isDown = false;
+    let moved = false;
+    let startX = 0;
+    let startScrollLeft = 0;
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return;
+      // 계좌/연락처 카드 캐러셀은 자체 마우스 드래그를 쓰므로, 그 위에서 시작된
+      // 드래그는 섹션 전환 드래그가 가로채지 않도록 건너뛴다.
+      if ((e.target as Element).closest?.('.carousel-viewport, .contact-carousel-vp')) return;
+      isDown = true;
+      moved = false;
+      startX = e.clientX;
+      startScrollLeft = el.scrollLeft;
+    };
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      const dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) > 4) {
+        moved = true;
+        el.classList.add('h-scroll-track--dragging');
+      }
+      if (moved) {
+        e.preventDefault();
+        el.scrollLeft = startScrollLeft - dx;
+      }
+    };
+    const endDrag = () => {
+      if (!isDown) return;
+      isDown = false;
+      el.classList.remove('h-scroll-track--dragging');
+    };
+    const onClickCapture = (e: MouseEvent) => {
+      if (moved) { e.preventDefault(); e.stopPropagation(); }
+    };
+
+    el.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', endDrag);
+    el.addEventListener('click', onClickCapture, true);
+    return () => {
+      el.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', endDrag);
+      el.removeEventListener('click', onClickCapture, true);
+    };
+  }, [data.scrollDirection]);
+
   if (data.scrollDirection === 'horizontal') {
     return (
       <article className={`preview-wrapper texture-${effectiveData.bgTexture || 'none'} preview-wrapper--h`} aria-label="청첩장">
