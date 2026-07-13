@@ -244,8 +244,8 @@
 .header-text-btn.reset:hover { border-color: #EF4444; color: #EF4444; background: #FEF2F2; }
 
 /* Preview panel */
-.preview-panel { flex: 0 0 390px; max-width: 390px; display: flex; flex-direction: column; padding-top: 12px; }
-.preview-container-box { width: 100%; flex: 1; background: white; border-radius: 0; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #E5E7EB; display: flex; flex-direction: column; position: relative; }
+.preview-panel { flex: 0 0 390px; max-width: 390px; display: flex; flex-direction: column; padding-top: 12px; min-height: 0; }
+.preview-container-box { width: 100%; flex: 1; min-height: 0; background: white; border-radius: 0; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #E5E7EB; display: flex; flex-direction: column; position: relative; }
 .preview-header-bar { display: flex; align-items: center; justify-content: space-between; padding: 15px 25px; border-bottom: 1px solid #F0F2F5; background: white; }
 .preview-label { font-size: 0.75rem; font-weight: 800; color: #B2A4B0; text-transform: uppercase; letter-spacing: 1.5px; }
 .full-preview-btn-mini { background: #F3F4F6; border: none; color: #4B5563; padding: 8px 18px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
@@ -257,7 +257,7 @@
    비쳐 보였다. article.preview-wrapper(테마 배경색을 가진 실제 청첩장 박스)가 아니라 이
    스크롤 컨테이너 자체에도 같은 테마 배경색을 깔아 두면, 원인이 되는 여백이 정확히 얼마든
    그 뒤로는 항상 올바른 색이 비치게 된다. */
-.preview-content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; overflow-anchor: none; transform: translateZ(0); background-color: var(--wedding-bg); }
+.preview-content-scroll { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; position: relative; overflow-anchor: none; transform: translateZ(0); background-color: var(--wedding-bg); }
 .preview-content-scroll::-webkit-scrollbar { display: none; }
 .preview-content-scroll .preview-wrapper { min-height: 100%; }
 
@@ -355,7 +355,7 @@
 
   .editor-panel { flex: none; border-radius: 0; min-height: 0; }
   .preview-panel { flex: none; display: none; max-width: 100%; padding-top: 0; }
-  .preview-panel.mobile-visible { display: flex; flex: 1; align-items: center; justify-content: center; }
+  .preview-panel.mobile-visible { display: flex; flex: 1; flex-direction: column; align-items: center; min-height: 0; }
 
   .editor-panel.mobile-hidden { display: none; }
   .editor-panel:not(.mobile-hidden) { flex: 1; }
@@ -391,7 +391,7 @@
   .mobile-tab-btn.active { color: #D4A5C6; }
   .mobile-tab-btn svg { width: 20px; height: 20px; }
 
-  .preview-container-box { border-radius: 0; border: none; box-shadow: none; width: 100%; max-width: 430px; flex: unset; height: 100%; }
+  .preview-container-box { border-radius: 0; border: none; box-shadow: none; width: 100%; max-width: 430px; flex: 1; min-height: 0; height: auto; }
   .builder-topbar { padding: 10px 16px; gap: 12px; }
   .topbar-left { flex: 0 0 auto; padding-left: 0; }
   .topbar-right { flex: 1; justify-content: flex-end; }
