@@ -19,24 +19,11 @@ function isAndroid(): boolean {
   return /Android/i.test(navigator.userAgent);
 }
 
-function openBrowserChooser(): void {
-  const url = window.location.href;
-  const path = url.replace(/^https?:\/\//, '');
-  // Android OS 브라우저 선택 다이얼로그 (Chrome·삼성인터넷·네이버 등 선택 가능)
-  window.location.href = `intent://${path}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end`;
-}
-
 const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAuthStore((s) => s.user);
   const loading = useAuthStore((s) => s.loading);
   const inApp = isInAppBrowser();
   const android = isAndroid();
-
-  React.useEffect(() => {
-    if (inApp && android && !loading && !user) {
-      openBrowserChooser();
-    }
-  }, [inApp, android, loading, user]);
 
   if (import.meta.env.DEV) return <>{children}</>;
 
@@ -49,21 +36,25 @@ const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   if (!user) {
-    // Android 인앱 브라우저: OS 브라우저 선택 다이얼로그 유도
+    // Android 인앱 브라우저: 사용자가 직접 탭하는 <a> 태그로 브라우저 선택 유도
+    // (window.location.href 방식은 KakaoTalk WebView에서 차단됨)
     if (inApp && android) {
+      const currentUrl = window.location.href;
+      const intentUrl = `intent://${currentUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(currentUrl)};end`;
       return (
         <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", gap: '16px', textAlign: 'center', padding: '0 32px', boxSizing: 'border-box' }}>
           <h1 style={{ color: '#D4A5C6', letterSpacing: '3px', margin: 0, fontSize: '2rem' }}>Sonett</h1>
-          <p style={{ color: '#374151', margin: 0, fontSize: '1rem', fontWeight: 600 }}>브라우저 선택 화면을 확인해주세요</p>
+          <p style={{ color: '#374151', margin: 0, fontSize: '1rem', fontWeight: 600 }}>외부 브라우저에서 열어주세요</p>
           <p style={{ color: '#6B7280', margin: 0, fontSize: '0.85rem', lineHeight: 1.6 }}>
-            Chrome, 삼성 인터넷, 네이버 등<br />원하는 브라우저를 선택하면 됩니다.
+            아래 버튼을 눌러 브라우저를 선택하면<br />Google 로그인도 사용할 수 있습니다.
           </p>
-          <button
-            onClick={openBrowserChooser}
-            style={{ background: '#B07A8E', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', marginTop: '8px' }}
+          <a
+            href={intentUrl}
+            style={{ display: 'inline-block', background: '#B07A8E', color: 'white', textDecoration: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', fontFamily: 'inherit', marginTop: '8px' }}
           >
-            브라우저 선택 창 열기
-          </button>
+            브라우저 선택하여 열기
+          </a>
+          <p style={{ color: '#9CA3AF', margin: 0, fontSize: '0.75rem' }}>Chrome · 삼성 인터넷 · 네이버 등 선택 가능</p>
         </div>
       );
     }
