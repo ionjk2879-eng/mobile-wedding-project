@@ -62,9 +62,9 @@ export interface BasicInfo {
 export interface DesignConfig {
   theme?: 'none' | 'ivorynavy' | 'mochaneutral' | 'dustyblue' | 'pastelblush' | 'sagenature' | 'warmcharcoal' | 'sunsetgold' | 'deepteal' | 'deepplum' | 'terracotta' | 'ivorychampagne';
   scrollDirection?: 'vertical' | 'horizontal';
-  // 가로 모드 전용. 'free'(기본값)는 지금처럼 자유롭게 이어서 드래그/스와이프되고,
-  // 'snap'은 한 번의 터치 스와이프로 섹션이 한 장 단위로 딱 멈춘다(scroll-snap).
-  horizontalPageMode?: 'free' | 'snap';
+  // 가로 모드 전용. 'free'(기본값)는 지금처럼 자유롭게 드래그/스와이프로 넘기고,
+  // 'tap'은 드래그를 막고 화면 좌우의 이전/다음 버튼을 탭해서만 한 장씩 넘긴다.
+  horizontalPageMode?: 'free' | 'tap';
   customBgColor?: string;
   customAccentColor?: string;
   customLabelColor?: string;

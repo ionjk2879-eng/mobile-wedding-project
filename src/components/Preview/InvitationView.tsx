@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 
 import {
   LayoutTemplate, MessageSquare, Clock, Heart, MessagesSquare,
   Image as ImageIcon, Milestone, MapPin, CalendarCheck, CreditCard,
-  Info, BookOpen, Camera, Send, Palette, Phone,
+  Info, BookOpen, Camera, Send, Palette, Phone, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { InvitationData, GuestRelation, OpeningConfig } from '../../types';
 import useInvitationStore from '../../stores/useInvitationStore';
@@ -305,7 +305,8 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   // 실제로 끌린 경우에만(임계값 이상 이동) 뒤이은 click을 취소해, 버튼/링크/입력창
   // 클릭이나 포커스는 그대로 정상 동작한다.
   useEffect(() => {
-    if (data.scrollDirection !== 'horizontal') return;
+    // 탭으로만 넘기는 모드에서는 드래그 자체를 막아야 하므로 이 리스너를 붙이지 않는다.
+    if (data.scrollDirection !== 'horizontal' || data.horizontalPageMode === 'tap') return;
     const el = trackRef.current;
     if (!el) return;
     let isDown = false;
@@ -360,7 +361,36 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       window.removeEventListener('mouseup', endDrag);
       el.removeEventListener('click', onClickCapture, true);
     };
-  }, [data.scrollDirection]);
+  }, [data.scrollDirection, data.horizontalPageMode]);
+
+  // 탭 넘기기 모드 전용: 지금 몇 번째 슬라이드가 보이는지, 전체 몇 장인지 추적해서
+  // 좌우 버튼을 경계(첫/마지막 슬라이드)에서 비활성화한다. 렌더 중에 trackRef.current를
+  // 직접 읽으면 첫 렌더 시점엔 아직 null이라 잘못된 값으로 굳어버리므로 effect에서 state로 옮겨둔다.
+  const [hTapIndex, setHTapIndex] = useState(0);
+  const [hTapTotal, setHTapTotal] = useState(1);
+  useEffect(() => {
+    if (data.scrollDirection !== 'horizontal' || data.horizontalPageMode !== 'tap') return;
+    const el = trackRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const w = el.clientWidth || 1;
+      setHTapIndex(Math.round(el.scrollLeft / w));
+      setHTapTotal(el.children.length);
+    };
+    onScroll();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [data.scrollDirection, data.horizontalPageMode, effectiveSectionOrder]);
+
+  const goToHSlide = (dir: 1 | -1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const w = el.clientWidth || 1;
+    const total = el.children.length;
+    const current = Math.round(el.scrollLeft / w);
+    const target = Math.min(Math.max(current + dir, 0), total - 1);
+    el.scrollTo({ left: target * w, behavior: 'smooth' });
+  };
 
   if (data.scrollDirection === 'horizontal') {
     return (
@@ -398,7 +428,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         )}
         {!effectiveData.bgEffectHeroOnly && <BackgroundEffects effect={effectiveData.bgEffect} />}
         <MusicPlayer url={effectiveData.bgMusicUrl} />
-        <div className={`h-scroll-track${effectiveData.horizontalPageMode === 'snap' ? ' h-scroll-track--snap' : ''}`} ref={trackRef}>
+        <div className={`h-scroll-track${effectiveData.horizontalPageMode === 'tap' ? ' h-scroll-track--tap' : ''}`} ref={trackRef}>
           {/* Hero — 첫 번째 슬라이드 */}
           <div className="h-slide">
             <div style={{ position: 'relative' }}>
@@ -445,6 +475,28 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             })}
           </ScrollRevealProvider>
         </div>
+        {effectiveData.horizontalPageMode === 'tap' && (
+          <>
+            <button
+              type="button"
+              className="h-tap-nav-btn h-tap-nav-btn--prev"
+              onClick={() => goToHSlide(-1)}
+              disabled={hTapIndex <= 0}
+              aria-label="이전 섹션"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              type="button"
+              className="h-tap-nav-btn h-tap-nav-btn--next"
+              onClick={() => goToHSlide(1)}
+              disabled={hTapIndex >= hTapTotal - 1}
+              aria-label="다음 섹션"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </>
+        )}
       </article>
     );
   }

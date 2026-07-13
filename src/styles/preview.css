@@ -1128,10 +1128,21 @@
 .h-scroll-track::-webkit-scrollbar { display: none; }
 .h-scroll-track--dragging { cursor: grabbing; user-select: none; scroll-behavior: auto; }
 .h-scroll-track--dragging * { user-select: none; }
-/* 한 장씩 넘기기 모드 — 터치 스와이프를 놓으면 가장 가까운 섹션 경계에 딱 멈춘다.
-   scroll-snap-stop:always로 빠르게 스와이프해도 한 번에 여러 장을 건너뛰지 않는다. */
-.h-scroll-track--snap { scroll-snap-type: x mandatory; }
-.h-scroll-track--snap .h-slide { scroll-snap-align: start; scroll-snap-stop: always; }
+/* 탭으로 넘기기 모드 — 드래그/스와이프로는 안 넘어가게 막고 좌우 버튼 탭으로만 이동한다.
+   overflow-x:hidden이어도 JS의 scrollTo/scrollLeft로는 그대로 스크롤된다. */
+.h-scroll-track--tap { overflow-x: hidden; cursor: default; }
+.h-tap-nav-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: rgba(0,0,0,0.28); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 20; transition: opacity 0.15s, background 0.15s;
+  backdrop-filter: blur(2px);
+}
+.h-tap-nav-btn:hover { background: rgba(0,0,0,0.4); }
+.h-tap-nav-btn:disabled { opacity: 0; pointer-events: none; }
+.h-tap-nav-btn--prev { left: 10px; }
+.h-tap-nav-btn--next { right: 10px; }
 .h-slide {
   flex: 0 0 100%; width: 100%; height: 100%;
   overflow-y: auto; overflow-x: hidden;

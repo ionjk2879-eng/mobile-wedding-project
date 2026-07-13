@@ -132,7 +132,7 @@ const DesignSection: React.FC = () => {
           <label className="opt-inline-label">가로 넘김 방식</label>
           <div className="account-style-grid">
             <button type="button" className={`account-style-btn ${(data.horizontalPageMode || 'free') === 'free' ? 'active' : ''}`} onClick={() => updateField('horizontalPageMode', 'free')}><strong>자유롭게 이어서</strong></button>
-            <button type="button" className={`account-style-btn ${data.horizontalPageMode === 'snap' ? 'active' : ''}`} onClick={() => updateField('horizontalPageMode', 'snap')}><strong>한 장씩 넘기기</strong></button>
+            <button type="button" className={`account-style-btn ${data.horizontalPageMode === 'tap' ? 'active' : ''}`} onClick={() => updateField('horizontalPageMode', 'tap')}><strong>탭으로 넘기기</strong></button>
           </div>
         </div>
       )}
