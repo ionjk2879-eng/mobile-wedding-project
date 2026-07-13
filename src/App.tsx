@@ -262,11 +262,23 @@ const App: React.FC = () => {
   };
 
   if (isFullPreview) {
+    // 가로 스크롤 모드는 세로로 이어 스크롤되는 구조가 아니라 한 섹션이 화면 높이를
+    // 그대로 채우는 구조라, 실제 청첩장 링크(ViewPage)와 동일하게 컨테이너 자체를
+    // 화면 높이에 고정하고 내부 세로 스크롤은 막아야 한다 — 그래야 가운데 정렬된
+    // 카드 안에서 섹션이 화면 높이만큼만 나타나고 좌우로만 넘어간다.
+    const isHorizontal = data.scrollDirection === 'horizontal';
     return (
-      <div className="full-preview-container" style={{ fontFamily: data.fontFamily }} ref={fullPreviewScrollRef}>
+      <div
+        className="full-preview-container"
+        style={{ fontFamily: data.fontFamily, ...(isHorizontal ? { overflowY: 'hidden' } : {}) }}
+        ref={fullPreviewScrollRef}
+      >
         <ToastContainer />
         <button className="back-to-editor-btn" onClick={() => setIsFullPreview(false)}>{te.backToEditor}</button>
-        <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
+        <div
+          className={`invitation-page theme-${data.theme || 'blush'}`}
+          style={{ fontSize: getBaseFontSize(), ...getCustomColorVars(), ...(isHorizontal ? { height: '100%', minHeight: 0 } : {}) }}
+        >
           <ScrollRootContext.Provider value={fullPreviewScrollRef}>
             <InvitationView data={data} showOpening shareEnabled={!!data.isPaid} enableAnonymousOpening isOwnerPreview />
           </ScrollRootContext.Provider>

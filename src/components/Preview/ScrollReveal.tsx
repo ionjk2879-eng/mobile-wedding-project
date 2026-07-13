@@ -22,13 +22,19 @@ export const ScrollRevealProvider: React.FC<{ rootRef: React.RefObject<HTMLDivEl
     const flush = () => {
       scheduled = false;
       const rootEl = rootRef?.current ?? null;
-      const rootRect = rootEl ? rootEl.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+      const rootRect = rootEl
+        ? rootEl.getBoundingClientRect()
+        : { top: 0, bottom: window.innerHeight, left: 0, right: window.innerWidth };
       const entries = Array.from(registry.entries());
       registry.clear();
       // read phase — 전부 모아서 한 번에 읽는다
+      // 가로 스크롤 모드에서는 아직 옆으로 밀려나 있는(화면 밖 좌우) 슬라이드까지
+      // 세로 겹침만으로 "이미 보인다"고 오판하지 않도록 가로 겹침도 함께 확인한다.
       const measured = entries.map(([, { el, setVisible }]) => {
         const r = el.getBoundingClientRect();
-        return { setVisible, visible: r.top < rootRect.bottom && r.bottom > rootRect.top };
+        const visible = r.top < rootRect.bottom && r.bottom > rootRect.top
+          && r.left < rootRect.right && r.right > rootRect.left;
+        return { setVisible, visible };
       });
       // write phase — 다 읽고 나서 한 번에 반영한다
       measured.forEach(({ setVisible, visible }) => setVisible(visible));
@@ -87,9 +93,14 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({ effect, children, delay = 0
     }
 
     const root = scrollRoot?.current;
-    const rootRect = root ? root.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+    const rootRect = root
+      ? root.getBoundingClientRect()
+      : { top: 0, bottom: window.innerHeight, left: 0, right: window.innerWidth };
     const elRect = el.getBoundingClientRect();
-    setVisible(elRect.top < rootRect.bottom && elRect.bottom > rootRect.top);
+    setVisible(
+      elRect.top < rootRect.bottom && elRect.bottom > rootRect.top
+      && elRect.left < rootRect.right && elRect.right > rootRect.left
+    );
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 실제 스크롤로 화면 밖에서 들어오는 섹션만 여기서 관찰해 애니메이션한다.

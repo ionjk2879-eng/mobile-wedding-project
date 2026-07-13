@@ -355,26 +355,32 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             </div>
           </div>
           {/* 각 섹션 슬라이드 */}
-          {effectiveSectionOrder.map((id) => {
-            if (!isSectionActive(id, effectiveData)) return null;
-            const ref = previewRefs?.[id];
-            const editorId = PREVIEW_TO_EDITOR[id] || id;
-            return (
-              <div key={id} className={`h-slide${isTopAlignedSlide(id, effectiveData) ? ' h-slide--top' : ''}`}>
-                <SectionComponent
-                  id={id}
-                  data={effectiveData}
-                  refEl={ref}
-                  shareEnabled={shareEnabled}
-                  onNav={onSectionNav ? () => onSectionNav(editorId) : undefined}
-                  onNavExtra={id === 'contacts' && onSectionNav ? () => onSectionNav('contacts') : undefined}
-                  guestName={guestName}
-                  guestCode={guestCode}
-                  isOwnerPreview={isOwnerPreview}
-                />
-              </div>
-            );
-          })}
+          <ScrollRevealProvider rootRef={scrollRoot}>
+            {effectiveSectionOrder.map((id, i) => {
+              if (!isSectionActive(id, effectiveData)) return null;
+              const ref = previewRefs?.[id];
+              const editorId = PREVIEW_TO_EDITOR[id] || id;
+              const eff = effectiveData.scrollEffect || 'none';
+              const delay = i % 2 === 0 ? 0 : 100;
+              return (
+                <div key={id} className={`h-slide${isTopAlignedSlide(id, effectiveData) ? ' h-slide--top' : ''}`}>
+                  <ScrollReveal effect={eff} delay={delay}>
+                    <SectionComponent
+                      id={id}
+                      data={effectiveData}
+                      refEl={ref}
+                      shareEnabled={shareEnabled}
+                      onNav={onSectionNav ? () => onSectionNav(editorId) : undefined}
+                      onNavExtra={id === 'contacts' && onSectionNav ? () => onSectionNav('contacts') : undefined}
+                      guestName={guestName}
+                      guestCode={guestCode}
+                      isOwnerPreview={isOwnerPreview}
+                    />
+                  </ScrollReveal>
+                </div>
+              );
+            })}
+          </ScrollRevealProvider>
         </div>
       </article>
     );
