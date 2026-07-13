@@ -282,6 +282,19 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     showRsvpNotice();
   };
 
+  const trackRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (data.scrollDirection !== 'horizontal') return;
+    const el = trackRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      el.scrollLeft += e.deltaY + e.deltaX;
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [data.scrollDirection]);
+
   if (data.scrollDirection === 'horizontal') {
     return (
       <article className={`preview-wrapper texture-${effectiveData.bgTexture || 'none'} preview-wrapper--h`} aria-label="청첩장">
@@ -318,7 +331,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         )}
         {!effectiveData.bgEffectHeroOnly && <BackgroundEffects effect={effectiveData.bgEffect} />}
         <MusicPlayer url={effectiveData.bgMusicUrl} />
-        <div className="h-scroll-track">
+        <div className="h-scroll-track" ref={trackRef}>
           {/* Hero — 첫 번째 슬라이드 */}
           <div className="h-slide">
             <div style={{ position: 'relative' }}>
