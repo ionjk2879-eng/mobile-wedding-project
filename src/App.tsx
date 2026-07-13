@@ -319,7 +319,7 @@ const App: React.FC = () => {
               <div className="preview-label">Live Preview</div>
               <button className="full-preview-btn-mini" onClick={() => setIsFullPreview(true)}>{te.fullscreen}</button>
             </div>
-            <div className={`preview-content-scroll theme-${data.theme || 'blush'}`} ref={previewScrollRef} style={{ fontFamily: data.fontFamily, fontSize: getBaseFontSize(), ...getCustomColorVars() }}>
+            <div className={`preview-content-scroll theme-${data.theme || 'blush'}`} ref={previewScrollRef} style={{ fontFamily: data.fontFamily, fontSize: getBaseFontSize(), ...getCustomColorVars(), ...(data.scrollDirection === 'horizontal' ? { overflowY: 'hidden' } : {}) }}>
               <ScrollRootContext.Provider value={previewScrollRef}>
                 <InvitationView data={data} previewRefs={previewRefs} onSectionNav={handlePreviewSectionNav} shareEnabled={!!data.isPaid} enableAnonymousOpening isOwnerPreview />
               </ScrollRootContext.Provider>

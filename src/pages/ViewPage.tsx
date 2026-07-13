@@ -239,6 +239,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
            앞에서 끊기고, 그 아래는 :root의 기본 배경색이 전체 폭으로 드러나 보였다.
            flex-start로 stretch를 끄면 카드가 실제 콘텐츠 높이만큼 정상적으로 끝까지 포함된다. */
         .view-container { width: 100%; min-height: 100svh; background: #EBEBEB; display: flex; justify-content: center; align-items: flex-start; overflow-anchor: none; }
+        ${data.scrollDirection === 'horizontal' ? '.view-container { height: 100svh; min-height: 0; overflow: hidden; align-items: stretch; }' : ''}
         /* .invitation-page는 기본 max-width:430px로 뷰포트 중앙에 놓인다 — PC처럼 뷰포트가
            넓을 때도 이 메뉴 FAB가 청첩장 카드 기준 우측 하단에 붙도록, 뷰포트 우측 끝이 아니라
            카드 우측 끝에서부터 16px 떨어지게 계산한다. 480px 이하에서는 카드가 뷰포트 전체 폭을
@@ -262,6 +263,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
         .view-menu-section-list { display: flex; flex-direction: column; padding-left: 10px; border-left: 2px solid rgba(0,0,0,0.06); margin: 2px 0 2px 20px; }
         .view-menu-option-nested { font-size: 0.85rem; padding: 10px 12px; }
         .view-container .invitation-page { width: 100%; max-width: 430px; background-color: var(--wedding-bg); min-height: 100svh; overflow-anchor: none; }
+        ${data.scrollDirection === 'horizontal' ? '.view-container .invitation-page { height: 100svh; min-height: 0; }' : ''}
         .view-loading, .view-error { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pretendard', sans-serif; color: #6B7280; text-align: center; padding: 20px; box-sizing: border-box; }
         .view-error h2 { color: #1F2937; margin-bottom: 8px; }
 

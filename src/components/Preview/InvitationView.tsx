@@ -282,6 +282,87 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     showRsvpNotice();
   };
 
+  if (data.scrollDirection === 'horizontal') {
+    return (
+      <article className={`preview-wrapper texture-${effectiveData.bgTexture || 'none'} preview-wrapper--h`} aria-label="청첩장">
+        {isPreWeddingAnniversaryPreview && previewBannerText && (
+          <div className="anniversary-preview-banner">
+            <strong>{previewBannerText}</strong>
+            {previewBannerSubText && <span>{previewBannerSubText}</span>}
+          </div>
+        )}
+        {rsvpNoticeVisible && !isAnniversaryMode && (
+          <RSVPNoticePopup data={data} onClose={() => setRsvpNoticeVisible(false)} />
+        )}
+        {shouldShowOpening && effectiveData.opening && (
+          <Opening
+            key={openingPreviewKey || 'static'}
+            opening={anniversaryOpening!}
+            groomName={effectiveData.groomName}
+            brideName={effectiveData.brideName}
+            date={effectiveData.date}
+            theme={effectiveData.theme}
+            autoClose={isPreviewOnly}
+            onDismissed={handleOpeningDismissed}
+            topOffset={openingTopOffset}
+            anniversaryMode={isAnniversaryMode}
+            language={effectiveData.language}
+            guestName={guestName}
+            guestRelation={guestRelation}
+            guestMessageIndex={guestMessageIndex}
+            weddingDateISO={effectiveData.weddingDateISO}
+            slug={effectiveData.slug}
+            enableAnonymousOpening={enableAnonymousOpening}
+            venueName={effectiveData.venueName}
+          />
+        )}
+        {!effectiveData.bgEffectHeroOnly && <BackgroundEffects effect={effectiveData.bgEffect} />}
+        <MusicPlayer url={effectiveData.bgMusicUrl} />
+        <div className="h-scroll-track">
+          {/* Hero — 첫 번째 슬라이드 */}
+          <div className="h-slide">
+            <div style={{ position: 'relative' }}>
+              {previewRefs?.hero && <div ref={previewRefs.hero} style={{ position: 'absolute', top: 0 }} />}
+              {onSectionNav && (
+                <div className="preview-nav-btn-stack">
+                  <button className="preview-section-nav-btn" onClick={() => onSectionNav('hero')} title="메인화면 편집" aria-label="메인화면 편집">
+                    <LayoutTemplate size={13} /><span className="preview-nav-label">메인화면</span>
+                  </button>
+                  <button className="preview-section-nav-btn" onClick={() => onSectionNav('design')} title="디자인 편집" aria-label="디자인 편집">
+                    <Palette size={13} /><span className="preview-nav-label">디자인</span>
+                  </button>
+                </div>
+              )}
+              <Hero data={effectiveData} />
+              {effectiveData.bgEffectHeroOnly && <BackgroundEffects effect={effectiveData.bgEffect} confined />}
+            </div>
+          </div>
+          {/* 각 섹션 슬라이드 */}
+          {effectiveSectionOrder.map((id) => {
+            if (!isSectionActive(id, effectiveData)) return null;
+            const ref = previewRefs?.[id];
+            const editorId = PREVIEW_TO_EDITOR[id] || id;
+            return (
+              <div key={id} className="h-slide">
+                <SectionComponent
+                  id={id}
+                  data={effectiveData}
+                  refEl={ref}
+                  shareEnabled={shareEnabled}
+                  onNav={onSectionNav ? () => onSectionNav(editorId) : undefined}
+                  onNavExtra={id === 'contacts' && onSectionNav ? () => onSectionNav('contacts') : undefined}
+                  guestName={guestName}
+                  guestCode={guestCode}
+                  isOwnerPreview={isOwnerPreview}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article className={`preview-wrapper texture-${data.bgTexture || 'none'}`} aria-label="청첩장">
       {isPreWeddingAnniversaryPreview && previewBannerText && (
