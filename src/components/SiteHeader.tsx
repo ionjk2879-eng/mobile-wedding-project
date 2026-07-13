@@ -130,6 +130,9 @@ const SiteHeader: React.FC = () => {
           </span>
           {t.site.loginWithGoogle}
         </button>
+        <p style={{ margin: '2px 0 4px', padding: '0 14px', fontSize: '0.68rem', color: '#9CA3AF', lineHeight: 1.5 }}>
+          카카오톡 등 앱에서 열었다면 Google 로그인은 정책상 제한됩니다. 하단 메뉴(···)에서 다른 브라우저로 열어 이용해주세요.
+        </p>
       </>
     );
   };
