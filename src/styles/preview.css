@@ -1128,9 +1128,7 @@
 .h-scroll-track::-webkit-scrollbar { display: none; }
 .h-scroll-track--dragging { cursor: grabbing; user-select: none; scroll-behavior: auto; }
 .h-scroll-track--dragging * { user-select: none; }
-/* 탭으로 넘기기 모드 — 드래그/스와이프로는 안 넘어가게 막고 좌우 버튼 탭으로만 이동한다.
-   overflow-x:hidden이어도 JS의 scrollTo/scrollLeft로는 그대로 스크롤된다. */
-.h-scroll-track--tap { overflow-x: hidden; cursor: default; }
+/* 탭으로 넘기기 모드 — 좌우 버튼 탭으로도, 드래그/스와이프로도 둘 다 넘어간다. */
 .h-tap-nav-btn {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 34px; height: 34px; border-radius: 50%; border: none;
@@ -1141,9 +1139,6 @@
 }
 .h-tap-nav-btn:hover { background: rgba(0,0,0,0.22); opacity: 0.85; }
 .h-tap-nav-btn:disabled { opacity: 0; pointer-events: none; }
-/* 두 번째 섹션부터는 안 보이게 하되, 탭으로 넘기는 기능 자체는 계속 살아있어야 하므로
-   pointer-events는 건드리지 않는다(호버에도 다시 안 보이도록 유지). */
-.h-tap-nav-btn--dim, .h-tap-nav-btn--dim:hover { opacity: 0; }
 .h-tap-nav-btn--prev { left: 10px; }
 .h-tap-nav-btn--next { right: 10px; }
 .h-slide {

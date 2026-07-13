@@ -305,8 +305,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   // 실제로 끌린 경우에만(임계값 이상 이동) 뒤이은 click을 취소해, 버튼/링크/입력창
   // 클릭이나 포커스는 그대로 정상 동작한다.
   useEffect(() => {
-    // 탭으로만 넘기는 모드에서는 드래그 자체를 막아야 하므로 이 리스너를 붙이지 않는다.
-    if (data.scrollDirection !== 'horizontal' || data.horizontalPageMode === 'tap') return;
+    if (data.scrollDirection !== 'horizontal') return;
     const el = trackRef.current;
     if (!el) return;
     let isDown = false;
@@ -428,7 +427,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         )}
         {!effectiveData.bgEffectHeroOnly && <BackgroundEffects effect={effectiveData.bgEffect} />}
         <MusicPlayer url={effectiveData.bgMusicUrl} />
-        <div className={`h-scroll-track${effectiveData.horizontalPageMode === 'tap' ? ' h-scroll-track--tap' : ''}`} ref={trackRef}>
+        <div className="h-scroll-track" ref={trackRef}>
           {/* Hero — 첫 번째 슬라이드 */}
           <div className="h-slide">
             <div style={{ position: 'relative' }}>
@@ -475,14 +474,13 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             })}
           </ScrollRevealProvider>
         </div>
-        {/* 탭으로 넘기는 기능 자체는 모든 섹션에서 계속 동작해야 하므로 버튼을 계속
-            렌더링해두되, 처음 보는 메인화면(첫 슬라이드) 이후로는 시야를 가리지 않도록
-            눈에만 안 보이게(opacity 0) 한다 — pointer-events는 그대로 살아있어 계속 탭할 수 있다. */}
+        {/* 탭으로 넘기기 모드에서는 드래그/스와이프도 그대로 되고, 좌우 버튼 탭으로도
+            넘어간다 — 버튼은 모든 섹션에서 메인화면과 동일하게 보인다. */}
         {effectiveData.horizontalPageMode === 'tap' && (
           <>
             <button
               type="button"
-              className={`h-tap-nav-btn h-tap-nav-btn--prev${hTapIndex > 0 ? ' h-tap-nav-btn--dim' : ''}`}
+              className="h-tap-nav-btn h-tap-nav-btn--prev"
               onClick={() => goToHSlide(-1)}
               disabled={hTapIndex <= 0}
               aria-label="이전 섹션"
@@ -491,7 +489,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             </button>
             <button
               type="button"
-              className={`h-tap-nav-btn h-tap-nav-btn--next${hTapIndex > 0 ? ' h-tap-nav-btn--dim' : ''}`}
+              className="h-tap-nav-btn h-tap-nav-btn--next"
               onClick={() => goToHSlide(1)}
               disabled={hTapIndex >= hTapTotal - 1}
               aria-label="다음 섹션"
