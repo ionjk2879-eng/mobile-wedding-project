@@ -61,6 +61,7 @@ export interface BasicInfo {
 
 export interface DesignConfig {
   theme?: 'none' | 'ivorynavy' | 'mochaneutral' | 'dustyblue' | 'pastelblush' | 'sagenature' | 'warmcharcoal' | 'sunsetgold' | 'deepteal' | 'deepplum' | 'terracotta' | 'ivorychampagne';
+  scrollDirection?: 'vertical' | 'horizontal';
   customBgColor?: string;
   customAccentColor?: string;
   customLabelColor?: string;

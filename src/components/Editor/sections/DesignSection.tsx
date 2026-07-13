@@ -121,6 +121,13 @@ const DesignSection: React.FC = () => {
   return (
     <>
       <div className="opt-inline-group">
+        <label className="opt-inline-label">스크롤 방향</label>
+        <div className="account-style-grid">
+          <button type="button" className={`account-style-btn ${(data.scrollDirection || 'vertical') === 'vertical' ? 'active' : ''}`} onClick={() => updateField('scrollDirection', 'vertical')}><strong>세로 모드</strong></button>
+          <button type="button" className={`account-style-btn ${data.scrollDirection === 'horizontal' ? 'active' : ''}`} onClick={() => updateField('scrollDirection', 'horizontal')}><strong>가로 모드</strong></button>
+        </div>
+      </div>
+      <div className="opt-inline-group">
         <label className="opt-inline-label">기본 언어</label>
         <div className="account-style-grid">
           <button type="button" className={`account-style-btn ${data.language === 'ko' ? 'active' : ''}`} onClick={() => updateField('language', 'ko')}><strong>한국어</strong></button>
