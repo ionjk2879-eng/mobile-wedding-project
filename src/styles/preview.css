@@ -1128,6 +1128,10 @@
 .h-scroll-track::-webkit-scrollbar { display: none; }
 .h-scroll-track--dragging { cursor: grabbing; user-select: none; scroll-behavior: auto; }
 .h-scroll-track--dragging * { user-select: none; }
+/* 한 장씩 넘기기 모드 — 터치 스와이프를 놓으면 가장 가까운 섹션 경계에 딱 멈춘다.
+   scroll-snap-stop:always로 빠르게 스와이프해도 한 번에 여러 장을 건너뛰지 않는다. */
+.h-scroll-track--snap { scroll-snap-type: x mandatory; }
+.h-scroll-track--snap .h-slide { scroll-snap-align: start; scroll-snap-stop: always; }
 .h-slide {
   flex: 0 0 100%; width: 100%; height: 100%;
   overflow-y: auto; overflow-x: hidden;

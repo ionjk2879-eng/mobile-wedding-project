@@ -127,6 +127,15 @@ const DesignSection: React.FC = () => {
           <button type="button" className={`account-style-btn ${data.scrollDirection === 'horizontal' ? 'active' : ''}`} onClick={() => updateField('scrollDirection', 'horizontal')}><strong>가로 모드</strong></button>
         </div>
       </div>
+      {data.scrollDirection === 'horizontal' && (
+        <div className="opt-inline-group">
+          <label className="opt-inline-label">가로 넘김 방식</label>
+          <div className="account-style-grid">
+            <button type="button" className={`account-style-btn ${(data.horizontalPageMode || 'free') === 'free' ? 'active' : ''}`} onClick={() => updateField('horizontalPageMode', 'free')}><strong>자유롭게 이어서</strong></button>
+            <button type="button" className={`account-style-btn ${data.horizontalPageMode === 'snap' ? 'active' : ''}`} onClick={() => updateField('horizontalPageMode', 'snap')}><strong>한 장씩 넘기기</strong></button>
+          </div>
+        </div>
+      )}
       <div className="opt-inline-group">
         <label className="opt-inline-label">기본 언어</label>
         <div className="account-style-grid">

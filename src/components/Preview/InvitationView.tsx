@@ -398,7 +398,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         )}
         {!effectiveData.bgEffectHeroOnly && <BackgroundEffects effect={effectiveData.bgEffect} />}
         <MusicPlayer url={effectiveData.bgMusicUrl} />
-        <div className="h-scroll-track" ref={trackRef}>
+        <div className={`h-scroll-track${effectiveData.horizontalPageMode === 'snap' ? ' h-scroll-track--snap' : ''}`} ref={trackRef}>
           {/* Hero — 첫 번째 슬라이드 */}
           <div className="h-slide">
             <div style={{ position: 'relative' }}>
