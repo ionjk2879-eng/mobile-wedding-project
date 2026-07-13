@@ -102,6 +102,10 @@ const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <p style={{ fontSize: '0.72rem', color: '#9CA3AF', marginTop: '20px', lineHeight: 1.6 }}>
           로그인 시 <Link to="/terms" style={{ color: '#6B7280', textDecoration: 'underline' }}>이용약관</Link> 및 <Link to="/privacy" style={{ color: '#6B7280', textDecoration: 'underline', fontWeight: 700 }}>개인정보처리방침</Link>에 동의하게 됩니다.
         </p>
+        {/* TODO: 디버그용 - UA 확인 후 제거 */}
+        <p style={{ fontSize: '0.55rem', color: '#D1D5DB', marginTop: '12px', lineHeight: 1.4, maxWidth: '300px', wordBreak: 'break-all', textAlign: 'left' }}>
+          {navigator.userAgent}
+        </p>
       </div>
     );
   }
