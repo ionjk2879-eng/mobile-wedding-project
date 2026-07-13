@@ -1129,5 +1129,7 @@
   flex: 0 0 100%; width: 100%; height: 100%;
   overflow-y: auto; overflow-x: hidden;
   scrollbar-width: none; position: relative;
+  display: flex; flex-direction: column; justify-content: center;
 }
 .h-slide::-webkit-scrollbar { display: none; }
+.h-slide--top { justify-content: flex-start; }
