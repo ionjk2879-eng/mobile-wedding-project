@@ -305,7 +305,8 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   // 실제로 끌린 경우에만(임계값 이상 이동) 뒤이은 click을 취소해, 버튼/링크/입력창
   // 클릭이나 포커스는 그대로 정상 동작한다.
   useEffect(() => {
-    if (data.scrollDirection !== 'horizontal') return;
+    // 탭 넘기기 모드는 드래그해도 한 장 단위로만 넘어가야 해서 아래 별도 effect가 담당한다.
+    if (data.scrollDirection !== 'horizontal' || data.horizontalPageMode === 'tap') return;
     const el = trackRef.current;
     if (!el) return;
     let isDown = false;
@@ -316,9 +317,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     const onMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
       const target = e.target as Element;
-      // 계좌/연락처 카드 캐러셀은 자체 마우스 드래그를 쓰므로, 그 위에서 시작된
-      // 드래그는 섹션 전환 드래그가 가로채지 않도록 건너뛴다.
-      if (target.closest?.('.carousel-viewport, .contact-carousel-vp')) return;
+      // 계좌/연락처 카드 캐러셀, 방명록 메시지 슬라이더는 자체 마우스 드래그를 쓰므로,
+      // 그 위에서 시작된 드래그는 섹션 전환 드래그가 가로채지 않도록 건너뛴다.
+      if (target.closest?.('.carousel-viewport, .contact-carousel-vp, .gb-note-scroll')) return;
       // 이미지 위에서 누르면 브라우저 기본 동작(고스트 이미지 드래그)이 먼저 끼어들어
       // mousemove 단계의 preventDefault가 이미 늦어버린다 — 입력창/버튼/링크처럼
       // mousedown의 기본 동작(포커스 등)이 필요한 요소만 빼고 여기서 미리 막는다.
@@ -362,11 +363,88 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     };
   }, [data.scrollDirection, data.horizontalPageMode]);
 
+  // 탭 넘기기 모드 전용 드래그: 마우스든 터치든(Pointer Events로 통일) 얼마나 멀리
+  // 끌었는지와 상관없이 방향 판정용 임계값만 넘으면 버튼 탭과 똑같이 딱 한 장만 넘어간다
+  // (자유 모드처럼 끈 거리만큼 비례해서 넘어가지 않는다). 터치의 네이티브 가로 스크롤은
+  // touch-action: pan-y(CSS)로 막아 이 로직과 부딪히지 않게 한다.
+  useEffect(() => {
+    if (data.scrollDirection !== 'horizontal' || data.horizontalPageMode !== 'tap') return;
+    const el = trackRef.current;
+    if (!el) return;
+    let isDown = false;
+    let moved = false;
+    let startX = 0;
+    let baseIndex = 0;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      const target = e.target as Element;
+      // 계좌/연락처 카드 캐러셀, 방명록 메시지 슬라이더는 자체 드래그를 쓰므로 건너뛴다.
+      if (target.closest?.('.carousel-viewport, .contact-carousel-vp, .gb-note-scroll')) return;
+      const isInteractive = !!target.closest?.('input, textarea, select, button, a, [contenteditable="true"]');
+      if (!isInteractive && e.pointerType === 'mouse') e.preventDefault();
+      isDown = true;
+      moved = false;
+      startX = e.clientX;
+      baseIndex = Math.round(el.scrollLeft / (el.clientWidth || 1));
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDown) return;
+      const dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) > 4) {
+        moved = true;
+        el.classList.add('h-scroll-track--dragging');
+        el.style.scrollBehavior = 'auto';
+      }
+      if (moved) {
+        const w = el.clientWidth || 1;
+        el.scrollLeft = baseIndex * w - dx;
+      }
+    };
+    const endDrag = (e: PointerEvent) => {
+      if (!isDown) return;
+      isDown = false;
+      el.classList.remove('h-scroll-track--dragging');
+      el.style.scrollBehavior = '';
+      if (!moved) return;
+      const w = el.clientWidth || 1;
+      const dx = e.clientX - startX;
+      const threshold = Math.min(60, w * 0.15);
+      let target = baseIndex;
+      if (dx <= -threshold) target = baseIndex + 1;
+      else if (dx >= threshold) target = baseIndex - 1;
+      const total = el.children.length;
+      target = Math.min(Math.max(target, 0), total - 1);
+      el.scrollTo({ left: target * w, behavior: 'smooth' });
+    };
+    const onClickCapture = (e: MouseEvent) => {
+      if (moved) { e.preventDefault(); e.stopPropagation(); }
+    };
+
+    el.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+    el.addEventListener('click', onClickCapture, true);
+    return () => {
+      el.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
+      el.removeEventListener('click', onClickCapture, true);
+    };
+  }, [data.scrollDirection, data.horizontalPageMode]);
+
   // 탭 넘기기 모드 전용: 지금 몇 번째 슬라이드가 보이는지, 전체 몇 장인지 추적해서
   // 좌우 버튼을 경계(첫/마지막 슬라이드)에서 비활성화한다. 렌더 중에 trackRef.current를
   // 직접 읽으면 첫 렌더 시점엔 아직 null이라 잘못된 값으로 굳어버리므로 effect에서 state로 옮겨둔다.
   const [hTapIndex, setHTapIndex] = useState(0);
   const [hTapTotal, setHTapTotal] = useState(1);
+  // 좌우 버튼 자체가 아니라 화면의 나머지 부분을 탭하면 버튼을 숨기고, 다시 탭하면
+  // 다시 보이게 한다. 버튼은 h-scroll-track과 별도 형제 요소라 버튼 탭은 여기 안 걸린다.
+  // 드래그(끌기)로 끝난 클릭은 InvitationView 안의 캡처 단계 리스너가 이미 막아주므로
+  // 실제 "탭"에서만 토글된다.
+  const [hTapUiVisible, setHTapUiVisible] = useState(true);
   useEffect(() => {
     if (data.scrollDirection !== 'horizontal' || data.horizontalPageMode !== 'tap') return;
     const el = trackRef.current;
@@ -427,7 +505,11 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
         )}
         {!effectiveData.bgEffectHeroOnly && <BackgroundEffects effect={effectiveData.bgEffect} />}
         <MusicPlayer url={effectiveData.bgMusicUrl} />
-        <div className="h-scroll-track" ref={trackRef}>
+        <div
+          className={`h-scroll-track${effectiveData.horizontalPageMode === 'tap' ? ' h-scroll-track--tap' : ''}`}
+          ref={trackRef}
+          onClick={effectiveData.horizontalPageMode === 'tap' ? () => setHTapUiVisible(v => !v) : undefined}
+        >
           {/* Hero — 첫 번째 슬라이드 */}
           <div className="h-slide">
             <div style={{ position: 'relative' }}>
@@ -480,7 +562,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           <>
             <button
               type="button"
-              className="h-tap-nav-btn h-tap-nav-btn--prev"
+              className={`h-tap-nav-btn h-tap-nav-btn--prev${hTapUiVisible ? '' : ' h-tap-nav-btn--hidden'}`}
               onClick={() => goToHSlide(-1)}
               disabled={hTapIndex <= 0}
               aria-label="이전 섹션"
@@ -489,7 +571,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             </button>
             <button
               type="button"
-              className="h-tap-nav-btn h-tap-nav-btn--next"
+              className={`h-tap-nav-btn h-tap-nav-btn--next${hTapUiVisible ? '' : ' h-tap-nav-btn--hidden'}`}
               onClick={() => goToHSlide(1)}
               disabled={hTapIndex >= hTapTotal - 1}
               aria-label="다음 섹션"

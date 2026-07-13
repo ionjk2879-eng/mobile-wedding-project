@@ -157,6 +157,8 @@ export interface FeatureConfig {
   isMidPhotoEnabled: boolean;
   isLiveGalleryEnabled: boolean;
   guestbookPassword: string;
+  // 갤러리 슬라이드쇼처럼 방명록 메시지도 몇 초마다 자동으로 한 장씩 넘겨서 보여준다(기본 꺼짐).
+  isGuestbookAutoAdvance?: boolean;
   opening: OpeningConfig;
   bgMusicUrl: string;
   sectionOrder: string[];

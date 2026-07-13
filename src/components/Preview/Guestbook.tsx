@@ -28,12 +28,11 @@ const NoteSlider: React.FC<{
   setDeleteTarget: (id: string | null) => void;
   setDeletePassword: (pw: string) => void;
   handleDelete: () => void;
-}> = ({ messages, isEn, isJa, label, onDelete, deleteTarget, deletePassword, setDeleteTarget, setDeletePassword, handleDelete }) => {
+  autoAdvance?: boolean;
+}> = ({ messages, isEn, isJa, label, onDelete, deleteTarget, deletePassword, setDeleteTarget, setDeletePassword, handleDelete, autoAdvance }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
-  const isDragging = useRef(false);
-  const dragStartX = useRef(0);
-  const dragScrollLeft = useRef(0);
+  const activeIdxRef = useRef(0);
   const didDrag = useRef(false);
 
   const handleScroll = () => {
@@ -47,6 +46,7 @@ const NoteSlider: React.FC<{
       const dist = Math.abs(card.offsetLeft - scrollLeft);
       if (dist < minDist) { minDist = dist; closest = i; }
     });
+    activeIdxRef.current = closest;
     setActiveIdx(closest);
   };
 
@@ -57,31 +57,73 @@ const NoteSlider: React.FC<{
     if (card) el.scrollTo({ left: card.offsetLeft, behavior: 'smooth' });
   };
 
-  const onMouseDown = (e: React.MouseEvent) => {
+  // 갤러리 슬라이드쇼처럼 몇 초마다 자동으로 다음 메시지로 넘어간다. 끝까지 가면
+  // 처음으로 돌아간다. 사용자가 직접 드래그/탭한 위치(activeIdxRef)를 기준으로 이어간다.
+  useEffect(() => {
+    if (!autoAdvance || messages.length <= 1) return;
+    const timer = setInterval(() => {
+      scrollTo((activeIdxRef.current + 1) % messages.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [autoAdvance, messages.length]);
+
+  // 마우스 드래그 리스너를 카드 자체가 아니라 window에 붙여서, 빠르게 끌다가 커서가
+  // 카드 밖으로 살짝 벗어나도 드래그가 뚝 끊기지 않고 계속 부드럽게 이어지게 한다
+  // (예전엔 엘리먼트 스코프 mousemove/mouseup이라 커서가 벗어나는 순간 멈췄었다).
+  useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    isDragging.current = true;
-    didDrag.current = false;
-    dragStartX.current = e.clientX;
-    dragScrollLeft.current = el.scrollLeft;
-    el.style.cursor = 'grabbing';
-    el.style.userSelect = 'none';
-  };
+    let isDown = false;
+    let startX = 0;
+    let startScrollLeft = 0;
 
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging.current || !scrollRef.current) return;
-    const dx = e.clientX - dragStartX.current;
-    if (Math.abs(dx) > 4) didDrag.current = true;
-    scrollRef.current.scrollLeft = dragScrollLeft.current - dx;
-  };
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return;
+      const target = e.target as Element;
+      const isInteractive = !!target.closest?.('input, textarea, select, button, a, [contenteditable="true"]');
+      if (!isInteractive) e.preventDefault();
+      isDown = true;
+      didDrag.current = false;
+      startX = e.clientX;
+      startScrollLeft = el.scrollLeft;
+    };
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      const dx = e.clientX - startX;
+      if (!didDrag.current && Math.abs(dx) > 4) {
+        didDrag.current = true;
+        el.style.cursor = 'grabbing';
+        el.style.userSelect = 'none';
+      }
+      if (didDrag.current) {
+        e.preventDefault();
+        el.scrollLeft = startScrollLeft - dx;
+      }
+    };
+    const endDrag = () => {
+      if (!isDown) return;
+      isDown = false;
+      el.style.cursor = '';
+      el.style.userSelect = '';
+    };
+    const onClickCapture = (e: MouseEvent) => {
+      if (didDrag.current) { e.preventDefault(); e.stopPropagation(); }
+    };
 
-  const onMouseUp = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    isDragging.current = false;
-    el.style.cursor = '';
-    el.style.userSelect = '';
-  };
+    el.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', endDrag);
+    el.addEventListener('click', onClickCapture, true);
+    return () => {
+      el.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', endDrag);
+      el.removeEventListener('click', onClickCapture, true);
+    };
+    // messages가 0 -> N으로 바뀌는 순간(비동기 로딩 완료) .gb-note-scroll이 처음
+    // 마운트되므로, 빈 배열 deps로는 이 시점에 scrollRef.current가 여전히 null이라
+    // 리스너가 영영 안 붙는다 — messages.length를 deps에 넣어 그 시점에 다시 붙게 한다.
+  }, [messages.length]);
 
   return (
     <div className="gb-note-section">
@@ -96,10 +138,6 @@ const NoteSlider: React.FC<{
             className="gb-note-scroll"
             ref={scrollRef}
             onScroll={handleScroll}
-            onMouseDown={onMouseDown}
-            onMouseMove={onMouseMove}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseUp}
             style={{ cursor: 'grab' }}
           >
             {messages.map((msg, i) => (
@@ -231,6 +269,7 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
     setDeleteTarget,
     setDeletePassword,
     handleDelete,
+    autoAdvance: data.isGuestbookAutoAdvance,
   };
 
   return (
@@ -285,6 +324,7 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
 }, (prev, next) =>
   prev.data.isGuestbookEnabled === next.data.isGuestbookEnabled
   && prev.data.guestbookPassword === next.data.guestbookPassword
+  && prev.data.isGuestbookAutoAdvance === next.data.isGuestbookAutoAdvance
   && prev.data.slug === next.data.slug
   && prev.data.language === next.data.language
   && prev.data.fontFamily === next.data.fontFamily

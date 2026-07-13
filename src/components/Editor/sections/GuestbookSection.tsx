@@ -5,6 +5,7 @@ import useInvitationStore from '../../../stores/useInvitationStore';
 const GuestbookSection: React.FC = () => {
   const isGuestbookEnabled = useInvitationStore((s) => s.data.isGuestbookEnabled);
   const guestbookPassword = useInvitationStore((s) => s.data.guestbookPassword);
+  const isGuestbookAutoAdvance = useInvitationStore((s) => s.data.isGuestbookAutoAdvance);
   const updateField = useInvitationStore((s) => s.updateField);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -18,6 +19,13 @@ const GuestbookSection: React.FC = () => {
       </div>
       {isGuestbookEnabled && (
         <>
+          <div className="input-group">
+            <label className="modern-checkbox">
+              <input type="checkbox" checked={!!isGuestbookAutoAdvance} onChange={(e) => updateField('isGuestbookAutoAdvance', e.target.checked)} />
+              <span>메시지 자동 넘기기</span>
+            </label>
+            <span className="input-hint">갤러리 슬라이드쇼처럼 몇 초마다 자동으로 메시지가 한 장씩 넘어갑니다.</span>
+          </div>
           <div className="opt-inline-group">
             <label className="opt-inline-label">관리 비밀번호</label>
             <div className="opt-inline-content">
