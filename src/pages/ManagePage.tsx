@@ -596,7 +596,6 @@ const ManagePage: React.FC = () => {
         .mc-card {
           background: white;
           border-radius: 16px;
-          overflow: hidden;
           box-shadow: 0 1px 4px rgba(0,0,0,0.06);
           transition: box-shadow 0.25s, transform 0.25s;
         }
@@ -612,6 +611,7 @@ const ManagePage: React.FC = () => {
           aspect-ratio: 3 / 4;
           overflow: hidden;
           background: #F3F4F6;
+          border-radius: 16px 16px 0 0;
         }
         .mc-thumb-link {
           position: absolute;
