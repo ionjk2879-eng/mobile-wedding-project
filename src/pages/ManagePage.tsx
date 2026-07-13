@@ -971,13 +971,10 @@ const ManagePage: React.FC = () => {
             font-size: 0.78rem;
           }
           .mc-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            grid-template-columns: 1fr;
+            gap: 16px;
           }
-          .mc-body { padding: 12px; }
-          .mc-name { font-size: 0.88rem; }
-          .mc-action-btn { padding: 6px 10px; font-size: 0.72rem; }
-          .mc-more-btn { padding: 6px; }
+          .mc-thumb { aspect-ratio: 16 / 9; }
           .share-modal { padding: 20px; max-width: 100%; }
           .share-modal-header { margin-bottom: 16px; }
           .share-modal-header h3 { font-size: 1rem; }
@@ -988,13 +985,6 @@ const ManagePage: React.FC = () => {
           .share-modal-url-input { padding: 8px 10px; font-size: 0.72rem; }
           .share-modal-actions { gap: 8px; }
           .share-modal-btn { padding: 12px 8px; font-size: 0.8rem; gap: 5px; }
-        }
-        @media (max-width: 400px) {
-          .mc-grid {
-            grid-template-columns: 1fr;
-            max-width: 300px;
-            margin: 0 auto;
-          }
         }
 
         /* Slug Change Modal */
