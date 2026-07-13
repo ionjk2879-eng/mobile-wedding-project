@@ -3,6 +3,21 @@ import { Link } from 'react-router-dom';
 import useAuthStore from '../stores/useAuthStore';
 import { signInWithGoogle, initiateKakaoLogin, initiateNaverLogin } from '../services/auth';
 
+function isInAppBrowser(): boolean {
+  const ua = navigator.userAgent;
+  return /KAKAOTALK|NaverApp|Instagram|FBAN|FBAV|Twitter|Line\/|MicroMessenger/i.test(ua);
+}
+
+function isAndroid(): boolean {
+  return /Android/i.test(navigator.userAgent);
+}
+
+function openInExternalBrowser(): void {
+  const url = window.location.href;
+  // Android: Chrome intent scheme으로 강제 외부 열기
+  window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+}
+
 const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAuthStore((s) => s.user);
   const loading = useAuthStore((s) => s.loading);
@@ -18,6 +33,39 @@ const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   if (!user) {
+    // 카카오톡·인스타그램 등 인앱 브라우저에서는 Google OAuth가 차단됨 → 외부 브라우저 유도
+    if (isInAppBrowser()) {
+      const android = isAndroid();
+      return (
+        <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", gap: '16px', textAlign: 'center', padding: '32px 24px', boxSizing: 'border-box' }}>
+          <h1 style={{ color: '#D4A5C6', letterSpacing: '3px', margin: 0, fontSize: '1.8rem' }}>Sonett</h1>
+          <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', marginTop: '8px' }}>🌐</div>
+          <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#1F2937' }}>외부 브라우저에서 열어주세요</h2>
+          <p style={{ margin: 0, fontSize: '0.88rem', color: '#6B7280', lineHeight: 1.7, maxWidth: '300px' }}>
+            {android
+              ? '카카오톡 내 브라우저에서는 로그인이 제한됩니다.\n아래 버튼을 눌러 Chrome에서 열어주세요.'
+              : '카카오톡 내 브라우저에서는 로그인이 제한됩니다.\n우측 하단 \u{22EF} 메뉴 → \u{2018}기본 브라우저로 열기\u{2019}를 눌러주세요.'}
+          </p>
+          {android && (
+            <button
+              onClick={openInExternalBrowser}
+              style={{ background: '#4285F4', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', width: '100%', maxWidth: '280px', marginTop: '8px' }}
+            >
+              Chrome으로 열기
+            </button>
+          )}
+          {!android && (
+            <div style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '14px', padding: '16px 20px', maxWidth: '300px', textAlign: 'left' }}>
+              <p style={{ margin: 0, fontSize: '0.82rem', color: '#374151', lineHeight: 1.8 }}>
+                1. 화면 우측 하단 <strong>···</strong> 버튼 탭<br />
+                2. <strong>기본 브라우저로 열기</strong> 선택
+              </p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: "'Pretendard', sans-serif", gap: '20px', textAlign: 'center' }}>
         <h1 style={{ color: '#D4A5C6', letterSpacing: '3px', margin: 0, fontSize: '2rem' }}>Sonett</h1>
