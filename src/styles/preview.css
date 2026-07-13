@@ -531,7 +531,7 @@
 .side-tabs { display: flex; background: var(--wedding-bg); border-radius: 14px; padding: 4px; margin-bottom: 20px; }
 .side-tab { flex: 1; padding: 12px; border: none; background: none; border-radius: 10px; font-size: 0.85em; font-weight: 700; color: #000000; cursor: pointer; transition: all 0.25s; }
 .side-tab.active { background: var(--wedding-card-bg); color: var(--wedding-emphasis); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.carousel-viewport { overflow: hidden; position: relative; touch-action: pan-x; cursor: grab; user-select: none; }
+.carousel-viewport { overflow: hidden; position: relative; touch-action: pan-y; cursor: grab; user-select: none; }
 .carousel-viewport:active { cursor: grabbing; }
 .carousel-track { display: flex; transition: transform 0.35s ease; }
 .carousel-card { width: 100%; flex-shrink: 0; box-sizing: border-box; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 18px; padding: 24px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
@@ -558,7 +558,7 @@
 .contact-group:last-child { margin-bottom: 0; }
 .contact-group-label { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8em; font-weight: 700; color: var(--wedding-emphasis); letter-spacing: 1px; margin: 0 0 14px 0; }
 .side-heart-label { display: inline-flex; align-items: center; gap: 6px; }
-.contact-carousel-vp { overflow: hidden; position: relative; cursor: grab; user-select: none; }
+.contact-carousel-vp { overflow: hidden; position: relative; touch-action: pan-y; cursor: grab; user-select: none; }
 .contact-carousel-vp:active { cursor: grabbing; }
 .contact-carousel-track { display: flex; transition: transform 0.35s ease; }
 .contact-card { width: 100%; flex-shrink: 0; box-sizing: border-box; background: var(--wedding-card-bg); border: 1px solid var(--wedding-border); border-radius: 18px; padding: 24px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }

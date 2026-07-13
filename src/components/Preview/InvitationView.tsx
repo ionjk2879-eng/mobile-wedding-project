@@ -133,8 +133,6 @@ export const DEFAULT_ORDER = ['greeting', 'contacts', 'photos', 'calendar', 'mes
 // 위쪽 여백이 콘텐츠 일부로 읽히는 섹션(목록/아코디언형)은 상단 고정이 자연스럽다.
 function isTopAlignedSlide(id: string, data: InvitationData): boolean {
   switch (id) {
-    case 'midphoto':
-    case 'ending':
     case 'guestbook':
       return true;
     case 'contacts':
