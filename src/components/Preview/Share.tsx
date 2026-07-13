@@ -47,48 +47,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
     const slug = data.slug || '';
     const imageUrl = slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`;
 
-    // 카카오 "공개 일정"(공식 톡캘린더 API, 채널 연결 + 사용 권한 심사 필요)을 먼저
-    // 시도한다. 성공하면 카카오가 메시지에 자동으로 붙여주는 "일정 등록" 버튼을 통해
-    // 앱 안에서 바로(다운로드·별도 로그인 없이) 톡캘린더에 등록된다. 심사 전이거나
-    // 서버에 어드민 키가 아직 설정 안 됐으면 실패하는데, 그 경우 기존 방식(feed 메시지
-    // + intent:///.ics 일정등록 버튼)으로 조용히 대체한다.
-    let kakaoEventId: string | null = null;
-    if (slug) {
-      try {
-        const res = await fetch('/api/calendar/kakao-event', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug }),
-        });
-        if (res.ok) {
-          const j = await res.json() as { event_id?: string };
-          kakaoEventId = j.event_id || null;
-        }
-      } catch {
-        // 네트워크 오류 등은 무시하고 feed 방식으로 대체
-      }
-    }
-
     try {
-      if (kakaoEventId) {
-        window.Kakao.Share.sendDefault({
-          objectType: 'calendar',
-          idType: 'event',
-          id: kakaoEventId,
-          content: {
-            title,
-            description,
-            imageUrl,
-            link: { mobileWebUrl: shareLink, webUrl: shareLink },
-          },
-        });
-        return;
-      }
-
-      const calendarButtonLabel = isEn ? 'Add to Calendar' : isJa ? 'カレンダーに追加' : '일정 등록';
-      // '청첩장 보기' 버튼은 따로 두지 않는다 — 메시지 썸네일(content.link)을 눌러도 어차피
-      // 같은 청첩장으로 이동하므로 버튼 두 개를 둘 필요가 없다.
-      const calendarLink = slug ? `${SITE_ORIGIN}/calendar/${slug}` : '';
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
@@ -97,7 +56,6 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
           imageUrl,
           link: { mobileWebUrl: shareLink, webUrl: shareLink },
         },
-        ...(calendarLink ? { buttons: [{ title: calendarButtonLabel, link: { mobileWebUrl: calendarLink, webUrl: calendarLink } }] } : {}),
       });
     } catch (e: any) {
       toast.error(`${isEn ? 'KakaoTalk share error' : isJa ? 'カカオ共有エラー' : '카카오 공유 오류'}: ${e?.message || (isEn ? 'Unknown error' : isJa ? '不明なエラー' : '알 수 없는 오류')}`);
