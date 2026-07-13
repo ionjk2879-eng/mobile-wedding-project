@@ -5,7 +5,7 @@
 
 /* Editor layout */
 .editor-outer-layout { display: flex; flex: 1; overflow: hidden; background: #F8F4F6; }
-.editor-sidebar-slim { width: 75px; background: #FFFFFF; margin: 0; border-radius: 0; display: flex; flex-direction: column; align-items: center; padding: 20px 0; flex-shrink: 0; overflow-y: auto; scrollbar-width: none; box-shadow: 1px 0 4px rgba(0,0,0,0.04); }
+.editor-sidebar-slim { width: 75px; background: #FFFFFF; margin: 0; margin-top: 12px; border-radius: 0; display: flex; flex-direction: column; align-items: center; padding: 20px 0; flex-shrink: 0; overflow-y: auto; scrollbar-width: none; box-shadow: 1px 0 4px rgba(0,0,0,0.04); }
 .editor-sidebar-slim::-webkit-scrollbar { display: none; }
 .sidebar-logo { font-size: 0.55rem; font-weight: 900; color: #D4A5C6; margin-bottom: 30px; letter-spacing: 2px; }
 .nav-menu-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
@@ -326,7 +326,7 @@
 
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
-  .editor-sidebar-slim { width: 60px; padding: 15px 0; }
+  .editor-sidebar-slim { width: 60px; padding: 15px 0; margin-top: 0; }
   .sidebar-logo { display: none; }
   .nav-menu-item { padding: 10px 0; }
   .menu-text { font-size: 0.58rem; }
