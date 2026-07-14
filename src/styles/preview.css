@@ -1143,7 +1143,7 @@
 }
 /* 아이콘 크기는 유지하면서 터치 히트 영역을 확장한다 */
 .h-tap-nav-btn::before {
-  content: ''; position: absolute; inset: -14px;
+  content: ''; position: absolute; inset: -24px;
 }
 .h-tap-nav-btn:hover { background: rgba(0,0,0,0.22); opacity: 0.85; }
 .h-tap-nav-btn:disabled { opacity: 0; pointer-events: none; }
