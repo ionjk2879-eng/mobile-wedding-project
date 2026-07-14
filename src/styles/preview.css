@@ -1155,9 +1155,14 @@
   flex: 0 0 100%; width: 100%; height: 100%;
   overflow-y: auto; overflow-x: hidden;
   scrollbar-width: none; position: relative;
-  display: flex; flex-direction: column; justify-content: center;
+  display: flex; flex-direction: column;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 .h-slide::-webkit-scrollbar { display: none; }
-.h-slide--top { justify-content: flex-start; }
+/* justify-content:center 대신 자식에 margin:auto를 준다 — justify-content:center는
+   내용이 슬라이드 높이를 넘칠 때 위쪽 절반이 스크롤로도 닿지 않게 잘려버리는(음수
+   오프셋) 문제가 있다. margin:auto는 공간이 남으면 중앙 정렬하고, 넘치면 자동으로
+   0이 되어 위쪽부터 자연스럽게 쌓이므로 스크롤로 전체 내용에 닿을 수 있다. */
+.h-slide > * { margin: auto 0; }
+.h-slide--top > * { margin: 0; }
