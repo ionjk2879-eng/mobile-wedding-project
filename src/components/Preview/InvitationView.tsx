@@ -305,8 +305,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
   // 실제로 끌린 경우에만(임계값 이상 이동) 뒤이은 click을 취소해, 버튼/링크/입력창
   // 클릭이나 포커스는 그대로 정상 동작한다.
   useEffect(() => {
-    // 탭 넘기기 모드는 드래그해도 한 장 단위로만 넘어가야 해서 아래 별도 effect가 담당한다.
-    if (data.scrollDirection !== 'horizontal' || data.horizontalPageMode === 'tap') return;
+    if (data.scrollDirection !== 'horizontal') return;
     const el = trackRef.current;
     if (!el) return;
     let isDown = false;
@@ -347,7 +346,10 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       isDown = false;
       el.classList.remove('h-scroll-track--dragging');
       if (!moved) return;
-      moved = false;
+      // 탭 모드: moved를 여기서 false로 리셋하면 mouseup 직후 발생하는 click에서
+      // onClickCapture가 moved=false를 보고 track onClick(UI 토글)을 막지 못한다.
+      // moved 리셋은 다음 mousedown(onMouseDown)에서 한다.
+      if (data.horizontalPageMode !== 'tap') moved = false;
       // 가장 가까운 슬라이드로 스냅 (CSS scroll-snap은 드래그 중 꺼져 있으므로 JS로 처리)
       const w = el.clientWidth || 1;
       const nearest = Math.round(el.scrollLeft / w);
