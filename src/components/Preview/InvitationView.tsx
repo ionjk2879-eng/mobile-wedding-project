@@ -414,7 +414,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       el.classList.remove('h-scroll-track--dragging');
       el.style.scrollBehavior = '';
       if (!moved) return;
-      moved = false;
+      // moved는 여기서 리셋하지 않는다. pointerup 직후 같은 이벤트 루프에서 click이
+      // 발생할 수 있는데, onClickCapture가 moved=true를 보고 클릭을 차단해야 하기 때문.
+      // moved 리셋은 다음 pointerdown 시작 시(onPointerDown)에 한다.
       const w = el.clientWidth || 1;
       const dx = e.clientX - startX;
       const threshold = Math.min(60, w * 0.15);
@@ -434,7 +436,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       if (!isDown) return;
       isDown = false;
       const wasMoved = moved;
-      moved = false;
+      // cancelDrag에서도 moved 리셋 생략 — 다음 pointerdown에서 리셋
       el.classList.remove('h-scroll-track--dragging');
       el.style.scrollBehavior = '';
       if (!wasMoved) return;
