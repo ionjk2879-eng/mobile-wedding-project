@@ -428,14 +428,27 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     // pointercancel은 브라우저가 제스처를 가져갈 때(세로 스크롤 등) 발생하며
     // e.clientX = 0으로 리셋된다. endDrag와 같은 함수를 쓰면 dx = -startX(항상 음수)가
     // 계산되어 threshold를 넘으면 무조건 오른쪽으로 이동하는 버그가 생긴다.
+    // 순수 탭(moved=false) 시 cancelDrag는 아무것도 하지 않는다(scrollTo 하면 탭할 때마다
+    // 현재 슬라이드로 smooth 스크롤이 발생해 슬라이드가 고정된 것처럼 보이는 버그).
     const cancelDrag = () => {
       if (!isDown) return;
       isDown = false;
+      const wasMoved = moved;
       moved = false;
       el.classList.remove('h-scroll-track--dragging');
       el.style.scrollBehavior = '';
+      if (!wasMoved) return;
+      // 드래그 중 브라우저 캔슬 → pointercancel에서 e.clientX=0이므로 scrollLeft 기준으로
+      // endDrag와 동일한 threshold 방식으로 방향 판정한다.
       const w = el.clientWidth || 1;
-      el.scrollTo({ left: baseIndex * w, behavior: 'smooth' });
+      const dScroll = el.scrollLeft - baseIndex * w; // onPointerMove: scrollLeft = base*w - dx
+      const threshold = Math.min(60, w * 0.15);
+      const total = el.children.length;
+      let target = baseIndex;
+      if (dScroll > threshold) target = baseIndex + 1;
+      else if (dScroll < -threshold) target = baseIndex - 1;
+      target = Math.min(Math.max(target, 0), total - 1);
+      el.scrollTo({ left: target * w, behavior: 'smooth' });
     };
     const onClickCapture = (e: MouseEvent) => {
       if (moved) { e.preventDefault(); e.stopPropagation(); }
