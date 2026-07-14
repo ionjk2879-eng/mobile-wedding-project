@@ -346,6 +346,13 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       if (!isDown) return;
       isDown = false;
       el.classList.remove('h-scroll-track--dragging');
+      if (!moved) return;
+      moved = false;
+      // 가장 가까운 슬라이드로 스냅 (CSS scroll-snap은 드래그 중 꺼져 있으므로 JS로 처리)
+      const w = el.clientWidth || 1;
+      const nearest = Math.round(el.scrollLeft / w);
+      const total = el.children.length;
+      el.scrollTo({ left: Math.min(Math.max(nearest, 0), total - 1) * w, behavior: 'smooth' });
     };
     const onClickCapture = (e: MouseEvent) => {
       if (moved) { e.preventDefault(); e.stopPropagation(); }

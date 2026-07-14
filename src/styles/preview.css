@@ -1124,15 +1124,17 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   cursor: grab;
+  /* 자유 드래그 모드: 터치 스와이프가 끝나면 가장 가까운 슬라이드로 자동 스냅 */
+  scroll-snap-type: x mandatory;
 }
 .h-scroll-track::-webkit-scrollbar { display: none; }
-.h-scroll-track--dragging { cursor: grabbing; user-select: none; scroll-behavior: auto; }
+/* JS로 scrollLeft를 직접 옮기는 드래그 중에는 CSS 스냅을 끄고 자유롭게 움직인다.
+   mouseup/pointerup에서 JS가 가장 가까운 슬라이드로 scrollTo해 스냅을 마무리한다. */
+.h-scroll-track--dragging { cursor: grabbing; user-select: none; scroll-snap-type: none; scroll-behavior: auto; }
 .h-scroll-track--dragging * { user-select: none; }
-/* 탭으로 넘기기 모드 — 좌우 버튼 탭으로도, 드래그/스와이프로도 둘 다 넘어가되 항상 한 장
-   단위로만 넘어간다. touch-action: pan-y로 네이티브 가로 스와이프 스크롤을 막아
-   JS 드래그 로직(끈 거리와 무관하게 한 장만 커밋)과 부딪히지 않게 한다. 세로(pan-y)는
-   그대로 열어둬서 슬라이드 내부 긴 콘텐츠는 평소처럼 세로로 스크롤된다. */
-.h-scroll-track--tap { touch-action: pan-y; }
+/* 탭 모드는 JS가 스냅을 담당하므로 CSS 스냅은 끈다. touch-action: pan-y로 네이티브
+   가로 스와이프 스크롤을 막아 JS 드래그 로직과 부딪히지 않게 한다. */
+.h-scroll-track--tap { scroll-snap-type: none; touch-action: pan-y; }
 .h-tap-nav-btn {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 34px; height: 34px; border-radius: 50%; border: none;
@@ -1140,6 +1142,10 @@
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; z-index: 20; transition: opacity 0.15s, background 0.15s;
   backdrop-filter: blur(2px); opacity: 0.55;
+}
+/* 아이콘 크기는 유지하면서 터치 히트 영역을 확장한다 */
+.h-tap-nav-btn::before {
+  content: ''; position: absolute; inset: -14px;
 }
 .h-tap-nav-btn:hover { background: rgba(0,0,0,0.22); opacity: 0.85; }
 .h-tap-nav-btn:disabled { opacity: 0; pointer-events: none; }
@@ -1152,6 +1158,7 @@
   overflow-y: auto; overflow-x: hidden;
   scrollbar-width: none; position: relative;
   display: flex; flex-direction: column; justify-content: center;
+  scroll-snap-align: start;
 }
 .h-slide::-webkit-scrollbar { display: none; }
 .h-slide--top { justify-content: flex-start; }
