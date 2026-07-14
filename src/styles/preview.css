@@ -1132,9 +1132,7 @@
    mouseup/pointerup에서 JS가 가장 가까운 슬라이드로 scrollTo해 스냅을 마무리한다. */
 .h-scroll-track--dragging { cursor: grabbing; user-select: none; scroll-snap-type: none; scroll-behavior: auto; }
 .h-scroll-track--dragging * { user-select: none; }
-/* 탭 모드는 JS가 스냅을 담당하므로 CSS 스냅은 끈다. touch-action: pan-y로 네이티브
-   가로 스와이프 스크롤을 막아 JS 드래그 로직과 부딪히지 않게 한다. */
-.h-scroll-track--tap { scroll-snap-type: none; touch-action: pan-y; }
+/* 탭 모드: CSS snap + 브라우저 네이티브 스와이프를 그대로 사용한다. JS 드래그 없음. */
 .h-tap-nav-btn {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 34px; height: 34px; border-radius: 50%; border: none;
