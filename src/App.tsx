@@ -326,7 +326,7 @@ const App: React.FC = () => {
         </div>
 
         <div className={`preview-panel ${mobileView === 'preview' ? 'mobile-visible' : ''}`}>
-          <div className="preview-container-box">
+          <div className={`preview-container-box${data.scrollDirection === 'horizontal' ? ' preview-container-box--phone' : ''}`}>
             <div className="preview-header-bar">
               <div className="preview-label">Live Preview</div>
               <button className="full-preview-btn-mini" onClick={() => setIsFullPreview(true)}>{te.fullscreen}</button>

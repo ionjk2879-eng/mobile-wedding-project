@@ -246,6 +246,10 @@
 /* Preview panel */
 .preview-panel { flex: 0 0 390px; max-width: 390px; display: flex; flex-direction: column; padding-top: 12px; min-height: 0; }
 .preview-container-box { width: 100%; flex: 1; min-height: 0; background: white; border-radius: 0; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #E5E7EB; display: flex; flex-direction: column; position: relative; }
+/* 가로모드는 "한 화면 = 한 섹션" 구조라 실제 폰 화면 비율로 봐야 스크롤 여부를 정확히
+   가늠할 수 있다 — 큰 모니터에서 패널 세로 공간을 다 채우면 실제 폰보다 훨씬 길어져
+   보인다. flex:1 대신 폰 화면 비율로 고정하고 패널 안에서 세로 중앙에 둔다. */
+.preview-container-box--phone { flex: 0 1 auto; aspect-ratio: 390 / 844; max-height: 100%; margin: auto 0; }
 .preview-header-bar { display: flex; align-items: center; justify-content: space-between; padding: 15px 25px; border-bottom: 1px solid #F0F2F5; background: white; }
 .preview-label { font-size: 0.75rem; font-weight: 800; color: #B2A4B0; text-transform: uppercase; letter-spacing: 1.5px; }
 .full-preview-btn-mini { background: #F3F4F6; border: none; color: #4B5563; padding: 8px 18px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }

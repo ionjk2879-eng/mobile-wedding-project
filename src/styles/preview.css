@@ -1164,3 +1164,7 @@
   scroll-snap-stop: always;
 }
 .h-slide::-webkit-scrollbar { display: none; }
+/* 사진 한 장/팝업 카드 등 화면을 꽉 채우며 짧게 끝나는 섹션은 세로 중앙에 놓는 게 자연스럽다.
+   justify-content:center 대신 자식에 margin:auto를 써서, 내용이 화면보다 커질 때도
+   (드물지만) 위쪽이 스크롤로 닿지 않게 잘리는 일 없이 자동으로 상단부터 쌓이게 한다. */
+.h-slide--center > * { margin: auto 0; }
