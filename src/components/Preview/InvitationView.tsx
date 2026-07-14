@@ -316,9 +316,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     const onMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
       const target = e.target as Element;
-      // 계좌/연락처 카드 캐러셀, 방명록 메시지 슬라이더는 자체 마우스 드래그를 쓰므로,
-      // 그 위에서 시작된 드래그는 섹션 전환 드래그가 가로채지 않도록 건너뛴다.
-      if (target.closest?.('.carousel-viewport, .contact-carousel-vp, .gb-note-scroll')) return;
+      // 계좌/연락처 카드 캐러셀, 방명록 메시지 슬라이더, 메이슨리 갤러리 미리보기 슬라이더는
+      // 자체 마우스 드래그를 쓰므로, 그 위에서 시작된 드래그는 섹션 전환 드래그가 가로채지 않도록 건너뛴다.
+      if (target.closest?.('.carousel-viewport, .contact-carousel-vp, .gb-note-scroll, .pv-preview-vp')) return;
       // 이미지 위에서 누르면 브라우저 기본 동작(고스트 이미지 드래그)이 먼저 끼어들어
       // mousemove 단계의 preventDefault가 이미 늦어버린다 — 입력창/버튼/링크처럼
       // mousedown의 기본 동작(포커스 등)이 필요한 요소만 빼고 여기서 미리 막는다.
