@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { loadInvitation, fetchPrivacySettings, updatePrivacySettings, PrivacySettings } from '../services/invitationService';
 import { fetchRSVPResponses } from '../services/rsvpService';
-import { fetchGuests, createGuest, updateGuest, deleteGuest } from '../services/guestService';
+import { fetchGuests, createGuest, updateGuest, deleteGuest, patchGuestLinkSent } from '../services/guestService';
 import { fetchGalleryAdminList, unhideGalleryPhoto, adminDeleteGalleryPhoto, GalleryAdminPhoto } from '../services/galleryService';
 import { signInWithGoogle, signOut } from '../services/auth';
 import { toast } from '../stores/useToastStore';
@@ -300,6 +300,17 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const handleToggleLinkSent = async (guest: Guest) => {
+    if (!slug) return;
+    const next = !guest.linkSent;
+    setGuests(prev => prev.map(g => g.code === guest.code ? { ...g, linkSent: next } : g));
+    try {
+      await patchGuestLinkSent(slug, guest.code, next);
+    } catch {
+      setGuests(prev => prev.map(g => g.code === guest.code ? { ...g, linkSent: guest.linkSent } : g));
+    }
+  };
+
   const handleCopyGuestLink = (code: string) => {
     navigator.clipboard.writeText(`${SITE_ORIGIN}/invite/${code}`);
     toast.success('링크가 복사되었습니다.');
@@ -585,7 +596,7 @@ const AdminPage: React.FC = () => {
           <div className="admin-table-wrap">
             <table>
               <thead>
-                <tr><th>이름</th><th>관계</th><th>개인화 링크</th><th>등록일</th><th>방문 여부</th><th></th></tr>
+                <tr><th>이름</th><th>관계</th><th>개인화 링크</th><th>등록일</th><th>방문 여부</th><th>발송</th><th></th></tr>
               </thead>
               <tbody>
                 {displayedGuests.map((g) => (
@@ -609,6 +620,9 @@ const AdminPage: React.FC = () => {
                             <span className="badge unvisited">아직 안 봄</span>
                           )}
                         </td>
+                        <td className="link-sent-cell">
+                          <input type="checkbox" className="link-sent-check" checked={g.linkSent} onChange={() => handleToggleLinkSent(g)} title="링크 발송 여부" />
+                        </td>
                         <td>
                           <button type="button" className="row-icon-btn" title="저장" onClick={() => handleSaveGuest(g.code)}><Check size={15} /></button>
                           <button type="button" className="row-icon-btn" title="취소" onClick={() => setEditingCode(null)}><X size={15} /></button>
@@ -626,6 +640,9 @@ const AdminPage: React.FC = () => {
                           ) : (
                             <span className="badge unvisited">아직 안 봄</span>
                           )}
+                        </td>
+                        <td className="link-sent-cell">
+                          <input type="checkbox" className="link-sent-check" checked={g.linkSent} onChange={() => handleToggleLinkSent(g)} title="링크 발송 여부" />
                         </td>
                         <td>
                           <button type="button" className="row-icon-btn" title="링크 복사" onClick={() => handleCopyGuestLink(g.code)}><Copy size={15} /></button>
@@ -827,6 +844,8 @@ const AdminPage: React.FC = () => {
         .badge.relation { background: #F3F4F6; color: #6B7280; }
         .badge.visited { background: #D1FAE5; color: #059669; white-space: nowrap; }
         .badge.unvisited { background: #FEF3C7; color: #92400E; white-space: nowrap; }
+        .link-sent-cell { text-align: center; }
+        .link-sent-check { width: 16px; height: 16px; accent-color: #B07A8E; cursor: pointer; }
         .guest-filter-toggle { display: flex; align-items: center; gap: 8px; margin: -8px 0 14px; font-size: 0.84rem; color: #4B5563; cursor: pointer; user-select: none; }
         .guest-filter-toggle input { accent-color: #B07A8E; width: 15px; height: 15px; cursor: pointer; }
         .link-cell { font-family: monospace; font-size: 0.82rem; color: #6B7280; }

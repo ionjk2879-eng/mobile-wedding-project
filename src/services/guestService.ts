@@ -17,6 +17,10 @@ export const deleteGuest = async (slug: string, code: string): Promise<void> => 
   await apiFetch(`/api/guests/${slug}/${code}`, { method: 'DELETE' });
 };
 
+export const patchGuestLinkSent = async (slug: string, code: string, linkSent: boolean): Promise<void> => {
+  await apiFetch(`/api/guests/${slug}/${code}`, { method: 'PATCH', body: JSON.stringify({ linkSent }) });
+};
+
 export interface InviteLookupResult {
   slug: string;
   name?: string;

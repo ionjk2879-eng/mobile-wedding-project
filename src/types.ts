@@ -209,4 +209,5 @@ export interface Guest {
   relation: GuestRelation;
   createdAt: string;
   visitedAt: string | null;
+  linkSent: boolean;
 }

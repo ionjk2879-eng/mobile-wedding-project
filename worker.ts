@@ -1029,10 +1029,11 @@ async function handleGuests(request: Request, env: Env, slug: string): Promise<R
 
   if (request.method === 'GET') {
     const rows = await env.DB.prepare(
-      'SELECT code, name, relation, created_at, visited_at FROM guests WHERE invitation_slug = ? ORDER BY created_at DESC'
+      'SELECT code, name, relation, created_at, visited_at, link_sent FROM guests WHERE invitation_slug = ? ORDER BY created_at DESC'
     ).bind(slug).all();
     return json(rows.results.map((r: Record<string, unknown>) => ({
       code: r.code, name: r.name, relation: r.relation, createdAt: r.created_at, visitedAt: r.visited_at ?? null,
+      linkSent: r.link_sent === 1,
     })), 200, origin);
   }
 
@@ -1073,6 +1074,13 @@ async function handleGuest(request: Request, env: Env, slug: string, code: strin
     if (!name) return json({ error: '이름을 입력해주세요.' }, 400, origin);
     const relation = normalizeGuestRelation(body.relation);
     await env.DB.prepare('UPDATE guests SET name = ?, relation = ? WHERE code = ?').bind(name, relation, code).run();
+    return json({ ok: true }, 200, origin);
+  }
+
+  if (request.method === 'PATCH') {
+    const body = await request.json() as { linkSent?: boolean };
+    if (typeof body.linkSent !== 'boolean') return json({ error: 'linkSent is required' }, 400, origin);
+    await env.DB.prepare('UPDATE guests SET link_sent = ? WHERE code = ?').bind(body.linkSent ? 1 : 0, code).run();
     return json({ ok: true }, 200, origin);
   }
 
