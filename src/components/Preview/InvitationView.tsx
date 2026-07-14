@@ -407,6 +407,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       el.classList.remove('h-scroll-track--dragging');
       el.style.scrollBehavior = '';
       if (!moved) return;
+      moved = false;
       const w = el.clientWidth || 1;
       const dx = e.clientX - startX;
       const threshold = Math.min(60, w * 0.15);
@@ -417,6 +418,18 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       target = Math.min(Math.max(target, 0), total - 1);
       el.scrollTo({ left: target * w, behavior: 'smooth' });
     };
+    // pointercancel은 브라우저가 제스처를 가져갈 때(세로 스크롤 등) 발생하며
+    // e.clientX = 0으로 리셋된다. endDrag와 같은 함수를 쓰면 dx = -startX(항상 음수)가
+    // 계산되어 threshold를 넘으면 무조건 오른쪽으로 이동하는 버그가 생긴다.
+    const cancelDrag = () => {
+      if (!isDown) return;
+      isDown = false;
+      moved = false;
+      el.classList.remove('h-scroll-track--dragging');
+      el.style.scrollBehavior = '';
+      const w = el.clientWidth || 1;
+      el.scrollTo({ left: baseIndex * w, behavior: 'smooth' });
+    };
     const onClickCapture = (e: MouseEvent) => {
       if (moved) { e.preventDefault(); e.stopPropagation(); }
     };
@@ -424,13 +437,13 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     el.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', endDrag);
-    window.addEventListener('pointercancel', endDrag);
+    window.addEventListener('pointercancel', cancelDrag);
     el.addEventListener('click', onClickCapture, true);
     return () => {
       el.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', endDrag);
-      window.removeEventListener('pointercancel', endDrag);
+      window.removeEventListener('pointercancel', cancelDrag);
       el.removeEventListener('click', onClickCapture, true);
     };
   }, [data.scrollDirection, data.horizontalPageMode]);
