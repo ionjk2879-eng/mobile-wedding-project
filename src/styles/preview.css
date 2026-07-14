@@ -1155,14 +1155,12 @@
   flex: 0 0 100%; width: 100%; height: 100%;
   overflow-y: auto; overflow-x: hidden;
   scrollbar-width: none; position: relative;
-  display: flex; flex-direction: column;
+  /* 세로 중앙 정렬은 섹션마다 내용 길이에 따라 상단 고정처럼 보이기도, 중앙 고정처럼
+     보이기도 해서(넘치면 자동으로 상단 고정된다) 화면마다 결과가 들쭉날쭉했다.
+     항상 상단부터 시작해 예측 가능하게 통일하고, 넘치는 내용은 슬라이드 자체
+     스크롤(overflow-y: auto)로 보게 한다. */
+  display: flex; flex-direction: column; justify-content: flex-start;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 .h-slide::-webkit-scrollbar { display: none; }
-/* justify-content:center 대신 자식에 margin:auto를 준다 — justify-content:center는
-   내용이 슬라이드 높이를 넘칠 때 위쪽 절반이 스크롤로도 닿지 않게 잘려버리는(음수
-   오프셋) 문제가 있다. margin:auto는 공간이 남으면 중앙 정렬하고, 넘치면 자동으로
-   0이 되어 위쪽부터 자연스럽게 쌓이므로 스크롤로 전체 내용에 닿을 수 있다. */
-.h-slide > * { margin: auto 0; }
-.h-slide--top > * { margin: 0; }

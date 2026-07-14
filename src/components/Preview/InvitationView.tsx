@@ -129,21 +129,6 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 // midphoto는 순서 관리 대상이 아니라 활성 섹션 중간에 자동 배치되는 고정 섹션이라 여기서 제외
 export const DEFAULT_ORDER = ['greeting', 'contacts', 'photos', 'calendar', 'message', 'interview', 'timeline', 'location', 'rsvp', 'guestbook', 'livegallery', 'accounts', 'ending', 'share'];
 
-// 가로 스크롤 모드에서 내용이 슬라이드 높이보다 짧을 때 세로 중앙 정렬이 기본이지만,
-// 위쪽 여백이 콘텐츠 일부로 읽히는 섹션(목록/아코디언형)은 상단 고정이 자연스럽다.
-function isTopAlignedSlide(id: string, data: InvitationData): boolean {
-  switch (id) {
-    case 'guestbook':
-      return true;
-    case 'contacts':
-      return (data.contactDisplayMode ?? 'inline') !== 'popup';
-    case 'accounts':
-      return data.accountStyle === 'style1' || data.accountStyle === 'style3';
-    default:
-      return false;
-  }
-}
-
 // 각 섹션의 on/off 토글 여부 (없는 섹션은 항상 활성)
 function isSectionActive(id: string, data: InvitationData): boolean {
   switch (id) {
@@ -474,7 +459,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
               const eff = effectiveData.scrollEffect || 'none';
               const delay = i % 2 === 0 ? 0 : 100;
               return (
-                <div key={id} className={`h-slide${isTopAlignedSlide(id, effectiveData) ? ' h-slide--top' : ''}`}>
+                <div key={id} className="h-slide">
                   <ScrollReveal effect={eff} delay={delay}>
                     <SectionComponent
                       id={id}
