@@ -1157,6 +1157,7 @@
   scrollbar-width: none; position: relative;
   display: flex; flex-direction: column; justify-content: center;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 .h-slide::-webkit-scrollbar { display: none; }
 .h-slide--top { justify-content: flex-start; }
