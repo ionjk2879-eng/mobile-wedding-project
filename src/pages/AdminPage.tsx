@@ -804,8 +804,8 @@ const AdminPage: React.FC = () => {
         .stat-icon.bride { background: #F43F5E; }
         .admin-table-wrap { background: white; border: 1px solid #F3F4F6; border-radius: 16px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-        th { text-align: left; padding: 14px 16px; border-bottom: 2px solid #F3F4F6; color: #9CA3AF; font-weight: 600; font-size: 0.8rem; }
-        td { padding: 12px 16px; border-bottom: 1px solid #F9FAFB; color: #374151; }
+        th { text-align: center; padding: 14px 16px; border-bottom: 2px solid #F3F4F6; color: #9CA3AF; font-weight: 600; font-size: 0.8rem; }
+        td { padding: 12px 16px; border-bottom: 1px solid #F9FAFB; color: #374151; text-align: center; vertical-align: middle; }
         .badge { padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
         .badge.ok { background: #D1FAE5; color: #059669; }
         .badge.no { background: #FEE2E2; color: #DC2626; }
@@ -848,7 +848,7 @@ const AdminPage: React.FC = () => {
         .link-sent-check { width: 16px; height: 16px; accent-color: #B07A8E; cursor: pointer; }
         .guest-filter-toggle { display: flex; align-items: center; gap: 8px; margin: -8px 0 14px; font-size: 0.84rem; color: #4B5563; cursor: pointer; user-select: none; }
         .guest-filter-toggle input { accent-color: #B07A8E; width: 15px; height: 15px; cursor: pointer; }
-        .link-cell { font-family: monospace; font-size: 0.82rem; color: #6B7280; }
+        .link-cell { font-family: monospace; font-size: 0.82rem; color: #6B7280; text-align: left; }
         .row-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; border-radius: 8px; background: none; color: #9CA3AF; cursor: pointer; transition: all 0.15s; margin-right: 2px; }
         .row-icon-btn:hover { background: #F3F4F6; color: #4B5563; }
         .row-icon-btn.danger:hover { background: #FEF2F2; color: #DC2626; }
