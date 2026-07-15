@@ -121,11 +121,12 @@ const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
     return '';
   });
 
-  // 이벤트용 구조화 필드
+  // 이벤트용 구조화 필드 — 기존 plain text 이벤트는 howTo에 마이그레이션
   const parsed = initial?.content ? parseEventContent(initial.content) : null;
+  const isLegacyEvent = initial?.type === 'event' && initial.content && !parsed;
   const [target, setTarget] = useState(parsed?.target ?? '');
   const [benefit, setBenefit] = useState(parsed?.benefit ?? '');
-  const [howTo, setHowTo] = useState(parsed?.howTo ?? '');
+  const [howTo, setHowTo] = useState(parsed?.howTo ?? (isLegacyEvent ? initial!.content : ''));
   const [notes, setNotes] = useState(parsed?.notes ?? '');
   const [naverReviewUrl, setNaverReviewUrl] = useState(parsed?.naverReviewUrl ?? '');
 
@@ -201,6 +202,11 @@ const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
 
         {type === 'event' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24, background: '#F9FAFB', borderRadius: 12, padding: '16px 14px' }}>
+            {isLegacyEvent && (
+              <p style={{ margin: '0 0 4px', fontSize: '0.75rem', color: '#D97706', background: '#FEF3C7', borderRadius: 8, padding: '8px 12px' }}>
+                기존 텍스트 내용을 '참여 방법'에 불러왔습니다. 각 항목을 정리한 후 저장해주세요.
+              </p>
+            )}
             {row('참여 대상', <input value={target} onChange={e => setTarget(e.target.value)} placeholder="예: 소네트 모바일 청첩장 구매자" style={FIELD_STYLE} />)}
             {row('혜택', <textarea value={benefit} onChange={e => setBenefit(e.target.value)} placeholder="예: 청첩장 1+1 쿠폰 제공" rows={2} style={{ ...FIELD_STYLE, resize: 'vertical' }} />)}
             {row('참여 방법', <textarea value={howTo} onChange={e => setHowTo(e.target.value)} placeholder="예: 네이버 스마트스토어에서 포토리뷰 작성&#10;또는 소네트 웹사이트에서 후기 작성" rows={3} style={{ ...FIELD_STYLE, resize: 'vertical' }} />)}
