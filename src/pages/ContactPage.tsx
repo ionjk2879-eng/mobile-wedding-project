@@ -15,6 +15,7 @@ interface InquiryItem {
 
 interface InquiryDetail extends InquiryItem {
   content: string;
+  photoUrl?: string | null;
   canComment: boolean;
 }
 
@@ -53,6 +54,9 @@ const ContactPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [writeError, setWriteError] = useState('');
+  const [photoKey, setPhotoKey] = useState<string | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
 
   const fetchList = useCallback(() => {
     setLoading(true);
@@ -117,18 +121,42 @@ const ContactPage: React.FC = () => {
     }
   };
 
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { setWriteError('사진은 2MB 이하만 업로드 가능합니다.'); return; }
+    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoUploading(true);
+    setWriteError('');
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('folder', 'inquiry');
+      const res = await fetch('/api/upload', { method: 'POST', body: fd, credentials: 'include' });
+      const data = await res.json() as { url?: string; error?: string };
+      if (!res.ok || !data.url) throw new Error(data.error || '업로드 실패');
+      setPhotoKey(data.url.replace('/images/', ''));
+    } catch {
+      setWriteError('사진 업로드에 실패했습니다. 다시 시도해주세요.');
+      setPhotoPreview(null);
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
   const submitWrite = async () => {
     if (!title.trim()) { setWriteError('제목을 입력해주세요.'); return; }
     if (!content.trim()) { setWriteError('내용을 입력해주세요.'); return; }
     if (isSecret && !password.trim()) { setWriteError('비밀번호를 설정해주세요.'); return; }
+    if (photoUploading) { setWriteError('사진 업로드 중입니다. 잠시 후 다시 시도해주세요.'); return; }
     setSubmitting(true);
     setWriteError('');
     try {
       await apiFetch('/api/inquiries', {
         method: 'POST',
-        body: JSON.stringify({ title: title.trim(), content: content.trim(), isSecret, password: isSecret ? password.trim() : undefined }),
+        body: JSON.stringify({ title: title.trim(), content: content.trim(), isSecret, password: isSecret ? password.trim() : undefined, photoKey }),
       });
-      setTitle(''); setContent(''); setIsSecret(false); setPassword('');
+      setTitle(''); setContent(''); setIsSecret(false); setPassword(''); setPhotoKey(null); setPhotoPreview(null);
       setView('list');
       fetchList();
     } catch {
@@ -184,6 +212,8 @@ const ContactPage: React.FC = () => {
     setPwError('');
     setComments([]);
     setCommentText('');
+    setPhotoKey(null);
+    setPhotoPreview(null);
   };
 
   return (
@@ -251,6 +281,25 @@ const ContactPage: React.FC = () => {
                 <label className="cp-label-text">내용</label>
                 <textarea className="cp-textarea" placeholder="문의하실 내용을 자세히 적어주세요." value={content} onChange={e => setContent(e.target.value)} rows={8} />
               </div>
+              <div className="cp-field">
+                <label className="cp-label-text">첨부 사진 <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(선택, 2MB 이하)</span></label>
+                <label className="cp-photo-upload">
+                  {photoPreview ? (
+                    <div className="cp-photo-preview-wrap">
+                      <img src={photoPreview} alt="첨부 사진 미리보기" className="cp-photo-preview" />
+                      {photoUploading && <div className="cp-photo-uploading">업로드 중...</div>}
+                      <span className="cp-photo-change">사진 변경</span>
+                    </div>
+                  ) : (
+                    <div className="cp-photo-placeholder">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                      <span>사진 첨부</span>
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoChange} />
+                </label>
+                {photoKey && !photoUploading && <p className="cp-photo-ok">✓ 사진이 업로드되었습니다.</p>}
+              </div>
               <label className="cp-secret-toggle">
                 <input type="checkbox" checked={isSecret} onChange={e => setIsSecret(e.target.checked)} />
                 <span>비밀글로 설정</span>
@@ -310,6 +359,11 @@ const ContactPage: React.FC = () => {
             <div className="cp-modal-body">
               <h3 className="cp-detail-title">{detail.title}</h3>
               <div className="cp-detail-content">{detail.content}</div>
+              {detail.photoUrl && (
+                <div className="cp-detail-photo-wrap">
+                  <img src={detail.photoUrl} alt="첨부 사진" className="cp-detail-photo" />
+                </div>
+              )}
 
               {/* 댓글 영역 */}
               <div className="cp-comments">
@@ -425,6 +479,17 @@ const ContactPage: React.FC = () => {
         .cp-detail-date { font-size: 0.78rem; color: #9CA3AF; }
         .cp-detail-title { font-size: 1.1rem; font-weight: 700; color: #1F2937; margin: 0 0 16px; line-height: 1.5; }
         .cp-detail-content { font-size: 0.9rem; color: #374151; line-height: 1.9; white-space: pre-wrap; word-break: keep-all; padding-bottom: 4px; }
+        .cp-detail-photo-wrap { margin-top: 12px; border-radius: 12px; overflow: hidden; border: 1px solid #F0F0F0; }
+        .cp-detail-photo { width: 100%; max-height: 400px; object-fit: contain; display: block; background: #F8F8F8; }
+
+        .cp-photo-upload { display: block; cursor: pointer; border-radius: 12px; overflow: hidden; }
+        .cp-photo-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 28px; border: 2px dashed #E5E7EB; border-radius: 12px; color: #9CA3AF; font-size: 0.82rem; transition: border-color 0.15s; }
+        .cp-photo-upload:hover .cp-photo-placeholder { border-color: #B07A8E; color: #B07A8E; }
+        .cp-photo-preview-wrap { position: relative; border-radius: 12px; overflow: hidden; border: 1.5px solid #E5E7EB; }
+        .cp-photo-preview { width: 100%; max-height: 220px; object-fit: cover; display: block; }
+        .cp-photo-uploading { position: absolute; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem; font-weight: 600; }
+        .cp-photo-change { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.55); color: white; font-size: 0.75rem; padding: 4px 10px; border-radius: 8px; }
+        .cp-photo-ok { font-size: 0.8rem; color: #059669; margin: 0; font-weight: 500; }
 
         /* 댓글 */
         .cp-comments { border-top: 1px solid #F0F0F0; padding-top: 16px; display: flex; flex-direction: column; gap: 12px; }

@@ -826,14 +826,15 @@ async function handleInquiries(request: Request, env: Env): Promise<Response> {
   if (request.method === 'POST') {
     const user = await getAuthUser(request, env);
     if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
-    const body = await request.json() as { title?: string; content?: string; isSecret?: boolean; password?: string };
+    const body = await request.json() as { title?: string; content?: string; isSecret?: boolean; password?: string; photoKey?: string };
     const title = body.title?.trim();
     const content = body.content?.trim();
     if (!title || !content) return json({ error: '제목과 내용을 입력해주세요.' }, 400, origin);
     if (body.isSecret && !body.password?.trim()) return json({ error: '비밀글에는 비밀번호를 설정해주세요.' }, 400, origin);
+    const photoKey = body.photoKey?.trim() || null;
     const result = await env.DB.prepare(
-      'INSERT INTO inquiries (uid, author_name, title, content, is_secret, password) VALUES (?, ?, ?, ?, ?, ?)'
-    ).bind(user.uid, user.name || user.email, title, content, body.isSecret ? 1 : 0, body.password?.trim() || null).run();
+      'INSERT INTO inquiries (uid, author_name, title, content, is_secret, password, photo_key) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).bind(user.uid, user.name || user.email, title, content, body.isSecret ? 1 : 0, body.password?.trim() || null, photoKey).run();
     return json({ id: result.meta.last_row_id }, 201, origin);
   }
 
@@ -847,26 +848,28 @@ async function handleInquiry(request: Request, env: Env, id: string): Promise<Re
 
   if (request.method === 'GET') {
     const row = await env.DB.prepare(
-      'SELECT id, uid, author_name, title, content, is_secret, password, created_at FROM inquiries WHERE id = ?'
+      'SELECT id, uid, author_name, title, content, is_secret, password, photo_key, created_at FROM inquiries WHERE id = ?'
     ).bind(id).first();
     if (!row) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
     const isOwn = user?.uid === row.uid;
+    const photoUrl = row.photo_key ? `/images/${row.photo_key}` : null;
     // 비밀글: 작성자 본인 or 관리자는 바로 공개
     if (!row.is_secret || isAdmin || isOwn) {
-      return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: !!row.is_secret, createdAt: row.created_at, isOwn, canComment: isAdmin || isOwn }, 200, origin);
+      return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: !!row.is_secret, photoUrl, createdAt: row.created_at, isOwn, canComment: isAdmin || isOwn }, 200, origin);
     }
     // 그 외: 비밀번호 확인
     const pw = new URL(request.url).searchParams.get('password');
     if (!pw || pw !== row.password) return json({ secret: true }, 200, origin);
-    return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: true, createdAt: row.created_at, isOwn: false, canComment: false }, 200, origin);
+    return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: true, photoUrl, createdAt: row.created_at, isOwn: false, canComment: false }, 200, origin);
   }
 
   if (request.method === 'DELETE') {
     if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
-    const row = await env.DB.prepare('SELECT uid FROM inquiries WHERE id = ?').bind(id).first();
+    const row = await env.DB.prepare('SELECT uid, photo_key FROM inquiries WHERE id = ?').bind(id).first();
     if (!row) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
     if (!isAdmin && row.uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
     await env.DB.prepare('DELETE FROM inquiries WHERE id = ?').bind(id).run();
+    if (row.photo_key) await env.IMAGES.delete(row.photo_key as string);
     return json({ ok: true }, 200, origin);
   }
 
@@ -1395,6 +1398,8 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
   let prefix = '';
   if (folder === 'review') {
     prefix = 'review/';
+  } else if (folder === 'inquiry') {
+    prefix = 'inquiry/';
   } else if (UPLOAD_FOLDER_PATTERN.test(folder)) {
     // folder가 특정 청첩장(anniversary/{slug})의 네임스페이스를 가리키므로, 패턴 모양만
     // 검사하고 끝내면 다른 로그인 사용자가 남의 청첩장 슬러그로 파일을 끼워넣을 수 있다.
