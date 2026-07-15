@@ -14,7 +14,7 @@ import PhotosSection from '../components/Editor/sections/PhotosSection';
 import { Search, RefreshCw, CheckCircle, ExternalLink, Plus, Pencil, Trash2, X, KeyRound, Download, Copy, Image as ImageIcon, Layers } from 'lucide-react';
 
 type Filter = 'all' | 'unpaid' | 'paid';
-type AdminTab = 'orders' | 'codes' | 'posts' | 'templates';
+type AdminTab = 'orders' | 'codes' | 'posts' | 'templates' | 'reviews' | 'inquiries';
 type PostType = 'event' | 'notice';
 
 interface InvRow {
@@ -40,6 +40,39 @@ interface Post {
   updated_at: string;
 }
 
+interface AdminReview {
+  id: number;
+  author_name: string;
+  rating: number;
+  content: string;
+  photo_key: string | null;
+  created_at: string;
+  isOwn: boolean;
+}
+
+interface AdminInquiry {
+  id: number;
+  author_name: string;
+  title: string;
+  content: string;
+  is_secret: number;
+  created_at: string;
+  isOwn: boolean;
+}
+
+interface InquiryComment {
+  id: number;
+  author_name: string;
+  is_admin: number;
+  content: string;
+  created_at: string;
+}
+
+interface AdminInquiryDetail extends AdminInquiry {
+  comments: InquiryComment[];
+  canComment: boolean;
+}
+
 function daysUntil(iso: string | null): number | null {
   if (!iso) return null;
   return Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000);
@@ -47,6 +80,10 @@ function daysUntil(iso: string | null): number | null {
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
+
+function renderStars(rating: number): string {
+  return '★'.repeat(rating) + '☆'.repeat(5 - rating);
 }
 
 const EVENT_TAGS = ['진행중', '예정', '종료'];
@@ -237,6 +274,16 @@ const SuperAdminPage: React.FC = () => {
   const [postsLoading, setPostsLoading] = useState(false);
   const [postForm, setPostForm] = useState<{ open: boolean; editing?: Post }>({ open: false });
 
+  // Reviews
+  const [reviews, setReviews] = useState<AdminReview[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+
+  // Inquiries
+  const [inquiries, setInquiries] = useState<AdminInquiry[]>([]);
+  const [inquiriesLoading, setInquiriesLoading] = useState(false);
+  const [selectedInquiry, setSelectedInquiry] = useState<AdminInquiryDetail | null>(null);
+  const [inquiryDetailLoading, setInquiryDetailLoading] = useState(false);
+
   // Templates
   const [templateSamples, setTemplateSamples] = useState<Record<string, { heroPhoto: string; updatedAt: string }>>({});
   const [templatesLoading, setTemplatesLoading] = useState(false);
@@ -269,6 +316,28 @@ const SuperAdminPage: React.FC = () => {
       toast.error('게시글 조회 실패');
     }
     setPostsLoading(false);
+  }, []);
+
+  const fetchReviews = useCallback(async () => {
+    setReviewsLoading(true);
+    try {
+      const data = await apiFetch<AdminReview[]>('/api/reviews');
+      setReviews(data);
+    } catch {
+      toast.error('후기 조회 실패');
+    }
+    setReviewsLoading(false);
+  }, []);
+
+  const fetchInquiries = useCallback(async () => {
+    setInquiriesLoading(true);
+    try {
+      const data = await apiFetch<AdminInquiry[]>('/api/inquiries');
+      setInquiries(data);
+    } catch {
+      toast.error('문의 조회 실패');
+    }
+    setInquiriesLoading(false);
   }, []);
 
   const fetchTemplateSamples = useCallback(async () => {
@@ -409,6 +478,14 @@ const SuperAdminPage: React.FC = () => {
     if (authorized && adminTab === 'templates') fetchTemplateSamples();
   }, [fetchTemplateSamples, authorized, adminTab]);
 
+  useEffect(() => {
+    if (authorized && adminTab === 'reviews') fetchReviews();
+  }, [fetchReviews, authorized, adminTab]);
+
+  useEffect(() => {
+    if (authorized && adminTab === 'inquiries') fetchInquiries();
+  }, [fetchInquiries, authorized, adminTab]);
+
   const handleActivate = async (row: InvRow) => {
     if (!row.weddingDateISO) { toast.error('결혼 날짜 정보가 없어 활성화할 수 없습니다.'); return; }
     const name = row.groomName && row.brideName ? `${row.groomName} & ${row.brideName}` : row.slug;
@@ -492,6 +569,52 @@ const SuperAdminPage: React.FC = () => {
     toast.success('코드 목록이 복사되었습니다.');
   };
 
+  const handleDeleteReview = async (id: number) => {
+    if (!confirm('이 후기를 삭제하시겠습니까?')) return;
+    try {
+      await apiFetch(`/api/reviews/${id}`, { method: 'DELETE' });
+      toast.success('삭제되었습니다.');
+      fetchReviews();
+    } catch (e: any) {
+      toast.error(e?.message || '삭제 실패');
+    }
+  };
+
+  const handleViewInquiry = async (inquiry: AdminInquiry) => {
+    setInquiryDetailLoading(true);
+    try {
+      const data = await apiFetch<AdminInquiryDetail>(`/api/inquiries/${inquiry.id}`);
+      setSelectedInquiry(data);
+    } catch (e: any) {
+      toast.error(e?.message || '조회 실패');
+    }
+    setInquiryDetailLoading(false);
+  };
+
+  const handleDeleteInquiry = async (id: number) => {
+    if (!confirm('이 문의글을 삭제하시겠습니까?')) return;
+    try {
+      await apiFetch(`/api/inquiries/${id}`, { method: 'DELETE' });
+      toast.success('삭제되었습니다.');
+      setSelectedInquiry(null);
+      fetchInquiries();
+    } catch (e: any) {
+      toast.error(e?.message || '삭제 실패');
+    }
+  };
+
+  const handleDeleteComment = async (inquiryId: number, commentId: number) => {
+    if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
+    try {
+      await apiFetch(`/api/inquiries/${inquiryId}/comments/${commentId}`, { method: 'DELETE' });
+      toast.success('삭제되었습니다.');
+      const data = await apiFetch<AdminInquiryDetail>(`/api/inquiries/${inquiryId}`);
+      setSelectedInquiry(data);
+    } catch (e: any) {
+      toast.error(e?.message || '삭제 실패');
+    }
+  };
+
   const handleCreatePost = async (data: { type: PostType; tag: string; title: string; content: string }) => {
     await apiFetch('/api/admin/posts', { method: 'POST', body: JSON.stringify(data) });
     toast.success('게시글이 등록되었습니다.');
@@ -557,7 +680,7 @@ const SuperAdminPage: React.FC = () => {
       {/* Header */}
       <div style={{ background: 'white', borderBottom: '1px solid #F0F0F0', padding: '0 24px', display: 'flex', alignItems: 'stretch', gap: 0 }}>
         <h1 style={{ margin: '0 24px 0 0', fontSize: '1.05rem', fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center' }}>관리자</h1>
-        {(['orders', 'codes', 'posts', 'templates'] as AdminTab[]).map(t => (
+        {(['orders', 'codes', 'posts', 'templates', 'reviews', 'inquiries'] as AdminTab[]).map(t => (
           <button
             key={t}
             onClick={() => setAdminTab(t)}
@@ -568,7 +691,7 @@ const SuperAdminPage: React.FC = () => {
               transition: 'all 0.15s',
             }}
           >
-            {t === 'orders' ? '주문 관리' : t === 'codes' ? '활성화 코드' : t === 'posts' ? '게시글 관리' : '템플릿 샘플'}
+            {t === 'orders' ? '주문 관리' : t === 'codes' ? '활성화 코드' : t === 'posts' ? '게시글 관리' : t === 'templates' ? '템플릿 샘플' : t === 'reviews' ? '후기 관리' : '문의 관리'}
             {t === 'orders' && unpaidCount > 0 && (
               <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 20, background: '#FEF3C7', color: '#D97706', fontSize: '0.68rem', fontWeight: 700 }}>
                 {unpaidCount}
@@ -908,6 +1031,97 @@ const SuperAdminPage: React.FC = () => {
           </>
         )}
 
+        {/* ── Reviews Tab ── */}
+        {adminTab === 'reviews' && (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+              <button onClick={fetchReviews} disabled={reviewsLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', border: '1px solid #E5E7EB', borderRadius: 10, background: 'white', fontSize: '0.82rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit', opacity: reviewsLoading ? 0.5 : 1 }}>
+                <RefreshCw size={13} style={{ animation: reviewsLoading ? 'spin 0.8s linear infinite' : 'none' }} /> 새로고침
+              </button>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #F0F0F0', overflow: 'hidden' }}>
+              {reviewsLoading ? (
+                <div style={{ padding: '48px', textAlign: 'center', color: '#9CA3AF', fontSize: '0.9rem' }}>불러오는 중...</div>
+              ) : reviews.length === 0 ? (
+                <div style={{ padding: '48px', textAlign: 'center', color: '#9CA3AF', fontSize: '0.9rem' }}>등록된 후기가 없습니다.</div>
+              ) : (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '120px 90px 1fr 60px 100px 60px', gap: 12, padding: '10px 20px', background: '#F9FAFB', borderBottom: '1px solid #F0F0F0', fontSize: '0.72rem', fontWeight: 700, color: '#9CA3AF' }}>
+                    <span>작성자</span><span>별점</span><span>내용</span><span>사진</span><span>날짜</span><span></span>
+                  </div>
+                  {reviews.map((review, i) => (
+                    <div key={review.id} style={{ display: 'grid', gridTemplateColumns: '120px 90px 1fr 60px 100px 60px', gap: 12, padding: '14px 20px', alignItems: 'center', borderBottom: i < reviews.length - 1 ? '1px solid #F9FAFB' : 'none' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1F2937' }}>{review.author_name}</span>
+                      <span style={{ fontSize: '0.85rem', color: '#F59E0B', letterSpacing: 1 }}>{renderStars(review.rating)}</span>
+                      <span style={{ fontSize: '0.83rem', color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{review.content}</span>
+                      <span style={{ fontSize: '0.75rem', color: review.photo_key ? '#059669' : '#D1D5DB', textAlign: 'center' }}>
+                        {review.photo_key ? '있음' : '없음'}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{review.created_at.slice(0, 10)}</span>
+                      <button onClick={() => handleDeleteReview(review.id)} style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '5px 10px', border: '1px solid #FEE2E2', borderRadius: 8, background: '#FEF2F2', fontSize: '0.75rem', fontWeight: 600, color: '#DC2626', cursor: 'pointer', fontFamily: 'inherit' }}>
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+            <p style={{ margin: '10px 0 0', fontSize: '0.75rem', color: '#9CA3AF', textAlign: 'right' }}>총 {reviews.length}건</p>
+          </>
+        )}
+
+        {/* ── Inquiries Tab ── */}
+        {adminTab === 'inquiries' && (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+              <button onClick={fetchInquiries} disabled={inquiriesLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', border: '1px solid #E5E7EB', borderRadius: 10, background: 'white', fontSize: '0.82rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit', opacity: inquiriesLoading ? 0.5 : 1 }}>
+                <RefreshCw size={13} style={{ animation: inquiriesLoading ? 'spin 0.8s linear infinite' : 'none' }} /> 새로고침
+              </button>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #F0F0F0', overflow: 'hidden' }}>
+              {inquiriesLoading ? (
+                <div style={{ padding: '48px', textAlign: 'center', color: '#9CA3AF', fontSize: '0.9rem' }}>불러오는 중...</div>
+              ) : inquiries.length === 0 ? (
+                <div style={{ padding: '48px', textAlign: 'center', color: '#9CA3AF', fontSize: '0.9rem' }}>등록된 문의가 없습니다.</div>
+              ) : (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '50px 1fr 110px 100px 100px', gap: 12, padding: '10px 20px', background: '#F9FAFB', borderBottom: '1px solid #F0F0F0', fontSize: '0.72rem', fontWeight: 700, color: '#9CA3AF' }}>
+                    <span>번호</span><span>제목</span><span>작성자</span><span>날짜</span><span></span>
+                  </div>
+                  {inquiries.map((inq, i) => (
+                    <div key={inq.id} style={{ display: 'grid', gridTemplateColumns: '50px 1fr 110px 100px 100px', gap: 12, padding: '14px 20px', alignItems: 'center', borderBottom: i < inquiries.length - 1 ? '1px solid #F9FAFB' : 'none' }}>
+                      <span style={{ fontSize: '0.78rem', color: '#9CA3AF' }}>{inq.id}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                        {!!inq.is_secret && (
+                          <span style={{ flexShrink: 0, padding: '2px 6px', borderRadius: 4, background: '#F3F4F6', color: '#6B7280', fontSize: '0.68rem', fontWeight: 700 }}>비밀</span>
+                        )}
+                        <span style={{ fontSize: '0.88rem', color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inq.title}</span>
+                      </div>
+                      <span style={{ fontSize: '0.82rem', color: '#4B5563' }}>{inq.author_name}</span>
+                      <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{inq.created_at.slice(0, 10)}</span>
+                      <div style={{ display: 'flex', gap: 5, justifyContent: 'flex-end' }}>
+                        <button
+                          onClick={() => handleViewInquiry(inq)}
+                          disabled={inquiryDetailLoading}
+                          style={{ padding: '5px 10px', border: '1px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.75rem', fontWeight: 600, color: '#1F2937', cursor: 'pointer', fontFamily: 'inherit', opacity: inquiryDetailLoading ? 0.5 : 1 }}
+                        >
+                          보기
+                        </button>
+                        <button onClick={() => handleDeleteInquiry(inq.id)} style={{ display: 'flex', alignItems: 'center', padding: '5px 8px', border: '1px solid #FEE2E2', borderRadius: 8, background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+            <p style={{ margin: '10px 0 0', fontSize: '0.75rem', color: '#9CA3AF', textAlign: 'right' }}>총 {inquiries.length}건</p>
+          </>
+        )}
+
       </div>
 
       {postForm.open && (
@@ -951,6 +1165,78 @@ const SuperAdminPage: React.FC = () => {
               </button>
               <button onClick={handleSaveTemplate} disabled={templateSaving} style={{ flex: 2, padding: '12px 0', border: 'none', borderRadius: 12, background: '#1F2937', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit', opacity: templateSaving ? 0.6 : 1 }}>
                 {templateSaving ? '저장 중...' : '저장'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 문의 상세 모달 */}
+      {selectedInquiry && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
+          <div style={{ background: 'white', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+            {/* 헤더 */}
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #F0F0F0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  {!!selectedInquiry.is_secret && (
+                    <span style={{ padding: '2px 7px', borderRadius: 4, background: '#F3F4F6', color: '#6B7280', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>비밀글</span>
+                  )}
+                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedInquiry.title}</h3>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: '#9CA3AF' }}>{selectedInquiry.author_name} · {selectedInquiry.created_at.slice(0, 10)}</p>
+              </div>
+              <button onClick={() => setSelectedInquiry(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 4, flexShrink: 0 }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* 내용 + 댓글 스크롤 영역 */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* 본문 */}
+              <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 16, fontSize: '0.9rem', color: '#1F2937', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {selectedInquiry.content}
+              </div>
+
+              {/* 댓글 */}
+              {selectedInquiry.comments.length > 0 && (
+                <div>
+                  <p style={{ margin: '0 0 10px', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280' }}>댓글 {selectedInquiry.comments.length}개</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {selectedInquiry.comments.map(c => (
+                      <div key={c.id} style={{ background: c.is_admin ? '#FDF6F9' : '#F9FAFB', border: `1px solid ${c.is_admin ? '#F0D9E4' : '#F0F0F0'}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: c.is_admin ? '#B07A8E' : '#1F2937' }}>{c.author_name}</span>
+                            {!!c.is_admin && <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#B07A8E', color: 'white' }}>관리자</span>}
+                            <span style={{ fontSize: '0.7rem', color: '#9CA3AF' }}>{c.created_at.slice(0, 10)}</span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: '#374151', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{c.content}</p>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteComment(selectedInquiry.id, c.id)}
+                          style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 2 }}
+                          title="삭제"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 하단 버튼 */}
+            <div style={{ padding: '16px 24px', borderTop: '1px solid #F0F0F0', display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => handleDeleteInquiry(selectedInquiry.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '9px 16px', border: '1px solid #FEE2E2', borderRadius: 10, background: '#FEF2F2', color: '#DC2626', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+              >
+                <Trash2 size={14} /> 문의 삭제
+              </button>
+              <button onClick={() => setSelectedInquiry(null)} style={{ padding: '9px 20px', border: '1px solid #E5E7EB', borderRadius: 10, background: 'white', color: '#6B7280', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+                닫기
               </button>
             </div>
           </div>
