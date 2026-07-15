@@ -731,6 +731,81 @@ async function handleAdminPost(request: Request, env: Env, id: string): Promise<
   return json({ error: 'Method Not Allowed' }, 405, origin);
 }
 
+// --- Inquiries API (문의/건의 게시판) ---
+
+async function handleInquiries(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+
+  if (request.method === 'GET') {
+    const user = await getAuthUser(request, env);
+    const isAdmin = !!user && user.email === env.SUPER_ADMIN_EMAIL;
+    const rows = await env.DB.prepare(
+      'SELECT id, uid, author_name, title, is_secret, created_at FROM inquiries ORDER BY created_at DESC'
+    ).all();
+    return json(rows.results.map((r: Record<string, unknown>) => {
+      const isOwn = user?.uid === r.uid;
+      const hidden = r.is_secret && !isAdmin && !isOwn;
+      return {
+        id: r.id,
+        authorName: r.author_name,
+        title: hidden ? '(비밀글)' : r.title,
+        isSecret: !!r.is_secret,
+        isOwn,
+        createdAt: r.created_at,
+      };
+    }), 200, origin);
+  }
+
+  if (request.method === 'POST') {
+    const user = await getAuthUser(request, env);
+    if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+    const body = await request.json() as { title?: string; content?: string; isSecret?: boolean; password?: string };
+    const title = body.title?.trim();
+    const content = body.content?.trim();
+    if (!title || !content) return json({ error: '제목과 내용을 입력해주세요.' }, 400, origin);
+    if (body.isSecret && !body.password?.trim()) return json({ error: '비밀글에는 비밀번호를 설정해주세요.' }, 400, origin);
+    const result = await env.DB.prepare(
+      'INSERT INTO inquiries (uid, author_name, title, content, is_secret, password) VALUES (?, ?, ?, ?, ?, ?)'
+    ).bind(user.uid, user.name || user.email, title, content, body.isSecret ? 1 : 0, body.password?.trim() || null).run();
+    return json({ id: result.meta.last_row_id }, 201, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+async function handleInquiry(request: Request, env: Env, id: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  const isAdmin = !!user && user.email === env.SUPER_ADMIN_EMAIL;
+
+  if (request.method === 'GET') {
+    const row = await env.DB.prepare(
+      'SELECT id, uid, author_name, title, content, is_secret, password, created_at FROM inquiries WHERE id = ?'
+    ).bind(id).first();
+    if (!row) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
+    const isOwn = user?.uid === row.uid;
+    // 비밀글: 작성자 본인 or 관리자는 바로 공개
+    if (!row.is_secret || isAdmin || isOwn) {
+      return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: !!row.is_secret, createdAt: row.created_at, isOwn }, 200, origin);
+    }
+    // 그 외: 비밀번호 확인
+    const pw = new URL(request.url).searchParams.get('password');
+    if (!pw || pw !== row.password) return json({ secret: true }, 200, origin);
+    return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: true, createdAt: row.created_at, isOwn: false }, 200, origin);
+  }
+
+  if (request.method === 'DELETE') {
+    if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+    const row = await env.DB.prepare('SELECT uid FROM inquiries WHERE id = ?').bind(id).first();
+    if (!row) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
+    if (!isAdmin && row.uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
+    await env.DB.prepare('DELETE FROM inquiries WHERE id = ?').bind(id).run();
+    return json({ ok: true }, 200, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
 // --- Admin API ---
 
 async function handleAdminInvitations(request: Request, env: Env): Promise<Response> {
@@ -1783,6 +1858,11 @@ export default {
 
       const extendMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/extend$/);
       if (extendMatch && request.method === 'POST') return await handleExtendExpiry(request, env, extendMatch[1]);
+
+      // Inquiries (문의/건의 게시판)
+      if (pathname === '/api/inquiries') return await handleInquiries(request, env);
+      const inquiryMatch = pathname.match(/^\/api\/inquiries\/(\d+)$/);
+      if (inquiryMatch) return await handleInquiry(request, env, inquiryMatch[1]);
 
       // Posts (public)
       if (pathname === '/api/posts') return await handlePostsPublic(request, env);
