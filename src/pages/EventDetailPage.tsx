@@ -131,11 +131,11 @@ const StructuredEvent: React.FC<{ post: Post; ec: EventContent }> = ({ post, ec 
             네이버 포토리뷰 작성하기
           </a>
         )}
-        <button onClick={() => navigate('/reviews')}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '16px', background: 'white', border: '2px solid #E5E7EB', borderRadius: 14, color: '#1F2937', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <a href="/reviews"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '16px', background: 'white', border: '2px solid #E5E7EB', borderRadius: 14, color: '#1F2937', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', fontFamily: 'inherit' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B07A8E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           소네트 사이트에서 후기 작성하기
-        </button>
+        </a>
         <button onClick={() => setShowCoupon(true)}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '16px', background: '#FEE500', border: 'none', borderRadius: 14, color: '#1A1A1A', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(254,229,0,0.4)' }}>
           🎁 (리뷰 작성완료) 쿠폰 받기
