@@ -511,10 +511,19 @@ async function handleRedeemCode(request: Request, env: Env, slug: string): Promi
   const code = (body.code || '').trim().toUpperCase();
   if (!code) return json({ error: '코드를 입력해주세요.' }, 400, origin);
 
+  // 만료 여부를 먼저 확인해 더 명확한 에러를 반환한다.
+  const existing = await env.DB.prepare(
+    'SELECT status, expires_at FROM activation_codes WHERE code = ?'
+  ).bind(code).first();
+  if (!existing) return json({ error: '유효하지 않은 코드입니다.' }, 400, origin);
+  if (existing.status === 'used') return json({ error: '이미 사용된 코드입니다.' }, 400, origin);
+  if (existing.expires_at && new Date(existing.expires_at as string) <= new Date())
+    return json({ error: '만료된 코드입니다.' }, 400, origin);
+
   // status='unused' 조건을 가진 단일 UPDATE로 원자적으로 소비한다 — 동시에 같은 코드로
   // 두 청첩장을 활성화하려는 경쟁 상황에서도 하나만 성공하도록 SELECT-then-UPDATE 대신 사용.
   const result = await env.DB.prepare(
-    "UPDATE activation_codes SET status = 'used', used_by_slug = ?, used_at = datetime('now') WHERE code = ? AND status = 'unused'"
+    "UPDATE activation_codes SET status = 'used', used_by_slug = ?, used_at = datetime('now') WHERE code = ? AND status = 'unused' AND (expires_at IS NULL OR expires_at > datetime('now'))"
   ).bind(slug, code).run();
   if (!result.meta.changes) return json({ error: '유효하지 않거나 이미 사용된 코드입니다.' }, 400, origin);
 
@@ -530,10 +539,11 @@ async function handleGenerateActivationCodes(request: Request, env: Env): Promis
   if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
     return json({ error: '권한이 없습니다.' }, 403, origin);
 
-  const body = await request.json() as { count?: number; note?: string };
+  const body = await request.json() as { count?: number; note?: string; expiresAt?: string };
   const count = Math.floor(body.count ?? 0);
   if (!count || count < 1 || count > 500) return json({ error: 'count는 1~500 사이여야 합니다.' }, 400, origin);
   const note = (body.note || '').trim().slice(0, 200) || null;
+  const expiresAt = (body.expiresAt || '').trim() || null;
 
   const codes = new Set<string>();
   while (codes.size < count) codes.add(generateActivationCode());
@@ -541,7 +551,7 @@ async function handleGenerateActivationCodes(request: Request, env: Env): Promis
 
   await env.DB.batch(
     codeList.map((code) =>
-      env.DB.prepare('INSERT INTO activation_codes (code, status, note) VALUES (?, ?, ?)').bind(code, 'unused', note)
+      env.DB.prepare('INSERT INTO activation_codes (code, status, note, expires_at) VALUES (?, ?, ?, ?)').bind(code, 'unused', note, expiresAt)
     )
   );
 
@@ -563,11 +573,15 @@ async function handleActivationCodesStatus(request: Request, env: Env): Promise<
 
   const placeholders = codes.map(() => '?').join(',');
   const rows = await env.DB.prepare(
-    `SELECT code, status FROM activation_codes WHERE code IN (${placeholders})`
+    `SELECT code, status, expires_at FROM activation_codes WHERE code IN (${placeholders})`
   ).bind(...codes).all();
 
   const statuses: Record<string, string> = {};
-  for (const r of rows.results) statuses[r.code as string] = r.status as string;
+  for (const r of rows.results) {
+    let s = r.status as string;
+    if (s === 'unused' && r.expires_at && new Date(r.expires_at as string) <= new Date()) s = 'expired';
+    statuses[r.code as string] = s;
+  }
   return json({ statuses }, 200, origin);
 }
 

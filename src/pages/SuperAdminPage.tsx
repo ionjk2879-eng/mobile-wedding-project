@@ -292,8 +292,10 @@ const SuperAdminPage: React.FC = () => {
   // Activation codes
   const [codeCount, setCodeCount] = useState('10');
   const [codeNote, setCodeNote] = useState('');
+  const [codeExpiry, setCodeExpiry] = useState('');
   const [generatingCodes, setGeneratingCodes] = useState(false);
   const [generatedCodes, setGeneratedCodes] = useState<string[] | null>(null);
+  const [generatedExpiry, setGeneratedExpiry] = useState<string>('');
   const [codeStatuses, setCodeStatuses] = useState<Record<string, string>>({});
   const [checkingCodeStatuses, setCheckingCodeStatuses] = useState(false);
 
@@ -552,9 +554,10 @@ const SuperAdminPage: React.FC = () => {
     try {
       const res = await apiFetch<{ codes: string[] }>('/api/admin/activation-codes', {
         method: 'POST',
-        body: JSON.stringify({ count, note: codeNote.trim() || undefined }),
+        body: JSON.stringify({ count, note: codeNote.trim() || undefined, expiresAt: codeExpiry || undefined }),
       });
       setGeneratedCodes(res.codes);
+      setGeneratedExpiry(codeExpiry);
       setCodeStatuses({});
       toast.success(`코드 ${res.codes.length}개를 생성했습니다.`);
     } catch (e: any) {
@@ -563,7 +566,7 @@ const SuperAdminPage: React.FC = () => {
     setGeneratingCodes(false);
   };
 
-  // 방금 생성한 코드들 중 이미 고객이 사용한 코드를 다시 조회해 취소선으로 표시한다.
+  // 방금 생성한 코드들 중 이미 고객이 사용/만료된 코드를 다시 조회해 표시한다.
   const handleCheckCodeStatuses = async () => {
     if (!generatedCodes || generatedCodes.length === 0) return;
     setCheckingCodeStatuses(true);
@@ -572,7 +575,11 @@ const SuperAdminPage: React.FC = () => {
       const res = await apiFetch<{ statuses: Record<string, string> }>(`/api/admin/activation-codes/status?${params}`);
       setCodeStatuses(res.statuses);
       const usedCount = Object.values(res.statuses).filter(s => s === 'used').length;
-      toast.success(usedCount > 0 ? `${usedCount}개가 이미 사용되었습니다.` : '아직 사용된 코드가 없습니다.');
+      const expiredCount = Object.values(res.statuses).filter(s => s === 'expired').length;
+      const parts = [];
+      if (usedCount > 0) parts.push(`${usedCount}개 사용됨`);
+      if (expiredCount > 0) parts.push(`${expiredCount}개 만료됨`);
+      toast.success(parts.length > 0 ? parts.join(', ') : '아직 사용된 코드가 없습니다.');
     } catch (e: any) {
       toast.error(e?.message || '상태 조회에 실패했습니다.');
     }
@@ -854,29 +861,28 @@ const SuperAdminPage: React.FC = () => {
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>개수</label>
                   <input
-                    type="number"
-                    min={1}
-                    max={500}
-                    value={codeCount}
-                    onChange={e => setCodeCount(e.target.value)}
+                    type="number" min={1} max={500} value={codeCount} onChange={e => setCodeCount(e.target.value)}
                     style={{ width: 100, padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: '#1F2937' }}
                   />
                 </div>
-                <div style={{ flex: 1, minWidth: 200 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>유효기간 (선택)</label>
+                  <input
+                    type="date" value={codeExpiry} onChange={e => setCodeExpiry(e.target.value)}
+                    min={new Date().toISOString().slice(0, 10)}
+                    style={{ padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: codeExpiry ? '#1F2937' : '#9CA3AF' }}
+                  />
+                </div>
+                <div style={{ flex: 1, minWidth: 160 }}>
                   <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>메모 (선택)</label>
                   <input
-                    type="text"
-                    value={codeNote}
-                    onChange={e => setCodeNote(e.target.value)}
-                    placeholder="예: 네이버스토어 2026-07 배치"
+                    type="text" value={codeNote} onChange={e => setCodeNote(e.target.value)}
+                    placeholder="예: 리뷰 이벤트 쿠폰"
                     style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: '#1F2937' }}
                   />
                 </div>
-                <button
-                  onClick={handleGenerateCodes}
-                  disabled={generatingCodes}
-                  style={{ padding: '11px 22px', border: 'none', borderRadius: 10, background: '#B07A8E', color: 'white', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit', opacity: generatingCodes ? 0.5 : 1 }}
-                >
+                <button onClick={handleGenerateCodes} disabled={generatingCodes}
+                  style={{ padding: '11px 22px', border: 'none', borderRadius: 10, background: '#B07A8E', color: 'white', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit', opacity: generatingCodes ? 0.5 : 1 }}>
                   {generatingCodes ? '생성 중...' : '코드 생성'}
                 </button>
               </div>
@@ -885,9 +891,16 @@ const SuperAdminPage: React.FC = () => {
             {generatedCodes && (
               <div style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #F0F0F0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#1F2937' }}>
-                    방금 생성한 코드 {generatedCodes.length}개
-                  </h2>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#1F2937' }}>
+                      방금 생성한 코드 {generatedCodes.length}개
+                    </h2>
+                    {generatedExpiry && (
+                      <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#D97706', fontWeight: 600 }}>
+                        유효기간: {generatedExpiry} 까지
+                      </p>
+                    )}
+                  </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={handleCheckCodeStatuses} disabled={checkingCodeStatuses} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', border: '1px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.78rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit', opacity: checkingCodeStatuses ? 0.5 : 1 }}>
                       <RefreshCw size={12} style={{ animation: checkingCodeStatuses ? 'spin 0.8s linear infinite' : 'none' }} /> 사용 여부 확인
@@ -902,19 +915,23 @@ const SuperAdminPage: React.FC = () => {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8, maxHeight: 360, overflowY: 'auto', padding: 4 }}>
                   {generatedCodes.map(code => {
-                    const used = codeStatuses[code] === 'used';
+                    const st = codeStatuses[code];
+                    const used = st === 'used';
+                    const expired = st === 'expired';
+                    const inactive = used || expired;
                     return (
-                      <span
-                        key={code}
-                        title={used ? '이미 사용된 코드입니다' : undefined}
+                      <span key={code}
+                        title={used ? '이미 사용된 코드' : expired ? '만료된 코드' : undefined}
                         style={{
-                          padding: '8px 10px', background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 8, fontFamily: 'monospace', fontSize: '0.82rem',
-                          textAlign: 'center', letterSpacing: '0.5px',
-                          color: used ? '#B0B7C0' : '#1F2937',
+                          padding: '8px 10px', background: expired ? '#FEF3C7' : '#F9FAFB',
+                          border: `1px solid ${expired ? '#FCD34D' : '#F0F0F0'}`, borderRadius: 8,
+                          fontFamily: 'monospace', fontSize: '0.82rem', textAlign: 'center', letterSpacing: '0.5px',
+                          color: inactive ? '#B0B7C0' : '#1F2937',
                           textDecoration: used ? 'line-through' : 'none',
                         }}
                       >
                         {code}
+                        {expired && <span style={{ display: 'block', fontSize: '0.65rem', color: '#D97706', fontFamily: 'inherit', letterSpacing: 0, marginTop: 2 }}>만료됨</span>}
                       </span>
                     );
                   })}
