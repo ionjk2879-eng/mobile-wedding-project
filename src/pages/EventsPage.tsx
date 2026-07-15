@@ -16,6 +16,7 @@ const EventsPage: React.FC = () => {
   const [tab, setTab] = useState<Tab>('event');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Post | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -58,7 +59,7 @@ const EventsPage: React.FC = () => {
             </div>
           ) : (
             filtered.map(post => (
-              <div key={post.id} className="ep-row">
+              <div key={post.id} className="ep-row" onClick={() => setSelected(post)}>
                 <span className={`ep-tag ep-tag-${tagColor(post.tag)}`}>{post.tag}</span>
                 <span className="ep-row-title">{post.title}</span>
                 <span className="ep-row-date">{post.created_at.slice(0, 10)}</span>
@@ -67,6 +68,20 @@ const EventsPage: React.FC = () => {
           )}
         </div>
       </main>
+
+      {selected && (
+        <div className="ep-modal-backdrop" onClick={() => setSelected(null)}>
+          <div className="ep-modal" onClick={e => e.stopPropagation()}>
+            <div className="ep-modal-header">
+              <span className={`ep-tag ep-tag-${tagColor(selected.tag)}`}>{selected.tag}</span>
+              <button className="ep-modal-close" onClick={() => setSelected(null)}>✕</button>
+            </div>
+            <h3 className="ep-modal-title">{selected.title}</h3>
+            <p className="ep-modal-date">{selected.created_at.slice(0, 10)}</p>
+            <div className="ep-modal-content">{selected.content}</div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .ep-page { min-height: 100vh; background: #EBEBEB; font-family: 'Pretendard', sans-serif; }
@@ -78,9 +93,9 @@ const EventsPage: React.FC = () => {
         .ep-tab.active { color: #B07A8E; border-bottom-color: #B07A8E; }
         .ep-tab:hover:not(.active) { color: #6B7280; }
         .ep-list { background: white; border-radius: 0 0 16px 16px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-        .ep-row { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #F3F4F6; cursor: default; transition: background 0.12s; }
+        .ep-row { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #F3F4F6; cursor: pointer; transition: background 0.12s; }
         .ep-row:last-child { border-bottom: none; }
-        .ep-row:hover { background: #FAFAFA; }
+        .ep-row:hover { background: #FDF8FA; }
         .ep-tag { flex-shrink: 0; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; min-width: 52px; text-align: center; }
         .ep-tag-green { background: #ECFDF5; color: #059669; }
         .ep-tag-gray { background: #F3F4F6; color: #6B7280; }
@@ -89,11 +104,22 @@ const EventsPage: React.FC = () => {
         .ep-row-title { flex: 1; font-size: 0.9rem; font-weight: 500; color: #1F2937; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .ep-row-date { flex-shrink: 0; font-size: 0.78rem; color: #9CA3AF; }
         .ep-empty { padding: 60px 24px; text-align: center; color: #9CA3AF; font-size: 0.88rem; }
+
+        .ep-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .ep-modal { background: white; border-radius: 16px; width: 100%; max-width: 560px; max-height: 80vh; overflow-y: auto; padding: 28px 28px 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+        .ep-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .ep-modal-close { background: none; border: none; font-size: 1rem; color: #9CA3AF; cursor: pointer; padding: 4px 8px; line-height: 1; }
+        .ep-modal-close:hover { color: #4B5563; }
+        .ep-modal-title { font-size: 1.05rem; font-weight: 700; color: #1F2937; margin: 0 0 6px; line-height: 1.5; }
+        .ep-modal-date { font-size: 0.78rem; color: #9CA3AF; margin: 0 0 20px; }
+        .ep-modal-content { font-size: 0.9rem; color: #374151; line-height: 1.8; white-space: pre-wrap; }
+
         @media (max-width: 480px) {
           .ep-main { padding: 24px 16px 60px; }
           .ep-tab { padding: 10px 16px; font-size: 0.85rem; }
           .ep-row { padding: 14px 16px; gap: 8px; }
           .ep-row-date { display: none; }
+          .ep-modal { padding: 20px 20px 28px; }
         }
       `}</style>
     </div>
