@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader';
 import useAuthStore from '../stores/useAuthStore';
 import { apiFetch } from '../services/api';
-import { imageResize } from '../utils/imageResize';
+import { resizeImageForUpload } from '../utils/imageResize';
 
 interface Review {
   id: number;
@@ -53,7 +53,7 @@ const ReviewsPage: React.FC = () => {
   // Write form
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState('');
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoFile, setPhotoFile] = useState<Blob | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [writeError, setWriteError] = useState('');
@@ -96,11 +96,11 @@ const ReviewsPage: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const resized = await imageResize(file, 1200);
+      const resized = await resizeImageForUpload(file, 1200);
       setPhotoFile(resized);
       setPhotoPreview(URL.createObjectURL(resized));
     } catch {
-      setPhotoFile(file);
+      setPhotoFile(file as Blob);
       setPhotoPreview(URL.createObjectURL(file));
     }
   };
@@ -114,7 +114,7 @@ const ReviewsPage: React.FC = () => {
       let photoKey: string | null = null;
       if (photoFile) {
         const fd = new FormData();
-        fd.append('file', photoFile);
+        fd.append('file', photoFile, 'review.jpg');
         fd.append('folder', 'review');
         const up = await apiFetch<{ url: string }>('/api/upload', { method: 'POST', body: fd });
         photoKey = up.url.replace('/images/', '');
