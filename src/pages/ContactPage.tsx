@@ -56,9 +56,8 @@ const ContactPage: React.FC = () => {
 
   const fetchList = useCallback(() => {
     setLoading(true);
-    fetch('/api/inquiries')
-      .then(r => r.json())
-      .then((data: InquiryItem[]) => setPosts(data))
+    apiFetch<InquiryItem[]>('/api/inquiries')
+      .then((data) => setPosts(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
