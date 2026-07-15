@@ -17,6 +17,7 @@ const SuperAdminPage = React.lazy(() => import('./pages/SuperAdminPage'))
 const TemplatePreviewPage = React.lazy(() => import('./pages/TemplatePreviewPage'))
 const TemplatesPage = React.lazy(() => import('./pages/TemplatesPage'))
 const EventsPage = React.lazy(() => import('./pages/EventsPage'))
+const EventDetailPage = React.lazy(() => import('./pages/EventDetailPage'))
 const InvitePage = React.lazy(() => import('./pages/InvitePage'))
 const GalleryPage = React.lazy(() => import('./pages/GalleryPage'))
 const AnniversaryEditPage = React.lazy(() => import('./pages/AnniversaryEditPage'))
@@ -43,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/manage/:slug/anniversary" element={<AuthGate><AnniversaryEditPage /></AuthGate>} />
         <Route path="/templates" element={<TemplatesPage />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/events/:id" element={<EventDetailPage />} />
         <Route path="/template-preview/:presetId" element={<TemplatePreviewPage />} />
         <Route path="/invite" element={<InvitePage />} />
         <Route path="/invite/:code" element={<InvitePage />} />

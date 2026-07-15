@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader';
 
 type Tab = 'event' | 'notice';
@@ -41,10 +42,10 @@ function tagColor(tag: string) {
 }
 
 const EventsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('event');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<Post | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -54,15 +55,6 @@ const EventsPage: React.FC = () => {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
-
-  useEffect(() => {
-    if (selected) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [selected]);
 
   const filtered = posts.filter(p => p.type === tab);
 
@@ -91,7 +83,7 @@ const EventsPage: React.FC = () => {
             {filtered.map(post => {
               const hashtags = extractHashtags(post.content);
               return (
-                <div key={post.id} className="ep-card" onClick={() => setSelected(post)}>
+                <div key={post.id} className="ep-card" onClick={() => navigate(`/events/${post.id}`)}>
                   <div className="ep-card-thumb" style={{ background: getGradient(post.id) }} />
                   <div className="ep-card-body">
                     <div className="ep-card-meta">
@@ -109,26 +101,6 @@ const EventsPage: React.FC = () => {
           </div>
         )}
       </main>
-
-      {selected && (
-        <div className="ep-overlay" onClick={() => setSelected(null)}>
-          <div className="ep-detail" onClick={e => e.stopPropagation()}>
-            <button className="ep-detail-close" onClick={() => setSelected(null)}>✕</button>
-            <div className="ep-detail-inner">
-              <div className="ep-detail-top">
-                <span className={`ep-badge ep-badge-${tagColor(selected.tag)}`}>{selected.tag}</span>
-              </div>
-              <h2 className="ep-detail-title">{selected.title}</h2>
-              <div className="ep-detail-hero" style={{ background: getGradient(selected.id) }} />
-              <div className="ep-detail-content">{selected.content}</div>
-              <p className="ep-detail-date">{selected.created_at.slice(0, 10)}</p>
-            </div>
-            <div className="ep-detail-footer">
-              <button className="ep-detail-back" onClick={() => setSelected(null)}>목록보기</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <style>{`
         .ep-page { min-height: 100vh; background: #F9F9F9; font-family: 'Pretendard', sans-serif; }
@@ -158,26 +130,6 @@ const EventsPage: React.FC = () => {
         .ep-badge-pink { background: #FDF2F5; color: #B07A8E; }
 
         .ep-empty { padding: 60px 24px; text-align: center; color: #9CA3AF; font-size: 0.88rem; }
-
-        /* 상세 모달 */
-        .ep-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
-        .ep-detail { background: white; width: 100%; max-width: 560px; max-height: 92vh; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; position: relative; }
-        .ep-detail-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1rem; color: #9CA3AF; cursor: pointer; padding: 8px; z-index: 1; }
-        .ep-detail-close:hover { color: #4B5563; }
-        .ep-detail-inner { flex: 1; overflow-y: auto; padding: 32px 28px 8px; }
-        .ep-detail-top { text-align: center; margin-bottom: 12px; }
-        .ep-detail-title { font-size: 1.25rem; font-weight: 800; color: #1F2937; text-align: center; margin: 0 0 20px; line-height: 1.5; }
-        .ep-detail-hero { height: 200px; border-radius: 16px; margin-bottom: 24px; }
-        .ep-detail-content { font-size: 0.88rem; color: #374151; line-height: 1.9; white-space: pre-wrap; word-break: keep-all; }
-        .ep-detail-date { font-size: 0.75rem; color: #C4B5BC; text-align: right; margin: 20px 0 0; }
-        .ep-detail-footer { padding: 12px 28px 28px; border-top: 1px solid #F3F4F6; }
-        .ep-detail-back { width: 100%; padding: 14px; background: #F3F4F6; border: none; border-radius: 12px; font-size: 0.9rem; font-weight: 600; color: #6B7280; cursor: pointer; font-family: inherit; }
-        .ep-detail-back:hover { background: #E9EAEB; }
-
-        @media (min-width: 640px) {
-          .ep-overlay { align-items: center; }
-          .ep-detail { border-radius: 24px; max-height: 85vh; }
-        }
 
         @media (max-width: 700px) {
           .ep-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
