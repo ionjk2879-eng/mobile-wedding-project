@@ -786,12 +786,12 @@ async function handleInquiry(request: Request, env: Env, id: string): Promise<Re
     const isOwn = user?.uid === row.uid;
     // 비밀글: 작성자 본인 or 관리자는 바로 공개
     if (!row.is_secret || isAdmin || isOwn) {
-      return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: !!row.is_secret, createdAt: row.created_at, isOwn }, 200, origin);
+      return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: !!row.is_secret, createdAt: row.created_at, isOwn, canComment: isAdmin || isOwn }, 200, origin);
     }
     // 그 외: 비밀번호 확인
     const pw = new URL(request.url).searchParams.get('password');
     if (!pw || pw !== row.password) return json({ secret: true }, 200, origin);
-    return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: true, createdAt: row.created_at, isOwn: false }, 200, origin);
+    return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: true, createdAt: row.created_at, isOwn: false, canComment: false }, 200, origin);
   }
 
   if (request.method === 'DELETE') {
@@ -804,6 +804,54 @@ async function handleInquiry(request: Request, env: Env, id: string): Promise<Re
   }
 
   return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+async function handleInquiryComments(request: Request, env: Env, inquiryId: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  const isAdmin = !!user && user.email === env.SUPER_ADMIN_EMAIL;
+
+  if (request.method === 'GET') {
+    const rows = await env.DB.prepare(
+      'SELECT id, uid, author_name, is_admin, content, created_at FROM inquiry_comments WHERE inquiry_id = ? ORDER BY created_at ASC'
+    ).bind(inquiryId).all();
+    return json(rows.results.map((r: Record<string, unknown>) => ({
+      id: r.id, authorName: r.author_name, isAdmin: !!r.is_admin,
+      content: r.content, createdAt: r.created_at, isOwn: user?.uid === r.uid,
+    })), 200, origin);
+  }
+
+  if (request.method === 'POST') {
+    if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+    // 작성자 본인 또는 관리자만 댓글 가능
+    const inquiry = await env.DB.prepare('SELECT uid FROM inquiries WHERE id = ?').bind(inquiryId).first();
+    if (!inquiry) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
+    if (!isAdmin && inquiry.uid !== user.uid) return json({ error: '댓글은 작성자 본인과 관리자만 달 수 있습니다.' }, 403, origin);
+
+    const body = await request.json() as { content?: string };
+    const content = body.content?.trim();
+    if (!content) return json({ error: '내용을 입력해주세요.' }, 400, origin);
+
+    const result = await env.DB.prepare(
+      'INSERT INTO inquiry_comments (inquiry_id, uid, author_name, is_admin, content) VALUES (?, ?, ?, ?, ?)'
+    ).bind(inquiryId, user.uid, user.name || user.email, isAdmin ? 1 : 0, content).run();
+    return json({ id: result.meta.last_row_id }, 201, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+async function handleInquiryComment(request: Request, env: Env, inquiryId: string, commentId: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  if (request.method !== 'DELETE') return json({ error: 'Method not allowed' }, 405, origin);
+  const user = await getAuthUser(request, env);
+  if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+  const isAdmin = user.email === env.SUPER_ADMIN_EMAIL;
+  const row = await env.DB.prepare('SELECT uid FROM inquiry_comments WHERE id = ? AND inquiry_id = ?').bind(commentId, inquiryId).first();
+  if (!row) return json({ error: '댓글을 찾을 수 없습니다.' }, 404, origin);
+  if (!isAdmin && row.uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
+  await env.DB.prepare('DELETE FROM inquiry_comments WHERE id = ?').bind(commentId).run();
+  return json({ ok: true }, 200, origin);
 }
 
 // --- Admin API ---
@@ -1861,6 +1909,10 @@ export default {
 
       // Inquiries (문의/건의 게시판)
       if (pathname === '/api/inquiries') return await handleInquiries(request, env);
+      const inquiryCommentMatch = pathname.match(/^\/api\/inquiries\/(\d+)\/comments\/(\d+)$/);
+      if (inquiryCommentMatch) return await handleInquiryComment(request, env, inquiryCommentMatch[1], inquiryCommentMatch[2]);
+      const inquiryCommentsMatch = pathname.match(/^\/api\/inquiries\/(\d+)\/comments$/);
+      if (inquiryCommentsMatch) return await handleInquiryComments(request, env, inquiryCommentsMatch[1]);
       const inquiryMatch = pathname.match(/^\/api\/inquiries\/(\d+)$/);
       if (inquiryMatch) return await handleInquiry(request, env, inquiryMatch[1]);
 

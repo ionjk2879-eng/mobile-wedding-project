@@ -15,6 +15,16 @@ interface InquiryItem {
 
 interface InquiryDetail extends InquiryItem {
   content: string;
+  canComment: boolean;
+}
+
+interface Comment {
+  id: number;
+  authorName: string;
+  isAdmin: boolean;
+  content: string;
+  createdAt: string;
+  isOwn: boolean;
 }
 
 type View = 'list' | 'write' | 'detail' | 'unlock';
@@ -30,6 +40,11 @@ const ContactPage: React.FC = () => {
   const [unlockId, setUnlockId] = useState<number | null>(null);
   const [pwInput, setPwInput] = useState('');
   const [pwError, setPwError] = useState('');
+
+  // Comments
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
 
   // Write form
   const [title, setTitle] = useState('');
@@ -59,6 +74,15 @@ const ContactPage: React.FC = () => {
     return () => { document.body.style.overflow = ''; };
   }, [view]);
 
+  const fetchComments = async (id: number) => {
+    try {
+      const data = await apiFetch<Comment[]>(`/api/inquiries/${id}/comments`);
+      setComments(data);
+    } catch {
+      setComments([]);
+    }
+  };
+
   const openDetail = async (post: InquiryItem) => {
     if (post.isSecret && !post.isOwn) {
       setUnlockId(post.id);
@@ -75,6 +99,8 @@ const ContactPage: React.FC = () => {
       setView('unlock');
     } else {
       setDetail(data);
+      setCommentText('');
+      await fetchComments(post.id);
       setView('detail');
     }
   };
@@ -86,6 +112,8 @@ const ContactPage: React.FC = () => {
       setPwError('비밀번호가 올바르지 않습니다.');
     } else {
       setDetail(data);
+      setCommentText('');
+      await fetchComments(unlockId!);
       setView('detail');
     }
   };
@@ -111,11 +139,38 @@ const ContactPage: React.FC = () => {
     }
   };
 
+  const submitComment = async () => {
+    if (!commentText.trim() || !detail) return;
+    setCommentSubmitting(true);
+    try {
+      await apiFetch(`/api/inquiries/${detail.id}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ content: commentText.trim() }),
+      });
+      setCommentText('');
+      await fetchComments(detail.id);
+    } catch {
+      alert('댓글 등록에 실패했습니다.');
+    } finally {
+      setCommentSubmitting(false);
+    }
+  };
+
+  const deleteComment = async (commentId: number) => {
+    if (!detail || !confirm('댓글을 삭제하시겠습니까?')) return;
+    try {
+      await apiFetch(`/api/inquiries/${detail.id}/comments/${commentId}`, { method: 'DELETE' });
+      await fetchComments(detail.id);
+    } catch {
+      alert('삭제에 실패했습니다.');
+    }
+  };
+
   const deletePost = async (id: number) => {
     if (!confirm('정말 삭제하시겠습니까?')) return;
     try {
       await apiFetch(`/api/inquiries/${id}`, { method: 'DELETE' });
-      if (view === 'detail') setView('list');
+      closeModal();
       fetchList();
     } catch {
       alert('삭제에 실패했습니다.');
@@ -128,6 +183,8 @@ const ContactPage: React.FC = () => {
     setUnlockId(null);
     setPwInput('');
     setPwError('');
+    setComments([]);
+    setCommentText('');
   };
 
   return (
@@ -189,52 +246,27 @@ const ContactPage: React.FC = () => {
             <div className="cp-modal-body">
               <div className="cp-field">
                 <label className="cp-label-text">제목</label>
-                <input
-                  className="cp-input"
-                  placeholder="제목을 입력하세요"
-                  value={title}
-                  onChange={e => setTitle(e.target.value)}
-                  maxLength={100}
-                />
+                <input className="cp-input" placeholder="제목을 입력하세요" value={title} onChange={e => setTitle(e.target.value)} maxLength={100} />
               </div>
               <div className="cp-field">
                 <label className="cp-label-text">내용</label>
-                <textarea
-                  className="cp-textarea"
-                  placeholder="문의하실 내용을 자세히 적어주세요."
-                  value={content}
-                  onChange={e => setContent(e.target.value)}
-                  rows={8}
-                />
+                <textarea className="cp-textarea" placeholder="문의하실 내용을 자세히 적어주세요." value={content} onChange={e => setContent(e.target.value)} rows={8} />
               </div>
               <label className="cp-secret-toggle">
-                <input
-                  type="checkbox"
-                  checked={isSecret}
-                  onChange={e => setIsSecret(e.target.checked)}
-                />
+                <input type="checkbox" checked={isSecret} onChange={e => setIsSecret(e.target.checked)} />
                 <span>비밀글로 설정</span>
               </label>
               {isSecret && (
                 <div className="cp-field">
                   <label className="cp-label-text">비밀번호</label>
-                  <input
-                    className="cp-input"
-                    type="password"
-                    placeholder="열람 시 사용할 비밀번호를 입력하세요"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    maxLength={30}
-                  />
+                  <input className="cp-input" type="password" placeholder="열람 시 사용할 비밀번호를 입력하세요" value={password} onChange={e => setPassword(e.target.value)} maxLength={30} />
                 </div>
               )}
               {writeError && <p className="cp-error">{writeError}</p>}
             </div>
             <div className="cp-modal-footer">
               <button className="cp-btn-cancel" onClick={closeModal}>취소</button>
-              <button className="cp-btn-submit" onClick={submitWrite} disabled={submitting}>
-                {submitting ? '등록 중...' : '등록'}
-              </button>
+              <button className="cp-btn-submit" onClick={submitWrite} disabled={submitting}>{submitting ? '등록 중...' : '등록'}</button>
             </div>
           </div>
         </div>
@@ -251,15 +283,7 @@ const ContactPage: React.FC = () => {
             <div className="cp-modal-body">
               <p className="cp-unlock-desc"><Lock size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />비밀번호를 입력하면 열람할 수 있습니다.</p>
               <div className="cp-field">
-                <input
-                  className="cp-input"
-                  type="password"
-                  placeholder="비밀번호"
-                  value={pwInput}
-                  onChange={e => { setPwInput(e.target.value); setPwError(''); }}
-                  onKeyDown={e => { if (e.key === 'Enter') submitPassword(); }}
-                  autoFocus
-                />
+                <input className="cp-input" type="password" placeholder="비밀번호" value={pwInput} onChange={e => { setPwInput(e.target.value); setPwError(''); }} onKeyDown={e => { if (e.key === 'Enter') submitPassword(); }} autoFocus />
               </div>
               {pwError && <p className="cp-error">{pwError}</p>}
             </div>
@@ -283,13 +307,55 @@ const ContactPage: React.FC = () => {
               </div>
               <button className="cp-modal-close" onClick={closeModal}>✕</button>
             </div>
+
             <div className="cp-modal-body">
               <h3 className="cp-detail-title">{detail.title}</h3>
               <div className="cp-detail-content">{detail.content}</div>
+
+              {/* 댓글 영역 */}
+              <div className="cp-comments">
+                <p className="cp-comments-label">댓글 {comments.length > 0 ? `(${comments.length})` : ''}</p>
+                {comments.length > 0 && (
+                  <div className="cp-comment-list">
+                    {comments.map(c => (
+                      <div key={c.id} className="cp-comment">
+                        <div className="cp-comment-top">
+                          <div className="cp-comment-author-row">
+                            {c.isAdmin && <span className="cp-admin-badge">관리자</span>}
+                            <span className="cp-comment-author">{c.authorName}</span>
+                            <span className="cp-comment-date">{c.createdAt.slice(0, 10)}</span>
+                          </div>
+                          {c.isOwn && (
+                            <button className="cp-comment-delete" onClick={() => deleteComment(c.id)}>삭제</button>
+                          )}
+                        </div>
+                        <p className="cp-comment-content">{c.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {detail.canComment && (
+                  <div className="cp-comment-form">
+                    <textarea
+                      className="cp-comment-input"
+                      placeholder="댓글을 입력하세요..."
+                      value={commentText}
+                      onChange={e => setCommentText(e.target.value)}
+                      rows={3}
+                      onKeyDown={e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) submitComment(); }}
+                    />
+                    <button className="cp-comment-submit" onClick={submitComment} disabled={commentSubmitting || !commentText.trim()}>
+                      {commentSubmitting ? '등록 중...' : '댓글 등록'}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
+
             <div className="cp-modal-footer">
               {detail.isOwn && (
-                <button className="cp-btn-delete" onClick={() => deletePost(detail.id)}>삭제</button>
+                <button className="cp-btn-delete" onClick={() => deletePost(detail.id)}>글 삭제</button>
               )}
               <button className="cp-btn-cancel" style={{ marginLeft: 'auto' }} onClick={closeModal}>목록</button>
             </div>
@@ -328,7 +394,7 @@ const ContactPage: React.FC = () => {
         .cp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
         .cp-modal { background: white; border-radius: 16px; width: 100%; max-width: 560px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.16); }
         .cp-modal-sm { max-width: 380px; }
-        .cp-modal-detail { max-width: 640px; }
+        .cp-modal-detail { max-width: 660px; }
         .cp-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 0; flex-shrink: 0; }
         .cp-modal-title-text { font-size: 1.05rem; font-weight: 700; color: #1F2937; margin: 0; }
         .cp-modal-close { background: none; border: none; font-size: 1rem; color: #9CA3AF; cursor: pointer; padding: 4px 8px; }
@@ -359,7 +425,27 @@ const ContactPage: React.FC = () => {
         .cp-detail-author { font-size: 0.85rem; font-weight: 600; color: #4B5563; }
         .cp-detail-date { font-size: 0.78rem; color: #9CA3AF; }
         .cp-detail-title { font-size: 1.1rem; font-weight: 700; color: #1F2937; margin: 0 0 16px; line-height: 1.5; }
-        .cp-detail-content { font-size: 0.9rem; color: #374151; line-height: 1.9; white-space: pre-wrap; word-break: keep-all; }
+        .cp-detail-content { font-size: 0.9rem; color: #374151; line-height: 1.9; white-space: pre-wrap; word-break: keep-all; padding-bottom: 4px; }
+
+        /* 댓글 */
+        .cp-comments { border-top: 1px solid #F0F0F0; padding-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .cp-comments-label { font-size: 0.82rem; font-weight: 700; color: #6B7280; margin: 0; }
+        .cp-comment-list { display: flex; flex-direction: column; gap: 1px; }
+        .cp-comment { background: #F8F9FA; border-radius: 10px; padding: 12px 14px; }
+        .cp-comment-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .cp-comment-author-row { display: flex; align-items: center; gap: 6px; }
+        .cp-admin-badge { font-size: 0.65rem; font-weight: 700; background: #B07A8E; color: white; padding: 2px 7px; border-radius: 6px; }
+        .cp-comment-author { font-size: 0.82rem; font-weight: 600; color: #374151; }
+        .cp-comment-date { font-size: 0.75rem; color: #9CA3AF; }
+        .cp-comment-delete { background: none; border: none; font-size: 0.75rem; color: #9CA3AF; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+        .cp-comment-delete:hover { background: #FEE2E2; color: #DC2626; }
+        .cp-comment-content { font-size: 0.88rem; color: #374151; line-height: 1.7; white-space: pre-wrap; word-break: keep-all; margin: 0; }
+        .cp-comment-form { display: flex; flex-direction: column; gap: 8px; }
+        .cp-comment-input { border: 1.5px solid #E5E7EB; border-radius: 10px; padding: 10px 14px; font-size: 0.88rem; font-family: inherit; outline: none; resize: none; line-height: 1.6; transition: border-color 0.15s; }
+        .cp-comment-input:focus { border-color: #B07A8E; }
+        .cp-comment-submit { align-self: flex-end; background: #B07A8E; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+        .cp-comment-submit:hover:not(:disabled) { background: #9B6A7E; }
+        .cp-comment-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
         @media (max-width: 600px) {
           .cp-main { padding: 32px 16px 60px; }
