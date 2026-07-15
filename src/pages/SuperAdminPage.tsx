@@ -96,12 +96,38 @@ interface PostFormProps {
   onClose: () => void;
 }
 
+function parseEventContent(raw: string) {
+  try { const p = JSON.parse(raw); if (p.structured) return p; } catch {}
+  return null;
+}
+
+const FIELD_STYLE: React.CSSProperties = {
+  width: '100%', padding: '8px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8,
+  fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: '#1F2937',
+};
+const LABEL_STYLE: React.CSSProperties = {
+  fontSize: '0.8rem', fontWeight: 700, color: '#4B5563', paddingTop: 9, minWidth: 80, flexShrink: 0,
+};
+
 const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
   const [type, setType] = useState<PostType>(initial?.type ?? 'event');
   const [tag, setTag] = useState(initial?.tag ?? '진행중');
   const [title, setTitle] = useState(initial?.title ?? '');
-  const [content, setContent] = useState(initial?.content ?? '');
   const [saving, setSaving] = useState(false);
+
+  // 공지사항용 plain 내용
+  const [content, setContent] = useState(() => {
+    if (initial?.type !== 'event') return initial?.content ?? '';
+    return '';
+  });
+
+  // 이벤트용 구조화 필드
+  const parsed = initial?.content ? parseEventContent(initial.content) : null;
+  const [target, setTarget] = useState(parsed?.target ?? '');
+  const [benefit, setBenefit] = useState(parsed?.benefit ?? '');
+  const [howTo, setHowTo] = useState(parsed?.howTo ?? '');
+  const [notes, setNotes] = useState(parsed?.notes ?? '');
+  const [naverReviewUrl, setNaverReviewUrl] = useState(parsed?.naverReviewUrl ?? '');
 
   const tagOptions = type === 'event' ? EVENT_TAGS : NOTICE_TAGS;
 
@@ -114,7 +140,10 @@ const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
     if (!title.trim()) { toast.error('제목을 입력해주세요.'); return; }
     setSaving(true);
     try {
-      await onSave({ type, tag, title: title.trim(), content: content.trim() });
+      const finalContent = type === 'event'
+        ? JSON.stringify({ structured: true, target: target.trim(), benefit: benefit.trim(), howTo: howTo.trim(), notes: notes.trim(), naverReviewUrl: naverReviewUrl.trim() })
+        : content.trim();
+      await onSave({ type, tag, title: title.trim(), content: finalContent });
       onClose();
     } catch (e: any) {
       toast.error(e?.message || '저장 실패');
@@ -122,9 +151,16 @@ const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
     setSaving(false);
   };
 
+  const row = (label: string, input: React.ReactNode) => (
+    <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', paddingBottom: 12, borderBottom: '1px solid #F3F4F6' }}>
+      <span style={LABEL_STYLE}>{label}</span>
+      <div style={{ flex: 1 }}>{input}</div>
+    </div>
+  );
+
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
-      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 480, boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24, overflowY: 'auto' }}>
+      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: type === 'event' ? 620 : 480, boxShadow: '0 20px 60px rgba(0,0,0,0.15)', margin: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#1F2937' }}>
             {initial ? '게시글 수정' : '새 게시글 작성'}
@@ -136,15 +172,9 @@ const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           {(['event', 'notice'] as PostType[]).map(t => (
-            <button
-              key={t}
-              onClick={() => handleTypeChange(t)}
+            <button key={t} onClick={() => handleTypeChange(t)}
               style={{ flex: 1, padding: '9px 0', border: '1.5px solid', borderRadius: 10, fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
-                borderColor: type === t ? '#B07A8E' : '#E5E7EB',
-                background: type === t ? '#FDF6F9' : 'white',
-                color: type === t ? '#B07A8E' : '#6B7280',
-              }}
-            >
+                borderColor: type === t ? '#B07A8E' : '#E5E7EB', background: type === t ? '#FDF6F9' : 'white', color: type === t ? '#B07A8E' : '#6B7280' }}>
               {t === 'event' ? '이벤트' : '공지사항'}
             </button>
           ))}
@@ -154,51 +184,43 @@ const PostForm: React.FC<PostFormProps> = ({ initial, onSave, onClose }) => {
           <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>태그</label>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {tagOptions.map(t => (
-              <button
-                key={t}
-                onClick={() => setTag(t)}
+              <button key={t} onClick={() => setTag(t)}
                 style={{ padding: '5px 14px', border: '1.5px solid', borderRadius: 8, fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-                  borderColor: tag === t ? '#1F2937' : '#E5E7EB',
-                  background: tag === t ? '#1F2937' : 'white',
-                  color: tag === t ? 'white' : '#6B7280',
-                }}
-              >
+                  borderColor: tag === t ? '#1F2937' : '#E5E7EB', background: tag === t ? '#1F2937' : 'white', color: tag === t ? 'white' : '#6B7280' }}>
                 {t}
               </button>
             ))}
           </div>
         </div>
 
-        <div style={{ marginBottom: 14 }}>
+        <div style={{ marginBottom: 16 }}>
           <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>제목 *</label>
-          <input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="게시글 제목"
-            style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: '#1F2937' }}
-          />
+          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="게시글 제목"
+            style={{ ...FIELD_STYLE }} />
         </div>
 
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>내용</label>
-          <textarea
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            placeholder="게시글 내용 (선택)"
-            rows={4}
-            style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', color: '#1F2937' }}
-          />
-        </div>
+        {type === 'event' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24, background: '#F9FAFB', borderRadius: 12, padding: '16px 14px' }}>
+            {row('참여 대상', <input value={target} onChange={e => setTarget(e.target.value)} placeholder="예: 소네트 모바일 청첩장 구매자" style={FIELD_STYLE} />)}
+            {row('혜택', <textarea value={benefit} onChange={e => setBenefit(e.target.value)} placeholder="예: 청첩장 1+1 쿠폰 제공" rows={2} style={{ ...FIELD_STYLE, resize: 'vertical' }} />)}
+            {row('참여 방법', <textarea value={howTo} onChange={e => setHowTo(e.target.value)} placeholder="예: 네이버 스마트스토어에서 포토리뷰 작성&#10;또는 소네트 웹사이트에서 후기 작성" rows={3} style={{ ...FIELD_STYLE, resize: 'vertical' }} />)}
+            {row('유의사항', <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="유의사항 (줄바꿈으로 항목 구분)" rows={5} style={{ ...FIELD_STYLE, resize: 'vertical' }} />)}
+            {row('네이버 리뷰 URL', <input value={naverReviewUrl} onChange={e => setNaverReviewUrl(e.target.value)} placeholder="https://smartstore.naver.com/..." style={FIELD_STYLE} />)}
+          </div>
+        ) : (
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>내용</label>
+            <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="게시글 내용 (선택)" rows={5}
+              style={{ ...FIELD_STYLE, resize: 'vertical' }} />
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: '12px 0', border: '1.5px solid #E5E7EB', borderRadius: 12, background: 'white', color: '#6B7280', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit' }}>
             취소
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={saving}
-            style={{ flex: 1, padding: '12px 0', border: 'none', borderRadius: 12, background: '#B07A8E', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit', opacity: saving ? 0.6 : 1 }}
-          >
+          <button onClick={handleSubmit} disabled={saving}
+            style={{ flex: 1, padding: '12px 0', border: 'none', borderRadius: 12, background: '#B07A8E', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit', opacity: saving ? 0.6 : 1 }}>
             {saving ? '저장 중...' : '저장'}
           </button>
         </div>
