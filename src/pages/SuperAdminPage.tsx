@@ -292,7 +292,7 @@ const SuperAdminPage: React.FC = () => {
   // Activation codes
   const [codeCount, setCodeCount] = useState('10');
   const [codeNote, setCodeNote] = useState('');
-  const [codeExpiry, setCodeExpiry] = useState('');
+  const [codeExpiry, setCodeExpiry] = useState('90');
   const [generatingCodes, setGeneratingCodes] = useState(false);
   const [generatedCodes, setGeneratedCodes] = useState<string[] | null>(null);
   const [generatedExpiry, setGeneratedExpiry] = useState<string>('');
@@ -554,10 +554,10 @@ const SuperAdminPage: React.FC = () => {
     try {
       const res = await apiFetch<{ codes: string[] }>('/api/admin/activation-codes', {
         method: 'POST',
-        body: JSON.stringify({ count, note: codeNote.trim() || undefined, expiresAt: codeExpiry || undefined }),
+        body: JSON.stringify({ count, note: codeNote.trim() || undefined, expiresAt: codeExpiry !== '0' ? new Date(Date.now() + parseInt(codeExpiry) * 86400000).toISOString().slice(0, 10) : undefined }),
       });
       setGeneratedCodes(res.codes);
-      setGeneratedExpiry(codeExpiry);
+      setGeneratedExpiry(codeExpiry !== '0' ? new Date(Date.now() + parseInt(codeExpiry) * 86400000).toISOString().slice(0, 10) : '');
       setCodeStatuses({});
       toast.success(`코드 ${res.codes.length}개를 생성했습니다.`);
     } catch (e: any) {
@@ -866,12 +866,14 @@ const SuperAdminPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>유효기간 (선택)</label>
-                  <input
-                    type="date" value={codeExpiry} onChange={e => setCodeExpiry(e.target.value)}
-                    min={new Date().toISOString().slice(0, 10)}
-                    style={{ padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: codeExpiry ? '#1F2937' : '#9CA3AF' }}
-                  />
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>유효기간</label>
+                  <select value={codeExpiry} onChange={e => setCodeExpiry(e.target.value)}
+                    style={{ padding: '10px 14px', border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', color: '#1F2937', background: 'white', cursor: 'pointer' }}>
+                    <option value="90">90일 (3개월)</option>
+                    <option value="180">180일 (6개월)</option>
+                    <option value="365">365일 (1년)</option>
+                    <option value="0">제한 없음</option>
+                  </select>
                 </div>
                 <div style={{ flex: 1, minWidth: 160 }}>
                   <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>메모 (선택)</label>
