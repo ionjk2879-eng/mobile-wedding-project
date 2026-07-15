@@ -731,6 +731,59 @@ async function handleAdminPost(request: Request, env: Env, id: string): Promise<
   return json({ error: 'Method Not Allowed' }, 405, origin);
 }
 
+// --- Reviews API (고객 후기) ---
+
+async function handleReviews(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+
+  if (request.method === 'GET') {
+    const user = await getAuthUser(request, env);
+    const rows = await env.DB.prepare(
+      'SELECT id, uid, author_name, rating, content, photo_key, created_at FROM reviews ORDER BY created_at DESC'
+    ).all();
+    return json(rows.results.map((r: Record<string, unknown>) => ({
+      id: r.id,
+      authorName: r.author_name,
+      rating: r.rating,
+      content: r.content,
+      photoUrl: r.photo_key ? `/images/${r.photo_key}` : null,
+      createdAt: r.created_at,
+      isOwn: user?.uid === r.uid,
+    })), 200, origin);
+  }
+
+  if (request.method === 'POST') {
+    const user = await getAuthUser(request, env);
+    if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+    const body = await request.json() as { rating?: number; content?: string; photoKey?: string };
+    const rating = Number(body.rating);
+    if (!rating || rating < 1 || rating > 5) return json({ error: '별점을 선택해주세요.' }, 400, origin);
+    const content = body.content?.trim();
+    if (!content) return json({ error: '내용을 입력해주세요.' }, 400, origin);
+    const photoKey = body.photoKey?.trim() || null;
+    const result = await env.DB.prepare(
+      'INSERT INTO reviews (uid, author_name, rating, content, photo_key) VALUES (?, ?, ?, ?, ?)'
+    ).bind(user.uid, user.name || user.email, rating, content, photoKey).run();
+    return json({ id: result.meta.last_row_id }, 201, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+async function handleReview(request: Request, env: Env, id: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  if (request.method !== 'DELETE') return json({ error: 'Method not allowed' }, 405, origin);
+  const user = await getAuthUser(request, env);
+  if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+  const isAdmin = user.email === env.SUPER_ADMIN_EMAIL;
+  const row = await env.DB.prepare('SELECT uid, photo_key FROM reviews WHERE id = ?').bind(id).first();
+  if (!row) return json({ error: '후기를 찾을 수 없습니다.' }, 404, origin);
+  if (!isAdmin && row.uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
+  await env.DB.prepare('DELETE FROM reviews WHERE id = ?').bind(id).run();
+  if (row.photo_key) await env.IMAGES.delete(row.photo_key as string);
+  return json({ ok: true }, 200, origin);
+}
+
 // --- Inquiries API (문의/건의 게시판) ---
 
 async function handleInquiries(request: Request, env: Env): Promise<Response> {
@@ -1326,7 +1379,9 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
 
   const folder = (formData.get('folder') as string | null) || '';
   let prefix = '';
-  if (UPLOAD_FOLDER_PATTERN.test(folder)) {
+  if (folder === 'review') {
+    prefix = 'review/';
+  } else if (UPLOAD_FOLDER_PATTERN.test(folder)) {
     // folder가 특정 청첩장(anniversary/{slug})의 네임스페이스를 가리키므로, 패턴 모양만
     // 검사하고 끝내면 다른 로그인 사용자가 남의 청첩장 슬러그로 파일을 끼워넣을 수 있다.
     // requireInvitationOwner와 동일한 방식(소유자 uid 일치)으로 실제 소유권을 확인한다.
@@ -1906,6 +1961,11 @@ export default {
 
       const extendMatch = pathname.match(/^\/api\/invitations\/([^/]+)\/extend$/);
       if (extendMatch && request.method === 'POST') return await handleExtendExpiry(request, env, extendMatch[1]);
+
+      // Reviews (고객 후기)
+      if (pathname === '/api/reviews') return await handleReviews(request, env);
+      const reviewMatch = pathname.match(/^\/api\/reviews\/(\d+)$/);
+      if (reviewMatch) return await handleReview(request, env, reviewMatch[1]);
 
       // Inquiries (문의/건의 게시판)
       if (pathname === '/api/inquiries') return await handleInquiries(request, env);
