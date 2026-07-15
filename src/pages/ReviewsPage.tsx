@@ -61,9 +61,8 @@ const ReviewsPage: React.FC = () => {
 
   const fetchReviews = useCallback(() => {
     setLoading(true);
-    fetch('/api/reviews')
-      .then(r => r.json())
-      .then((data: Review[]) => setReviews(data))
+    apiFetch<Review[]>('/api/reviews')
+      .then((data) => setReviews(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
