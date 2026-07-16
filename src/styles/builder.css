@@ -244,8 +244,11 @@
 .header-text-btn.reset:hover { border-color: #EF4444; color: #EF4444; background: #FEF2F2; }
 
 /* Preview panel */
-.preview-panel { flex: 0 0 390px; max-width: 390px; display: flex; flex-direction: column; padding-top: 12px; min-height: 0; }
-.preview-container-box { width: 100%; flex: 1; min-height: 0; background: white; border-radius: 0; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #E5E7EB; display: flex; flex-direction: column; position: relative; }
+.preview-panel { flex: 0 0 390px; max-width: 390px; display: flex; flex-direction: column; padding-top: 12px; padding-bottom: 12px; min-height: 0; }
+/* 세로모드에서 박스가 패널 바닥까지 꽉 채우면 모서리 그림자가 드러날 공간이 없어 "붙어있는"
+   느낌이 난다 — 위와 대칭으로 아래도 12px 띄우고(패널 padding-bottom) 모서리를 둥글려서
+   배경 위에 살짝 떠 있는 카드처럼 보이게 한다. */
+.preview-container-box { width: 100%; flex: 1; min-height: 0; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #E5E7EB; display: flex; flex-direction: column; position: relative; }
 /* 가로모드는 "한 화면 = 한 섹션" 구조라 실제 폰 화면 비율로 봐야 스크롤 여부를 정확히
    가늠할 수 있다 — 큰 모니터에서 패널 세로 공간을 다 채우면 실제 폰보다 훨씬 길어져
    보인다. flex:1 대신 폰 화면 비율로 고정한다. 세로 중앙 정렬 대신 위쪽에 맞춘다 —
@@ -366,7 +369,7 @@
   .builder-main-container { flex-direction: column; flex: 1; gap: 0; padding: 0; max-width: 100%; }
 
   .editor-panel { flex: none; border-radius: 0; min-height: 0; }
-  .preview-panel { flex: none; display: none; max-width: 100%; padding-top: 0; }
+  .preview-panel { flex: none; display: none; max-width: 100%; padding-top: 0; padding-bottom: 0; }
   .preview-panel.mobile-visible { display: flex; flex: 1; flex-direction: column; align-items: center; min-height: 0; }
 
   .editor-panel.mobile-hidden { display: none; }
