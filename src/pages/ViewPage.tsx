@@ -56,6 +56,9 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   // 오프닝 애니메이션이 떠 있는 동안(z-index 99999)에는 이 FAB(z-index 100000)가 그 위에
   // 겹쳐 보이지 않도록 InvitationView가 useLayoutEffect로 알려주는 값을 그대로 따른다.
   const [openingActive, setOpeningActive] = useState(false);
+  // "맨 위로" 버튼은 가로모드 탭 넘김 화살표(h-tap-nav-btn)처럼 평소엔 흐리게 떠 있다가,
+  // 콘텐츠 아무 곳이나 탭하면 숨고 다시 탭하면 나타난다 — 세로/가로 모드 공통.
+  const [topBtnVisible, setTopBtnVisible] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
   // 섹션 이동 기능이 스크롤할 대상 ref들 — InvitationView에 previewRefs로 그대로 넘겨
   // 편집용 미리보기와 동일한 방식으로 각 섹션 DOM에 ref를 붙인다(onSectionNav를 안 넘기므로
@@ -136,7 +139,10 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   // - ?mode= URL 파라미터가 있으면(공유 링크 등에서 명시적으로 강제) 그 값을 기본으로 삼는다.
   // - 없으면 서버가 계산해 내려준 예식일+24시간 경과 여부(isPastAnniversaryThreshold)로 기본값을 정한다.
   // - modeOverride는 화면에서 토글 버튼을 눌렀을 때만 채워지는 세션 한정 임시 상태다.
-  const canAnniversaryMode = !!data.isPaid;
+  // - isAnniversaryModeVisible은 관리 페이지의 공개 설정 결과(서버가 override/전환일 기준으로
+  //   계산)로, 소유자가 비공개로 정했으면 하객 요청에 한해 false가 내려온다(소유자 본인 요청은
+  //   항상 true). false면 ?mode=anniversary URL을 직접 넣어도 기념일 모드로 전환되지 않는다.
+  const canAnniversaryMode = !!data.isPaid && data.isAnniversaryModeVisible !== false;
   const isPastAnniversaryThreshold = !!data.isPastAnniversaryThreshold;
   // ownerUid는 공개 응답에도 항상 포함되는 값이라(민감 정보 아님) 클라이언트에서 비교해도 안전하다 —
   // 관리자 API들처럼 서버가 매번 로그인 헤더로 소유권을 재확인하는 대신, 이미 내려온 값과 현재
@@ -150,9 +156,12 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   const currentMode: 'invitation' | 'anniversary' = canAnniversaryMode ? (modeOverride ?? forcedMode ?? defaultMode) : 'invitation';
   const anniversaryMode = currentMode === 'anniversary';
 
-  // 예식일+24시간 이전엔 소유자만 토글이 보인다(자기 청첩장 미리보기 목적).
-  // 이후엔 누구나 토글로 오갈 수 있다.
-  const showModeToggle = canAnniversaryMode && (isPastAnniversaryThreshold || isOwner);
+  // 예식일+24시간 이전에도 토글은 항상 보인다. 로그인 세션(isOwner) 기준으로 숨겼던 예전 방식은,
+  // 소유자가 로그인 안 한 모바일 브라우저(카카오톡 인앱 브라우저 등)로 자기 청첩장 링크를 열면
+  // 게스트와 똑같이 취급되어 버튼이 안 보이는 문제가 있었다. 게다가 ?mode=anniversary URL
+  // 파라미터로는 로그인 여부와 무관하게 이미 누구나 미리보기가 가능했으므로, 버튼만 숨기는 건
+  // 실질적인 보호 효과 없이 불편함만 유발했다.
+  const showModeToggle = canAnniversaryMode;
   // 예식 전엔 기본이 청첩장 모드라서, 되돌아가는 방향은 "다른 모드로 전환"이 아니라
   // "미리보기 종료" 뉘앙스가 자연스럽다. 예식 후엔 둘 다 정식 모드라 "OO 모드로 보기"로 대칭.
   const modeToggleLabel = !isPastAnniversaryThreshold
@@ -185,7 +194,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   return (
     <div className="view-container" style={{ fontFamily: data.fontFamily }}>
       <ToastContainer />
-      <div className={`invitation-page theme-${data.theme || 'blush'}`} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor } as React.CSSProperties : {}), ...(data.customLabelColor ? { '--wedding-label': data.customLabelColor } as React.CSSProperties : {}), ...(data.customTextColor ? { '--wedding-emphasis': data.customTextColor } as React.CSSProperties : {}) }}>
+      <div className={`invitation-page theme-${data.theme || 'blush'}`} onClick={() => setTopBtnVisible((v) => !v)} style={{ fontSize: getBaseFontSize(), ...(data.customBgColor ? { '--wedding-bg': data.customBgColor } as React.CSSProperties : {}), ...(data.customAccentColor ? { '--wedding-main': data.customAccentColor } as React.CSSProperties : {}), ...(data.customLabelColor ? { '--wedding-label': data.customLabelColor } as React.CSSProperties : {}), ...(data.customTextColor ? { '--wedding-emphasis': data.customTextColor } as React.CSSProperties : {}) }}>
         <ScrollRootContext.Provider value={null}>
           <InvitationView data={data} previewRefs={sectionRefs} showOpening shareEnabled={!!data.isPaid} forceAnniversaryMode={anniversaryMode} guestName={guestName} guestRelation={guestRelation} guestCode={guestCode} guestMessageIndex={guestMessageIndex} enableAnonymousOpening onOpeningActiveChange={setOpeningActive} isOwnerPreview={isOwner} />
         </ScrollRootContext.Provider>
@@ -224,7 +233,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
               )}
             </div>
           )}
-          <button type="button" className="view-menu-fab" onClick={handleScrollToTop} aria-label={isEn ? 'Scroll to top' : isJa ? '上部へ' : '맨 위로'}>
+          <button type="button" className={`view-menu-fab view-scroll-top-fab${topBtnVisible ? '' : ' view-scroll-top-fab--hidden'}`} onClick={handleScrollToTop} aria-label={isEn ? 'Scroll to top' : isJa ? '上部へ' : '맨 위로'}>
             <ArrowUp size={18} />
           </button>
           <button type="button" className="view-menu-fab" onClick={() => setShowMenu((v) => !v)} aria-label={isEn ? 'Menu' : isJa ? 'メニュー' : '메뉴'}>
@@ -256,6 +265,15 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
           box-shadow: 0 2px 10px rgba(0,0,0,0.08); cursor: pointer; transition: opacity 0.2s, background 0.2s;
         }
         .view-menu-fab:hover { opacity: 0.85; background: rgba(255,255,255,0.9); }
+        /* 가로모드 탭 넘김 화살표(h-tap-nav-btn)와 같은 흐린 스타일 — 항상 떠 있는 메뉴
+           버튼과 달리 눈에 덜 띄어야 하고, 콘텐츠를 탭하면 숨었다가 다시 탭하면 돌아온다. */
+        .view-scroll-top-fab {
+          border: none; background: rgba(0,0,0,0.12); color: rgba(255,255,255,0.75);
+          backdrop-filter: blur(2px); opacity: 0.55; box-shadow: none;
+          transition: opacity 0.2s, background 0.2s;
+        }
+        .view-scroll-top-fab:hover { opacity: 0.85; background: rgba(0,0,0,0.22); }
+        .view-scroll-top-fab--hidden { opacity: 0; pointer-events: none; }
         .view-menu-sheet { background: rgba(255,255,255,0.92); backdrop-filter: blur(6px); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); min-width: 190px; max-height: 60vh; overflow-y: auto; }
         .view-menu-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: none; background: none; cursor: pointer; font-family: 'Pretendard', sans-serif; font-size: 0.88rem; color: #6B7280; border-radius: 10px; transition: background 0.15s; box-sizing: border-box; white-space: nowrap; }
         .view-menu-option:hover { background: rgba(0,0,0,0.045); }
