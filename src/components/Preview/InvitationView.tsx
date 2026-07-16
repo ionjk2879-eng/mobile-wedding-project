@@ -129,13 +129,17 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 // midphoto는 순서 관리 대상이 아니라 활성 섹션 중간에 자동 배치되는 고정 섹션이라 여기서 제외
 export const DEFAULT_ORDER = ['greeting', 'contacts', 'photos', 'calendar', 'message', 'interview', 'timeline', 'location', 'rsvp', 'guestbook', 'livegallery', 'accounts', 'ending', 'share'];
 
-// 가로 스크롤 모드 슬라이드는 기본적으로 상단 고정이지만, 사진 한 장/팝업 카드처럼
-// 내용이 짧고 화면 안에 자연스럽게 꽉 채워지는 섹션은 세로 중앙에 놓는 편이 보기 좋다.
+// 가로 스크롤 모드 슬라이드는 기본적으로 상단 고정이지만, 사진 한 장/팝업 카드나
+// 공유·라이브갤러리·RSVP처럼 내용이 화면 안에 자연스럽게 꽉 채워지는 섹션은
+// 세로 중앙에 놓는 편이 보기 좋다.
 function isCenteredSlide(id: string, data: InvitationData): boolean {
   switch (id) {
     case 'midphoto':
     case 'ending':
     case 'interview':
+    case 'share':
+    case 'livegallery':
+    case 'rsvp':
       return true;
     case 'contacts':
       return (data.contactDisplayMode ?? 'inline') === 'popup';
