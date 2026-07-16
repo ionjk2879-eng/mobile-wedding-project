@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader';
 import useAuthStore from '../stores/useAuthStore';
 import { apiFetch } from '../services/api';
@@ -33,6 +34,7 @@ type View = 'list' | 'write' | 'detail' | 'unlock';
 const ContactPage: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const authLoading = useAuthStore((s) => s.loading);
+  const [searchParams] = useSearchParams();
 
   const [posts, setPosts] = useState<InquiryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,6 +87,25 @@ const ContactPage: React.FC = () => {
       setComments([]);
     }
   };
+
+  // 알림 클릭 등으로 특정 문의를 바로 열어야 할 때(?inquiry=id) 목록과 무관하게 상세를 바로 불러온다.
+  useEffect(() => {
+    const inquiryId = searchParams.get('inquiry');
+    if (!inquiryId) return;
+    (async () => {
+      try {
+        const data = await apiFetch<InquiryDetail | { secret: true }>(`/api/inquiries/${inquiryId}`);
+        if (!('secret' in data)) {
+          setDetail(data);
+          setCommentText('');
+          await fetchComments(Number(inquiryId));
+          setView('detail');
+        }
+      } catch {
+        // 접근 불가/삭제된 글이면 조용히 무시하고 목록 화면을 보여준다.
+      }
+    })();
+  }, [searchParams]);
 
   const openDetail = async (post: InquiryItem) => {
     if (post.isSecret && !post.isOwn) {

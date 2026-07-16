@@ -1,9 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/useAuthStore';
 import { signInWithGoogle, signOut, deleteAccount, initiateKakaoLogin, initiateNaverLogin } from '../services/auth';
-import { LogIn, LogOut, UserX, Menu, X, ChevronDown } from 'lucide-react';
+import { apiFetch } from '../services/api';
+import { LogIn, LogOut, UserX, Menu, X, ChevronDown, Bell } from 'lucide-react';
 import { useSiteLang, SiteLang } from '../i18n';
+
+interface NotificationItem {
+  id: number;
+  inquiryId: number;
+  title: string;
+  contentPreview: string;
+  createdAt: string;
+  isRead: boolean;
+}
 
 const getProviderLabel = (uid: string) => {
   if (uid.startsWith('kakao_')) return 'Kakao';
@@ -15,11 +25,60 @@ const LANG_LABELS: Record<SiteLang, string> = { ko: 'KO', en: 'EN', ja: 'JA' };
 
 const SiteHeader: React.FC = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const loading = useAuthStore((s) => s.loading);
   const { lang, setLang, t } = useSiteLang();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = useCallback(() => {
+    apiFetch<{ items: NotificationItem[]; unreadCount: number }>('/api/notifications')
+      .then((data) => { setNotifications(data.items); setUnreadCount(data.unreadCount); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!user) { setNotifications([]); setUnreadCount(0); return; }
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000);
+    return () => clearInterval(interval);
+  }, [user, fetchNotifications]);
+
+  useEffect(() => {
+    if (!notifOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [notifOpen]);
+
+  const toggleNotifications = async () => {
+    const next = !notifOpen;
+    setNotifOpen(next);
+    if (next && unreadCount > 0) {
+      try {
+        await apiFetch('/api/notifications/read', { method: 'POST' });
+        setUnreadCount(0);
+        setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      } catch {
+        // 읽음 처리 실패는 무시 — 다음 폴링에서 다시 시도된다.
+      }
+    }
+  };
+
+  const handleNotifClick = (n: NotificationItem) => {
+    setNotifOpen(false);
+    navigate(`/contact?inquiry=${n.inquiryId}`);
+  };
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -161,6 +220,30 @@ const SiteHeader: React.FC = () => {
         </nav>
       </div>
       <div className="site-header-right">
+        {!loading && user && (
+          <div className="site-notif" ref={notifRef}>
+            <button className="site-notif-btn" onClick={toggleNotifications} aria-label="알림">
+              <Bell size={18} />
+              {unreadCount > 0 && <span className="site-notif-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>}
+            </button>
+            {notifOpen && (
+              <div className="site-notif-menu">
+                <div className="site-notif-menu-title">알림</div>
+                {notifications.length === 0 ? (
+                  <div className="site-notif-empty">새 알림이 없습니다.</div>
+                ) : (
+                  notifications.map((n) => (
+                    <button key={n.id} className={`site-notif-item ${n.isRead ? '' : 'unread'}`} onClick={() => handleNotifClick(n)}>
+                      <span className="site-notif-item-title">{n.title}</span>
+                      <span className="site-notif-item-preview">{n.contentPreview}</span>
+                      <span className="site-notif-item-date">{n.createdAt.slice(0, 10)}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        )}
         <Link to="/manage" className={`site-nav-link site-nav-link-desktop ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
         <div className="site-lang-dropdown site-lang-dropdown-desktop" ref={langMenuRef}>
           <button className="site-lang-trigger" onClick={() => setLangMenuOpen(!langMenuOpen)}>
@@ -579,6 +662,113 @@ const SiteHeader: React.FC = () => {
         .site-auth-btn.login:hover {
           background: #9B6A7E;
         }
+        .site-notif {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+        .site-notif-btn {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: none;
+          border: none;
+          color: #6B7280;
+          padding: 6px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .site-notif-btn:hover {
+          background: #F9FAFB;
+          color: #B07A8E;
+        }
+        .site-notif-badge {
+          position: absolute;
+          top: 1px;
+          right: 1px;
+          min-width: 15px;
+          height: 15px;
+          padding: 0 3px;
+          border-radius: 8px;
+          background: #DC2626;
+          color: white;
+          font-size: 0.62rem;
+          font-weight: 700;
+          line-height: 15px;
+          text-align: center;
+        }
+        .site-notif-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: -8px;
+          background: white;
+          border-radius: 14px;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+          border: 1px solid #F0F0F0;
+          width: 300px;
+          max-width: calc(100vw - 32px);
+          max-height: 380px;
+          overflow-y: auto;
+          padding: 6px;
+          animation: site-menu-in 0.15s ease;
+          z-index: 200;
+        }
+        .site-notif-menu-title {
+          padding: 8px 10px 6px;
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: #9CA3AF;
+        }
+        .site-notif-empty {
+          padding: 24px 14px;
+          text-align: center;
+          font-size: 0.82rem;
+          color: #9CA3AF;
+        }
+        .site-notif-item {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          width: 100%;
+          padding: 10px 12px;
+          border: none;
+          border-radius: 10px;
+          background: none;
+          text-align: left;
+          cursor: pointer;
+          transition: background 0.15s;
+          font-family: inherit;
+        }
+        .site-notif-item:hover {
+          background: #F9FAFB;
+        }
+        .site-notif-item.unread {
+          background: #FBF2F5;
+        }
+        .site-notif-item.unread:hover {
+          background: #F7E8EE;
+        }
+        .site-notif-item-title {
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #1F2937;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .site-notif-item-preview {
+          font-size: 0.76rem;
+          color: #6B7280;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .site-notif-item-date {
+          font-size: 0.7rem;
+          color: #9CA3AF;
+        }
         .site-lang-dropdown {
           position: relative;
           display: flex;
@@ -631,6 +821,7 @@ const SiteHeader: React.FC = () => {
           .site-auth-btn.login { padding: 6px 12px; font-size: 0.78rem; }
           .site-auth-menu { min-width: 200px; right: -4px; }
           .site-nav-dropdown { right: -4px; }
+          .site-notif-menu { right: -60px; width: 280px; }
         }
       `}</style>
     </header>

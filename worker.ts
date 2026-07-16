@@ -924,6 +924,52 @@ async function handleInquiryComment(request: Request, env: Env, inquiryId: strin
   return json({ ok: true }, 200, origin);
 }
 
+// --- Notifications (문의 답글 알림) ---
+// 본인이 작성한 문의글에 "다른 사람"(실질적으로 관리자)이 댓글을 달면 알림 대상이 된다.
+// 본인이 자기 글에 단 댓글(후속 질문 등)은 알림에서 제외한다.
+
+async function handleNotifications(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin);
+  const user = await getAuthUser(request, env);
+  if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+
+  const userRow = await env.DB.prepare('SELECT notifications_read_at FROM users WHERE uid = ?').bind(user.uid).first();
+  const readAt = (userRow?.notifications_read_at as string) || '';
+
+  const rows = await env.DB.prepare(
+    `SELECT ic.id, ic.inquiry_id, ic.content, ic.created_at, i.title
+     FROM inquiry_comments ic
+     JOIN inquiries i ON ic.inquiry_id = i.id
+     WHERE i.uid = ? AND ic.uid != ?
+     ORDER BY ic.created_at DESC
+     LIMIT 30`
+  ).bind(user.uid, user.uid).all();
+
+  const items = rows.results.map((r: Record<string, unknown>) => {
+    const createdAt = r.created_at as string;
+    return {
+      id: r.id,
+      inquiryId: r.inquiry_id,
+      title: r.title,
+      contentPreview: (r.content as string).slice(0, 60),
+      createdAt,
+      isRead: readAt ? createdAt <= readAt : false,
+    };
+  });
+  const unreadCount = items.filter((i) => !i.isRead).length;
+  return json({ items, unreadCount }, 200, origin);
+}
+
+async function handleNotificationsRead(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405, origin);
+  const user = await getAuthUser(request, env);
+  if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+  await env.DB.prepare("UPDATE users SET notifications_read_at = datetime('now') WHERE uid = ?").bind(user.uid).run();
+  return json({ ok: true }, 200, origin);
+}
+
 // --- Admin API ---
 
 async function handleAdminInvitations(request: Request, env: Env): Promise<Response> {
@@ -1985,6 +2031,10 @@ export default {
       if (pathname === '/api/reviews') return await handleReviews(request, env);
       const reviewMatch = pathname.match(/^\/api\/reviews\/(\d+)$/);
       if (reviewMatch) return await handleReview(request, env, reviewMatch[1]);
+
+      // Notifications (문의 답글 알림)
+      if (pathname === '/api/notifications') return await handleNotifications(request, env);
+      if (pathname === '/api/notifications/read') return await handleNotificationsRead(request, env);
 
       // Inquiries (문의/건의 게시판)
       if (pathname === '/api/inquiries') return await handleInquiries(request, env);
