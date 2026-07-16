@@ -248,8 +248,16 @@
 .preview-container-box { width: 100%; flex: 1; min-height: 0; background: white; border-radius: 0; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #E5E7EB; display: flex; flex-direction: column; position: relative; }
 /* 가로모드는 "한 화면 = 한 섹션" 구조라 실제 폰 화면 비율로 봐야 스크롤 여부를 정확히
    가늠할 수 있다 — 큰 모니터에서 패널 세로 공간을 다 채우면 실제 폰보다 훨씬 길어져
-   보인다. flex:1 대신 폰 화면 비율로 고정하고 패널 안에서 세로 중앙에 둔다. */
-.preview-container-box--phone { flex: 0 1 auto; aspect-ratio: 390 / 844; max-height: 100%; margin: auto 0; }
+   보인다. flex:1 대신 폰 화면 비율로 고정한다. 세로 중앙 정렬 대신 위쪽에 맞춘다 —
+   .preview-panel의 padding-top(12px)이 이미 왼쪽 사이드바(.editor-sidebar-slim)의
+   margin-top(12px)과 같은 값으로 맞춰져 있어서, 추가 여백 없이 그대로 붙이면 "SONETT"
+   로고/"청첩장 주소" 카드 제목 줄과 자연스럽게 수평이 맞는다. 아래 남는 여백에는
+   .preview-horizontal-note가 채워진다. */
+.preview-container-box--phone { flex: 0 1 auto; aspect-ratio: 390 / 844; max-height: 100%; margin: 0; }
+.preview-horizontal-note {
+  margin: 16px 4px 0; padding: 14px 16px; background: #FBF2F5; border: 1px solid #F3E4EA;
+  border-radius: 12px; color: #9C7688; font-size: 0.76rem; line-height: 1.6; text-align: center;
+}
 .preview-header-bar { display: flex; align-items: center; justify-content: space-between; padding: 15px 25px; border-bottom: 1px solid #F0F2F5; background: white; }
 .preview-label { font-size: 0.75rem; font-weight: 800; color: #B2A4B0; text-transform: uppercase; letter-spacing: 1.5px; }
 .full-preview-btn-mini { background: #F3F4F6; border: none; color: #4B5563; padding: 8px 18px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
