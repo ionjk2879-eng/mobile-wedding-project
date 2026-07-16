@@ -56,7 +56,7 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
   // 오프닝 애니메이션이 떠 있는 동안(z-index 99999)에는 이 FAB(z-index 100000)가 그 위에
   // 겹쳐 보이지 않도록 InvitationView가 useLayoutEffect로 알려주는 값을 그대로 따른다.
   const [openingActive, setOpeningActive] = useState(false);
-  // "맨 위로" 버튼은 가로모드 탭 넘김 화살표(h-tap-nav-btn)처럼 평소엔 흐리게 떠 있다가,
+  // "맨 위로"/"메뉴" 버튼은 가로모드 탭 넘김 화살표(h-tap-nav-btn)처럼 평소엔 흐리게 떠 있다가,
   // 콘텐츠 아무 곳이나 탭하면 숨고 다시 탭하면 나타난다 — 세로/가로 모드 공통.
   const [topBtnVisible, setTopBtnVisible] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -233,10 +233,10 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
               )}
             </div>
           )}
-          <button type="button" className={`view-menu-fab view-scroll-top-fab${topBtnVisible ? '' : ' view-scroll-top-fab--hidden'}`} onClick={handleScrollToTop} aria-label={isEn ? 'Scroll to top' : isJa ? '上部へ' : '맨 위로'}>
+          <button type="button" className={`view-menu-fab view-menu-fab--faded${topBtnVisible ? '' : ' view-menu-fab--hidden'}`} onClick={handleScrollToTop} aria-label={isEn ? 'Scroll to top' : isJa ? '上部へ' : '맨 위로'}>
             <ArrowUp size={18} />
           </button>
-          <button type="button" className="view-menu-fab" onClick={() => setShowMenu((v) => !v)} aria-label={isEn ? 'Menu' : isJa ? 'メニュー' : '메뉴'}>
+          <button type="button" className={`view-menu-fab view-menu-fab--faded${topBtnVisible ? '' : ' view-menu-fab--hidden'}`} onClick={() => setShowMenu((v) => !v)} aria-label={isEn ? 'Menu' : isJa ? 'メニュー' : '메뉴'}>
             <Menu size={18} />
           </button>
         </div>
@@ -265,15 +265,15 @@ const ViewPage: React.FC<ViewPageProps> = ({ slugOverride, guestName, guestRelat
           box-shadow: 0 2px 10px rgba(0,0,0,0.08); cursor: pointer; transition: opacity 0.2s, background 0.2s;
         }
         .view-menu-fab:hover { opacity: 0.85; background: rgba(255,255,255,0.9); }
-        /* 가로모드 탭 넘김 화살표(h-tap-nav-btn)와 같은 흐린 스타일 — 항상 떠 있는 메뉴
-           버튼과 달리 눈에 덜 띄어야 하고, 콘텐츠를 탭하면 숨었다가 다시 탭하면 돌아온다. */
-        .view-scroll-top-fab {
+        /* 가로모드 탭 넘김 화살표(h-tap-nav-btn)와 같은 흐린 스타일 — 맨 위로/메뉴 버튼 둘 다
+           평소엔 눈에 덜 띄게 흐려져 있고, 콘텐츠를 탭하면 숨었다가 다시 탭하면 돌아온다. */
+        .view-menu-fab--faded {
           border: none; background: rgba(0,0,0,0.12); color: rgba(255,255,255,0.75);
           backdrop-filter: blur(2px); opacity: 0.55; box-shadow: none;
           transition: opacity 0.2s, background 0.2s;
         }
-        .view-scroll-top-fab:hover { opacity: 0.85; background: rgba(0,0,0,0.22); }
-        .view-scroll-top-fab--hidden { opacity: 0; pointer-events: none; }
+        .view-menu-fab--faded:hover { opacity: 0.85; background: rgba(0,0,0,0.22); }
+        .view-menu-fab--hidden { opacity: 0; pointer-events: none; }
         .view-menu-sheet { background: rgba(255,255,255,0.92); backdrop-filter: blur(6px); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); min-width: 190px; max-height: 60vh; overflow-y: auto; }
         .view-menu-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: none; background: none; cursor: pointer; font-family: 'Pretendard', sans-serif; font-size: 0.88rem; color: #6B7280; border-radius: 10px; transition: background 0.15s; box-sizing: border-box; white-space: nowrap; }
         .view-menu-option:hover { background: rgba(0,0,0,0.045); }
