@@ -179,7 +179,9 @@ const Gallery: React.FC<PreviewProps> = React.memo(({ data }) => {
   // 자동 애니메이션: 사진 배열을 두 번 이어붙여 폭의 절반(-50%)만큼 translateX 하면
   // 이음매 없이 무한 루프된다(물결 효과와 같은 방식). 속도는 사진 수에 비례해
   // 사진이 많아져도 개별 사진이 흐르는 체감 속도가 비슷하게 유지되게 한다.
-  const autoScrollDuration = Math.max(14, data.photos.length * 4);
+  // (사진 크기를 슬라이드쇼 수준으로 키운 만큼, 장당 이동 거리가 늘어난 비율만큼
+  // 배수도 같이 키워 체감 속도가 커지기 전과 비슷하게 유지한다.)
+  const autoScrollDuration = Math.max(20, data.photos.length * 6);
 
   // 라이트박스는 document.body로 포털링되어(아래 참고) 테마 wrapper(.invitation-page)
   // DOM 서브트리 바깥에 렌더링되므로, CSS 변수/폰트를 이 엘리먼트에 직접 다시 적용해야 한다.
