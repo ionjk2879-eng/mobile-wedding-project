@@ -341,8 +341,8 @@ const App: React.FC = () => {
           {data.scrollDirection === 'horizontal' && (
             <p className="preview-horizontal-note">
               가로모드 미리보기는 실제 폰 화면 비율에 맞추기 위해 위쪽에 고정돼 있어 아래
-              여백이 비어 보일 수 있어요. 실제 청첩장에서는 화면을 꽉 채워 균형 있게 보이도록
-              설계되어 있으니 걱정하지 않으셔도 됩니다.
+              여백이 비어 보일 수 있어요. 실제 청첩장에서는 화면을 꽉 채워 균형 있게
+              설계되어 있습니다.
             </p>
           )}
 
