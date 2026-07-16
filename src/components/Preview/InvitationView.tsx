@@ -130,8 +130,8 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
 export const DEFAULT_ORDER = ['greeting', 'contacts', 'photos', 'calendar', 'message', 'interview', 'timeline', 'location', 'rsvp', 'guestbook', 'livegallery', 'accounts', 'ending', 'share'];
 
 // 가로 스크롤 모드 슬라이드는 기본적으로 상단 고정이지만, 사진 한 장/팝업 카드나
-// 공유·라이브갤러리·RSVP처럼 내용이 화면 안에 자연스럽게 꽉 채워지는 섹션은
-// 세로 중앙에 놓는 편이 보기 좋다.
+// 공유·라이브갤러리·RSVP·인사말·한마디·갤러리 자동애니메이션처럼 내용이 화면 안에
+// 자연스럽게 꽉 채워지는 섹션은 세로 중앙에 놓는 편이 보기 좋다.
 function isCenteredSlide(id: string, data: InvitationData): boolean {
   switch (id) {
     case 'midphoto':
@@ -140,9 +140,13 @@ function isCenteredSlide(id: string, data: InvitationData): boolean {
     case 'share':
     case 'livegallery':
     case 'rsvp':
+    case 'greeting':
+    case 'message':
       return true;
     case 'contacts':
       return (data.contactDisplayMode ?? 'inline') === 'popup';
+    case 'photos':
+      return data.galleryStyle === 'auto';
     default:
       return false;
   }
