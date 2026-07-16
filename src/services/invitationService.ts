@@ -52,6 +52,7 @@ export interface PrivacySettings {
   isPastTransition: boolean;
   accountInfoVisibleOverride: 0 | 1 | null;
   rsvpFormOpenOverride: 0 | 1 | null;
+  anniversaryModeVisibleOverride: 0 | 1 | null;
 }
 
 export const fetchPrivacySettings = (slug: string): Promise<PrivacySettings> =>
@@ -60,7 +61,7 @@ export const fetchPrivacySettings = (slug: string): Promise<PrivacySettings> =>
 // 각 필드는 넘긴 것만 갱신된다. override에 null을 넘기면 "자동으로 전환"(tri-state 중 자동 판단)으로 되돌아간다.
 export const updatePrivacySettings = (
   slug: string,
-  patch: { privacyTransitionDate?: string; accountInfoVisibleOverride?: 0 | 1 | null; rsvpFormOpenOverride?: 0 | 1 | null }
+  patch: { privacyTransitionDate?: string; accountInfoVisibleOverride?: 0 | 1 | null; rsvpFormOpenOverride?: 0 | 1 | null; anniversaryModeVisibleOverride?: 0 | 1 | null }
 ): Promise<void> =>
   apiFetch(`/api/invitations/${slug}/privacy-settings`, { method: 'PUT', body: JSON.stringify(patch) });
 

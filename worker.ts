@@ -251,7 +251,7 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
 
   if (method === 'GET') {
     const row = await env.DB.prepare(
-      'SELECT owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override FROM invitations WHERE slug = ?'
+      'SELECT owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override, anniversary_mode_visible_override FROM invitations WHERE slug = ?'
     ).bind(slug).first();
     if (!row) return json(null, 404, origin);
 
@@ -269,13 +269,19 @@ async function handleInvitation(request: Request, env: Env, slug: string): Promi
         data.isRSVPEnabled = false;
       }
     }
+    // 기념일 모드는 계좌/RSVP처럼 감출 필드가 없다(민감 정보 아님) — 대신 이 모드로
+    // 전환 자체가 가능한지를 별도 플래그로 내려줘서, 소유자가 관리 페이지에서 비공개로
+    // 설정했으면 하객 쪽 ViewPage가 애초에 기념일 모드로 전환하지 못하게 막는다.
+    // 소유자 본인은 이 설정과 무관하게 항상 미리볼 수 있어야 하므로 true로 고정한다.
+    const isAnniversaryModeVisible = isOwnerRequest
+      || computeEffectiveVisibility(row.anniversary_mode_visible_override as number | null, row.privacy_transition_date as string | null);
 
     // 기념일 모드 기본 전환 시점(예식일 + 24시간) — 클라이언트 시계를 신뢰하지 않고 서버 기준으로 계산해서
     // 내려준다. 이 값은 민감 정보가 아니라 로그인 여부와 무관하게 항상 계산해 내려준다.
     const isPastAnniversaryThreshold = !!data.weddingDateISO
       && (Date.now() - new Date(data.weddingDateISO).getTime()) >= 24 * 60 * 60 * 1000;
 
-    return json({ ...data, slug, ownerUid: row.owner_uid, isPaid: !!row.is_paid, expiresAt: row.expires_at ?? null, isPastAnniversaryThreshold }, 200, origin);
+    return json({ ...data, slug, ownerUid: row.owner_uid, isPaid: !!row.is_paid, expiresAt: row.expires_at ?? null, isPastAnniversaryThreshold, isAnniversaryModeVisible }, 200, origin);
   }
 
   const user = await getAuthUser(request, env);
@@ -372,7 +378,7 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
   if (!body.newSlug) return json({ error: 'newSlug is required' }, 400, origin);
   const newSlug = body.newSlug;
 
-  const oldRow = await env.DB.prepare('SELECT owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override FROM invitations WHERE slug = ?').bind(oldSlug).first();
+  const oldRow = await env.DB.prepare('SELECT owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override, anniversary_mode_visible_override FROM invitations WHERE slug = ?').bind(oldSlug).first();
   if (!oldRow) return json({ error: '기존 청첩장을 찾을 수 없습니다.' }, 404, origin);
   if (oldRow.owner_uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
 
@@ -405,8 +411,8 @@ async function handleChangeSlug(request: Request, env: Env, oldSlug: string): Pr
     // slug 변경은 새 행을 만들고 기존 행을 지우는 방식이라, 개인정보 전환 관련 컬럼도
     // 명시적으로 옮기지 않으면 신랑신부가 수동으로 설정해둔 override(0/1)가 유실되고 NULL(자동 판단)로 되돌아간다.
     env.DB.prepare(
-      'INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-    ).bind(newSlug, user.uid, JSON.stringify(data), oldRow.is_paid, oldRow.expires_at, oldRow.privacy_transition_date, oldRow.account_info_visible_override, oldRow.rsvp_form_open_override),
+      'INSERT INTO invitations (slug, owner_uid, data, is_paid, expires_at, privacy_transition_date, account_info_visible_override, rsvp_form_open_override, anniversary_mode_visible_override) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    ).bind(newSlug, user.uid, JSON.stringify(data), oldRow.is_paid, oldRow.expires_at, oldRow.privacy_transition_date, oldRow.account_info_visible_override, oldRow.rsvp_form_open_override, oldRow.anniversary_mode_visible_override),
     env.DB.prepare('UPDATE guestbook SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE rsvp SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
     env.DB.prepare('UPDATE guests SET invitation_slug = ? WHERE invitation_slug = ?').bind(newSlug, oldSlug),
@@ -593,7 +599,7 @@ async function handlePrivacySettings(request: Request, env: Env, slug: string): 
 
   if (request.method === 'GET') {
     const row = await env.DB.prepare(
-      'SELECT privacy_transition_date, account_info_visible_override, rsvp_form_open_override FROM invitations WHERE slug = ?'
+      'SELECT privacy_transition_date, account_info_visible_override, rsvp_form_open_override, anniversary_mode_visible_override FROM invitations WHERE slug = ?'
     ).bind(slug).first();
     if (!row) return json({ error: '청첩장을 찾을 수 없습니다.' }, 404, origin);
 
@@ -605,6 +611,7 @@ async function handlePrivacySettings(request: Request, env: Env, slug: string): 
       isPastTransition,
       accountInfoVisibleOverride: (row.account_info_visible_override as number | null) ?? null,
       rsvpFormOpenOverride: (row.rsvp_form_open_override as number | null) ?? null,
+      anniversaryModeVisibleOverride: (row.anniversary_mode_visible_override as number | null) ?? null,
     }, 200, origin);
   }
 
@@ -613,6 +620,7 @@ async function handlePrivacySettings(request: Request, env: Env, slug: string): 
       privacyTransitionDate?: string | null;
       accountInfoVisibleOverride?: 0 | 1 | null;
       rsvpFormOpenOverride?: 0 | 1 | null;
+      anniversaryModeVisibleOverride?: 0 | 1 | null;
     };
 
     const isValidOverride = (v: unknown) => v === null || v === 0 || v === 1;
@@ -636,6 +644,11 @@ async function handlePrivacySettings(request: Request, env: Env, slug: string): 
       if (!isValidOverride(body.rsvpFormOpenOverride)) return json({ error: 'rsvpFormOpenOverride must be 0, 1, or null' }, 400, origin);
       sets.push('rsvp_form_open_override = ?');
       binds.push(body.rsvpFormOpenOverride);
+    }
+    if ('anniversaryModeVisibleOverride' in body) {
+      if (!isValidOverride(body.anniversaryModeVisibleOverride)) return json({ error: 'anniversaryModeVisibleOverride must be 0, 1, or null' }, 400, origin);
+      sets.push('anniversary_mode_visible_override = ?');
+      binds.push(body.anniversaryModeVisibleOverride);
     }
 
     if (sets.length === 0) return json({ error: '변경할 값이 없습니다.' }, 400, origin);

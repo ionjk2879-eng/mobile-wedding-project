@@ -126,7 +126,7 @@ const AdminPage: React.FC = () => {
     setSavingTransitionDate(false);
   };
 
-  const handleSetOverride = async (field: 'accountInfoVisibleOverride' | 'rsvpFormOpenOverride', value: 0 | 1 | null) => {
+  const handleSetOverride = async (field: 'accountInfoVisibleOverride' | 'rsvpFormOpenOverride' | 'anniversaryModeVisibleOverride', value: 0 | 1 | null) => {
     if (!slug) return;
     try {
       await updatePrivacySettings(slug, { [field]: value });
@@ -477,7 +477,7 @@ const AdminPage: React.FC = () => {
       )}
 
       <section className="admin-privacy-section">
-        <h2 className="admin-section-title"><Shield size={18} /> 개인정보 공개 설정</h2>
+        <h2 className="admin-section-title"><Shield size={18} /> 공개 정보 설정</h2>
         {privacyLoading || !privacySettings ? (
           <p className="admin-loading">불러오는 중...</p>
         ) : (
@@ -547,6 +547,35 @@ const AdminPage: React.FC = () => {
                     type="button"
                     className={`privacy-override-btn danger ${privacySettings.rsvpFormOpenOverride === 0 ? 'active' : ''}`}
                     onClick={() => handleSetOverride('rsvpFormOpenOverride', 0)}
+                  >
+                    지금 바로 비공개
+                  </button>
+                </div>
+              </div>
+
+              <div className="privacy-field">
+                <h3>기념일 모드</h3>
+                <p className="privacy-field-desc">개인정보는 아니지만, 앨범처럼 예식 후에도 하객에게 공개할지 직접 정할 수 있습니다.</p>
+                <p className="privacy-status">{privacyStatusMessage(privacySettings.anniversaryModeVisibleOverride, '기념일 모드')}</p>
+                <div className="privacy-override-buttons">
+                  <button
+                    type="button"
+                    className={`privacy-override-btn ${privacySettings.anniversaryModeVisibleOverride === null ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('anniversaryModeVisibleOverride', null)}
+                  >
+                    자동으로 전환
+                  </button>
+                  <button
+                    type="button"
+                    className={`privacy-override-btn ${privacySettings.anniversaryModeVisibleOverride === 1 ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('anniversaryModeVisibleOverride', 1)}
+                  >
+                    계속 공개 유지
+                  </button>
+                  <button
+                    type="button"
+                    className={`privacy-override-btn danger ${privacySettings.anniversaryModeVisibleOverride === 0 ? 'active' : ''}`}
+                    onClick={() => handleSetOverride('anniversaryModeVisibleOverride', 0)}
                   >
                     지금 바로 비공개
                   </button>
@@ -826,9 +855,10 @@ const AdminPage: React.FC = () => {
         .privacy-date-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #F3F4F6; }
         .privacy-date-row label { font-size: 0.85rem; font-weight: 600; color: #4B5563; }
         .privacy-date-input { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: #374151; }
-        .privacy-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .privacy-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
         .privacy-field { border: 1px solid #F3F4F6; border-radius: 12px; padding: 16px; }
         .privacy-field h3 { margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; color: #1F2937; }
+        .privacy-field-desc { margin: 0 0 10px; font-size: 0.78rem; color: #9CA3AF; line-height: 1.5; }
         .privacy-status { margin: 0 0 14px; font-size: 0.85rem; color: #6B7280; line-height: 1.5; min-height: 2.6em; }
         .privacy-override-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
         .privacy-override-btn { padding: 8px 12px; border: 1px solid #E5E7EB; border-radius: 8px; background: white; color: #4B5563; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }

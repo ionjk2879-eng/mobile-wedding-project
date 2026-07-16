@@ -185,6 +185,7 @@ export interface SharingConfig {
   isPermanent?: boolean;
   ownerUid?: string;
   isPastAnniversaryThreshold?: boolean; // 서버가 weddingDateISO+24시간 경과 여부를 계산해 내려주는 값
+  isAnniversaryModeVisible?: boolean; // 서버가 관리 페이지 공개 설정을 반영해 계산해 내려주는 값(하객 기준). 소유자 요청엔 항상 true.
 }
 
 export type InvitationData = BasicInfo & DesignConfig & ContentData & FeatureConfig & SharingConfig;
