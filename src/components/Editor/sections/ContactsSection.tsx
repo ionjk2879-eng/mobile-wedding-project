@@ -6,6 +6,7 @@ const MODES: { key: NonNullable<InvitationData['contactDisplayMode']>; name: str
   { key: 'inline', name: '인라인' },
   { key: 'popup', name: '팝업' },
   { key: 'accordion', name: '아코디언' },
+  { key: 'flat', name: '배경일체형' },
 ];
 
 const ContactsSection: React.FC = () => {

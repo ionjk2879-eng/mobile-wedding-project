@@ -55,6 +55,32 @@ const GroupsInline: React.FC<{ groups: Group[] }> = ({ groups }) => (
   </>
 );
 
+// 팝업/아코디언/배경일체형이 공통으로 쓰는 "역할·이름 + 전화/문자 버튼" 한 줄짜리 목록.
+// 카드나 캐러셀 없이 구분선만 있는 형태라 어디에 놓아도(팝업 안, 아코디언 안, 페이지 배경 위)
+// 그 자체로는 별도 배경/테두리를 갖지 않는다.
+const ContactRows: React.FC<{ contacts: ContactEntry[] }> = ({ contacts }) => (
+  <>
+    {contacts.map((c, ci) => (
+      <div key={ci} className="contact-popup-row">
+        <div className="contact-popup-info">
+          <span className="contact-popup-role">{c.role}</span>
+          <span className="contact-popup-name">{c.name}</span>
+        </div>
+        {c.phone && (
+          <div className="contact-popup-actions">
+            <a href={`tel:${c.phone}`} className="contact-popup-btn" aria-label={`${c.name}에게 전화하기`}>
+              <Phone size={17} />
+            </a>
+            <a href={`sms:${c.phone}`} className="contact-popup-btn" aria-label={`${c.name}에게 문자하기`}>
+              <MessageSquare size={17} />
+            </a>
+          </div>
+        )}
+      </div>
+    ))}
+  </>
+);
+
 const GroupsAccordion: React.FC<{ groups: Group[] }> = ({ groups }) => {
   const [openIdx, setOpenIdx] = useState<Record<number, boolean>>({});
   return (
@@ -74,7 +100,7 @@ const GroupsAccordion: React.FC<{ groups: Group[] }> = ({ groups }) => {
           </button>
           <div className={`accordion-body ${openIdx[gi] ? 'open' : ''}`}>
             <div className="accordion-inner">
-              <Carousel contacts={group.contacts} />
+              <ContactRows contacts={group.contacts} />
             </div>
           </div>
         </div>
@@ -95,24 +121,7 @@ const PopupGroupsList: React.FC<{ groups: Group[] }> = ({ groups }) => (
           />
           <span className="contact-popup-side-label">{group.label}</span>
         </div>
-        {group.contacts.map((c, ci) => (
-          <div key={ci} className="contact-popup-row">
-            <div className="contact-popup-info">
-              <span className="contact-popup-role">{c.role}</span>
-              <span className="contact-popup-name">{c.name}</span>
-            </div>
-            {c.phone && (
-              <div className="contact-popup-actions">
-                <a href={`tel:${c.phone}`} className="contact-popup-btn" aria-label={`${c.name}에게 전화하기`}>
-                  <Phone size={17} />
-                </a>
-                <a href={`sms:${c.phone}`} className="contact-popup-btn" aria-label={`${c.name}에게 문자하기`}>
-                  <MessageSquare size={17} />
-                </a>
-              </div>
-            )}
-          </div>
-        ))}
+        <ContactRows contacts={group.contacts} />
       </div>
     ))}
   </div>
@@ -165,6 +174,8 @@ const Contacts: React.FC<PreviewProps> = React.memo(({ data }) => {
       )}
 
       {mode === 'accordion' && <GroupsAccordion groups={allGroups} />}
+
+      {mode === 'flat' && <PopupGroupsList groups={allGroups} />}
     </section>
   );
 }, (prev, next) =>

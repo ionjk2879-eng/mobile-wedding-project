@@ -115,7 +115,7 @@ export interface ContentData {
   interview: InterviewQA[];
   accounts: Account[];
   accountStyle: 'style1' | 'style2' | 'style3' | 'style4';
-  contactDisplayMode?: 'inline' | 'popup' | 'accordion';
+  contactDisplayMode?: 'inline' | 'popup' | 'accordion' | 'flat';
   videoUrl: string;
   endingPhoto: string;
   endingPhotoX?: number;
