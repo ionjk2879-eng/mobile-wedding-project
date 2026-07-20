@@ -217,6 +217,7 @@ const SiteHeader: React.FC = () => {
           <Link to="/reviews" className={`site-nav-link ${pathname === '/reviews' ? 'active' : ''}`}>{t.site.reviews}</Link>
           <Link to="/guide" className={`site-nav-link ${pathname === '/guide' ? 'active' : ''}`}>{t.site.guide}</Link>
           <Link to="/contact" className={`site-nav-link ${pathname === '/contact' ? 'active' : ''}`}>{t.site.contact}</Link>
+          <Link to="/board" className={`site-nav-link ${pathname === '/board' ? 'active' : ''}`}>이벤트 게시판</Link>
         </nav>
       </div>
       <div className="site-header-right">
@@ -309,6 +310,7 @@ const SiteHeader: React.FC = () => {
               <Link to="/reviews" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/reviews' ? 'active' : ''}`}>{t.site.reviews}</Link>
               <Link to="/guide" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/guide' ? 'active' : ''}`}>{t.site.guide}</Link>
               <Link to="/contact" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/contact' ? 'active' : ''}`}>{t.site.contact}</Link>
+              <Link to="/board" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/board' ? 'active' : ''}`}>이벤트 게시판</Link>
               <div className="site-auth-menu-divider" />
               <Link to="/manage" onClick={() => setNavMenuOpen(false)} className={`site-nav-dropdown-link ${pathname === '/manage' ? 'active' : ''}`}>{t.site.manage}</Link>
               <div className="site-auth-menu-divider" />

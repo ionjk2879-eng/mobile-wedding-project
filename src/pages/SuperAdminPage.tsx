@@ -14,7 +14,7 @@ import PhotosSection from '../components/Editor/sections/PhotosSection';
 import { Search, RefreshCw, CheckCircle, ExternalLink, Plus, Pencil, Trash2, X, KeyRound, Download, Copy, Image as ImageIcon, Layers } from 'lucide-react';
 
 type Filter = 'all' | 'unpaid' | 'paid';
-type AdminTab = 'orders' | 'codes' | 'posts' | 'templates' | 'reviews' | 'inquiries';
+type AdminTab = 'orders' | 'codes' | 'posts' | 'templates' | 'reviews' | 'inquiries' | 'board';
 type PostType = 'event' | 'notice';
 
 interface InvRow {
@@ -71,6 +71,28 @@ interface InquiryComment {
 interface AdminInquiryDetail extends AdminInquiry {
   comments: InquiryComment[];
   canComment: boolean;
+}
+
+interface AdminBoardPost {
+  id: number;
+  author_name: string;
+  title: string;
+  content: string;
+  is_secret: number;
+  created_at: string;
+}
+
+interface BoardComment {
+  id: number;
+  uid: string;
+  author_name: string;
+  is_admin: number;
+  content: string;
+  created_at: string;
+}
+
+interface AdminBoardDetail extends AdminBoardPost {
+  comments: BoardComment[];
 }
 
 function daysUntil(iso: string | null): number | null {
@@ -314,6 +336,12 @@ const SuperAdminPage: React.FC = () => {
   const [selectedInquiry, setSelectedInquiry] = useState<AdminInquiryDetail | null>(null);
   const [inquiryDetailLoading, setInquiryDetailLoading] = useState(false);
 
+  // Board
+  const [boardPosts, setBoardPosts] = useState<AdminBoardPost[]>([]);
+  const [boardLoading, setBoardLoading] = useState(false);
+  const [selectedBoardPost, setSelectedBoardPost] = useState<AdminBoardDetail | null>(null);
+  const [boardDetailLoading, setBoardDetailLoading] = useState(false);
+
   // Templates
   const [templateSamples, setTemplateSamples] = useState<Record<string, { heroPhoto: string; updatedAt: string }>>({});
   const [templatesLoading, setTemplatesLoading] = useState(false);
@@ -368,6 +396,17 @@ const SuperAdminPage: React.FC = () => {
       toast.error('문의 조회 실패');
     }
     setInquiriesLoading(false);
+  }, []);
+
+  const fetchBoardPosts = useCallback(async () => {
+    setBoardLoading(true);
+    try {
+      const data = await apiFetch<AdminBoardPost[]>('/api/admin/board');
+      setBoardPosts(data);
+    } catch {
+      toast.error('게시판 조회 실패');
+    }
+    setBoardLoading(false);
   }, []);
 
   const fetchTemplateSamples = useCallback(async () => {
@@ -516,6 +555,10 @@ const SuperAdminPage: React.FC = () => {
     if (authorized && adminTab === 'inquiries') fetchInquiries();
   }, [fetchInquiries, authorized, adminTab]);
 
+  useEffect(() => {
+    if (authorized && adminTab === 'board') fetchBoardPosts();
+  }, [fetchBoardPosts, authorized, adminTab]);
+
   const handleActivate = async (row: InvRow) => {
     if (!row.weddingDateISO) { toast.error('결혼 날짜 정보가 없어 활성화할 수 없습니다.'); return; }
     const name = row.groomName && row.brideName ? `${row.groomName} & ${row.brideName}` : row.slug;
@@ -650,6 +693,41 @@ const SuperAdminPage: React.FC = () => {
     }
   };
 
+  const handleViewBoardPost = async (post: AdminBoardPost) => {
+    setBoardDetailLoading(true);
+    try {
+      const data = await apiFetch<AdminBoardDetail>(`/api/admin/board/${post.id}`);
+      setSelectedBoardPost(data);
+    } catch (e: any) {
+      toast.error(e?.message || '조회 실패');
+    }
+    setBoardDetailLoading(false);
+  };
+
+  const handleDeleteBoardPost = async (id: number) => {
+    if (!confirm('이 게시글을 삭제하시겠습니까?')) return;
+    try {
+      await apiFetch(`/api/admin/board/${id}`, { method: 'DELETE' });
+      toast.success('삭제되었습니다.');
+      setSelectedBoardPost(null);
+      fetchBoardPosts();
+    } catch (e: any) {
+      toast.error(e?.message || '삭제 실패');
+    }
+  };
+
+  const handleDeleteBoardComment = async (postId: number, commentId: number) => {
+    if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
+    try {
+      await apiFetch(`/api/board/${postId}/comments/${commentId}`, { method: 'DELETE' });
+      toast.success('삭제되었습니다.');
+      const data = await apiFetch<AdminBoardDetail>(`/api/admin/board/${postId}`);
+      setSelectedBoardPost(data);
+    } catch (e: any) {
+      toast.error(e?.message || '삭제 실패');
+    }
+  };
+
   const handleCreatePost = async (data: { type: PostType; tag: string; title: string; content: string }) => {
     await apiFetch('/api/admin/posts', { method: 'POST', body: JSON.stringify(data) });
     toast.success('게시글이 등록되었습니다.');
@@ -715,7 +793,7 @@ const SuperAdminPage: React.FC = () => {
       {/* Header */}
       <div style={{ background: 'white', borderBottom: '1px solid #F0F0F0', padding: '0 24px', display: 'flex', alignItems: 'stretch', gap: 0 }}>
         <h1 style={{ margin: '0 24px 0 0', fontSize: '1.05rem', fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center' }}>관리자</h1>
-        {(['orders', 'codes', 'posts', 'templates', 'reviews', 'inquiries'] as AdminTab[]).map(t => (
+        {(['orders', 'codes', 'posts', 'templates', 'reviews', 'inquiries', 'board'] as AdminTab[]).map(t => (
           <button
             key={t}
             onClick={() => setAdminTab(t)}
@@ -726,7 +804,7 @@ const SuperAdminPage: React.FC = () => {
               transition: 'all 0.15s',
             }}
           >
-            {t === 'orders' ? '주문 관리' : t === 'codes' ? '활성화 코드' : t === 'posts' ? '게시글 관리' : t === 'templates' ? '템플릿 샘플' : t === 'reviews' ? '후기 관리' : '문의 관리'}
+            {t === 'orders' ? '주문 관리' : t === 'codes' ? '활성화 코드' : t === 'posts' ? '게시글 관리' : t === 'templates' ? '템플릿 샘플' : t === 'reviews' ? '후기 관리' : t === 'inquiries' ? '문의 관리' : '게시판 관리'}
             {t === 'orders' && unpaidCount > 0 && (
               <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 20, background: '#FEF3C7', color: '#D97706', fontSize: '0.68rem', fontWeight: 700 }}>
                 {unpaidCount}
@@ -964,11 +1042,11 @@ const SuperAdminPage: React.FC = () => {
                 <div style={{ padding: '48px', textAlign: 'center', color: '#9CA3AF', fontSize: '0.9rem' }}>게시글이 없습니다.</div>
               ) : (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: '70px 60px 1fr 100px 80px', gap: 12, padding: '10px 20px', background: '#F9FAFB', borderBottom: '1px solid #F0F0F0', fontSize: '0.72rem', fontWeight: 700, color: '#9CA3AF' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '70px 60px 1fr 100px 130px', gap: 12, padding: '10px 20px', background: '#F9FAFB', borderBottom: '1px solid #F0F0F0', fontSize: '0.72rem', fontWeight: 700, color: '#9CA3AF' }}>
                     <span>구분</span><span>태그</span><span>제목</span><span>등록일</span><span></span>
                   </div>
                   {posts.map((post, i) => (
-                    <div key={post.id} style={{ display: 'grid', gridTemplateColumns: '70px 60px 1fr 100px 80px', gap: 12, padding: '14px 20px', alignItems: 'center', borderBottom: i < posts.length - 1 ? '1px solid #F9FAFB' : 'none' }}>
+                    <div key={post.id} style={{ display: 'grid', gridTemplateColumns: '70px 60px 1fr 100px 130px', gap: 12, padding: '14px 20px', alignItems: 'center', borderBottom: i < posts.length - 1 ? '1px solid #F9FAFB' : 'none' }}>
                       <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 8px', borderRadius: 6, textAlign: 'center', background: post.type === 'event' ? '#EFF6FF' : '#F3F4F6', color: post.type === 'event' ? '#2563EB' : '#6B7280' }}>
                         {post.type === 'event' ? '이벤트' : '공지'}
                       </span>
@@ -976,10 +1054,10 @@ const SuperAdminPage: React.FC = () => {
                       <span style={{ fontSize: '0.88rem', color: '#1F2937', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.title}</span>
                       <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{post.created_at.slice(0, 10)}</span>
                       <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                        <button onClick={() => setPostForm({ open: true, editing: post })} style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '5px 10px', border: '1px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.75rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit' }}>
+                        <button onClick={() => setPostForm({ open: true, editing: post })} style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '5px 10px', border: '1px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.75rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
                           <Pencil size={11} /> 수정
                         </button>
-                        <button onClick={() => handleDeletePost(post)} style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '5px 10px', border: '1px solid #FEE2E2', borderRadius: 8, background: '#FEF2F2', fontSize: '0.75rem', fontWeight: 600, color: '#DC2626', cursor: 'pointer', fontFamily: 'inherit' }}>
+                        <button onClick={() => handleDeletePost(post)} style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '5px 10px', border: '1px solid #FEE2E2', borderRadius: 8, background: '#FEF2F2', fontSize: '0.75rem', fontWeight: 600, color: '#DC2626', cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>
                           <Trash2 size={11} />
                         </button>
                       </div>
@@ -1169,6 +1247,57 @@ const SuperAdminPage: React.FC = () => {
           </>
         )}
 
+        {/* ── Board Tab ── */}
+        {adminTab === 'board' && (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+              <button onClick={fetchBoardPosts} disabled={boardLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', border: '1px solid #E5E7EB', borderRadius: 10, background: 'white', fontSize: '0.82rem', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit', opacity: boardLoading ? 0.5 : 1 }}>
+                <RefreshCw size={13} style={{ animation: boardLoading ? 'spin 0.8s linear infinite' : 'none' }} /> 새로고침
+              </button>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #F0F0F0', overflow: 'hidden' }}>
+              {boardLoading ? (
+                <div style={{ padding: '48px', textAlign: 'center', color: '#9CA3AF', fontSize: '0.9rem' }}>불러오는 중...</div>
+              ) : boardPosts.length === 0 ? (
+                <div style={{ padding: '48px', textAlign: 'center', color: '#9CA3AF', fontSize: '0.9rem' }}>등록된 게시글이 없습니다.</div>
+              ) : (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '50px 1fr 110px 100px 100px', gap: 12, padding: '10px 20px', background: '#F9FAFB', borderBottom: '1px solid #F0F0F0', fontSize: '0.72rem', fontWeight: 700, color: '#9CA3AF' }}>
+                    <span>번호</span><span>제목</span><span>작성자</span><span>날짜</span><span></span>
+                  </div>
+                  {boardPosts.map((post, i) => (
+                    <div key={post.id} style={{ display: 'grid', gridTemplateColumns: '50px 1fr 110px 100px 100px', gap: 12, padding: '14px 20px', alignItems: 'center', borderBottom: i < boardPosts.length - 1 ? '1px solid #F9FAFB' : 'none' }}>
+                      <span style={{ fontSize: '0.78rem', color: '#9CA3AF' }}>{post.id}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                        {!!post.is_secret && (
+                          <span style={{ flexShrink: 0, padding: '2px 6px', borderRadius: 4, background: '#F3F4F6', color: '#6B7280', fontSize: '0.68rem', fontWeight: 700 }}>비밀</span>
+                        )}
+                        <span style={{ fontSize: '0.88rem', color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.title}</span>
+                      </div>
+                      <span style={{ fontSize: '0.82rem', color: '#4B5563' }}>{post.author_name}</span>
+                      <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{post.created_at.slice(0, 10)}</span>
+                      <div style={{ display: 'flex', gap: 5, justifyContent: 'flex-end' }}>
+                        <button
+                          onClick={() => handleViewBoardPost(post)}
+                          disabled={boardDetailLoading}
+                          style={{ padding: '5px 10px', border: '1px solid #E5E7EB', borderRadius: 8, background: 'white', fontSize: '0.75rem', fontWeight: 600, color: '#1F2937', cursor: 'pointer', fontFamily: 'inherit', opacity: boardDetailLoading ? 0.5 : 1 }}
+                        >
+                          보기
+                        </button>
+                        <button onClick={() => handleDeleteBoardPost(post.id)} style={{ display: 'flex', alignItems: 'center', padding: '5px 8px', border: '1px solid #FEE2E2', borderRadius: 8, background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+            <p style={{ margin: '10px 0 0', fontSize: '0.75rem', color: '#9CA3AF', textAlign: 'right' }}>총 {boardPosts.length}건</p>
+          </>
+        )}
+
       </div>
 
       {postForm.open && (
@@ -1283,6 +1412,73 @@ const SuperAdminPage: React.FC = () => {
                 <Trash2 size={14} /> 문의 삭제
               </button>
               <button onClick={() => setSelectedInquiry(null)} style={{ padding: '9px 20px', border: '1px solid #E5E7EB', borderRadius: 10, background: 'white', color: '#6B7280', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 게시판 상세 모달 */}
+      {selectedBoardPost && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
+          <div style={{ background: 'white', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #F0F0F0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  {!!selectedBoardPost.is_secret && (
+                    <span style={{ padding: '2px 7px', borderRadius: 4, background: '#F3F4F6', color: '#6B7280', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>비밀글</span>
+                  )}
+                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedBoardPost.title}</h3>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: '#9CA3AF' }}>{selectedBoardPost.author_name} · {selectedBoardPost.created_at.slice(0, 10)}</p>
+              </div>
+              <button onClick={() => setSelectedBoardPost(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 4, flexShrink: 0 }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 16, fontSize: '0.9rem', color: '#1F2937', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {selectedBoardPost.content}
+              </div>
+
+              {selectedBoardPost.comments.length > 0 && (
+                <div>
+                  <p style={{ margin: '0 0 10px', fontSize: '0.78rem', fontWeight: 700, color: '#6B7280' }}>댓글 {selectedBoardPost.comments.length}개</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {selectedBoardPost.comments.map(c => (
+                      <div key={c.id} style={{ background: c.is_admin ? '#FDF6F9' : '#F9FAFB', border: `1px solid ${c.is_admin ? '#F0D9E4' : '#F0F0F0'}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: c.is_admin ? '#B07A8E' : '#1F2937' }}>{c.author_name}</span>
+                            {!!c.is_admin && <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#B07A8E', color: 'white' }}>관리자</span>}
+                            <span style={{ fontSize: '0.7rem', color: '#9CA3AF' }}>{c.created_at.slice(0, 10)}</span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: '#374151', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{c.content}</p>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteBoardComment(selectedBoardPost.id, c.id)}
+                          style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 2 }}
+                          title="삭제"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ padding: '16px 24px', borderTop: '1px solid #F0F0F0', display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => handleDeleteBoardPost(selectedBoardPost.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '9px 16px', border: '1px solid #FEE2E2', borderRadius: 10, background: '#FEF2F2', color: '#DC2626', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+              >
+                <Trash2 size={14} /> 게시글 삭제
+              </button>
+              <button onClick={() => setSelectedBoardPost(null)} style={{ padding: '9px 20px', border: '1px solid #E5E7EB', borderRadius: 10, background: 'white', color: '#6B7280', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
                 닫기
               </button>
             </div>

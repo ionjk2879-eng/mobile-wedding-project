@@ -983,6 +983,170 @@ async function handleNotificationsRead(request: Request, env: Env): Promise<Resp
   return json({ ok: true }, 200, origin);
 }
 
+// ── Event Board (이벤트 게시판) ──────────────────────────────────────
+
+async function handleBoard(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+
+  if (request.method === 'GET') {
+    const user = await getAuthUser(request, env);
+    const isAdmin = !!user && user.email === env.SUPER_ADMIN_EMAIL;
+    const rows = await env.DB.prepare(
+      'SELECT id, uid, author_name, title, is_secret, created_at FROM board_posts ORDER BY created_at DESC'
+    ).all();
+    return json(rows.results.map((r: Record<string, unknown>) => {
+      const isOwn = user?.uid === r.uid;
+      const hidden = r.is_secret && !isAdmin && !isOwn;
+      return {
+        id: r.id,
+        authorName: r.author_name,
+        title: hidden ? '(비밀글)' : r.title,
+        isSecret: !!r.is_secret,
+        isOwn,
+        createdAt: r.created_at,
+      };
+    }), 200, origin);
+  }
+
+  if (request.method === 'POST') {
+    const user = await getAuthUser(request, env);
+    if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+    const body = await request.json() as { title?: string; content?: string; isSecret?: boolean; password?: string; photoKey?: string };
+    const title = body.title?.trim();
+    const content = body.content?.trim();
+    if (!title || !content) return json({ error: '제목과 내용을 입력해주세요.' }, 400, origin);
+    if (body.isSecret && !body.password?.trim()) return json({ error: '비밀글에는 비밀번호를 설정해주세요.' }, 400, origin);
+    const photoKey = body.photoKey?.trim() || null;
+    const result = await env.DB.prepare(
+      'INSERT INTO board_posts (uid, author_name, title, content, is_secret, password, photo_key) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).bind(user.uid, user.name || user.email, title, content, body.isSecret ? 1 : 0, body.password?.trim() || null, photoKey).run();
+    return json({ id: result.meta.last_row_id }, 201, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+async function handleBoardPost(request: Request, env: Env, id: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  const isAdmin = !!user && user.email === env.SUPER_ADMIN_EMAIL;
+
+  if (request.method === 'GET') {
+    const row = await env.DB.prepare(
+      'SELECT id, uid, author_name, title, content, is_secret, password, photo_key, created_at FROM board_posts WHERE id = ?'
+    ).bind(id).first();
+    if (!row) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
+    const isOwn = user?.uid === row.uid;
+    const photoUrl = row.photo_key ? `/images/${row.photo_key}` : null;
+    if (!row.is_secret || isAdmin || isOwn) {
+      return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: !!row.is_secret, photoUrl, createdAt: row.created_at, isOwn, canComment: isAdmin || isOwn }, 200, origin);
+    }
+    const pw = new URL(request.url).searchParams.get('password');
+    if (!pw || pw !== row.password) return json({ secret: true }, 200, origin);
+    return json({ id: row.id, authorName: row.author_name, title: row.title, content: row.content, isSecret: true, photoUrl, createdAt: row.created_at, isOwn: false, canComment: false }, 200, origin);
+  }
+
+  if (request.method === 'DELETE') {
+    if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+    const row = await env.DB.prepare('SELECT uid, photo_key FROM board_posts WHERE id = ?').bind(id).first();
+    if (!row) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
+    if (!isAdmin && row.uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
+    await env.DB.prepare('DELETE FROM board_posts WHERE id = ?').bind(id).run();
+    if (row.photo_key) await env.IMAGES.delete(row.photo_key as string);
+    return json({ ok: true }, 200, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+async function handleBoardComments(request: Request, env: Env, postId: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  const isAdmin = !!user && user.email === env.SUPER_ADMIN_EMAIL;
+
+  if (request.method === 'GET') {
+    const rows = await env.DB.prepare(
+      'SELECT id, uid, author_name, is_admin, content, created_at FROM board_comments WHERE post_id = ? ORDER BY created_at ASC'
+    ).bind(postId).all();
+    return json(rows.results.map((r: Record<string, unknown>) => ({
+      id: r.id, authorName: r.author_name, isAdmin: !!r.is_admin,
+      content: r.content, createdAt: r.created_at, isOwn: user?.uid === r.uid,
+    })), 200, origin);
+  }
+
+  if (request.method === 'POST') {
+    if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+    const post = await env.DB.prepare('SELECT uid FROM board_posts WHERE id = ?').bind(postId).first();
+    if (!post) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
+    if (!isAdmin && post.uid !== user.uid) return json({ error: '댓글은 작성자 본인과 관리자만 달 수 있습니다.' }, 403, origin);
+    const body = await request.json() as { content?: string };
+    const content = body.content?.trim();
+    if (!content) return json({ error: '내용을 입력해주세요.' }, 400, origin);
+    const result = await env.DB.prepare(
+      'INSERT INTO board_comments (post_id, uid, author_name, is_admin, content) VALUES (?, ?, ?, ?, ?)'
+    ).bind(postId, user.uid, user.name || user.email, isAdmin ? 1 : 0, content).run();
+    return json({ id: result.meta.last_row_id }, 201, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
+async function handleBoardComment(request: Request, env: Env, postId: string, commentId: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  if (request.method !== 'DELETE') return json({ error: 'Method not allowed' }, 405, origin);
+  const user = await getAuthUser(request, env);
+  if (!user) return json({ error: '로그인이 필요합니다.' }, 401, origin);
+  const isAdmin = user.email === env.SUPER_ADMIN_EMAIL;
+  const row = await env.DB.prepare('SELECT uid FROM board_comments WHERE id = ? AND post_id = ?').bind(commentId, postId).first();
+  if (!row) return json({ error: '댓글을 찾을 수 없습니다.' }, 404, origin);
+  if (!isAdmin && row.uid !== user.uid) return json({ error: '권한이 없습니다.' }, 403, origin);
+  await env.DB.prepare('DELETE FROM board_comments WHERE id = ?').bind(commentId).run();
+  return json({ ok: true }, 200, origin);
+}
+
+async function handleAdminBoard(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+  if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin);
+  const rows = await env.DB.prepare(
+    'SELECT id, uid, author_name, title, content, is_secret, created_at FROM board_posts ORDER BY created_at DESC'
+  ).all();
+  return json(rows.results.map((r: Record<string, unknown>) => ({
+    id: r.id, author_name: r.author_name, title: r.title,
+    content: r.content, is_secret: r.is_secret, created_at: r.created_at,
+  })), 200, origin);
+}
+
+async function handleAdminBoardPost(request: Request, env: Env, id: string): Promise<Response> {
+  const origin = request.headers.get('Origin') || '*';
+  const user = await getAuthUser(request, env);
+  if (!user || user.email !== env.SUPER_ADMIN_EMAIL)
+    return json({ error: '권한이 없습니다.' }, 403, origin);
+
+  if (request.method === 'GET') {
+    const row = await env.DB.prepare(
+      'SELECT id, uid, author_name, title, content, is_secret, created_at FROM board_posts WHERE id = ?'
+    ).bind(id).first();
+    if (!row) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
+    const comments = await env.DB.prepare(
+      'SELECT id, uid, author_name, is_admin, content, created_at FROM board_comments WHERE post_id = ? ORDER BY created_at ASC'
+    ).bind(id).all();
+    return json({ ...row, comments: comments.results }, 200, origin);
+  }
+
+  if (request.method === 'DELETE') {
+    const row = await env.DB.prepare('SELECT photo_key FROM board_posts WHERE id = ?').bind(id).first();
+    if (!row) return json({ error: '게시글을 찾을 수 없습니다.' }, 404, origin);
+    await env.DB.prepare('DELETE FROM board_posts WHERE id = ?').bind(id).run();
+    if (row.photo_key) await env.IMAGES.delete(row.photo_key as string);
+    return json({ ok: true }, 200, origin);
+  }
+
+  return json({ error: 'Method not allowed' }, 405, origin);
+}
+
 // --- Admin API ---
 
 async function handleAdminInvitations(request: Request, env: Env): Promise<Response> {
@@ -2057,6 +2221,20 @@ export default {
       if (inquiryCommentsMatch) return await handleInquiryComments(request, env, inquiryCommentsMatch[1]);
       const inquiryMatch = pathname.match(/^\/api\/inquiries\/(\d+)$/);
       if (inquiryMatch) return await handleInquiry(request, env, inquiryMatch[1]);
+
+      // Board (이벤트 게시판)
+      if (pathname === '/api/board') return await handleBoard(request, env);
+      const boardCommentMatch = pathname.match(/^\/api\/board\/(\d+)\/comments\/(\d+)$/);
+      if (boardCommentMatch) return await handleBoardComment(request, env, boardCommentMatch[1], boardCommentMatch[2]);
+      const boardCommentsMatch = pathname.match(/^\/api\/board\/(\d+)\/comments$/);
+      if (boardCommentsMatch) return await handleBoardComments(request, env, boardCommentsMatch[1]);
+      const boardMatch = pathname.match(/^\/api\/board\/(\d+)$/);
+      if (boardMatch) return await handleBoardPost(request, env, boardMatch[1]);
+
+      // Admin board
+      if (pathname === '/api/admin/board') return await handleAdminBoard(request, env);
+      const adminBoardPostMatch = pathname.match(/^\/api\/admin\/board\/(\d+)$/);
+      if (adminBoardPostMatch) return await handleAdminBoardPost(request, env, adminBoardPostMatch[1]);
 
       // Posts (public)
       if (pathname === '/api/posts') return await handlePostsPublic(request, env);
