@@ -207,6 +207,7 @@ const LandingPage: React.FC = () => {
           <span>|</span>
           <Link to="/privacy" className="land-footer-privacy">{tl.privacy}</Link>
         </div>
+        <p className="land-footer-biz">상호명 지오스트컴퍼니 | 사업자 등록번호 467-27-02116</p>
         <p>© 2026 Sonett. All rights reserved.</p>
       </footer>
 
@@ -544,6 +545,7 @@ const LandingPage: React.FC = () => {
         .land-footer-links a:hover { color: #6B7280; }
         .land-footer-links span { color: #D1D5DB; }
         .land-footer-privacy { font-weight: 700; }
+        .land-footer-biz { margin: 6px 0 4px; color: #B0B7C0; font-size: 0.75rem; }
 
         /* Mobile */
         @media (max-width: 768px) {
