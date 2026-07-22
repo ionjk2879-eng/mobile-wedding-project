@@ -341,7 +341,10 @@ const AdminPage: React.FC = () => {
           imageUrl: slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`,
           link: { mobileWebUrl: inviteLink, webUrl: inviteLink },
         },
-        buttons: [{ title: '초대장 보기', link: { mobileWebUrl: inviteLink, webUrl: inviteLink } }],
+        buttons: [
+          { title: '초대장 보기', link: { mobileWebUrl: inviteLink, webUrl: inviteLink } },
+          { title: '일정등록', link: { mobileWebUrl: inviteLink, webUrl: inviteLink } },
+        ],
       });
     } catch (e: any) {
       toast.error(`카카오 공유 오류: ${e?.message || '알 수 없는 오류'}`);

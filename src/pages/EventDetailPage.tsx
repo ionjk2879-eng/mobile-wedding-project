@@ -54,7 +54,7 @@ const CouponModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
       <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🎁</div>
       <h3 style={{ margin: '0 0 10px', fontSize: '1.1rem', fontWeight: 800, color: '#1F2937' }}>쿠폰 신청 방법</h3>
       <p style={{ margin: '0 0 20px', fontSize: '0.88rem', color: '#6B7280', lineHeight: 1.7 }}>
-        작성하신 리뷰 스크린샷을 문의 게시판에 남겨주시면<br />
+        작성하신 리뷰 스크린샷을 이벤트 게시판에 남겨주시면<br />
         영업일 기준 1~2일 내에 1+1 쿠폰을 발급해드립니다.
       </p>
       <div style={{ display: 'flex', gap: 8 }}>
@@ -62,9 +62,9 @@ const CouponModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
           style={{ flex: 1, padding: '12px 0', border: '1.5px solid #E5E7EB', borderRadius: 12, background: 'white', color: '#6B7280', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit' }}>
           닫기
         </button>
-        <a href="/contact"
+        <a href="/board"
           style={{ flex: 1, padding: '12px 0', border: 'none', borderRadius: 12, background: '#B07A8E', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          문의 게시판 가기
+          이벤트 게시판 가기
         </a>
       </div>
     </div>
@@ -138,7 +138,7 @@ const StructuredEvent: React.FC<{ post: Post; ec: EventContent }> = ({ post, ec 
         </a>
         <button onClick={() => setShowCoupon(true)}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '16px', background: '#FEE500', border: 'none', borderRadius: 14, color: '#1A1A1A', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(254,229,0,0.4)' }}>
-          🎁 (리뷰 작성완료) 쿠폰 받기
+          🎁 작성완료 쿠폰받기
         </button>
       </div>
 

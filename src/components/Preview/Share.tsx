@@ -56,6 +56,10 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
           imageUrl,
           link: { mobileWebUrl: shareLink, webUrl: shareLink },
         },
+        buttons: [
+          { title: '청첩장 보기', link: { mobileWebUrl: shareLink, webUrl: shareLink } },
+          { title: '일정등록', link: { mobileWebUrl: shareLink, webUrl: shareLink } },
+        ],
       });
     } catch (e: any) {
       toast.error(`${isEn ? 'KakaoTalk share error' : isJa ? 'カカオ共有エラー' : '카카오 공유 오류'}: ${e?.message || (isEn ? 'Unknown error' : isJa ? '不明なエラー' : '알 수 없는 오류')}`);
