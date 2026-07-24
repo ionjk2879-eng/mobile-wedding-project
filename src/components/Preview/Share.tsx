@@ -74,7 +74,6 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
             title,
             description,
             imageUrl,
-            link: { mobileWebUrl: shareLink, webUrl: shareLink },
           },
         });
       } else {
