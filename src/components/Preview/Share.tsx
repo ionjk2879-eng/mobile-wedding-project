@@ -66,7 +66,6 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
       }
 
       if (kakaoEventId) {
-        toast.success(`[디버그] event_id: ${kakaoEventId}`);
         window.Kakao.Share.sendDefault({
           objectType: 'calendar',
           idType: 'event',
@@ -79,7 +78,6 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
           },
         });
       } else {
-        toast.error('[디버그] event_id 없음 — feed 방식으로 대체');
         window.Kakao.Share.sendDefault({
           objectType: 'feed',
           content: {
