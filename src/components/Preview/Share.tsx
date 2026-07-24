@@ -41,26 +41,56 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
       return;
     }
     const title = data.shareTitle || getDefaultShareTitle(data);
-    // 신랑/신부 이름은 이미 title(플랫폼별로 굵게 렌더링되는 영역)에 들어있어
-    // description에는 날짜만 넣어 중복을 없앰
     const description = data.shareDescription || getDefaultShareDescription(data);
     const slug = data.slug || '';
     const imageUrl = slug ? `${SITE_ORIGIN}/og/${slug}` : `${SITE_ORIGIN}/og-image.png`;
 
     try {
-      window.Kakao.Share.sendDefault({
-        objectType: 'feed',
-        content: {
-          title,
-          description,
-          imageUrl,
-          link: { mobileWebUrl: shareLink, webUrl: shareLink },
-        },
-        buttons: [
-          { title: '청첩장 보기', link: { mobileWebUrl: shareLink, webUrl: shareLink } },
-          { title: '일정등록', link: { mobileWebUrl: shareLink, webUrl: shareLink } },
-        ],
-      });
+      // 공개 일정 event_id를 가져와 캘린더 템플릿으로 공유한다.
+      // 실패(KAKAO_ADMIN_KEY 미설정 등)하면 기존 feed 방식으로 대체한다.
+      let kakaoEventId: string | null = null;
+      if (slug) {
+        try {
+          const res = await fetch('/api/calendar/kakao-event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slug }),
+          });
+          if (res.ok) {
+            const body = await res.json() as { event_id?: string };
+            kakaoEventId = body.event_id ?? null;
+          }
+        } catch {
+          // 네트워크 오류 등 — fall through to feed
+        }
+      }
+
+      if (kakaoEventId) {
+        window.Kakao.Share.sendDefault({
+          objectType: 'calendar',
+          idType: 'event',
+          id: kakaoEventId,
+          content: {
+            title,
+            description,
+            imageUrl,
+            link: { mobileWebUrl: shareLink, webUrl: shareLink },
+          },
+        });
+      } else {
+        window.Kakao.Share.sendDefault({
+          objectType: 'feed',
+          content: {
+            title,
+            description,
+            imageUrl,
+            link: { mobileWebUrl: shareLink, webUrl: shareLink },
+          },
+          buttons: [
+            { title: isEn ? 'View Invitation' : isJa ? '招待状を見る' : '청첩장 보기', link: { mobileWebUrl: shareLink, webUrl: shareLink } },
+          ],
+        });
+      }
     } catch (e: any) {
       toast.error(`${isEn ? 'KakaoTalk share error' : isJa ? 'カカオ共有エラー' : '카카오 공유 오류'}: ${e?.message || (isEn ? 'Unknown error' : isJa ? '不明なエラー' : '알 수 없는 오류')}`);
     }
