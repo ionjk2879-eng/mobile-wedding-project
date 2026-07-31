@@ -47,7 +47,7 @@ export const deleteAccount = async (): Promise<void> => {
 
 // Google
 export const initiateGoogleLogin = (returnUrl = '/manage'): void => {
-  const clientId = '584343413565-h8ukuqrrnravndmocei20kr9t3inkkjn.apps.googleusercontent.com';
+  const clientId = '1060518913429-quibjjsoa87bjoo000u7cek7ksn8tthr.apps.googleusercontent.com';
   const nonce = crypto.randomUUID();
   sessionStorage.setItem('oauth_nonce', nonce);
   const params = new URLSearchParams({
