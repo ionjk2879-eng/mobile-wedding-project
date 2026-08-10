@@ -587,6 +587,13 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       <span>{groom} &amp; {bride}</span>
     </div>
   ) : null;
+  const petalFooter = openingTemplate === 'petal-card' ? (
+    <div className="op-petal-footer" aria-hidden="true">
+      <i className="op-petal-vine" />
+      {Array.from({ length: 6 }, (_, i) => <span key={i} style={{ '--leaf-i': i } as React.CSSProperties} />)}
+      <b className="op-petal-footer-flower" />
+    </div>
+  ) : null;
 
   // 배경이 그라데이션이 아니라 단색(테마 자동 포함)일 때는 버튼이 배경에 묻혀 구분이 잘 안 되므로
   // 옅은 배경 채움 + 그림자를 얹어 하나의 박스로 도드라져 보이게 한다.
@@ -661,7 +668,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           {Array.from({ length: 8 }, (_, i) => <i key={i} style={{ '--spark-i': i } as React.CSSProperties} />)}
         </div>
       )}
-      {hasEnvelope && <div className="op-envelope-pocket" aria-hidden="true" />}
+      {hasEnvelope && (
+        <svg className="op-envelope-pocket" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 0 0 L 50 21.12 L 100 0 L 100 44 L 0 44 Z" vectorEffect="non-scaling-stroke" />
+        </svg>
+      )}
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
       {isBlind && (
@@ -761,6 +772,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
               {venueName && <span style={{ display: 'block', marginTop: '0.35em', opacity: 0.75, fontSize: '0.9em' }}>{venueName}</span>}
             </p>
             <button className={`op-enter op-typing-btn${typingPhase === 'done' ? ' visible' : ''}`} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
+            {petalFooter}
           </div>
         </div>
       ) : (
@@ -843,6 +855,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           <div className="op-line op-line-bottom" style={{ animation: `op-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${seqLineBottomDelay} both` }} />
 
           <button className="op-enter" style={{ animation: `op-fade-up 0.6s ease ${seqEnterDelay} both`, pointerEvents: seqBtnActive ? 'auto' : 'none', cursor: seqBtnActive ? undefined : 'default' }} onAnimationStart={() => setSeqBtnActive(true)} onClick={handleDismiss}>{anniversaryMode ? (language === 'en' ? 'View Memories' : language === 'ja' ? '思い出を見る' : '추억 보기') : (language === 'en' ? 'Open Invitation' : language === 'ja' ? '招待状を開く' : '초대장 열기')}</button>
+          {petalFooter}
         </div>
       )}
 
