@@ -628,6 +628,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       {openingTemplate === 'petal-card' && (
         <div className="op-template-stage op-petal-card-stage" aria-hidden="true">
           <div className="op-petal-card-sheet" />
+          <div className="op-petal-botanical op-petal-botanical-left"><span /><span /><span /><b /></div>
+          <div className="op-petal-botanical op-petal-botanical-right"><span /><span /><span /><b /></div>
           {Array.from({ length: 12 }, (_, i) => <i key={i} style={{ '--petal-i': i } as React.CSSProperties} />)}
         </div>
       )}
@@ -667,6 +669,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           {Array.from({ length: 8 }, (_, i) => <i key={i} style={{ '--spark-i': i } as React.CSSProperties} />)}
         </div>
       )}
+      {hasEnvelope && <div className="op-envelope-pocket" aria-hidden="true" />}
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
       {isBlind && (
