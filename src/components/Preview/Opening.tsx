@@ -656,9 +656,9 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       )}
       {openingTemplate === 'monogram' && (
         <div className="op-template-stage op-monogram-stage" aria-hidden="true">
-          <span className="op-monogram-letter op-monogram-groom">{groom.trim().charAt(0) || 'G'}</span>
-          <i className="op-monogram-ring" />
-          <span className="op-monogram-letter op-monogram-bride">{bride.trim().charAt(0) || 'B'}</span>
+          <span className="op-monogram-mark">
+            {groom.trim().charAt(0) || 'G'}<span className="op-monogram-divider">·</span>{bride.trim().charAt(0) || 'B'}
+          </span>
         </div>
       )}
       {hasEnvelope && envelopeTexture && <div className="op-envelope-paper-texture" aria-hidden="true" />}
