@@ -1070,10 +1070,10 @@
 .op-envelope-lift .op-body, .op-envelope-lift .op-typing-body { animation:op-letter-pull 1.15s cubic-bezier(.16,1,.3,1) .12s both; }
 .op-template-envelope .op-curtain-deco { display:none; }
 .op-template-envelope.op-phase-exit { opacity:var(--op-opacity) !important; transition:none !important; animation:op-envelope-veil-out .7s cubic-bezier(.76,0,.24,1) forwards !important; }
-.op-envelope-lift.op-phase-exit .op-body, .op-envelope-lift.op-phase-exit .op-typing-body { animation:none !important; opacity:1 !important; translate:0 5%; transform:none; }
-@keyframes op-letter-pull { from { opacity:1; translate:0 48%; scale:1; } to { opacity:1; translate:0 5%; scale:1; } }
+.op-envelope-lift.op-phase-exit .op-body, .op-envelope-lift.op-phase-exit .op-typing-body { animation:none !important; opacity:1 !important; translate:0 -8%; transform:none; }
+@keyframes op-letter-pull { from { opacity:1; translate:0 48%; scale:1; } to { opacity:1; translate:0 -8%; scale:1; } }
 @keyframes op-envelope-veil-out { from { translate:0 0; } to { translate:0 -110%; } }
-@media (prefers-reduced-motion: reduce) { .op-envelope-lift .op-body, .op-envelope-lift .op-typing-body { animation:none; translate:0 5%; } .op-envelope-sparkles { display:none; } }
+@media (prefers-reduced-motion: reduce) { .op-envelope-lift .op-body, .op-envelope-lift .op-typing-body { animation:none; translate:0 -8%; } .op-envelope-sparkles { display:none; } }
 
 /* 완성형 애니메이션 템플릿 */
 .op-template-stage { position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
