@@ -42,7 +42,7 @@ const OpeningSection: React.FC = () => {
 
   const update = (partial: Partial<OpeningConfig>) => {
     const customOnlyKeys: (keyof OpeningConfig)[] = [
-      'openingContentStyle', 'openingStyle', 'openingCoverStyle', 'openingDecoEffect', 'openingBgPattern',
+      'openingStyle', 'openingCoverStyle', 'openingDecoEffect', 'openingBgPattern',
     ];
     const leavesTemplate = effectiveTemplate !== 'custom'
       && customOnlyKeys.some(key => Object.prototype.hasOwnProperty.call(partial, key))
@@ -108,7 +108,6 @@ const OpeningSection: React.FC = () => {
                     openingTemplate: template.key,
                     openingBgPattern: selectedPatterns.filter(p => p !== 'letter'),
                     ...(template.key !== 'custom' ? {
-                      openingContentStyle: 'sequential' as const,
                       openingStyle: 'curtain' as const,
                       openingCoverStyle: 'none' as const,
                       openingDecoEffect: 'none' as const,

@@ -1082,14 +1082,14 @@
 /* 편지 봉투 전용 개봉 연출 */
 .op-envelope-paper-texture { position:absolute; z-index:1; inset:0 0 42% 0; pointer-events:none; opacity:.18; mix-blend-mode:overlay; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.045 .7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.22'/%3E%3C/svg%3E"); box-shadow:0 18px 34px rgba(0,0,0,.06); }
 .op-template-envelope .op-body,
-.op-template-envelope .op-typing-inner { width:min(82vw,340px); box-sizing:border-box; padding:42px 30px; background:color-mix(in srgb,var(--op-bg) 82%,var(--op-text)); border:1px solid color-mix(in srgb,var(--op-accent) 72%,transparent); box-shadow:0 18px 42px rgba(0,0,0,.14), inset 0 0 28px color-mix(in srgb,var(--op-text) 4%,transparent); }
+.op-template-envelope .op-typing-inner { --op-text:#493f39; --op-accent:#b28a72; --op-heart:#b28a72; --op-btn-bg:rgba(178,138,114,.08); width:min(82vw,340px); box-sizing:border-box; padding:44px 30px; color:#493f39; background-color:#fffaf0; background-image:linear-gradient(rgba(178,138,114,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(178,138,114,.025) 1px,transparent 1px); background-size:100% 24px,24px 100%; border:1px solid #e2d2bd; border-top:3px solid #c3a188; box-shadow:0 22px 46px rgba(61,42,31,.22),inset 0 0 32px rgba(178,138,114,.06); }
 .op-envelope-sparkles { position:absolute; z-index:1; left:50%; top:54%; width:1px; height:1px; pointer-events:none; }
 .op-envelope-sparkles i { --angle:calc(var(--spark-i) * 45deg); position:absolute; width:4px; height:4px; border-radius:50%; background:var(--op-accent); opacity:0; animation:op-envelope-spark .75s ease-out 1s both; transform:rotate(var(--angle)) translateX(0); }
 @keyframes op-envelope-spark { 0% { opacity:0; transform:rotate(var(--angle)) translateX(12px) scale(.3); } 35% { opacity:.9; } 100% { opacity:0; transform:rotate(var(--angle)) translateX(48px) scale(1); } }
-.op-envelope-lift .op-body, .op-envelope-lift .op-typing-body { translate:0 34px; transition:translate .9s cubic-bezier(.22,1,.36,1) 1s; }
-.op-envelope-lift.op-phase-ready .op-body, .op-envelope-lift.op-phase-ready .op-typing-body { translate:0 -26px; }
-.op-envelope-lift.op-phase-exit .op-body, .op-envelope-lift.op-phase-exit .op-typing-body { translate:0 -38px; transition-delay:0s; }
-@media (prefers-reduced-motion: reduce) { .op-envelope-lift .op-body, .op-envelope-lift .op-typing-body { translate:none; transition:none; } .op-envelope-sparkles { display:none; } }
+.op-envelope-lift .op-body, .op-envelope-lift .op-typing-body { animation:op-letter-pull 1.15s cubic-bezier(.16,1,.3,1) .12s both; }
+.op-envelope-lift.op-phase-exit .op-body, .op-envelope-lift.op-phase-exit .op-typing-body { animation:op-body-exit .25s ease forwards !important; }
+@keyframes op-letter-pull { from { opacity:.15; translate:0 38%; scale:.94; } to { opacity:1; translate:0 -7%; scale:1; } }
+@media (prefers-reduced-motion: reduce) { .op-envelope-lift .op-body, .op-envelope-lift .op-typing-body { animation:none; translate:0 -7%; } .op-envelope-sparkles { display:none; } }
 
 /* 완성형 애니메이션 템플릿 */
 .op-template-stage { position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
@@ -1103,12 +1103,6 @@
 .op-petal-card-sheet { position:absolute; left:50%; top:50%; width:min(78%,330px); height:min(68%,520px); translate:-50% -50%; border:1px solid var(--op-frame-color); background:color-mix(in srgb,var(--op-bg) 86%,var(--op-text)); box-shadow:0 18px 50px rgba(0,0,0,.12); animation:op-card-rise 1s cubic-bezier(.22,1,.36,1) both; }
 .op-petal-card-stage i { --a:calc(var(--petal-i) * 30deg); position:absolute; left:50%; top:50%; width:10px; height:18px; border-radius:80% 20% 70% 30%; background:var(--op-accent); opacity:0; animation:op-card-petal 1.7s ease-out calc(var(--petal-i) * .045s) both; }
 .op-template-petal-card .op-body { animation:op-card-content-rise .9s cubic-bezier(.22,1,.36,1) .1s both; }
-.op-template-petal-card .op-body .op-char { opacity:1; transform:none; animation:none; }
-.op-template-petal-card .op-body .op-names,
-.op-template-petal-card .op-body .op-main { opacity:1 !important; transform:none; animation:none !important; }
-.op-template-petal-card .op-body .op-flip-box { opacity:1; transform:none; animation:none !important; }
-.op-template-petal-card .op-body .op-line { width:60px; animation:none !important; }
-.op-template-petal-card .op-body .op-sub { opacity:.88; transform:none; animation:none !important; }
 @keyframes op-card-rise { from { opacity:0; translate:-50% -42%; scale:.92; } to { opacity:1; translate:-50% -50%; scale:1; } }
 @keyframes op-card-content-rise { from { opacity:0; translate:0 18px; } to { opacity:1; translate:0 0; } }
 @keyframes op-card-petal { 0% { opacity:0; transform:rotate(var(--a)) translateX(12px) rotate(20deg); } 35% { opacity:.7; } 100% { opacity:.18; transform:rotate(var(--a)) translateX(clamp(130px,38vw,240px)) rotate(170deg); } }
