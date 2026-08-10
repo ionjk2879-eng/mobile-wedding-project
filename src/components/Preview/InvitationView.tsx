@@ -164,8 +164,10 @@ function isCenteredSlide(id: string, data: InvitationData): boolean {
 // 가로 스크롤 모드에서 빈 슬라이드가 생기지 않도록, 컴포넌트 내부 self-hide 조건을 여기서도 동일하게 체크한다.
 function isSectionActive(id: string, data: InvitationData): boolean {
   switch (id) {
-    case 'interview': return data.isInterviewEnabled !== false;
-    case 'timeline': return data.isTimelineEnabled !== false;
+    // Interview/Timeline render nothing until at least one item exists.
+    // Checking only the enabled flag would still create an empty h-slide.
+    case 'interview': return data.isInterviewEnabled !== false && (data.interview?.length ?? 0) > 0;
+    case 'timeline': return data.isTimelineEnabled !== false && (data.timeline?.length ?? 0) > 0;
     case 'message': return data.isMessageEnabled !== false;
     case 'ending': return data.isEndingEnabled !== false;
     // These components use an explicit truthy check internally. Keep this
