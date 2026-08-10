@@ -147,26 +147,28 @@ const OpeningSection: React.FC = () => {
 
           <div className="opt-inline-group">
             <label className="opt-inline-label">대표 커버 디자인</label>
-            <p className="section-desc" style={{ marginTop: -4, marginBottom: 10 }}>
-              사진 대신 이름과 심플한 도형으로 시작하는 오프닝입니다. 전환 스타일과 별도로 적용됩니다.
-            </p>
-            <div className="opening-cover-grid">
-              {([
-                { key: 'none' as const, name: '기본', mark: '♡' },
-                { key: 'overlap' as const, name: '포개진 원', mark: '○○' },
-                { key: 'arch' as const, name: '미니멀 아치', mark: '⌒' },
-                { key: 'orbit' as const, name: '두 개의 궤도', mark: '◎' },
-                { key: 'petals' as const, name: '네 잎', mark: '✣' },
-                { key: 'monogram' as const, name: '이니셜', mark: 'G B' },
-                { key: 'ribbon' as const, name: '인연의 선', mark: '∞' },
-              ]).map(s => (
-                <button key={s.key} type="button"
-                  className={`opening-cover-option ${(opening.openingCoverStyle || 'none') === s.key ? 'active' : ''}`}
-                  onClick={() => update({ openingCoverStyle: s.key })}>
-                  <span className={`opening-cover-option-mark mark-${s.key}`}>{s.mark}</span>
-                  <strong>{s.name}</strong>
-                </button>
-              ))}
+            <div className="opt-inline-content">
+              <p className="section-desc opening-option-desc">
+                사진 대신 이름과 심플한 도형으로 시작합니다. 전환 스타일과 별도로 적용됩니다.
+              </p>
+              <div className="opening-cover-grid">
+                {([
+                  { key: 'none' as const, name: '기본', mark: '♡' },
+                  { key: 'overlap' as const, name: '포개진 원', mark: '○○' },
+                  { key: 'arch' as const, name: '미니멀 아치', mark: '⌒' },
+                  { key: 'orbit' as const, name: '두 개의 궤도', mark: '◎' },
+                  { key: 'petals' as const, name: '네 잎', mark: '✣' },
+                  { key: 'monogram' as const, name: '이니셜', mark: 'G B' },
+                  { key: 'ribbon' as const, name: '인연의 선', mark: '∞' },
+                ]).map(s => (
+                  <button key={s.key} type="button"
+                    className={`opening-cover-option ${(opening.openingCoverStyle || 'none') === s.key ? 'active' : ''}`}
+                    onClick={() => update({ openingCoverStyle: s.key })}>
+                    <span className={`opening-cover-option-mark mark-${s.key}`}>{s.mark}</span>
+                    <strong>{s.name}</strong>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -372,37 +374,39 @@ const OpeningSection: React.FC = () => {
           {isEnvelopeTemplate && (
             <div className="opt-inline-group envelope-options-panel">
               <label className="opt-inline-label">편지 봉투 연출</label>
-              <p className="section-desc" style={{ marginTop: -4, marginBottom: 10 }}>
-                템플릿에 포함된 개봉 디테일을 취향에 맞게 조절할 수 있습니다.
-              </p>
-              <div className="envelope-option-row">
-                <span className="envelope-option-title">왁스 실링</span>
-                <div className="account-style-grid">
-                  {([
-                    { key: 'none' as const, name: '없음' },
-                    { key: 'heart' as const, name: '하트' },
-                    { key: 'initials' as const, name: '이니셜' },
-                  ]).map(s => (
-                    <button key={s.key} type="button"
-                      className={`account-style-btn ${(opening.openingEnvelopeSeal || 'initials') === s.key ? 'active' : ''}`}
-                      onClick={() => update({ openingEnvelopeSeal: s.key })}>
-                      <strong>{s.name}</strong>
-                    </button>
-                  ))}
+              <div className="opt-inline-content">
+                <p className="section-desc opening-option-desc">
+                  템플릿에 포함된 개봉 디테일을 취향에 맞게 조절할 수 있습니다.
+                </p>
+                <div className="envelope-option-row">
+                  <span className="envelope-option-title">왁스 실링</span>
+                  <div className="account-style-grid">
+                    {([
+                      { key: 'none' as const, name: '없음' },
+                      { key: 'heart' as const, name: '하트' },
+                      { key: 'initials' as const, name: '이니셜' },
+                    ]).map(s => (
+                      <button key={s.key} type="button"
+                        className={`account-style-btn ${(opening.openingEnvelopeSeal || 'initials') === s.key ? 'active' : ''}`}
+                        onClick={() => update({ openingEnvelopeSeal: s.key })}>
+                        <strong>{s.name}</strong>
+                      </button>
+                    ))}
+                  </div>
                 </div>
+                {([
+                  { key: 'openingEnvelopeLift' as const, name: '편지 상승', desc: '개봉 후 편지 내용이 부드럽게 올라옵니다.' },
+                  { key: 'openingEnvelopeTexture' as const, name: '종이 질감', desc: '편지 영역에 은은한 종이결과 깊이감을 더합니다.' },
+                  { key: 'openingEnvelopeSparkle' as const, name: '개봉 빛 포인트', desc: '실링 주변에 빛이 한 번 짧게 퍼집니다.' },
+                ]).map(item => (
+                  <label key={item.key} className="modern-checkbox envelope-feature-check">
+                    <input type="checkbox"
+                      checked={opening[item.key] !== false}
+                      onChange={(e) => update({ [item.key]: e.target.checked })} />
+                    <span><strong>{item.name}</strong><small>{item.desc}</small></span>
+                  </label>
+                ))}
               </div>
-              {([
-                { key: 'openingEnvelopeLift' as const, name: '편지 상승', desc: '개봉 후 편지 내용이 부드럽게 올라옵니다.' },
-                { key: 'openingEnvelopeTexture' as const, name: '종이 질감', desc: '편지 영역에 은은한 종이결과 깊이감을 더합니다.' },
-                { key: 'openingEnvelopeSparkle' as const, name: '개봉 빛 포인트', desc: '실링 주변에 빛이 한 번 짧게 퍼집니다.' },
-              ]).map(item => (
-                <label key={item.key} className="modern-checkbox envelope-feature-check">
-                  <input type="checkbox"
-                    checked={opening[item.key] !== false}
-                    onChange={(e) => update({ [item.key]: e.target.checked })} />
-                  <span><strong>{item.name}</strong><small>{item.desc}</small></span>
-                </label>
-              ))}
             </div>
           )}
 
