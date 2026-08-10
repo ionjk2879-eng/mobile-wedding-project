@@ -9,6 +9,8 @@ export interface AIPreset {
   category: string;
   previewColors: string[];
   tags?: string[];
+  previewPhotoIndex?: number;
+  /** Legacy admin sample rows; new previews use the shared source directly. */
   sampleSlug?: string;
   accentOnText?: boolean;
   settings: Partial<InvitationData>;
@@ -20,7 +22,7 @@ export const AI_PRESETS: AIPreset[] = [
   {
     id: 'sage-garden', name: '세이지 가든', category: '내추럴', emoji: '🌿',
     description: '세이지 그린과 린넨 질감, 잎사귀 효과가 어우러진 편안한 정원 무드',
-    previewColors: ['#FBF5DD', '#306D29', '#0D530E'], sampleSlug: '_tmpl-sage-garden',
+    previewColors: ['#FBF5DD', '#306D29', '#0D530E'],
     tags: ['에디토리얼', '베일 오프닝', '린넨', '나뭇잎'],
     settings: {
       theme: 'sagenature', fontFamily: "'Gowun Batang', serif", fontSize: 'medium',
@@ -33,7 +35,7 @@ export const AI_PRESETS: AIPreset[] = [
   {
     id: 'blue-editorial', name: '블루 에디토리얼', category: '모던', emoji: '🩵',
     description: '더스티 블루와 매거진 프레임으로 완성한 맑고 감각적인 에디토리얼',
-    previewColors: ['#D0E7E6', '#4274D9', '#293681'], sampleSlug: '_tmpl-blue-editorial', accentOnText: true,
+    previewColors: ['#D0E7E6', '#4274D9', '#293681'], previewPhotoIndex: 2, accentOnText: true,
     tags: ['매거진 프레임', '인스타 오프닝', '슬라이드', '블루'],
     settings: {
       theme: 'dustyblue', fontFamily: "'Pretendard', sans-serif", fontSize: 'small',
@@ -46,7 +48,7 @@ export const AI_PRESETS: AIPreset[] = [
   {
     id: 'champagne-classic', name: '샴페인 클래식', category: '클래식', emoji: '🥂',
     description: '아이보리와 샴페인 골드, 투명 액자가 만드는 정제된 클래식 무드',
-    previewColors: ['#FDF8F0', '#C9A227', '#6B4E1E'], sampleSlug: '_tmpl-champagne-classic',
+    previewColors: ['#FDF8F0', '#C9A227', '#6B4E1E'], previewPhotoIndex: -1,
     tags: ['글라스 프레임', '커튼 오프닝', '실크', '샴페인 골드'],
     settings: {
       theme: 'ivorychampagne', fontFamily: "'Cormorant Garamond', 'Nanum Myeongjo', serif", fontSize: 'medium',
@@ -59,7 +61,7 @@ export const AI_PRESETS: AIPreset[] = [
   {
     id: 'blush-romance', name: '블러쉬 로맨스', category: '로맨틱', emoji: '🌸',
     description: '파스텔 블러쉬와 수채화, 꽃잎이 흐르는 부드럽고 로맨틱한 스타일',
-    previewColors: ['#F6F4E8', '#DC9B9B', '#3E5A4C'], sampleSlug: '_tmpl-blush-romance',
+    previewColors: ['#F6F4E8', '#DC9B9B', '#3E5A4C'], previewPhotoIndex: 0,
     tags: ['센터 카드', '원형 오프닝', '수채화', '꽃잎'],
     settings: {
       theme: 'pastelblush', fontFamily: "'Gowun Batang', serif", fontSize: 'medium',
@@ -72,7 +74,7 @@ export const AI_PRESETS: AIPreset[] = [
   {
     id: 'charcoal-minimal', name: '차콜 미니멀', category: '미니멀', emoji: '🩶',
     description: '웜 차콜과 절제된 타이포그래피가 돋보이는 도시적인 미니멀 디자인',
-    previewColors: ['#F5F1EA', '#B97A56', '#33302C'], sampleSlug: '_tmpl-charcoal-minimal', accentOnText: true,
+    previewColors: ['#F5F1EA', '#B97A56', '#33302C'], previewPhotoIndex: 1, accentOnText: true,
     tags: ['데이트 스플릿', '블라인드 오프닝', '미니멀', '차콜'],
     settings: {
       theme: 'warmcharcoal', fontFamily: "'SUIT', 'Pretendard', sans-serif", fontSize: 'small',
@@ -85,7 +87,7 @@ export const AI_PRESETS: AIPreset[] = [
   {
     id: 'terracotta-film', name: '테라코타 필름', category: '빈티지', emoji: '🍂',
     description: '테라코타와 한지 질감, 필름 스틸 구성이 어우러진 따뜻한 빈티지 무드',
-    previewColors: ['#F3E4D3', '#C1633B', '#7A3418'], sampleSlug: '_tmpl-terracotta-film',
+    previewColors: ['#F3E4D3', '#C1633B', '#7A3418'], previewPhotoIndex: 3,
     tags: ['필름 스틸', '프레임 오프닝', '한지', '단풍'],
     settings: {
       theme: 'terracotta', fontFamily: "'Nanum Myeongjo', serif", fontSize: 'medium',

@@ -23,9 +23,9 @@ const TemplatePreviewPage: React.FC = () => {
   useEffect(() => { loadAllFonts(); }, []);
 
   useEffect(() => {
-    if (!preset?.sampleSlug) return;
+    if (!preset) return;
     setLoading(true);
-    loadInvitationPublic(preset.sampleSlug)
+    loadInvitationPublic('junho-seoyeon1')
       .then(async d => {
         if (d) {
           setSampleData(d);
@@ -36,7 +36,7 @@ const TemplatePreviewPage: React.FC = () => {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [preset?.sampleSlug]);
+  }, [preset?.id]);
 
   if (!preset) {
     return (
@@ -59,7 +59,11 @@ const TemplatePreviewPage: React.FC = () => {
     greetingContent: s.greetingContent,
     groomMessage: s.groomMessage,
     brideMessage: s.brideMessage,
-    heroPhoto: s.heroPhoto || '',
+    heroPhoto: preset.previewPhotoIndex === -1
+      ? (s.heroPhoto2 || s.heroPhoto || '')
+      : preset.previewPhotoIndex !== undefined
+        ? (s.photos?.[preset.previewPhotoIndex] || s.heroPhoto || '')
+        : (s.heroPhoto || ''),
     heroPhotoX: s.heroPhotoX,
     heroPhotoY: s.heroPhotoY,
     heroPhoto2: s.heroPhoto2 || '',

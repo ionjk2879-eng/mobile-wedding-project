@@ -106,17 +106,20 @@ const TemplatesPage: React.FC = () => {
   const [photos, setPhotos] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
-    // 각 프리셋의 전용 템플릿 샘플 슬러그에서 독립적으로 사진 fetch
-    AI_PRESETS.forEach(preset => {
-      if (!preset.sampleSlug) return;
-      loadInvitationPublic(preset.sampleSlug)
-        .then(d => {
-          if (d?.heroPhoto) {
-            setPhotos(prev => ({ ...prev, [preset.id]: d.heroPhoto! }));
-          }
-        })
-        .catch(() => {});
-    });
+    // One public sample supplies the content. Presets only choose a different
+    // photo and design combination, so no duplicated template rows are needed.
+    loadInvitationPublic('junho-seoyeon1').then(d => {
+      if (!d) return;
+      const next: Record<string, string | null> = {};
+      AI_PRESETS.forEach(preset => {
+        next[preset.id] = preset.previewPhotoIndex === -1
+          ? (d.heroPhoto2 || d.heroPhoto || null)
+          : preset.previewPhotoIndex !== undefined
+            ? (d.photos?.[preset.previewPhotoIndex] || d.heroPhoto || null)
+            : (d.heroPhoto || null);
+      });
+      setPhotos(next);
+    }).catch(() => {});
   }, []);
 
   return (
