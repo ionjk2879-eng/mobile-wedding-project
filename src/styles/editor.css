@@ -401,3 +401,19 @@
   .input-grid-2 { grid-template-columns: 1fr; }
   .interview-answer-row { grid-template-columns: 1fr; }
 }
+.opening-cover-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.opening-cover-option { min-height: 82px; padding: 10px 8px; border: 1px solid #e8e1e4; border-radius: 10px; background: #fff; color: #62565b; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; transition: border-color .2s, background .2s, transform .2s; }
+.opening-cover-option:hover { transform: translateY(-1px); border-color: #d4a5c6; }
+.opening-cover-option.active { border: 2px solid #b07a8e; background: #fdf6f9; color: #8e6073; }
+.opening-cover-option strong { font-size: .72rem; }
+.opening-cover-option-mark { height: 30px; display: flex; align-items: center; justify-content: center; color: #b07a8e; font-family: Georgia, serif; font-size: 24px; letter-spacing: -7px; padding-right: 7px; }
+.opening-cover-option-mark.mark-monogram { font-size: 13px; letter-spacing: 3px; padding-right: 0; }
+.opening-cover-option-mark.mark-ribbon { font-size: 29px; letter-spacing: 0; padding-right: 0; }
+.opening-cover-option-mark.mark-none { letter-spacing: 0; padding-right: 0; }
+.envelope-options-panel { padding: 14px; border-radius: 12px; background: #faf7f8; border: 1px solid #eadde2; }
+.envelope-option-row { margin-bottom: 14px; }
+.envelope-option-title { display: block; margin-bottom: 7px; color: #62565b; font-size: .75rem; font-weight: 700; }
+.envelope-feature-check { display: flex; align-items: flex-start; gap: 9px; padding: 10px 0; border-top: 1px solid #eee5e8; }
+.envelope-feature-check span { display: flex; flex-direction: column; gap: 3px; }
+.envelope-feature-check strong { font-size: .76rem; color: #4b4246; }
+.envelope-feature-check small { font-size: .66rem; line-height: 1.45; color: #8c7f84; }

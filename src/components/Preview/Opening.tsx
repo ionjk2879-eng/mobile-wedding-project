@@ -158,6 +158,21 @@ function hexLuminance(hex: string): number {
   } catch { return 0; }
 }
 
+const OpeningCoverMark: React.FC<{ style: NonNullable<OpeningConfig['openingCoverStyle']>; groom: string; bride: string }> = ({ style, groom, bride }) => {
+  if (style === 'none') return null;
+  const initials = `${groom.trim().charAt(0) || 'G'} · ${bride.trim().charAt(0) || 'B'}`;
+  return (
+    <div className={`op-cover-mark op-cover-${style}`} aria-hidden="true">
+      {style === 'overlap' && <><i className="shape shape-large" /><i className="shape shape-left" /><i className="shape shape-right" /><i className="shape shape-arc" /></>}
+      {style === 'arch' && <><i className="shape arch-outer" /><i className="shape arch-inner" /><i className="shape arch-dot" /></>}
+      {style === 'orbit' && <><i className="shape orbit-one" /><i className="shape orbit-two" /><i className="shape orbit-core" /></>}
+      {style === 'petals' && <><i className="shape petal p1" /><i className="shape petal p2" /><i className="shape petal p3" /><i className="shape petal p4" /></>}
+      {style === 'monogram' && <span className="op-cover-initials">{initials}</span>}
+      {style === 'ribbon' && <><i className="shape ribbon-left" /><i className="shape ribbon-right" /><i className="shape ribbon-dot" /></>}
+    </div>
+  );
+};
+
 const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO, slug, enableAnonymousOpening, venueName }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
@@ -498,6 +513,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const opacity = opening.openingBgOpacity ?? 0.95;
   const groom = groomName || '신랑';
   const bride = brideName || '신부';
+  const coverStyle = opening.openingCoverStyle || 'none';
 
   // 줄 단위 등장(lines): 이름/멘트가 글자 단위가 아니라 한 덩어리로 페이드업되므로 고정 딜레이를 쓴다.
   const isLineReveal = opening.openingContentStyle === 'lines';
@@ -549,6 +565,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const bgPatterns: string[] = Array.isArray(rawPattern)
     ? rawPattern.filter(p => p !== 'none')
     : (rawPattern && rawPattern !== 'none') ? [rawPattern] : [];
+  const hasEnvelope = bgPatterns.includes('letter');
+  const envelopeSeal = opening.openingEnvelopeSeal || 'initials';
+  const envelopeLift = opening.openingEnvelopeLift !== false;
+  const envelopeTexture = opening.openingEnvelopeTexture !== false;
+  const envelopeSparkle = opening.openingEnvelopeSparkle !== false;
   const gradientValue = colorMode === 'gradient'
     ? isThemeGradient
       ? `linear-gradient(180deg, ${themeColor.bg} 0%, ${themeColor.accent} 100%)`
@@ -592,10 +613,21 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   return (
     <div
       ref={rootRef}
-      className={`op-root op-${effectiveStyle} op-phase-${phase}`}
+      className={`op-root op-${effectiveStyle} op-phase-${phase}${hasEnvelope && envelopeLift ? ' op-envelope-lift' : ''}`}
       style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', '--op-pattern-color': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)', '--op-frame-color': isDark ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.30)', '--op-frame-color2': isDark ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)', '--op-curtain-bg': isDark ? 'rgba(195,193,198,0.50)' : bgColor, '--op-frame-bg': isDark ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.07)', '--op-frame-shadow': isDark ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)', '--op-frame-inset': isDark ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)', '--op-insta-track': isDark ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.22)', '--op-insta-fill': isDark ? 'rgba(0,0,0,0.90)' : 'rgba(255,255,255,0.95)', '--op-insta-pct': isDark ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.85)', '--op-btn-bg': btnBg, '--op-btn-shadow': btnShadow, '--op-envelope-tint': isDark ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.16)', ...bgOverride, ...editorBounds, ...(topOffset != null && !Object.keys(editorBounds).length ? { top: topOffset, height: `calc(100% - ${topOffset}px)` } : {}) } as React.CSSProperties}
     >
       {bgPatterns.map(pat => <div key={pat} className={`op-pattern op-pattern-${pat}`} aria-hidden="true" />)}
+      {hasEnvelope && envelopeTexture && <div className="op-envelope-paper-texture" aria-hidden="true" />}
+      {hasEnvelope && envelopeSeal !== 'none' && (
+        <div className={`op-envelope-seal op-envelope-seal-${envelopeSeal}`} aria-hidden="true">
+          {envelopeSeal === 'heart' ? '♥' : `${groom.trim().charAt(0) || 'G'}·${bride.trim().charAt(0) || 'B'}`}
+        </div>
+      )}
+      {hasEnvelope && envelopeSparkle && (
+        <div className="op-envelope-sparkles" aria-hidden="true">
+          {Array.from({ length: 8 }, (_, i) => <i key={i} style={{ '--spark-i': i } as React.CSSProperties} />)}
+        </div>
+      )}
       {isCurtain && <div className="op-curtain-deco op-deco-top" />}
       {isCurtain && <div className="op-curtain-deco op-deco-bottom" />}
       {isBlind && (
@@ -669,7 +701,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
                 <span className="op-insta-percent">{instaPercent}%</span>
               </div>
             )}
-            <div className={`op-typing-heart${typingPhase !== 'idle' ? ' visible' : ''}`}>
+            {coverStyle !== 'none' && <OpeningCoverMark style={coverStyle} groom={groom} bride={bride} />}
+            <div className={`op-typing-heart${typingPhase !== 'idle' ? ' visible' : ''}`} style={coverStyle !== 'none' ? { display: 'none' } : undefined}>
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34, display: 'block' }}>
                 <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>
               </svg>
@@ -714,7 +747,8 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
               <span className="op-insta-percent">{instaPercent}%</span>
             </div>
           )}
-          <div className="op-heart-deco">
+          {coverStyle !== 'none' && <OpeningCoverMark style={coverStyle} groom={groom} bride={bride} />}
+          <div className="op-heart-deco" style={coverStyle !== 'none' ? { display: 'none' } : undefined}>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 28, height: 28, display: 'block' }}>
               <path d="M12 20.5C12 20.5 3 13.5 3 8.5C3 6.02 5.02 4 7.5 4C9.06 4 10.47 4.77 11.32 6.04L12 7L12.68 6.04C13.53 4.77 14.94 4 16.5 4C18.98 4 21 6.02 21 8.5C21 13.5 12 20.5 12 20.5Z" fill="currentColor"/>
             </svg>

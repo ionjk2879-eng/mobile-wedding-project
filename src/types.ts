@@ -142,8 +142,15 @@ export interface OpeningConfig {
   openingText: string;
   openingSubText: string;
   openingFontStyle?: 'elegant' | 'simple' | 'clean';
+  // 사진 없이 이름과 간단한 도형만으로 구성하는 오프닝 전용 대표 커버.
+  // 미지정/none이면 기존 하트 장식을 그대로 사용한다.
+  openingCoverStyle?: 'none' | 'overlap' | 'arch' | 'orbit' | 'petals' | 'monogram' | 'ribbon';
   openingDecoEffect?: 'none' | 'dots' | 'ripple' | 'sparkle' | 'bokeh' | 'aurora' | 'firefly' | 'petal' | 'aurora-bokeh' | 'firefly-petal' | 'trace';
   openingBgPattern?: string | string[];
+  openingEnvelopeSeal?: 'none' | 'heart' | 'initials';
+  openingEnvelopeLift?: boolean;
+  openingEnvelopeTexture?: boolean;
+  openingEnvelopeSparkle?: boolean;
 }
 
 export interface FeatureConfig {
