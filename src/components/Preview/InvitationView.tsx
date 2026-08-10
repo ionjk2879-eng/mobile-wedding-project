@@ -171,9 +171,14 @@ function isSectionActive(id: string, data: InvitationData): boolean {
     case 'rsvp': return data.isRSVPEnabled !== false;
     case 'guestbook': return data.isGuestbookEnabled !== false;
     case 'accounts': return data.accounts.some(a => a.bank || a.number || a.owner);
-    // 새로 추가된 기능이라 기존 청첩장에는 값이 없으므로, 다른 토글과 반대로
-    // 명시적으로 켠 경우에만 노출한다(기본 꺼짐) — 갑자기 남의 청첩장에 나타나지 않도록.
     case 'livegallery': return data.isLiveGalleryEnabled === true;
+    case 'contacts': {
+      const groomSelf = data.contacts.find(c => c.role === '신랑');
+      const brideSelf = data.contacts.find(c => c.role === '신부');
+      const hasGroom = !!(groomSelf && (data.groomName || groomSelf.phone)) || data.parents.groomParents.some(p => p.name || p.phone);
+      const hasBride = !!(brideSelf && (data.brideName || brideSelf.phone)) || data.parents.brideParents.some(p => p.name || p.phone);
+      return hasGroom || hasBride;
+    }
     default: return true;
   }
 }
@@ -604,6 +609,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       )}
       <ScrollRevealProvider rootRef={scrollRoot}>
         {effectiveSectionOrder.map((id, i) => {
+          if (!isSectionActive(id, effectiveData)) return null;
           const eff = data.scrollEffect || 'none';
           const delay = i % 2 === 0 ? 0 : 100;
           const ref = previewRefs?.[id];
