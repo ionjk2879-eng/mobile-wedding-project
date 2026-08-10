@@ -581,6 +581,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const bgOverride: React.CSSProperties = gradientValue
     ? { background: gradientValue }
     : {};
+  const polaroidCard = openingTemplate === 'polaroid' ? (
+    <div className="op-polaroid-card" aria-hidden="true">
+      <div className="op-polaroid-photo" style={heroPhoto ? { backgroundImage: `url(${heroPhoto})` } : undefined} />
+      <span>{groom} &amp; {bride}</span>
+    </div>
+  ) : null;
 
   // 배경이 그라데이션이 아니라 단색(테마 자동 포함)일 때는 버튼이 배경에 묻혀 구분이 잘 안 되므로
   // 옅은 배경 채움 + 그림자를 얹어 하나의 박스로 도드라져 보이게 한다.
@@ -595,7 +601,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     const t = setTimeout(() => {
       setPhase('exit');
       const style = effectiveStyle;
-      const exitDelay = style === 'curtain' ? 650 : style === 'circle' ? 750 : style === 'veil' ? 700 : style === 'blind' ? 800 : style === 'insta' ? 700 : style === 'frame' ? 680 : 600;
+      const exitDelay = hasEnvelope ? 700 : style === 'curtain' ? 650 : style === 'circle' ? 750 : style === 'veil' ? 700 : style === 'blind' ? 800 : style === 'insta' ? 700 : style === 'frame' ? 680 : 600;
       setTimeout(() => { setDismissed(true); onDismissed?.(); }, exitDelay);
     }, 2500);
     return () => clearTimeout(t);
@@ -608,14 +614,14 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     phaseRef.current = 'exit'; // editorBounds 갱신 즉시 차단
     setPhase('exit');
     const style = effectiveStyle;
-    const delay = style === 'curtain' ? 650 : style === 'circle' ? 750 : style === 'veil' ? 700 : style === 'blind' ? 800 : style === 'insta' ? 700 : style === 'frame' ? 680 : 600;
+    const delay = hasEnvelope ? 700 : style === 'curtain' ? 650 : style === 'circle' ? 750 : style === 'veil' ? 700 : style === 'blind' ? 800 : style === 'insta' ? 700 : style === 'frame' ? 680 : 600;
     setTimeout(() => { setDismissed(true); onDismissed?.(); }, delay);
   };
 
   return (
     <div
       ref={rootRef}
-      className={`op-root op-${effectiveStyle} op-phase-${phase} op-template-${openingTemplate}${hasEnvelope ? ' op-envelope-lift' : ''}`}
+      className={`op-root op-${hasEnvelope && phase === 'exit' ? 'veil' : effectiveStyle} op-phase-${phase} op-template-${openingTemplate}${hasEnvelope ? ' op-envelope-lift' : ''}`}
       style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', '--op-pattern-color': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)', '--op-frame-color': isDark ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.30)', '--op-frame-color2': isDark ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)', '--op-curtain-bg': isDark ? 'rgba(195,193,198,0.50)' : bgColor, '--op-frame-bg': isDark ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.07)', '--op-frame-shadow': isDark ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)', '--op-frame-inset': isDark ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)', '--op-insta-track': isDark ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.22)', '--op-insta-fill': isDark ? 'rgba(0,0,0,0.90)' : 'rgba(255,255,255,0.95)', '--op-insta-pct': isDark ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.85)', '--op-btn-bg': btnBg, '--op-btn-shadow': btnShadow, '--op-envelope-tint': isDark ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.16)', ...bgOverride, ...editorBounds, ...(topOffset != null && !Object.keys(editorBounds).length ? { top: topOffset, height: `calc(100% - ${topOffset}px)` } : {}) } as React.CSSProperties}
     >
       {bgPatterns.map(pat => <div key={pat} className={`op-pattern op-pattern-${pat}`} aria-hidden="true" />)}
@@ -643,14 +649,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           <div className="op-cinema-bar op-cinema-bar-top" />
           <div className="op-cinema-bar op-cinema-bar-bottom" />
           <span className="op-cinema-count">01</span>
-        </div>
-      )}
-      {openingTemplate === 'polaroid' && (
-        <div className="op-template-stage op-polaroid-stage" aria-hidden="true">
-          <div className="op-polaroid-card">
-            <div className="op-polaroid-photo" style={heroPhoto ? { backgroundImage: `url(${heroPhoto})` } : undefined} />
-            <span>{groom} &amp; {bride}</span>
-          </div>
         </div>
       )}
       {openingTemplate === 'monogram' && (
@@ -734,6 +732,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}${isSwitchingContent ? ' op-body-out' : ''}`}
         >
           <div className="op-typing-inner">
+            {polaroidCard}
             {isInsta && (
               <div className="op-insta-progress">
                 <div className="op-insta-bar" />
@@ -772,6 +771,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
           className={`op-body${isSwitchingContent ? ' op-body-out' : ''}`}
           key={`seq-${effectiveStyle}-${templateAnimationKey}-${seqBodyKey}-${effectiveOpeningText}`}
         >
+          {polaroidCard}
           {decoEffect === 'trace' && (
             <div className="op-deco-trace" aria-hidden="true">
               <span className="op-trace-top" />
