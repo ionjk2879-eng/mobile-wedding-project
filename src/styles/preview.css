@@ -1124,15 +1124,16 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   cursor: grab;
-  /* 자유 드래그 모드: 터치 스와이프가 끝나면 가장 가까운 슬라이드로 자동 스냅 */
-  scroll-snap-type: x mandatory;
+  /* 자유 모드: scroll-snap 없음 — 드래그/스와이프가 끝난 위치 그대로 멈춘다 */
 }
 .h-scroll-track::-webkit-scrollbar { display: none; }
+/* 탭 모드: CSS snap으로 슬라이드 단위 이동 */
+.h-scroll-track--tap { scroll-snap-type: x mandatory; }
 /* JS로 scrollLeft를 직접 옮기는 드래그 중에는 CSS 스냅을 끄고 자유롭게 움직인다.
-   mouseup/pointerup에서 JS가 가장 가까운 슬라이드로 scrollTo해 스냅을 마무리한다. */
+   탭 모드는 mouseup에서 JS가 가장 가까운 슬라이드로 scrollTo해 스냅을 마무리한다. */
 .h-scroll-track--dragging { cursor: grabbing; user-select: none; scroll-snap-type: none; scroll-behavior: auto; }
 .h-scroll-track--dragging * { user-select: none; }
-/* 탭 모드: CSS snap + 브라우저 네이티브 스와이프를 그대로 사용한다. JS 드래그 없음. */
+/* 탭 모드: CSS snap + 브라우저 네이티브 스와이프를 그대로 사용한다. */
 .h-tap-nav-btn {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 34px; height: 34px; border-radius: 50%; border: none;

@@ -153,12 +153,16 @@ function isCenteredSlide(id: string, data: InvitationData): boolean {
 }
 
 // 각 섹션의 on/off 토글 여부 (없는 섹션은 항상 활성)
+// 가로 스크롤 모드에서 빈 슬라이드가 생기지 않도록, 컴포넌트 내부 self-hide 조건을 여기서도 동일하게 체크한다.
 function isSectionActive(id: string, data: InvitationData): boolean {
   switch (id) {
     case 'interview': return data.isInterviewEnabled !== false;
     case 'timeline': return data.isTimelineEnabled !== false;
     case 'message': return data.isMessageEnabled !== false;
     case 'ending': return data.isEndingEnabled !== false;
+    case 'rsvp': return data.isRSVPEnabled !== false;
+    case 'guestbook': return data.isGuestbookEnabled !== false;
+    case 'accounts': return data.accounts.some(a => a.bank || a.number || a.owner);
     // 새로 추가된 기능이라 기존 청첩장에는 값이 없으므로, 다른 토글과 반대로
     // 명시적으로 켠 경우에만 노출한다(기본 꺼짐) — 갑자기 남의 청첩장에 나타나지 않도록.
     case 'livegallery': return data.isLiveGalleryEnabled === true;
@@ -358,11 +362,14 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
       // onClickCapture가 moved=false를 보고 track onClick(UI 토글)을 막지 못한다.
       // moved 리셋은 다음 mousedown(onMouseDown)에서 한다.
       if (data.horizontalPageMode !== 'tap') moved = false;
-      // 가장 가까운 슬라이드로 스냅 (CSS scroll-snap은 드래그 중 꺼져 있으므로 JS로 처리)
-      const w = el.clientWidth || 1;
-      const nearest = Math.round(el.scrollLeft / w);
-      const total = el.children.length;
-      el.scrollTo({ left: Math.min(Math.max(nearest, 0), total - 1) * w, behavior: 'smooth' });
+      // 탭 모드에서만 가장 가까운 슬라이드로 스냅한다.
+      // 자유 모드는 드래그를 놓은 위치 그대로 멈춘다.
+      if (data.horizontalPageMode === 'tap') {
+        const w = el.clientWidth || 1;
+        const nearest = Math.round(el.scrollLeft / w);
+        const total = el.children.length;
+        el.scrollTo({ left: Math.min(Math.max(nearest, 0), total - 1) * w, behavior: 'smooth' });
+      }
     };
     const onClickCapture = (e: MouseEvent) => {
       if (moved) { e.preventDefault(); e.stopPropagation(); }
