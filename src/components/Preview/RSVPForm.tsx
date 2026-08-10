@@ -76,7 +76,7 @@ const RSVPForm: React.FC<PreviewProps> = React.memo(({ data, guestName, guestCod
       <PreviewOverlay open={formOpen} onClose={() => setFormOpen(false)} anchorRef={sectionRef} title={isEn ? 'RSVP' : isJa ? '出欠をお知らせください' : '참석 여부를 알려주세요'}>
         <form onSubmit={handleSubmit}>
           <div className="pf-group">
-            <label className="pf-label">{isEn ? 'Side' : isJa ? '区分' : '구분'}</label>
+            <label className="pf-label">{isEn ? 'Side' : isJa ? 'ご関係' : '구분'}</label>
             <div className="pf-tabs">
               <button type="button" className={`pf-tab ${formData.relation === 'groom' ? 'active' : ''}`} onClick={() => setFormData({...formData, relation: 'groom'})}>{isEn ? "Groom's" : isJa ? '新郎側' : '신랑측'}</button>
               <button type="button" className={`pf-tab ${formData.relation === 'bride' ? 'active' : ''}`} onClick={() => setFormData({...formData, relation: 'bride'})}>{isEn ? "Bride's" : isJa ? '新婦側' : '신부측'}</button>

@@ -126,7 +126,7 @@ const Calendar: React.FC<CalendarProps> = ({ data }) => {
           <p className="countdown-label">{isEn ? 'The wedding has begun!' : isJa ? '式が始まりました！' : '결혼식이 시작되었습니다!'}</p>
         ) : (
           <>
-            <p className="countdown-label">{isEn ? 'Until the Wedding' : isJa ? '式まであと' : '결혼식까지 남은 시간'}</p>
+            <p className="countdown-label">{isEn ? 'Until the Wedding' : isJa ? '挙式まであと' : '결혼식까지 남은 시간'}</p>
             <div className={`countdown-boxes ${calendarPlain ? 'countdown-plain' : ''}`}>
               <div className="countdown-box">
                 <span className="countdown-unit">DAYS</span>

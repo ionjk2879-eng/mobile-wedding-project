@@ -69,7 +69,7 @@ const Share: React.FC<PreviewProps> = React.memo(({ data, shareEnabled = false }
         <div className="share-buttons">
           <button className="share-btn kakao" onClick={handleKakaoShare}>
             <Share2 size={20} />
-            <span>{isEn ? 'Share on KakaoTalk' : isJa ? 'カカオでシェア' : '카카오톡 공유하기'}</span>
+            <span>{isEn ? 'Share on KakaoTalk' : isJa ? 'カカオトークでシェア' : '카카오톡 공유하기'}</span>
           </button>
           <button className="share-btn link" onClick={handleCopyLink}>
             <Link size={20} />

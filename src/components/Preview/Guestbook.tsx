@@ -294,7 +294,7 @@ const Guestbook: React.FC<PreviewProps> = React.memo(({ data }) => {
       <PreviewOverlay open={formOpen} onClose={() => setFormOpen(false)} anchorRef={sectionRef} title={isEn ? 'Write a Message' : isJa ? 'メッセージを書いてください' : '축하 메시지를 남겨주세요'}>
         <form onSubmit={handleSubmit}>
           <div className="pf-group">
-            <label className="pf-label">{isEn ? 'Side' : isJa ? '区分' : '구분'}</label>
+            <label className="pf-label">{isEn ? 'Side' : isJa ? 'ご関係' : '구분'}</label>
             <div className="gb-side-pick">
               <button type="button" className={`gb-side-btn ${side === 'groom' ? 'active' : ''}`} onClick={() => setSide('groom')}>{groomLabel}</button>
               <button type="button" className={`gb-side-btn ${side === 'bride' ? 'active' : ''}`} onClick={() => setSide('bride')}>{brideLabel}</button>
