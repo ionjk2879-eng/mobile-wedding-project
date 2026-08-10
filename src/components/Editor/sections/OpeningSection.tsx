@@ -41,7 +41,20 @@ const OpeningSection: React.FC = () => {
   const isEnvelopeTemplate = effectiveTemplate === 'envelope';
 
   const update = (partial: Partial<OpeningConfig>) => {
-    updateField('opening', { ...opening, ...partial });
+    const customOnlyKeys: (keyof OpeningConfig)[] = [
+      'openingContentStyle', 'openingStyle', 'openingCoverStyle', 'openingDecoEffect', 'openingBgPattern',
+    ];
+    const leavesTemplate = effectiveTemplate !== 'custom'
+      && customOnlyKeys.some(key => Object.prototype.hasOwnProperty.call(partial, key))
+      && !Object.prototype.hasOwnProperty.call(partial, 'openingTemplate');
+    updateField('opening', {
+      ...opening,
+      ...(leavesTemplate ? {
+        openingTemplate: 'custom' as const,
+        openingBgPattern: selectedPatterns.filter(p => p !== 'letter'),
+      } : {}),
+      ...partial,
+    });
   };
 
   return (
@@ -78,7 +91,8 @@ const OpeningSection: React.FC = () => {
         <>
           <div className="opt-inline-group opening-template-group">
             <label className="opt-inline-label">애니메이션 템플릿</label>
-            <div className="opening-template-grid">
+            <div className="opt-inline-content">
+              <div className="opening-template-grid">
               {([
                 { key: 'custom' as const, icon: '✦', name: '자유 조합', desc: '전환·장식·패턴을 직접 선택' },
                 { key: 'envelope' as const, icon: '✉', name: '편지봉투 초대장', desc: '실링·개봉·상승 효과' },
@@ -93,6 +107,13 @@ const OpeningSection: React.FC = () => {
                   onClick={() => update({
                     openingTemplate: template.key,
                     openingBgPattern: selectedPatterns.filter(p => p !== 'letter'),
+                    ...(template.key !== 'custom' ? {
+                      openingContentStyle: 'sequential' as const,
+                      openingStyle: 'curtain' as const,
+                      openingCoverStyle: 'none' as const,
+                      openingDecoEffect: 'none' as const,
+                      openingBgPattern: [],
+                    } : {}),
                     ...(template.key === 'envelope' ? {
                       openingEnvelopeSeal: opening.openingEnvelopeSeal || 'initials',
                       openingEnvelopeLift: opening.openingEnvelopeLift !== false,
@@ -104,6 +125,12 @@ const OpeningSection: React.FC = () => {
                   <span><strong>{template.name}</strong><small>{template.desc}</small></span>
                 </button>
               ))}
+              </div>
+              {effectiveTemplate !== 'custom' && (
+                <p className="opening-template-notice">
+                  완성형 템플릿 적용 중 · 내용 연출, 전환 스타일, 대표 커버, 장식 효과 또는 패턴을 바꾸면 자유 조합으로 전환됩니다.
+                </p>
+              )}
             </div>
           </div>
 

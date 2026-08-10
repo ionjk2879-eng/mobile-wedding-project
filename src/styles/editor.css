@@ -427,4 +427,5 @@
 .opening-template-option > span:last-child { display: flex; flex-direction: column; gap: 3px; }
 .opening-template-option strong { font-size: .78rem; }
 .opening-template-option small { color: #91858a; font-size: .66rem; line-height: 1.4; }
+.opening-template-notice { margin: 9px 0 0; padding: 8px 10px; border-radius: 8px; background: #f8f3f5; color: #896f7a; font-size: .67rem; line-height: 1.5; }
 @media (max-width: 520px) { .opening-template-grid { grid-template-columns: 1fr; } .opening-cover-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
