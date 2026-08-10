@@ -805,7 +805,7 @@
 .anniversary-preview-banner span { font-size: 0.72rem; opacity: 0.8; }
 
 /* === Opening === */
-.op-root { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; display: flex; align-items: center; justify-content: center; overflow: hidden; touch-action: none; overscroll-behavior: none; background: var(--op-bg); opacity: var(--op-opacity); }
+.op-root { position: fixed; top: 0; left: 0; width: 100%; height: 100%; container-type:size; z-index: 99999; display: flex; align-items: center; justify-content: center; overflow: hidden; touch-action: none; overscroll-behavior: none; background: var(--op-bg); opacity: var(--op-opacity); }
 /* exit 중 클릭 방지 */
 .op-root.op-phase-exit { pointer-events: none !important; }
 /* 커튼 패널: 단색 (var(--op-bg)보다 약간 밝게), 기본 숨김 상태 */
@@ -1140,6 +1140,14 @@
 .op-template-polaroid .op-body,.op-template-polaroid .op-typing-body { translate:0 31%; scale:.82; }
 @keyframes op-polaroid-drop { from { opacity:0; translate:-50% -28px; rotate:-8deg; } to { opacity:1; translate:-50% 0; rotate:-3deg; } }
 @keyframes op-photo-develop { from { opacity:.08; filter:saturate(0) contrast(.55) brightness(1.7); } to { opacity:1; filter:saturate(.82) contrast(.94) brightness(1); } }
+
+/* 공개 청첩장처럼 실제 오프닝 높이가 짧을 때 폴라로이드와 문구 영역을 분리한다. */
+@container (max-height:700px) {
+  .op-polaroid-card { top:3%; width:min(45%,170px); padding:8px 8px 28px; }
+  .op-polaroid-card span { bottom:8px; font-size:11px; }
+  .op-template-polaroid .op-body { position:absolute; left:50%; bottom:2%; width:min(100%,360px); translate:-50% 0; scale:.72; transform-origin:bottom center; }
+  .op-template-polaroid .op-typing-body { justify-content:flex-end; padding-bottom:2%; translate:0; scale:.72; transform-origin:bottom center; }
+}
 
 /* 미니멀 모노그램 */
 .op-monogram-stage { overflow:visible; }
