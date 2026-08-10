@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import AuthGate from './components/AuthGate'
+import KakaoOpenChatFab from './components/KakaoOpenChatFab'
 import { SiteLangProvider } from './i18n'
 import './index.css'
 
@@ -35,6 +36,7 @@ const Loading = () => (
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <SiteLangProvider>
   <BrowserRouter>
+    <KakaoOpenChatFab />
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
