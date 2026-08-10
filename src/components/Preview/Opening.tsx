@@ -572,7 +572,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     ? 'envelope'
     : (opening.openingTemplate || 'custom');
   const hasEnvelope = openingTemplate === 'envelope';
-  const envelopeSeal = opening.openingEnvelopeSeal || 'initials';
   const envelopeLift = opening.openingEnvelopeLift !== false;
   const envelopeTexture = opening.openingEnvelopeTexture !== false;
   const envelopeSparkle = opening.openingEnvelopeSparkle !== false;
@@ -663,11 +662,6 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         </div>
       )}
       {hasEnvelope && envelopeTexture && <div className="op-envelope-paper-texture" aria-hidden="true" />}
-      {hasEnvelope && envelopeSeal !== 'none' && (
-        <div className={`op-envelope-seal op-envelope-seal-${envelopeSeal}`} aria-hidden="true">
-          {envelopeSeal === 'heart' ? '♥' : `${groom.trim().charAt(0) || 'G'}·${bride.trim().charAt(0) || 'B'}`}
-        </div>
-      )}
       {hasEnvelope && envelopeSparkle && (
         <div className="op-envelope-sparkles" aria-hidden="true">
           {Array.from({ length: 8 }, (_, i) => <i key={i} style={{ '--spark-i': i } as React.CSSProperties} />)}

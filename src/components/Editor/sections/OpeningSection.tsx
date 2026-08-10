@@ -95,7 +95,7 @@ const OpeningSection: React.FC = () => {
               <div className="opening-template-grid">
               {([
                 { key: 'custom' as const, icon: '✦', name: '자유 조합', desc: '전환·장식·패턴을 직접 선택' },
-                { key: 'envelope' as const, icon: '✉', name: '편지봉투 초대장', desc: '실링·개봉·상승 효과' },
+                { key: 'envelope' as const, icon: '✉', name: '편지봉투 초대장', desc: '개봉·편지 상승 효과' },
                 { key: 'petal-card' as const, icon: '❀', name: '꽃잎 카드', desc: '카드와 꽃잎이 함께 등장' },
                 { key: 'ribbon' as const, icon: '∞', name: '리본 언베일', desc: '리본이 풀리며 문구 공개' },
                 { key: 'cinema' as const, icon: '▶', name: '시네마 타이틀', desc: '영화처럼 빛과 제목 등장' },
@@ -115,7 +115,6 @@ const OpeningSection: React.FC = () => {
                       openingBgPattern: [],
                     } : {}),
                     ...(template.key === 'envelope' ? {
-                      openingEnvelopeSeal: opening.openingEnvelopeSeal || 'initials',
                       openingEnvelopeLift: opening.openingEnvelopeLift !== false,
                       openingEnvelopeTexture: opening.openingEnvelopeTexture !== false,
                       openingEnvelopeSparkle: opening.openingEnvelopeSparkle !== false,
@@ -405,26 +404,10 @@ const OpeningSection: React.FC = () => {
                 <p className="section-desc opening-option-desc">
                   템플릿에 포함된 개봉 디테일을 취향에 맞게 조절할 수 있습니다.
                 </p>
-                <div className="envelope-option-row">
-                  <span className="envelope-option-title">왁스 실링</span>
-                  <div className="account-style-grid">
-                    {([
-                      { key: 'none' as const, name: '없음' },
-                      { key: 'heart' as const, name: '하트' },
-                      { key: 'initials' as const, name: '이니셜' },
-                    ]).map(s => (
-                      <button key={s.key} type="button"
-                        className={`account-style-btn ${(opening.openingEnvelopeSeal || 'initials') === s.key ? 'active' : ''}`}
-                        onClick={() => update({ openingEnvelopeSeal: s.key })}>
-                        <strong>{s.name}</strong>
-                      </button>
-                    ))}
-                  </div>
-                </div>
                 {([
                   { key: 'openingEnvelopeLift' as const, name: '편지 상승', desc: '개봉 후 편지 내용이 부드럽게 올라옵니다.' },
                   { key: 'openingEnvelopeTexture' as const, name: '종이 질감', desc: '편지 영역에 은은한 종이결과 깊이감을 더합니다.' },
-                  { key: 'openingEnvelopeSparkle' as const, name: '개봉 빛 포인트', desc: '실링 주변에 빛이 한 번 짧게 퍼집니다.' },
+                  { key: 'openingEnvelopeSparkle' as const, name: '개봉 빛 포인트', desc: '편지가 열릴 때 빛이 한 번 짧게 퍼집니다.' },
                 ]).map(item => (
                   <label key={item.key} className="modern-checkbox envelope-feature-check">
                     <input type="checkbox"
