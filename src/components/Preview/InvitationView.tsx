@@ -168,10 +168,14 @@ function isSectionActive(id: string, data: InvitationData): boolean {
     case 'timeline': return data.isTimelineEnabled !== false;
     case 'message': return data.isMessageEnabled !== false;
     case 'ending': return data.isEndingEnabled !== false;
-    case 'rsvp': return data.isRSVPEnabled !== false;
-    case 'guestbook': return data.isGuestbookEnabled !== false;
+    // These components use an explicit truthy check internally. Keep this
+    // predicate identical so an old document with a missing flag cannot leave
+    // behind a full-width, empty horizontal slide.
+    case 'rsvp': return data.isRSVPEnabled === true;
+    case 'guestbook': return data.isGuestbookEnabled === true;
     case 'accounts': return data.accounts.some(a => a.bank || a.number || a.owner);
     case 'livegallery': return data.isLiveGalleryEnabled === true;
+    case 'calendar': return !Number.isNaN(new Date(data.weddingDateISO).getTime());
     case 'contacts': {
       const groomSelf = data.contacts.find(c => c.role === '신랑');
       const brideSelf = data.contacts.find(c => c.role === '신부');
@@ -179,7 +183,15 @@ function isSectionActive(id: string, data: InvitationData): boolean {
       const hasBride = !!(brideSelf && (data.brideName || brideSelf.phone)) || data.parents.brideParents.some(p => p.name || p.phone);
       return hasGroom || hasBride;
     }
-    default: return true;
+    case 'greeting':
+    case 'photos':
+    case 'location':
+    case 'midphoto':
+    case 'share':
+      return true;
+    // Ignore stale/unknown IDs saved by an older editor instead of rendering
+    // an empty slide whose SectionComponent resolves to null.
+    default: return false;
   }
 }
 
@@ -255,7 +267,9 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
     }
   }, [openingPreviewKey, showOpening]);
 
-  const effectiveSectionOrder = sectionOrder;
+  // Filter before creating .h-slide containers. Filtering only inside
+  // SectionComponent removes the contents but leaves the 100%-wide frame.
+  const effectiveSectionOrder = sectionOrder.filter((id) => isSectionActive(id, effectiveData));
 
   // 예식 전(소유자 미리보기 등으로 daysAfterWedding이 음수)에도 실제 기념일 모드와 동일한
   // 구성(D+n)을 그대로 보여주기 위해, 예식일+364일이 지난 것으로 가정한다 — 예식 전 미리보기가
