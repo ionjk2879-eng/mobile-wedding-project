@@ -282,6 +282,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   // openingStyle === 'typing' 은 구버전 호환용 — 새 데이터는 openingContentStyle로 판단
   const isTyping = opening.openingContentStyle === 'typing'
     || (!opening.openingContentStyle && opening.openingStyle === 'typing');
+  const templateAnimationKey = `${opening.openingTemplate || 'custom'}-${JSON.stringify(opening.openingBgPattern || 'none')}`;
   const effectiveStyle = (opening.openingStyle === 'typing' && !opening.openingContentStyle)
     ? 'curtain'
     : opening.openingStyle;
@@ -340,12 +341,12 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
         el.classList.add(styleClass);
       }
     }
-  }, [opening.openingContentStyle]);
+  }, [opening.openingContentStyle, templateAnimationKey]);
 
   useEffect(() => {
     phaseTimerRef.current = setTimeout(() => setPhase('ready'), 3200);
     return () => clearTimeout(phaseTimerRef.current);
-  }, [opening.openingStyle, opening.openingContentStyle]);
+  }, [opening.openingStyle, opening.openingContentStyle, templateAnimationKey]);
 
   // 순차↔타이핑 전환: 250ms 페이드아웃 후 새 body 마운트
   useEffect(() => {
@@ -369,14 +370,14 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
     if (!isTyping) return;
     setTypedCount(0);
     setTypingPhase('idle');
-  }, [isTyping, opening.openingStyle, effectiveOpeningText]);
+  }, [isTyping, opening.openingStyle, effectiveOpeningText, templateAnimationKey]);
 
   useEffect(() => {
     if (!isTyping) return;
     const t1 = setTimeout(() => setTypingPhase('heart'), 500);
     const t2 = setTimeout(() => setTypingPhase('typing'), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isTyping, opening.openingStyle, effectiveOpeningText]);
+  }, [isTyping, opening.openingStyle, effectiveOpeningText, templateAnimationKey]);
 
   useEffect(() => {
     if (typingPhase !== 'typing') return;
@@ -735,7 +736,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
 
       {displayedIsTyping ? (
         <div
-          key={`typing-${effectiveStyle}-${typingBodyKey}-${effectiveOpeningText}`}
+          key={`typing-${effectiveStyle}-${templateAnimationKey}-${typingBodyKey}-${effectiveOpeningText}`}
           className={`op-typing-body${typingPhase === 'done' ? ' op-typing-done' : ''}${isSwitchingContent ? ' op-body-out' : ''}`}
         >
           <div className="op-typing-inner">
@@ -775,7 +776,7 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
       ) : (
         <div
           className={`op-body${isSwitchingContent ? ' op-body-out' : ''}`}
-          key={`seq-${effectiveStyle}-${seqBodyKey}-${effectiveOpeningText}`}
+          key={`seq-${effectiveStyle}-${templateAnimationKey}-${seqBodyKey}-${effectiveOpeningText}`}
         >
           {decoEffect === 'trace' && (
             <div className="op-deco-trace" aria-hidden="true">
