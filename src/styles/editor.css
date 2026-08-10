@@ -136,8 +136,8 @@
 .input-hint { display: block; font-size: 0.78rem; color: #9CA3AF; margin-top: 6px; }
 .label-hint { font-size: 0.78rem; font-weight: 500; color: #D4A5C6; }
 .modern-checkbox { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-.modern-checkbox input { width: 20px; height: 20px; accent-color: #D4A5C6; }
-.modern-checkbox span { font-size: 0.9rem; font-weight: 700; color: #374151; }
+.modern-checkbox input { width: 20px; height: 20px; margin: 0; flex-shrink: 0; accent-color: #D4A5C6; vertical-align: middle; }
+.modern-checkbox span { font-size: 0.9rem; font-weight: 700; color: #374151; line-height: 1; }
 
 /* Timeline & interview editors */
 .timeline-editor-list, .interview-editor-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
