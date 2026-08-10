@@ -1065,7 +1065,7 @@
 .op-envelope-sparkles { position:absolute; z-index:1; left:50%; top:54%; width:1px; height:1px; pointer-events:none; }
 .op-envelope-sparkles i { --angle:calc(var(--spark-i) * 45deg); position:absolute; width:4px; height:4px; border-radius:50%; background:var(--op-accent); opacity:0; animation:op-envelope-spark .75s ease-out 1s both; transform:rotate(var(--angle)) translateX(0); }
 @keyframes op-envelope-spark { 0% { opacity:0; transform:rotate(var(--angle)) translateX(12px) scale(.3); } 35% { opacity:.9; } 100% { opacity:0; transform:rotate(var(--angle)) translateX(48px) scale(1); } }
-.op-envelope-pocket { position:absolute; z-index:3; left:0; right:0; bottom:0; width:100%; height:44%; pointer-events:none; overflow:visible; filter:drop-shadow(0 -8px 18px rgba(0,0,0,.08)); }
+.op-envelope-pocket { position:absolute; z-index:3; left:0; right:0; bottom:-4%; width:100%; height:44%; pointer-events:none; overflow:visible; filter:drop-shadow(0 -8px 18px rgba(0,0,0,.08)); }
 .op-envelope-pocket path { fill:color-mix(in srgb,var(--op-bg) 72%,var(--op-text)); stroke:var(--op-envelope-line,var(--op-accent)); stroke-width:2px; stroke-linejoin:round; }
 .op-envelope-lift .op-body, .op-envelope-lift .op-typing-body { animation:op-letter-pull 1.15s cubic-bezier(.16,1,.3,1) .12s both; }
 .op-template-envelope .op-curtain-deco { display:none; }
