@@ -131,6 +131,9 @@ export interface ContentData {
 
 export interface OpeningConfig {
   openingEnabled: boolean;
+  // 완성된 오프닝 흐름. custom은 아래 옵션을 자유롭게 조합하고,
+  // envelope는 실링→개봉→편지 상승을 하나의 템플릿으로 사용한다.
+  openingTemplate?: 'custom' | 'envelope' | 'petal-card' | 'ribbon' | 'cinema' | 'polaroid' | 'monogram';
   openingStyle: 'curtain' | 'circle' | 'veil' | 'blind' | 'frame' | 'insta' | 'typing'; // 'typing' kept for backwards compat
   openingContentStyle?: 'sequential' | 'typing' | 'lines' | 'flip';
   openingColorMode: 'theme' | 'custom' | 'gradient';

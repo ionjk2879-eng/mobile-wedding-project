@@ -145,6 +145,7 @@ interface OpeningProps {
   slug?: string;
   enableAnonymousOpening?: boolean;
   venueName?: string;
+  heroPhoto?: string;
 }
 
 function hexLuminance(hex: string): number {
@@ -173,7 +174,7 @@ const OpeningCoverMark: React.FC<{ style: NonNullable<OpeningConfig['openingCove
   );
 };
 
-const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO, slug, enableAnonymousOpening, venueName }) => {
+const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, theme, autoClose, onDismissed, topOffset, anniversaryMode, language = 'ko', guestName, guestRelation, guestMessageIndex, weddingDateISO, slug, enableAnonymousOpening, venueName, heroPhoto }) => {
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<'enter' | 'ready' | 'exit'>('enter');
   const [instaPercent, setInstaPercent] = useState(0);
@@ -565,7 +566,11 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   const bgPatterns: string[] = Array.isArray(rawPattern)
     ? rawPattern.filter(p => p !== 'none')
     : (rawPattern && rawPattern !== 'none') ? [rawPattern] : [];
-  const hasEnvelope = bgPatterns.includes('letter');
+  // openingBgPattern='letter'는 이전 저장 데이터 호환용이다.
+  const openingTemplate: NonNullable<OpeningConfig['openingTemplate']> = bgPatterns.includes('letter')
+    ? 'envelope'
+    : (opening.openingTemplate || 'custom');
+  const hasEnvelope = openingTemplate === 'envelope';
   const envelopeSeal = opening.openingEnvelopeSeal || 'initials';
   const envelopeLift = opening.openingEnvelopeLift !== false;
   const envelopeTexture = opening.openingEnvelopeTexture !== false;
@@ -613,10 +618,49 @@ const Opening: React.FC<OpeningProps> = ({ opening, groomName, brideName, date, 
   return (
     <div
       ref={rootRef}
-      className={`op-root op-${effectiveStyle} op-phase-${phase}${hasEnvelope && envelopeLift ? ' op-envelope-lift' : ''}`}
+      className={`op-root op-${effectiveStyle} op-phase-${phase} op-template-${openingTemplate}${hasEnvelope && envelopeLift ? ' op-envelope-lift' : ''}`}
       style={{ '--op-bg': bgColor, '--op-opacity': opacity, '--op-text': textColor, '--op-accent': accentColor, '--op-heart': heartColor, '--op-font': fontConfig.family, '--op-weight': fontConfig.weights, '--op-hover-bg': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.10)', '--op-hover-bd': isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.65)', '--op-pattern-color': isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)', '--op-frame-color': isDark ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.30)', '--op-frame-color2': isDark ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)', '--op-curtain-bg': isDark ? 'rgba(195,193,198,0.50)' : bgColor, '--op-frame-bg': isDark ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.07)', '--op-frame-shadow': isDark ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)', '--op-frame-inset': isDark ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)', '--op-insta-track': isDark ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.22)', '--op-insta-fill': isDark ? 'rgba(0,0,0,0.90)' : 'rgba(255,255,255,0.95)', '--op-insta-pct': isDark ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.85)', '--op-btn-bg': btnBg, '--op-btn-shadow': btnShadow, '--op-envelope-tint': isDark ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.16)', ...bgOverride, ...editorBounds, ...(topOffset != null && !Object.keys(editorBounds).length ? { top: topOffset, height: `calc(100% - ${topOffset}px)` } : {}) } as React.CSSProperties}
     >
       {bgPatterns.map(pat => <div key={pat} className={`op-pattern op-pattern-${pat}`} aria-hidden="true" />)}
+      {opening.openingTemplate === 'envelope' && !bgPatterns.includes('letter') && (
+        <div className="op-pattern op-pattern-letter" aria-hidden="true" />
+      )}
+      {openingTemplate === 'petal-card' && (
+        <div className="op-template-stage op-petal-card-stage" aria-hidden="true">
+          <div className="op-petal-card-sheet" />
+          {Array.from({ length: 12 }, (_, i) => <i key={i} style={{ '--petal-i': i } as React.CSSProperties} />)}
+        </div>
+      )}
+      {openingTemplate === 'ribbon' && (
+        <div className="op-template-stage op-ribbon-stage" aria-hidden="true">
+          <div className="op-ribbon-band op-ribbon-left" />
+          <div className="op-ribbon-band op-ribbon-right" />
+          <div className="op-ribbon-knot">∞</div>
+        </div>
+      )}
+      {openingTemplate === 'cinema' && (
+        <div className="op-template-stage op-cinema-stage" aria-hidden="true">
+          <div className="op-cinema-beam" />
+          <div className="op-cinema-bar op-cinema-bar-top" />
+          <div className="op-cinema-bar op-cinema-bar-bottom" />
+          <span className="op-cinema-count">01</span>
+        </div>
+      )}
+      {openingTemplate === 'polaroid' && (
+        <div className="op-template-stage op-polaroid-stage" aria-hidden="true">
+          <div className="op-polaroid-card">
+            <div className="op-polaroid-photo" style={heroPhoto ? { backgroundImage: `url(${heroPhoto})` } : undefined} />
+            <span>{groom} &amp; {bride}</span>
+          </div>
+        </div>
+      )}
+      {openingTemplate === 'monogram' && (
+        <div className="op-template-stage op-monogram-stage" aria-hidden="true">
+          <span className="op-monogram-letter op-monogram-groom">{groom.trim().charAt(0) || 'G'}</span>
+          <i className="op-monogram-ring" />
+          <span className="op-monogram-letter op-monogram-bride">{bride.trim().charAt(0) || 'B'}</span>
+        </div>
+      )}
       {hasEnvelope && envelopeTexture && <div className="op-envelope-paper-texture" aria-hidden="true" />}
       {hasEnvelope && envelopeSeal !== 'none' && (
         <div className={`op-envelope-seal op-envelope-seal-${envelopeSeal}`} aria-hidden="true">

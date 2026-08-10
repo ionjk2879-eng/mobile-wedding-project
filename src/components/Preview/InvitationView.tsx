@@ -482,6 +482,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
             slug={effectiveData.slug}
             enableAnonymousOpening={enableAnonymousOpening}
             venueName={effectiveData.venueName}
+            heroPhoto={effectiveData.heroPhoto}
           />
         )}
         {!effectiveData.bgEffectHeroOnly && <BackgroundEffects effect={effectiveData.bgEffect} />}
@@ -596,6 +597,7 @@ const InvitationView: React.FC<InvitationViewProps> = ({ data, previewRefs, show
           slug={data.slug}
           enableAnonymousOpening={enableAnonymousOpening}
           venueName={data.venueName}
+          heroPhoto={data.heroPhoto}
         />
       )}
       {!data.bgEffectHeroOnly && <BackgroundEffects effect={data.bgEffect} />}

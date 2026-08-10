@@ -34,7 +34,11 @@ const OpeningSection: React.FC = () => {
   const selectedPatterns = Array.isArray(opening.openingBgPattern)
     ? opening.openingBgPattern
     : opening.openingBgPattern ? [opening.openingBgPattern] : [];
-  const hasLetterPattern = selectedPatterns.includes('letter');
+  // 예전 openingBgPattern='letter' 저장값도 새 템플릿으로 자연스럽게 이어준다.
+  const effectiveTemplate: NonNullable<OpeningConfig['openingTemplate']> = selectedPatterns.includes('letter')
+    ? 'envelope'
+    : (opening.openingTemplate || 'custom');
+  const isEnvelopeTemplate = effectiveTemplate === 'envelope';
 
   const update = (partial: Partial<OpeningConfig>) => {
     updateField('opening', { ...opening, ...partial });
@@ -72,6 +76,37 @@ const OpeningSection: React.FC = () => {
 
       {opening.openingEnabled && (
         <>
+          <div className="opt-inline-group opening-template-group">
+            <label className="opt-inline-label">애니메이션 템플릿</label>
+            <div className="opening-template-grid">
+              {([
+                { key: 'custom' as const, icon: '✦', name: '자유 조합', desc: '전환·장식·패턴을 직접 선택' },
+                { key: 'envelope' as const, icon: '✉', name: '편지봉투 초대장', desc: '실링·개봉·상승 효과' },
+                { key: 'petal-card' as const, icon: '❀', name: '꽃잎 카드', desc: '카드와 꽃잎이 함께 등장' },
+                { key: 'ribbon' as const, icon: '∞', name: '리본 언베일', desc: '리본이 풀리며 문구 공개' },
+                { key: 'cinema' as const, icon: '▶', name: '시네마 타이틀', desc: '영화처럼 빛과 제목 등장' },
+                { key: 'polaroid' as const, icon: '▣', name: '폴라로이드 메모리', desc: '대표사진이 서서히 현상' },
+                { key: 'monogram' as const, icon: 'G·B', name: '미니멀 모노그램', desc: '두 이니셜이 하나로 연결' },
+              ]).map(template => (
+                <button key={template.key} type="button"
+                  className={`opening-template-option ${effectiveTemplate === template.key ? 'active' : ''}`}
+                  onClick={() => update({
+                    openingTemplate: template.key,
+                    openingBgPattern: selectedPatterns.filter(p => p !== 'letter'),
+                    ...(template.key === 'envelope' ? {
+                      openingEnvelopeSeal: opening.openingEnvelopeSeal || 'initials',
+                      openingEnvelopeLift: opening.openingEnvelopeLift !== false,
+                      openingEnvelopeTexture: opening.openingEnvelopeTexture !== false,
+                      openingEnvelopeSparkle: opening.openingEnvelopeSparkle !== false,
+                    } : {}),
+                  })}>
+                  <span className={`opening-template-icon template-icon-${template.key}`}>{template.icon}</span>
+                  <span><strong>{template.name}</strong><small>{template.desc}</small></span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="opt-inline-group">
             <label className="opt-inline-label">내용 연출</label>
             <div className="account-style-grid">
@@ -323,7 +358,6 @@ const OpeningSection: React.FC = () => {
                   { key: 'wave',  name: '웨이브' },
                   { key: 'frame', name: '이중 테두리' },
                   { key: 'grain', name: '그레인 노이즈' },
-                  { key: 'letter', name: '편지 봉투' },
                 ] as const).map(p => (
                   <button key={p.key} type="button"
                     className={`account-style-btn ${p.key === 'none' ? (selected.length === 0 ? 'active' : '') : selected.includes(p.key) ? 'active' : ''}`}
@@ -335,11 +369,11 @@ const OpeningSection: React.FC = () => {
             </div>
           </div>
 
-          {hasLetterPattern && (
+          {isEnvelopeTemplate && (
             <div className="opt-inline-group envelope-options-panel">
               <label className="opt-inline-label">편지 봉투 연출</label>
               <p className="section-desc" style={{ marginTop: -4, marginBottom: 10 }}>
-                편지 봉투 패턴에서만 적용되는 개봉 디테일입니다.
+                템플릿에 포함된 개봉 디테일을 취향에 맞게 조절할 수 있습니다.
               </p>
               <div className="envelope-option-row">
                 <span className="envelope-option-title">왁스 실링</span>
