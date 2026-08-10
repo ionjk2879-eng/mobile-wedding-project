@@ -109,19 +109,27 @@ const SectionComponent: React.FC<{ id: string; data: InvitationData; refEl?: Rea
   switch (id) {
     case 'greeting': return wrap(<Greeting data={data} />);
     case 'calendar': return wrap(<Calendar data={data} />);
-    case 'message': return wrap(<PersonalMessage data={data} />);
-    case 'interview': return wrap(<Interview data={data} />);
     case 'photos': return wrap(<Gallery data={data} />);
-    case 'timeline': return wrap(<Timeline data={data} />);
     case 'location': return wrap(<Location data={data} />);
     case 'midphoto': return wrap(<MidPhoto data={data} />);
-    case 'rsvp': return wrap(<RSVPForm data={data} guestName={guestName} guestCode={guestCode} />);
-    case 'accounts': return wrap(<Money data={data} />);
-    case 'contacts': return wrap(<Contacts data={data} />);
-    case 'guestbook': return wrap(<Guestbook data={data} />);
-    case 'livegallery': return wrap(<LiveGallery data={data} guestCode={guestCode} isOwnerPreview={isOwnerPreview} />);
-    case 'ending': return wrap(<Ending data={data} />);
     case 'share': return wrap(<Share data={data} shareEnabled={shareEnabled} />);
+    // 아래 케이스들은 비활성 시 null을 반환해 가로 모드에서 빈 슬라이드가 생기지 않도록 한다.
+    case 'message': if (data.isMessageEnabled === false) return null; return wrap(<PersonalMessage data={data} />);
+    case 'interview': if (data.isInterviewEnabled === false) return null; return wrap(<Interview data={data} />);
+    case 'timeline': if (data.isTimelineEnabled === false) return null; return wrap(<Timeline data={data} />);
+    case 'rsvp': if (!data.isRSVPEnabled) return null; return wrap(<RSVPForm data={data} guestName={guestName} guestCode={guestCode} />);
+    case 'guestbook': if (!data.isGuestbookEnabled) return null; return wrap(<Guestbook data={data} />);
+    case 'livegallery': if (!data.isLiveGalleryEnabled) return null; return wrap(<LiveGallery data={data} guestCode={guestCode} isOwnerPreview={isOwnerPreview} />);
+    case 'ending': if (data.isEndingEnabled === false) return null; return wrap(<Ending data={data} />);
+    case 'accounts': if (!data.accounts.some(a => a.bank || a.number || a.owner)) return null; return wrap(<Money data={data} />);
+    case 'contacts': {
+      const groomSelf = data.contacts.find(c => c.role === '신랑');
+      const brideSelf = data.contacts.find(c => c.role === '신부');
+      const hasGroom = !!(groomSelf && (data.groomName || groomSelf.phone)) || data.parents.groomParents.some(p => p.name || p.phone);
+      const hasBride = !!(brideSelf && (data.brideName || brideSelf.phone)) || data.parents.brideParents.some(p => p.name || p.phone);
+      if (!hasGroom && !hasBride) return null;
+      return wrap(<Contacts data={data} />);
+    }
     default: return null;
   }
 };
