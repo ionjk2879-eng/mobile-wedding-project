@@ -461,7 +461,7 @@ const SuperAdminPage: React.FC = () => {
 
     let junhoData: InvitationData | null = null;
     try {
-      junhoData = await loadInvitationPublic('junho-seoyeon');
+      junhoData = await loadInvitationPublic('junho-seoyeon1');
     } catch { /* ignore */ }
     if (!junhoData) {
       toast.error('junho-seoyeon 데이터를 불러올 수 없습니다.');
@@ -470,12 +470,12 @@ const SuperAdminPage: React.FC = () => {
     }
 
     const HERO_PHOTOS: Record<string, string> = {
-      'natural-serene':    junhoData.heroPhoto || '',
-      'clear-insta':       junhoData.photos?.[2] || junhoData.heroPhoto || '',
-      'elegant-pearl':     junhoData.heroPhoto2 || junhoData.heroPhoto || '',
-      'romantic-wisteria': junhoData.photos?.[0] || junhoData.heroPhoto || '',
-      'modern-slate':      junhoData.photos?.[1] || junhoData.heroPhoto || '',
-      'warm-copper':       junhoData.photos?.[3] || junhoData.heroPhoto || '',
+      'sage-garden':       junhoData.heroPhoto || '',
+      'blue-editorial':    junhoData.photos?.[2] || junhoData.heroPhoto || '',
+      'champagne-classic': junhoData.heroPhoto2 || junhoData.heroPhoto || '',
+      'blush-romance':     junhoData.photos?.[0] || junhoData.heroPhoto || '',
+      'charcoal-minimal':  junhoData.photos?.[1] || junhoData.heroPhoto || '',
+      'terracotta-film':   junhoData.photos?.[3] || junhoData.heroPhoto || '',
     };
 
     for (const preset of AI_PRESETS) {
@@ -492,6 +492,10 @@ const SuperAdminPage: React.FC = () => {
           date: junhoData.date,
           time: junhoData.time,
           weddingDateISO: junhoData.weddingDateISO,
+          greetingTitle: junhoData.greetingTitle,
+          greetingContent: junhoData.greetingContent,
+          groomMessage: junhoData.groomMessage,
+          brideMessage: junhoData.brideMessage,
           heroPhoto,
           heroPhotoX: 50,
           heroPhotoY: 50,
@@ -501,7 +505,12 @@ const SuperAdminPage: React.FC = () => {
           photos: junhoData.photos || [],
           groomPhoto: junhoData.groomPhoto || '',
           bridePhoto: junhoData.bridePhoto || '',
+          interview: (junhoData.interview?.length ? junhoData.interview : base.interview) ?? [],
           timeline: (junhoData.timeline?.length ? junhoData.timeline : base.timeline) ?? [],
+          midPhoto: junhoData.midPhoto || '',
+          midPhotoCaption: junhoData.midPhotoCaption || '',
+          endingPhoto: junhoData.endingPhoto || '',
+          endingMessage: junhoData.endingMessage || base.endingMessage,
           parents: {
             groomParents: (junhoData.parents?.groomParents || []).map(p => ({ ...p, phone: '' })),
             brideParents: (junhoData.parents?.brideParents || []).map(p => ({ ...p, phone: '' })),
@@ -514,6 +523,13 @@ const SuperAdminPage: React.FC = () => {
             parking: '건물 지하 1~3층 (3시간 무료)',
           },
           slug,
+        };
+        templateData.venueName = '메종 드 루미에르 그랜드홀';
+        templateData.venueAddress = '서울특별시 성동구 서울숲길 24';
+        templateData.transport = {
+          subway: '수인분당선 서울숲역 4번 출구 도보 5분',
+          bus: '간선 121번 서울숲 정류장 하차',
+          parking: '건물 지하 1~3층, 예식 하객 3시간 무료',
         };
         await apiFetch('/api/admin/template-samples/seed', {
           method: 'POST',

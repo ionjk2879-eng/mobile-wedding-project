@@ -55,6 +55,10 @@ const TemplatePreviewPage: React.FC = () => {
     date: s.date,
     time: s.time,
     weddingDateISO: s.weddingDateISO,
+    greetingTitle: s.greetingTitle,
+    greetingContent: s.greetingContent,
+    groomMessage: s.groomMessage,
+    brideMessage: s.brideMessage,
     heroPhoto: s.heroPhoto || '',
     heroPhotoX: s.heroPhotoX,
     heroPhotoY: s.heroPhotoY,
@@ -64,7 +68,12 @@ const TemplatePreviewPage: React.FC = () => {
     photos: s.photos || [],
     groomPhoto: s.groomPhoto || '',
     bridePhoto: s.bridePhoto || '',
+    interview: s.interview?.length ? s.interview : base.interview,
     timeline: s.timeline?.length ? s.timeline : base.timeline,
+    midPhoto: s.midPhoto || '',
+    midPhotoCaption: s.midPhotoCaption || '',
+    endingPhoto: s.endingPhoto || '',
+    endingMessage: s.endingMessage || base.endingMessage,
     parents: {
       groomParents: (s.parents?.groomParents || []).map(p => ({ ...p, phone: '' })),
       brideParents: (s.parents?.brideParents || []).map(p => ({ ...p, phone: '' })),
@@ -77,6 +86,15 @@ const TemplatePreviewPage: React.FC = () => {
       parking: '건물 지하 1~3층 (3시간 무료)',
     },
   } : base;
+
+  // Template previews must never expose the real wedding venue.
+  previewData.venueName = '메종 드 루미에르 그랜드홀';
+  previewData.venueAddress = '서울특별시 성동구 서울숲길 24';
+  previewData.transport = {
+    subway: '수인분당선 서울숲역 4번 출구 도보 5분',
+    bus: '간선 121번 서울숲 정류장 하차',
+    parking: '건물 지하 1~3층, 예식 하객 3시간 무료',
+  };
 
   const themeClass = previewData.theme ? `theme-${previewData.theme}` : '';
 
