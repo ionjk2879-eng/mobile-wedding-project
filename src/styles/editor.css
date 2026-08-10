@@ -411,13 +411,6 @@
 .opening-cover-option-mark.mark-ribbon { font-size: 29px; letter-spacing: 0; padding-right: 0; }
 .opening-cover-option-mark.mark-none { letter-spacing: 0; padding-right: 0; }
 .opening-option-desc { margin: 0 0 11px; font-size: .7rem; line-height: 1.55; color: #8b7f84; }
-.envelope-options-panel { padding: 14px; border-radius: 12px; background: #faf7f8; border: 1px solid #eadde2; box-sizing: border-box; }
-.envelope-option-row { margin-bottom: 14px; }
-.envelope-option-title { display: block; margin-bottom: 7px; color: #62565b; font-size: .75rem; font-weight: 700; }
-.envelope-feature-check { display: flex; align-items: flex-start; gap: 9px; padding: 10px 0; border-top: 1px solid #eee5e8; }
-.envelope-feature-check span { display: flex; flex-direction: column; gap: 3px; }
-.envelope-feature-check strong { font-size: .76rem; color: #4b4246; }
-.envelope-feature-check small { font-size: .66rem; line-height: 1.45; color: #8c7f84; }
 .opening-template-group { padding-bottom: 16px; }
 .opening-template-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; flex: 1; min-width: 0; }
 .opening-template-option { width: 100%; display: flex; align-items: center; gap: 12px; padding: 13px 14px; border: 1px solid #e6dde1; border-radius: 12px; background: #fff; color: #5d5357; text-align: left; cursor: pointer; transition: border-color .2s, background .2s, transform .2s; }

@@ -150,9 +150,6 @@ export interface OpeningConfig {
   openingCoverStyle?: 'none' | 'overlap' | 'arch' | 'orbit' | 'petals' | 'monogram' | 'ribbon';
   openingDecoEffect?: 'none' | 'dots' | 'ripple' | 'sparkle' | 'bokeh' | 'aurora' | 'firefly' | 'petal' | 'aurora-bokeh' | 'firefly-petal' | 'trace';
   openingBgPattern?: string | string[];
-  openingEnvelopeLift?: boolean;
-  openingEnvelopeTexture?: boolean;
-  openingEnvelopeSparkle?: boolean;
 }
 
 export interface FeatureConfig {

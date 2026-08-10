@@ -38,7 +38,6 @@ const OpeningSection: React.FC = () => {
   const effectiveTemplate: NonNullable<OpeningConfig['openingTemplate']> = selectedPatterns.includes('letter')
     ? 'envelope'
     : (opening.openingTemplate || 'custom');
-  const isEnvelopeTemplate = effectiveTemplate === 'envelope';
 
   const update = (partial: Partial<OpeningConfig>) => {
     const customOnlyKeys: (keyof OpeningConfig)[] = [
@@ -112,11 +111,6 @@ const OpeningSection: React.FC = () => {
                       openingCoverStyle: 'none' as const,
                       openingDecoEffect: 'none' as const,
                       openingBgPattern: [],
-                    } : {}),
-                    ...(template.key === 'envelope' ? {
-                      openingEnvelopeLift: opening.openingEnvelopeLift !== false,
-                      openingEnvelopeTexture: opening.openingEnvelopeTexture !== false,
-                      openingEnvelopeSparkle: opening.openingEnvelopeSparkle !== false,
                     } : {}),
                   })}>
                   <span className={`opening-template-icon template-icon-${template.key}`}>{template.icon}</span>
@@ -395,29 +389,6 @@ const OpeningSection: React.FC = () => {
               })()}
             </div>
           </div>
-
-          {isEnvelopeTemplate && (
-            <div className="opt-inline-group envelope-options-panel">
-              <label className="opt-inline-label">편지 봉투 연출</label>
-              <div className="opt-inline-content">
-                <p className="section-desc opening-option-desc">
-                  템플릿에 포함된 개봉 디테일을 취향에 맞게 조절할 수 있습니다.
-                </p>
-                {([
-                  { key: 'openingEnvelopeLift' as const, name: '편지 상승', desc: '개봉 후 편지 내용이 부드럽게 올라옵니다.' },
-                  { key: 'openingEnvelopeTexture' as const, name: '종이 질감', desc: '편지 영역에 은은한 종이결과 깊이감을 더합니다.' },
-                  { key: 'openingEnvelopeSparkle' as const, name: '개봉 빛 포인트', desc: '편지가 열릴 때 빛이 한 번 짧게 퍼집니다.' },
-                ]).map(item => (
-                  <label key={item.key} className="modern-checkbox envelope-feature-check">
-                    <input type="checkbox"
-                      checked={opening[item.key] !== false}
-                      onChange={(e) => update({ [item.key]: e.target.checked })} />
-                    <span><strong>{item.name}</strong><small>{item.desc}</small></span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="opt-inline-group">
             <label className="opt-inline-label">멘트 폰트 스타일</label>
