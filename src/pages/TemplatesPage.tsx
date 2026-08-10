@@ -108,16 +108,19 @@ const TemplatesPage: React.FC = () => {
   useEffect(() => {
     // One public sample supplies the content. Presets only choose a different
     // photo and design combination, so no duplicated template rows are needed.
-    loadInvitationPublic('junho-seoyeon1').then(d => {
-      if (!d) return;
+    loadInvitationPublic('junho-seoyeon1').then(async fallback => {
+      if (!fallback) return;
       const next: Record<string, string | null> = {};
-      AI_PRESETS.forEach(preset => {
+      await Promise.all(AI_PRESETS.map(async preset => {
+        const d = preset.sampleSlug
+          ? (await loadInvitationPublic(preset.sampleSlug).catch(() => null)) || fallback
+          : fallback;
         next[preset.id] = preset.previewPhotoIndex === -1
           ? (d.heroPhoto2 || d.heroPhoto || null)
           : preset.previewPhotoIndex !== undefined
             ? (d.photos?.[preset.previewPhotoIndex] || d.heroPhoto || null)
             : (d.heroPhoto || null);
-      });
+      }));
       setPhotos(next);
     }).catch(() => {});
   }, []);

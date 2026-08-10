@@ -25,7 +25,10 @@ const TemplatePreviewPage: React.FC = () => {
   useEffect(() => {
     if (!preset) return;
     setLoading(true);
-    loadInvitationPublic('junho-seoyeon1')
+    Promise.all([
+      preset.sampleSlug ? loadInvitationPublic(preset.sampleSlug).catch(() => null) : Promise.resolve(null),
+      loadInvitationPublic('junho-seoyeon1'),
+    ]).then(([templateSample, fallback]) => templateSample || fallback)
       .then(async d => {
         if (d) {
           setSampleData(d);

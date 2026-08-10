@@ -809,7 +809,7 @@ const SuperAdminPage: React.FC = () => {
       {/* Header */}
       <div style={{ background: 'white', borderBottom: '1px solid #F0F0F0', padding: '0 24px', display: 'flex', alignItems: 'stretch', gap: 0 }}>
         <h1 style={{ margin: '0 24px 0 0', fontSize: '1.05rem', fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center' }}>관리자</h1>
-        {(['orders', 'codes', 'posts', 'reviews', 'inquiries', 'board'] as AdminTab[]).map(t => (
+        {(['orders', 'codes', 'posts', 'templates', 'reviews', 'inquiries', 'board'] as AdminTab[]).map(t => (
           <button
             key={t}
             onClick={() => setAdminTab(t)}
